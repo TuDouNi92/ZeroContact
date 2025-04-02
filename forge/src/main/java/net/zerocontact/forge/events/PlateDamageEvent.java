@@ -1,7 +1,5 @@
 package net.zerocontact.forge.events;
 
-import dev.architectury.event.EventResult;
-import dev.architectury.event.events.common.EntityEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
@@ -22,7 +20,7 @@ public class DamagePlateEvent {
         iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
             ItemStack stack = stacksHandler.getStacks().getStackInSlot(0);
             int hits = stack.getOrCreateTag().getInt("hitCount") + 1;
-            int damagePlateMultiplier = Math.max(1,stack.getOrCreateTag().getInt("damage_plate_multiplier"));
+            int damagePlateMultiplier = Math.max(1, stack.getOrCreateTag().getInt("damage_plate_multiplier"));
 
             //soruceTypeFactor：伤害来源的类型决定耐久消耗速率高低
             float sourceTypeFactor = damageSource.is(DamageTypes.MOB_ATTACK) ? 0.1f : 1;
@@ -35,11 +33,7 @@ public class DamagePlateEvent {
     }
 
     public static void DamagePlateRegister(LivingEntity entity, DamageSource damageSource, float amount) {
-        if (entity instanceof Player && (
-                damageSource.is(DamageTypes.ARROW)
-                        || damageSource.is(DamageTypes.MOB_ATTACK)
-                        || damageSource.is(DamageTypes.MOB_PROJECTILE))
-        ) {
+        if (entity instanceof Player && EventUtil.isDamageSourceValid(damageSource)) {
             CuriosApi.getCuriosInventory(entity).ifPresent(inv -> {
                 DamagePlateModifier(inv, entity, damageSource, amount, "front_plate");
                 DamagePlateModifier(inv, entity, damageSource, amount, "back_plate");

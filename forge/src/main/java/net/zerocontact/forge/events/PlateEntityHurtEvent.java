@@ -13,8 +13,6 @@ import net.zerocontact.ModSoundEvents;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 public class HurtPlateEntityEvent {
 
     private static void DefenseModifier(
@@ -26,10 +24,7 @@ public class HurtPlateEntityEvent {
     ) {
         iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
             ItemStack stack = stacksHandler.getStacks().getStackInSlot(0);
-            if (entity instanceof Player && (
-                    damageSource.is(DamageTypes.ARROW)
-                            || damageSource.is(DamageTypes.MOB_ATTACK)
-                            || damageSource.is(DamageTypes.MOB_PROJECTILE))) {
+            if (entity instanceof Player && EventUtil.isDamageSourceValid(damageSource)) {
 
                 if (damageSource.getDirectEntity() instanceof Player) {
 
@@ -58,6 +53,7 @@ public class HurtPlateEntityEvent {
                             || source.is(DamageTypes.MOB_PROJECTILE))
             ) {
                 ModLogger.LOG.info(source);
+                EventUtil.isIncidentAngleValid(lv, source, amount);
                 if (amount <= 3) {
                     lv.hurt(modifiedDamageSource, amount / 2);
                     return true;
