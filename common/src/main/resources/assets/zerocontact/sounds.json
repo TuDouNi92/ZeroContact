@@ -1,0 +1,18 @@
+{
+  "armor/plate_equip": {
+    "sounds": [
+      {
+        "name":"zerocontact:armor/plate_equip",
+        "type": "file"
+      }
+    ]
+  },
+  "armor/plate_hit": {
+    "sounds": [
+      {
+        "name": "zerocontact:armor/plate_hit",
+        "type": "file"
+      }
+    ]
+  }
+}
