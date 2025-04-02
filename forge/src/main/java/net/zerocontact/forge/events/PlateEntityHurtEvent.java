@@ -13,7 +13,9 @@ import net.zerocontact.ModSoundEvents;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
-public class HurtPlateEntityEvent {
+import java.util.concurrent.atomic.AtomicBoolean;
+
+public class PlateEntityHurtEvent {
 
     private static void DefenseModifier(
             LivingEntity entity,
@@ -39,28 +41,35 @@ public class HurtPlateEntityEvent {
     public static boolean changeHurtAmount(LivingEntity lv, DamageSource source, float amount, String identifier) {
         Holder<DamageType> customDamageType = lv.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.MAGIC);
         DamageSource modifiedDamageSource = new DamageSource(customDamageType);
+        AtomicBoolean result = new AtomicBoolean();
+        result.set(false);
         CuriosApi.getCuriosInventory(lv).ifPresent(iCuriosItemHandler -> {
             iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
                 if (!(stacksHandler.getStacks().getStackInSlot(0).isEmpty())) {
                     lv.playSound(ModSoundEvents.ARMOR_HIT_PLATE);
+                    if (!(source.type() == modifiedDamageSource.type())) {
+                        if (lv instanceof Player && EventUtil.isDamageSourceValid(source)
+                        ) {
+                            ModLogger.LOG.info(source);
+                            if(EventUtil.isIncidentAngleValid(lv, source, amount)){
+                                lv.hurt(modifiedDamageSource, amount / 3);
+                                result.set(true);
+                            }
+                            else{
+                                result.set(false);
+                            }
+                            if (amount <= 3) {
+                                lv.hurt(modifiedDamageSource, amount / 2);
+                                result.set(true);
+                            } else {
+                                result.set(false);
+                            }
+
+                        }
+                    }
                 }
             });
         });
-        if (!(source.type() == modifiedDamageSource.type())) {
-            if (lv instanceof Player && (
-                    source.is(DamageTypes.ARROW)
-                            || source.is(DamageTypes.MOB_ATTACK)
-                            || source.is(DamageTypes.MOB_PROJECTILE))
-            ) {
-                ModLogger.LOG.info(source);
-                EventUtil.isIncidentAngleValid(lv, source, amount);
-                if (amount <= 3) {
-                    lv.hurt(modifiedDamageSource, amount / 2);
-                    return true;
-                }
-                return false;
-            }
-        }
-        return false;
+        return result.get();
     }
 }

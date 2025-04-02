@@ -11,8 +11,8 @@ import static net.zerocontact.ZeroContact.MOD_ID;
 
 public class ModSoundEvents {
     private static final DeferredRegister<SoundEvent> MOD_SOUND_REG = DeferredRegister.create(MOD_ID, Registries.SOUND_EVENT);
-    public static final SoundEvent ARMOR_EQUIP_PLATE = SoundEvent.createFixedRangeEvent(new ResourceLocation(MOD_ID,"armor/plate_equip"),1f);
-    public static final SoundEvent ARMOR_HIT_PLATE = SoundEvent.createFixedRangeEvent(new ResourceLocation(MOD_ID,"armor/plate_hit"),1f);
+    public static final SoundEvent ARMOR_EQUIP_PLATE = SoundEvent.createFixedRangeEvent(new ResourceLocation(MOD_ID,"armor/plate_equip"),8f);
+    public static final SoundEvent ARMOR_HIT_PLATE = SoundEvent.createFixedRangeEvent(new ResourceLocation(MOD_ID,"armor/plate_hit"),22f);
     public static void register(){
         MOD_SOUND_REG.register();
     }

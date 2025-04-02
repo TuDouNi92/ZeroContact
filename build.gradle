@@ -20,9 +20,8 @@ subprojects {
         mappings loom.officialMojangMappings()
         // The following line declares the yarn mappings you may select this one as well.
         // mappings "net.fabricmc:yarn:1.20.1+build.10:v2"
-        compileOnly("top.theillusivec4.curios:curios-forge:5.9.1+1.20.1:api")
+        implementation("io.github.llamalad7:mixinextras-forge:0.2.0")
         // Use the full Curios API jar at runtime
-
     }
 }
 
@@ -47,6 +46,14 @@ allprojects {
         maven {
             name = "Illusive Soulworks maven"
             url = "https://maven.theillusivec4.top/"
+        }
+        maven {
+            // Add curse maven to repositories
+            name = "Curse Maven"
+            url = "https://www.cursemaven.com"
+            content {
+                includeGroup "curse.maven"
+            }
         }
     }
 
