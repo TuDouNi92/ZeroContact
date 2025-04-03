@@ -1,6 +1,7 @@
 package net.zerocontact;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
@@ -14,11 +15,13 @@ public class SapiIV extends ArmorItem {
     protected final ArmorMaterial material;
     protected final int defense;
     protected static final int DAMAGE_PLATE_MULTIPLIER = 1;
+    public static final int MAX_HURT_DAMAGE_CAN_HOLD = 12;
     public SapiIV(ArmorMaterial armorMaterial, Type type, Properties properties) {
         super(armorMaterial, type, properties.defaultDurability(armorMaterial.getDurabilityForType(type)));
         this.material = armorMaterial;
         this.type = type;
         this.defense = armorMaterial.getDefenseForType(type);
+
     }
 
 

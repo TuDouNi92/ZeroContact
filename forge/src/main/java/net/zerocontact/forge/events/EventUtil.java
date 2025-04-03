@@ -13,7 +13,9 @@ public class EventUtil {
                 || damageSource.is(DamageTypes.PLAYER_ATTACK)
                 || damageSource.is(DamageTypes.MOB_ATTACK)
                 || damageSource.is(DamageTypes.MOB_PROJECTILE)
-                || damageSource.is(ModDamageTypes.BULLET);
+                || damageSource.is(ModDamageTypes.BULLET)
+                || damageSource.is(DamageTypes.EXPLOSION)
+                || damageSource.is(DamageTypes.PLAYER_EXPLOSION);
     }
 
     //判断入射角是否合法，服务于判断跳弹功能

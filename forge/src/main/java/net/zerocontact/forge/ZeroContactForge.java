@@ -17,8 +17,8 @@ public class ZeroContactForge {
         ZeroContact.init();
         EntityEvent.LIVING_HURT.register((lv, source, amount) -> {
                     PlateDamageEvent.DamagePlateRegister(lv, source, amount);
-                    if ((PlateEntityHurtEvent.changeHurtAmount(lv, source, amount,"front_plate"))
-                    || PlateEntityHurtEvent.changeHurtAmount(lv, source, amount,"back_plate")) {
+                    if ((PlateEntityHurtEvent.changeHurtAmountRicochet(lv, source, amount,"front_plate"))
+                    || PlateEntityHurtEvent.changeHurtAmountRicochet(lv, source, amount,"back_plate")) {
                         return EventResult.interruptFalse();
                     }
                     return EventResult.pass();
