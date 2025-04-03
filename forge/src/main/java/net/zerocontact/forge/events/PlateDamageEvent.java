@@ -20,8 +20,15 @@ public class PlateDamageEvent {
     ) {
         iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
             ItemStack stack = stacksHandler.getStacks().getStackInSlot(0);
+            //记录受击数
             int hits = stack.getOrCreateTag().getInt("hitCount") + 1;
+
+            //记录插板耐久损耗乘数
             int damagePlateMultiplier = Math.max(1, stack.getOrCreateTag().getInt("damage_plate_multiplier"));
+
+            //记录插板最大承受伤害，随着受击次数非线性递减
+            int maxDamageCanHold = 12;
+            int maxDamageCanHoldCapacity = Math.max(0, maxDamageCanHold-(int) Math.floor(Math.pow(hits,3)/4));
 
             //sourceTypeFactor：伤害来源的类型决定耐久消耗速率高低
             float sourceTypeFactor = damageSource.is(DamageTypes.MOB_ATTACK) ? 0.1f : 1;

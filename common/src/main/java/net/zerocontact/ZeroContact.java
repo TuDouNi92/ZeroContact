@@ -11,7 +11,6 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import org.apache.logging.log4j.Logger;
 
 import java.util.function.Supplier;
 
@@ -30,9 +29,8 @@ public class ZeroContact {
 
     //注册新物品，先用defer创建好再注册
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(MOD_ID, Registries.ITEM);
-
     public static final RegistrySupplier<Item> EXAMPLE_ITEM = ITEMS.register("steel_plate", () ->
-            new SapiIV(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE,new Item.Properties().arch$tab(EXAMPLE_TAB)));
+             SapiIV.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE,new Item.Properties().arch$tab(EXAMPLE_TAB)));
 
     public static void init() {
         TABS.register();

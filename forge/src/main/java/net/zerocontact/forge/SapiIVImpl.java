@@ -1,4 +1,4 @@
-package net.zerocontact.forge.items;
+package net.zerocontact.forge;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -22,27 +22,6 @@ public class SapiIVImpl extends SapiIV implements ICurioItem {
     public SapiIVImpl(ArmorMaterial armorMaterial, Type type, Properties properties) {
         super(armorMaterial, type, properties.defaultDurability(armorMaterial.getDurabilityForType(type)));
     }
-
-//
-//    @Override
-//    public Type getType() {
-//        return this.type;
-//    }
-//
-//    @Override
-//    public ArmorMaterial getMaterial() {
-//        return this.material;
-//    }
-//
-//    @Override
-//    public int getDefense() {
-//        return this.defense;
-//    }
-//
-//    @Override
-//    public EquipmentSlot getEquipmentSlot() {
-//        return super.getEquipmentSlot();
-//    }
 
     @Override
     public ICurio.SoundInfo getEquipSound(SlotContext slotContext, ItemStack stack) {
@@ -69,5 +48,9 @@ public class SapiIVImpl extends SapiIV implements ICurioItem {
     @Override
     public boolean canEquipFromUse(SlotContext slotContext, ItemStack stack) {
         return true;
+    }
+
+    public static SapiIV create(ArmorMaterial armorMaterial, Type type, Properties properties) {
+        return new SapiIVImpl(armorMaterial, type, properties);
     }
 }

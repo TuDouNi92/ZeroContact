@@ -1,4 +1,4 @@
-package net.zerocontact.forge.items;
+package net.zerocontact.forge;
 
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;

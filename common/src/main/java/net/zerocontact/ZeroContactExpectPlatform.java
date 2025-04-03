@@ -24,4 +24,5 @@ public class ZeroContactExpectPlatform {
         // Just throw an error, the content should get replaced at runtime.
         throw new AssertionError();
     }
+
 }
