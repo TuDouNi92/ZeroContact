@@ -32,27 +32,26 @@ public class PlateEntityHurtEvent {
                         ModLogger.LOG.info(source);
 
                         if (EventUtil.isIncidentAngleValid(lv, source, amount)) {
-                            float hurtAmount = amount*0.1f;
+                            float hurtAmount = amount*0.05f;
                             lv.hurt(modifiedDamageSource, hurtAmount);
-                            ModLogger.LOG.info(hurtAmount);
+                            ModLogger.LOG.info("跳弹伤害{}", hurtAmount);
                             result.set(true);
                         } else {
                             result.set(false);
                         }
 
+                        float hurtAmount;
                         if (SapiIV.MAX_HURT_DAMAGE_CAN_HOLD > amount) {
                             //钝伤
-                            float hurtAmount = amount*0.2f;
-                            lv.hurt(modifiedDamageSource,hurtAmount);
-                            ModLogger.LOG.info(hurtAmount);
-                            result.set(true);
+                            hurtAmount = amount * 0.1f;
+                            ModLogger.LOG.info("blunt hurt:{}", hurtAmount);
                         } else {
                             //贯穿
-                            float hurtAmount = amount*0.6f;
-                            lv.hurt(modifiedDamageSource,hurtAmount);
-                            ModLogger.LOG.info(hurtAmount);
-                            result.set(true);
+                            hurtAmount = amount * 0.7f;
+                            ModLogger.LOG.info("penetrate hurt:{}", hurtAmount);
                         }
+                        lv.hurt(modifiedDamageSource,hurtAmount);
+                        result.set(true);
                     }
 
                 }

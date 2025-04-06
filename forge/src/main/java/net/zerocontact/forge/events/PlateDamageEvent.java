@@ -21,24 +21,19 @@ public class PlateDamageEvent {
     ) {
         iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
             ItemStack stack = stacksHandler.getStacks().getStackInSlot(0);
-            int durabilityLossAmount;
-            //记录受击数
-            int hits = stack.getOrCreateTag().getInt("hitCount") + 1;
+            float durabilityLossFactor = 1;
+            int durabilityLossAmount = 1;
             if (!stack.isEmpty() && damageSource.is(ModDamageTypes.BULLET)) {
-                stack.getOrCreateTag().putInt("hitCount", hits);
-                if (amount < SapiIV.MAX_HURT_DAMAGE_CAN_HOLD) {
-                    //钝伤
-                    durabilityLossAmount = (int) Math.floor(Math.pow(hits*0.2f, 3));
-                    ModLogger.LOG.info("blunt damage:" + durabilityLossAmount);
-                } else {
-                    //贯穿
-                    durabilityLossAmount = (int) Math.floor(Math.pow(hits*0.6f, 3));
-                    ModLogger.LOG.info("penetrate damage:" + durabilityLossAmount);
+                if(amount<4){
+                    durabilityLossFactor=0.1f;
                 }
-
-            }
-            else{
-                durabilityLossAmount = 1;
+                else if(amount<9){
+                    durabilityLossFactor=0.7f;
+                }
+                else if(amount<13){
+                    durabilityLossFactor=0.95f;
+                }
+                durabilityLossAmount =(int) Math.floor(durabilityLossFactor*amount);
             }
             stack.hurtAndBreak(durabilityLossAmount, entity, livingEntity -> {
                 ModLogger.LOG.info(livingEntity.getName() + "的插板碎掉了！");

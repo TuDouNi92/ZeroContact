@@ -15,7 +15,7 @@ public class SapiIV extends ArmorItem {
     protected final ArmorMaterial material;
     protected final int defense;
     protected static final int DAMAGE_PLATE_MULTIPLIER = 1;
-    public static final int MAX_HURT_DAMAGE_CAN_HOLD = 12;
+    public static final int MAX_HURT_DAMAGE_CAN_HOLD = 7;
     public SapiIV(ArmorMaterial armorMaterial, Type type, Properties properties) {
         super(armorMaterial, type, properties.defaultDurability(armorMaterial.getDurabilityForType(type)));
         this.material = armorMaterial;

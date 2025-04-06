@@ -35,7 +35,8 @@ public class EventUtil {
         ModLogger.LOG.info(incidentAngle);
         if((Math.abs(Math.abs(incidentAngle)-90)<30)&&(Math.abs(Math.abs(incidentAngle)-90)>=10)){
             ModLogger.LOG.info("跳弹！");
+            return true;
         }
-        return true;
+        return false;
     }
 }

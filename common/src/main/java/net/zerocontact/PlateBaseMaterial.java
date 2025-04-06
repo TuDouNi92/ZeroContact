@@ -9,7 +9,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 
 public enum PlateBaseMaterial implements ArmorMaterial {
 
-    ARMOR_STEEL("armor_steel",1,new int[]{0,20,0,0},25, SoundEvents.ARMOR_EQUIP_IRON,1f,0f);
+    ARMOR_STEEL("armor_steel",1,new int[]{0,10,0,0},25, SoundEvents.ARMOR_EQUIP_IRON,0,0f);
     private final String name;
     private final int durabilityMultiplier;
     private final int[] protectionAmounts;
