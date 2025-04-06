@@ -16,16 +16,16 @@ public enum PlateBaseMaterial implements ArmorMaterial {
     private final int enchantmentValue;
     private final SoundEvent sound;
     private final float toughness;
-    private final float knockbackResistance;
+    private final float knockBackResistance;
     private static final int[] BASE_DURABILITY = {0,128,0,0};
-    PlateBaseMaterial(String name, int durabilityMultiplier, int[] protectionAmounts, int enchantmentValue, SoundEvent sound, float toughness, float knockbackResistance) {
+    PlateBaseMaterial(String name, int durabilityMultiplier, int[] protectionAmounts, int enchantmentValue, SoundEvent sound, float toughness, float knockBackResistance) {
         this.name = name;
         this.durabilityMultiplier = durabilityMultiplier;
         this.protectionAmounts = protectionAmounts;
         this.enchantmentValue = enchantmentValue;
         this.sound = sound;
         this.toughness = toughness;
-        this.knockbackResistance = knockbackResistance;
+        this.knockBackResistance = knockBackResistance;
     }
 
 
@@ -66,7 +66,7 @@ public enum PlateBaseMaterial implements ArmorMaterial {
 
     @Override
     public float getKnockbackResistance() {
-        return this.knockbackResistance;
+        return this.knockBackResistance;
     }
 
 }

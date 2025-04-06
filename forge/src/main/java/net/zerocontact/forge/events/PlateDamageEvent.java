@@ -22,6 +22,7 @@ public class PlateDamageEvent {
         iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
             ItemStack stack = stacksHandler.getStacks().getStackInSlot(0);
             float durabilityLossFactor = 1;
+            int hits = stack.getOrCreateTag().getInt("hits")+1;
             int durabilityLossAmount = 1;
             if (!stack.isEmpty() && damageSource.is(ModDamageTypes.BULLET)) {
                 if(amount<4){
@@ -33,8 +34,9 @@ public class PlateDamageEvent {
                 else if(amount<13){
                     durabilityLossFactor=0.95f;
                 }
-                durabilityLossAmount =(int) Math.floor(durabilityLossFactor*amount);
+                durabilityLossAmount = (int)Math.round(0.4*Math.pow(amount*durabilityLossFactor,1.5)*(1+hits*0.1f));
             }
+            stack.getOrCreateTag().putInt("hits",hits);
             stack.hurtAndBreak(durabilityLossAmount, entity, livingEntity -> {
                 ModLogger.LOG.info(livingEntity.getName() + "的插板碎掉了！");
             });
