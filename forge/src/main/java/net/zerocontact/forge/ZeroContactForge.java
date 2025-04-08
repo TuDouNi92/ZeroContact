@@ -6,6 +6,7 @@ import dev.architectury.platform.forge.EventBuses;
 import net.zerocontact.ZeroContact;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.zerocontact.forge.events.EventUtil;
 import net.zerocontact.forge.events.PlateDamageEvent;
 import net.zerocontact.forge.events.PlateEntityHurtEvent;
 
@@ -17,8 +18,7 @@ public class ZeroContactForge {
         ZeroContact.init();
         EntityEvent.LIVING_HURT.register((lv, source, amount) -> {
                     PlateDamageEvent.DamagePlateRegister(lv, source, amount);
-                    if ((PlateEntityHurtEvent.changeHurtAmountRicochet(lv, source, amount,"front_plate"))
-                    || PlateEntityHurtEvent.changeHurtAmountRicochet(lv, source, amount,"back_plate")) {
+                    if (PlateEntityHurtEvent.changeHurtAmountRicochet(lv, source, amount, EventUtil.idHitFromBack(lv, source))) {
                         return EventResult.interruptFalse();
                     }
                     return EventResult.pass();

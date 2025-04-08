@@ -7,6 +7,7 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.zerocontact.ModLogger;
 import net.zerocontact.ModSoundEvents;
 import net.zerocontact.SapiIV;
@@ -24,7 +25,8 @@ public class PlateEntityHurtEvent {
         result.set(false);
         CuriosApi.getCuriosInventory(lv).ifPresent(iCuriosItemHandler -> {
             iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
-                if (!(stacksHandler.getStacks().getStackInSlot(0).isEmpty() && source.type() != modifiedDamageSource.type())) {
+                ItemStack stack = stacksHandler.getStacks().getStackInSlot(0);
+                if (!(stack.isEmpty() && source.type() != modifiedDamageSource.type())) {
                     lv.playSound(ModSoundEvents.ARMOR_HIT_PLATE);
 
                     if (lv instanceof Player && EventUtil.isDamageSourceValid(source)
@@ -32,7 +34,7 @@ public class PlateEntityHurtEvent {
                         ModLogger.LOG.info(source);
 
                         if (EventUtil.isIncidentAngleValid(lv, source, amount)) {
-                            float hurtAmount = amount*0.05f;
+                            float hurtAmount = amount * 0.05f;
                             lv.hurt(modifiedDamageSource, hurtAmount);
                             ModLogger.LOG.info("跳弹伤害{}", hurtAmount);
                             result.set(true);
@@ -50,10 +52,10 @@ public class PlateEntityHurtEvent {
                             hurtAmount = amount * 0.7f;
                             ModLogger.LOG.info("penetrate hurt:{}", hurtAmount);
                         }
-                        lv.hurt(modifiedDamageSource,hurtAmount);
+                        lv.hurt(modifiedDamageSource, hurtAmount);
                         result.set(true);
                     }
-
+                    result.set(false);
                 }
             });
         });

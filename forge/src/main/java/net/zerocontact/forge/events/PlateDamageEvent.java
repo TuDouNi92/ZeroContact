@@ -15,7 +15,7 @@ public class PlateDamageEvent {
 
     private static void DamagePlateModifier(
             ICuriosItemHandler iCuriosItemHandler,
-            LivingEntity entity,
+            LivingEntity livingEntity,
             DamageSource damageSource,
             float amount,
             String identifier
@@ -38,8 +38,9 @@ public class PlateDamageEvent {
                 durabilityLossAmount = (int)Math.round(0.4*Math.pow(amount*durabilityLossFactor,1.5)*(1+hits*0.1f));
             }
             stack.getOrCreateTag().putInt("hits",hits);
-            stack.hurtAndBreak(durabilityLossAmount, entity, lv -> {
+            stack.hurtAndBreak(durabilityLossAmount, livingEntity, lv -> {
                 lv.level().playSound(null,lv.getX(),lv.getY(),lv.getZ(),ModSoundEvents.ARMOR_BROKEN_PLATE, SoundSource.PLAYERS,1.0f,1.0f);
+
                 ModLogger.LOG.info(lv.getName() + "的插板碎掉了！");
             });
         });
@@ -48,8 +49,7 @@ public class PlateDamageEvent {
     public static void DamagePlateRegister(LivingEntity entity, DamageSource damageSource, float amount) {
         if (entity instanceof Player && EventUtil.isDamageSourceValid(damageSource)) {
             CuriosApi.getCuriosInventory(entity).ifPresent(inv -> {
-                DamagePlateModifier(inv, entity, damageSource, amount, "front_plate");
-                DamagePlateModifier(inv, entity, damageSource, amount, "back_plate");
+                    DamagePlateModifier(inv, entity, damageSource, amount, EventUtil.idHitFromBack(entity,damageSource));
             });
         }
     }
