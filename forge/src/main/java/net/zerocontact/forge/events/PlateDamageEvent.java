@@ -1,12 +1,13 @@
 package net.zerocontact.forge.events;
 
 import com.tacz.guns.init.ModDamageTypes;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.ModLogger;
-import net.zerocontact.SapiIV;
+import net.zerocontact.ModSoundEvents;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
@@ -37,8 +38,9 @@ public class PlateDamageEvent {
                 durabilityLossAmount = (int)Math.round(0.4*Math.pow(amount*durabilityLossFactor,1.5)*(1+hits*0.1f));
             }
             stack.getOrCreateTag().putInt("hits",hits);
-            stack.hurtAndBreak(durabilityLossAmount, entity, livingEntity -> {
-                ModLogger.LOG.info(livingEntity.getName() + "的插板碎掉了！");
+            stack.hurtAndBreak(durabilityLossAmount, entity, lv -> {
+                lv.level().playSound(null,lv.getX(),lv.getY(),lv.getZ(),ModSoundEvents.ARMOR_BROKEN_PLATE, SoundSource.PLAYERS,1.0f,1.0f);
+                ModLogger.LOG.info(lv.getName() + "的插板碎掉了！");
             });
         });
     }

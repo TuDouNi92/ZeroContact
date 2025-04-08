@@ -14,5 +14,13 @@
         "type": "file"
       }
     ]
+  },
+  "armor/plate_broke": {
+    "sounds": [
+      {
+        "name": "zerocontact:armor/plate_broke",
+        "type": "file"
+      }
+    ]
   }
 }
