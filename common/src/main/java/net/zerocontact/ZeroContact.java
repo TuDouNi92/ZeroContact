@@ -32,11 +32,11 @@ public class ZeroContact {
     public static final RegistrySupplier<Item> EXAMPLE_ITEM = ITEMS.register("steel_plate", () ->
              SapiIV.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE,new Item.Properties().arch$tab(EXAMPLE_TAB)));
 
+
     public static void init() {
         TABS.register();
         ITEMS.register();
         ModSoundEvents.register();
-        ModLogger.LOG.info("called init()");
         System.out.println(ZeroContactExpectPlatform.getConfigDirectory().toAbsolutePath().normalize().toString());
     }
 }

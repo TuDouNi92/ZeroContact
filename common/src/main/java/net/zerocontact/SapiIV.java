@@ -1,7 +1,6 @@
 package net.zerocontact;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
@@ -10,7 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.SlotContext;
 
 //ArmorItem的实现需要盔甲材料类的各种属性与基础的防御值，也是从材料里拿
-public class SapiIV extends ArmorItem {
+public class SapiIV extends ArmorItem  {
     protected final Type type;
     protected final ArmorMaterial material;
     protected final int defense;
@@ -23,7 +22,6 @@ public class SapiIV extends ArmorItem {
         this.defense = armorMaterial.getDefenseForType(type);
 
     }
-
 
     @Override
     public Type getType() {
@@ -45,6 +43,7 @@ public class SapiIV extends ArmorItem {
     public EquipmentSlot getEquipmentSlot() {
         return super.getEquipmentSlot();
     }
+
 
     @ExpectPlatform
     public static SapiIV create(ArmorMaterial armorMaterial, ArmorItem.Type type, Item.Properties properties) {

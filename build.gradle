@@ -21,7 +21,6 @@ subprojects {
         // The following line declares the yarn mappings you may select this one as well.
         // mappings "net.fabricmc:yarn:1.20.1+build.10:v2"
         implementation("io.github.llamalad7:mixinextras-forge:0.2.0")
-        // Use the full Curios API jar at runtime
     }
 }
 
@@ -53,6 +52,14 @@ allprojects {
             url = "https://www.cursemaven.com"
             content {
                 includeGroup "curse.maven"
+            }
+        }
+        maven {
+            name = 'GeckoLib'
+            url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+            content {
+                includeGroupByRegex("software\\.bernie.*")
+                includeGroup("com.eliotlash.mclib")
             }
         }
     }
