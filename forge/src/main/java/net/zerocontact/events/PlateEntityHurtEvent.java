@@ -1,4 +1,4 @@
-package net.zerocontact.forge.events;
+package net.zerocontact.events;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -9,8 +9,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.ModLogger;
-import net.zerocontact.ModSoundEvents;
-import net.zerocontact.SapiIV;
+import net.zerocontact.item.SapiIV;
+import net.zerocontact.registries.ModSoundEventsReg;
 import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -27,7 +27,7 @@ public class PlateEntityHurtEvent {
             iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
                 ItemStack stack = stacksHandler.getStacks().getStackInSlot(0);
                 if (!(stack.isEmpty() && source.type() != modifiedDamageSource.type())) {
-                    lv.playSound(ModSoundEvents.ARMOR_HIT_PLATE);
+                    lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
 
                     if (lv instanceof Player && EventUtil.isDamageSourceValid(source)
                     ) {

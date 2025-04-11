@@ -1,24 +1,24 @@
-package net.zerocontact.forge.models;
+package net.zerocontact.models;
 
 import net.minecraft.resources.ResourceLocation;
 import net.zerocontact.ZeroContact;
-import net.zerocontact.forge.SapiIVImpl;
+import net.zerocontact.item.armor.forge.JpcArmorImpl;
 import software.bernie.geckolib.model.GeoModel;
 
-public class JpcModel extends GeoModel<SapiIVImpl> {
+public class JpcModel extends GeoModel<JpcArmorImpl> {
 
     @Override
-    public ResourceLocation getModelResource(SapiIVImpl sapiIV) {
+    public ResourceLocation getModelResource(JpcArmorImpl sapiIV) {
         return new ResourceLocation(ZeroContact.MOD_ID,"geo/jpc_armor.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(SapiIVImpl sapiIV) {
+    public ResourceLocation getTextureResource(JpcArmorImpl sapiIV) {
         return new ResourceLocation(ZeroContact.MOD_ID,"textures/models/armor/jpc.png");
     }
 
     @Override
-    public ResourceLocation getAnimationResource(SapiIVImpl sapiIV) {
+    public ResourceLocation getAnimationResource(JpcArmorImpl sapiIV) {
         return null;
     }
 }

@@ -1,11 +1,10 @@
-package net.zerocontact.forge.events;
+package net.zerocontact.events;
 
 import com.tacz.guns.init.ModDamageTypes;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.zerocontact.ModLogger;
-import top.theillusivec4.curios.api.CuriosApi;
 
 public class EventUtil {
 

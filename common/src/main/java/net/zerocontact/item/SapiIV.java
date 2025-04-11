@@ -1,4 +1,4 @@
-package net.zerocontact;
+package net.zerocontact.item;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -6,6 +6,7 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import top.theillusivec4.curios.api.SlotContext;
 
 //ArmorItem的实现需要盔甲材料类的各种属性与基础的防御值，也是从材料里拿
@@ -24,12 +25,12 @@ public class SapiIV extends ArmorItem  {
     }
 
     @Override
-    public Type getType() {
+    public @NotNull Type getType() {
         return this.type;
     }
 
     @Override
-    public ArmorMaterial getMaterial() {
+    public @NotNull ArmorMaterial getMaterial() {
         return this.material;
     }
 
@@ -38,19 +39,8 @@ public class SapiIV extends ArmorItem  {
         return this.defense;
     }
 
-
-    @Override
-    public EquipmentSlot getEquipmentSlot() {
-        return super.getEquipmentSlot();
-    }
-
-
     @ExpectPlatform
     public static SapiIV create(ArmorMaterial armorMaterial, ArmorItem.Type type, Item.Properties properties) {
         throw new AssertionError();
-    }
-
-    public boolean canEquip(SlotContext slotContext, ItemStack stack) {
-        return true;
     }
 }

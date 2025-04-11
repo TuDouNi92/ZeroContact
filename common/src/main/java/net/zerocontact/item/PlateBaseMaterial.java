@@ -1,4 +1,4 @@
-package net.zerocontact;
+package net.zerocontact.item;
 
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;

@@ -6,9 +6,9 @@ import dev.architectury.platform.forge.EventBuses;
 import net.zerocontact.ZeroContact;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.zerocontact.forge.events.EventUtil;
-import net.zerocontact.forge.events.PlateDamageEvent;
-import net.zerocontact.forge.events.PlateEntityHurtEvent;
+import net.zerocontact.events.EventUtil;
+import net.zerocontact.events.PlateDamageEvent;
+import net.zerocontact.events.PlateEntityHurtEvent;
 import software.bernie.geckolib.GeckoLib;
 
 @Mod(ZeroContact.MOD_ID)
