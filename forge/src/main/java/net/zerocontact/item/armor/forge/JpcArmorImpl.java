@@ -6,6 +6,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.zerocontact.item.armor.JpcArmor;
 import net.zerocontact.renderer.JpcRender;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +37,6 @@ public class JpcArmorImpl extends JpcArmor implements GeoItem {
     public static JpcArmor create(ArmorMaterial material, Type type, Properties properties){
         return new JpcArmorImpl(type,material,properties);
     }
-
     @Override
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new IClientItemExtensions() {

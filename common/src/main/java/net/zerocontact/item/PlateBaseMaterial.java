@@ -9,7 +9,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 
 public enum PlateBaseMaterial implements ArmorMaterial {
 
-    ARMOR_STEEL("armor_steel",1,new int[]{0,10,0,0},25, SoundEvents.ARMOR_EQUIP_IRON,0,0f);
+    ARMOR_STEEL("armor_steel",128,new int[]{0,10,0,0},25, SoundEvents.ARMOR_EQUIP_IRON,0,0f),
+    SLIME_STEEL("slime_steel",64,new int[]{0,0,0,0},0,SoundEvents.ARMOR_EQUIP_IRON,0,0);
     private final String name;
     private final int durabilityMultiplier;
     private final int[] protectionAmounts;
@@ -17,7 +18,7 @@ public enum PlateBaseMaterial implements ArmorMaterial {
     private final SoundEvent sound;
     private final float toughness;
     private final float knockBackResistance;
-    private static final int[] BASE_DURABILITY = {0,128,0,0};
+    private static final int[] BASE_DURABILITY = {0,1,0,0};
     PlateBaseMaterial(String name, int durabilityMultiplier, int[] protectionAmounts, int enchantmentValue, SoundEvent sound, float toughness, float knockBackResistance) {
         this.name = name;
         this.durabilityMultiplier = durabilityMultiplier;

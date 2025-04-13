@@ -1,4 +1,5 @@
 {
   "replace": false,
-  "values": ["zerocontact:steel_plate"]
+  "values": ["zerocontact:steel_plate",
+    "zerocontact:si_plate"]
 }

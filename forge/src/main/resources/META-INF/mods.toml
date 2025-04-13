@@ -6,7 +6,7 @@ license = "Insert License Here"
 [[mods]]
 modId = "zerocontact"
 version = "${version}"
-displayName = "Example Mod"
+displayName = "Zero Contact"
 authors = "Me!"
 description = '''
 This is an example description! Tell everyone what your mod is about!

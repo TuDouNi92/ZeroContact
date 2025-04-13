@@ -14,6 +14,7 @@ import net.zerocontact.item.armor.JpcArmor;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
 import static net.zerocontact.item.PlateBaseMaterial.ARMOR_STEEL;
+import static net.zerocontact.item.PlateBaseMaterial.SLIME_STEEL;
 
 public class ItemsReg {
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(MOD_ID, Registries.CREATIVE_MODE_TAB);
@@ -22,12 +23,17 @@ public class ItemsReg {
                     () -> new ItemStack(ItemsReg.STEEL_PLATE.get())));
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(MOD_ID, Registries.ITEM);
     public static final RegistrySupplier<Item> STEEL_PLATE = ITEMS.register("steel_plate", () ->
-            SapiIV.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE,new Item.Properties().arch$tab(ZERO_CONTACT)));
-    public static final RegistrySupplier<Item> JPC_ARMOR = ITEMS.register("jpc_armor",()->
-            JpcArmor.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE,new Item.Properties().arch$tab(ZERO_CONTACT)));
-    public static void register(){
+            SapiIV.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT),10,7));
+    public static final RegistrySupplier<Item> JPC_ARMOR = ITEMS.register("jpc_armor", () ->
+            JpcArmor.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT)));
+    public static final RegistrySupplier<Item> SLIME_INDUSTRIES_PLATE = ITEMS.register("si_plate",
+            () -> SapiIV.create(SLIME_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT),5,4));
+
+    public static final RegistrySupplier<Item> BALLISTIC_CONVOY_PLATE = ITEMS.register("bc_plate",
+            () -> SapiIV.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT),10,10));
+
+    public static void register() {
         TABS.register();
         ITEMS.register();
     }
-
 }

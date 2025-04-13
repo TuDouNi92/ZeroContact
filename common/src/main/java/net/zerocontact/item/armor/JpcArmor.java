@@ -10,11 +10,12 @@ import org.jetbrains.annotations.NotNull;
 
 public class JpcArmor extends ArmorItem{
 
-    protected final Type type;
-    protected final ArmorMaterial material;
-    protected final int defense;
+    private final Type type;
+    private final ArmorMaterial material;
+    private final int defense;
+    protected static final int defaultDurability = 256;
     public JpcArmor(Type type, ArmorMaterial material, Properties properties) {
-        super(material,type,properties.defaultDurability(material.getDurabilityForType(type)));
+        super(material,type,properties.defaultDurability(defaultDurability));
         this.type = type;
         this.material = material;
         this.defense = 2;

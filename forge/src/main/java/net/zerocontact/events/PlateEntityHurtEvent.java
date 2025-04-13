@@ -26,6 +26,7 @@ public class PlateEntityHurtEvent {
         CuriosApi.getCuriosInventory(lv).ifPresent(iCuriosItemHandler -> {
             iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
                 ItemStack stack = stacksHandler.getStacks().getStackInSlot(0);
+                int hurtCanHold = stack.getOrCreateTag().getInt("absorb");
                 if (!(stack.isEmpty() && source.type() != modifiedDamageSource.type())) {
                     lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
 
@@ -43,7 +44,7 @@ public class PlateEntityHurtEvent {
                         }
 
                         float hurtAmount;
-                        if (SapiIV.MAX_HURT_DAMAGE_CAN_HOLD > amount) {
+                        if (hurtCanHold > amount) {
                             //钝伤
                             hurtAmount = amount * 0.1f;
                             ModLogger.LOG.info("blunt hurt:{}", hurtAmount);
