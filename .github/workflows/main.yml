@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: Build for Forge
-    runs-on: unbuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - name: CheckOut
         uses: actions/checkout@v3
