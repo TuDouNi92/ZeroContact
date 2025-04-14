@@ -31,7 +31,7 @@ jobs:
       - name: Make Gradle Executable
         run: chmod +x ./gradlew
       - name: Build and Remap Jar
-        run: gradlew :forge:remapJar
+        run: ./gradlew :forge:remapJar
         
        
  
