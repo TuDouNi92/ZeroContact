@@ -12,7 +12,6 @@ public class EventUtil {
     public static boolean isDamageSourceValid(DamageSource damageSource) {
         return damageSource.is(DamageTypes.ARROW)
                 || damageSource.is(DamageTypes.PLAYER_ATTACK)
-                || damageSource.is(DamageTypes.MOB_ATTACK)
                 || damageSource.is(DamageTypes.MOB_PROJECTILE)
                 || damageSource.is(ModDamageTypes.BULLET)
                 || damageSource.is(DamageTypes.EXPLOSION)
