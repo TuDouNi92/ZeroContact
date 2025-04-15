@@ -32,7 +32,7 @@ jobs:
       - name: Build and Remap Jar
         run: ./gradlew :forge:remapJar
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ZeroContact-${{ github.ref_name }}
           path: forge/build/libs/zerocontact-*.*.*.jar
