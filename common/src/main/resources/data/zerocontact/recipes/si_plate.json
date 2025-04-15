@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "111",
+    "121",
+    "111"
+  ],
+  "key": {
+    "1": {
+      "item": "minecraft:leather"
+    },
+    "2": {
+      "item": "minecraft:slimeball"
+    }
+  },
+  "result": {
+    "item": "zerocontact:si_plate",
+    "count": 2
+  }
+}

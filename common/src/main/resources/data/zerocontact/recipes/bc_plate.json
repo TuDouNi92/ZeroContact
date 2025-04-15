@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "131",
+    "121",
+    "131"
+  ],
+  "key": {
+    "1": {
+      "item": "minecraft:iron_ingot"
+    },
+    "2": {
+      "item": "minecraft:coal"
+    },
+    "3": {
+      "item": "minecraft:hardened_clay"
+    }
+  },
+  "result": {
+    "item": "zerocontact:bc_plate",
+    "count": 1
+  }
+}
