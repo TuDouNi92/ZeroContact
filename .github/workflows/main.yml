@@ -31,10 +31,15 @@ jobs:
         run: chmod +x ./gradlew
       - name: Build and Remap Jar
         run: ./gradlew :forge:remapJar
+
+      - name: Get short commit hash
+        id: vars
+        run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ZeroContact-${{ github.ref_name }}
+          name: ZeroContact-${{ github.ref_name }}-build-${{ github.run_number }}-${{steps.vars.outputs.SHORT_SHA}}
           path: forge/build/libs/zerocontact-*.*.*.jar
        
  
