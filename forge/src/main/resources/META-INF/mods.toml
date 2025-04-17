@@ -7,7 +7,7 @@ license = "Insert License Here"
 modId = "zerocontact"
 version = "${version}"
 displayName = "Zero Contact"
-authors = "Me!"
+authors = "TuDouNi92"
 description = '''
 This is an example description! Tell everyone what your mod is about!
 '''
@@ -33,3 +33,25 @@ mandatory = true
 versionRange = "[9.1.12,)"
 ordering = "AFTER"
 side = "BOTH"
+
+[[dependencies.zerocontact]]
+modId = "curios"
+mandatory = true
+versionRange = "[5.9.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.zerocontact]]
+modId = "tacz"
+mandatory = true
+versionRange = "[1.0.2,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.zerocontact]]
+modId = "geckolib"
+mandatory = true
+versionRange = "[4.2.1,)"
+ordering = "NONE"
+side = "BOTH"
+
