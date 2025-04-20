@@ -1,4 +1,11 @@
 {
   "item.zerocontact.steel_plate": "Steel plate",
-  "itemGroup.zerocontact.zero_contact": "ZeroContact"
+  "item.zerocontact.si_plate": "SlimeIndustries plate",
+  "item.zerocontact.bc_plate": "BallisticConvoy plate",
+  "item.zerocontact.jpc_armor": "Dyer Precision Jpc 2.0 MultiCam",
+  "itemGroup.zerocontact.zero_contact": "ZeroContact",
+  "curios.modifiers.front_plate": "Front plate",
+  "curios.modifiers.back_plate": "Back Plate",
+  "curios.identifiers.front_plate": "Front plate Slot",
+  "curios.identifiers.back_plate": "Back plate Slot"
 }
