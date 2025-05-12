@@ -2,6 +2,7 @@ package net.zerocontact.item.forge;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -9,6 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.events.PlateInteract;
+import net.zerocontact.events.ProtectionLevel;
 import net.zerocontact.registries.ModSoundEventsReg;
 import net.zerocontact.item.SapiIV;
 import org.jetbrains.annotations.NotNull;
@@ -16,6 +18,7 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
+import java.util.List;
 import java.util.UUID;
 
 //ArmorItem的实现需要盔甲材料类的各种属性与基础的防御值，也是从材料里拿
@@ -87,5 +90,13 @@ public class SapiIVImpl extends SapiIV implements ICurioItem {
 
     public static SapiIV create(ArmorMaterial armorMaterial, Type type, Properties properties, int defense, int absorb) {
         return new SapiIVImpl(armorMaterial, type, properties, defense, absorb);
+    }
+
+    @Override
+    public List<Component> getAttributesTooltip(List<Component> tooltips, ItemStack stack) {
+        Component tipsToAdd = Component.translatable(ProtectionLevel.getProtectionLevel(absorb).name());
+        if(tooltips.contains(tipsToAdd))return tooltips;
+        tooltips.add(tipsToAdd);
+        return tooltips;
     }
 }

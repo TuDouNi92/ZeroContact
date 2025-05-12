@@ -23,23 +23,21 @@ public class PlateDamageEvent {
         iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
             ItemStack stack = stacksHandler.getStacks().getStackInSlot(0);
             float durabilityLossFactor = 1;
-            int hits = stack.getOrCreateTag().getInt("hits")+1;
+            int hits = stack.getOrCreateTag().getInt("hits") + 1;
             int durabilityLossAmount = 1;
-            if (!stack.isEmpty() && damageSource.is(ModDamageTypes.BULLET)) {
-                if(amount<4){
-                    durabilityLossFactor=0.1f;
+            if (!stack.isEmpty() && (damageSource.is(ModDamageTypes.BULLET) || damageSource.is(ModDamageTypes.BULLET_IGNORE_ARMOR))) {
+                switch (ProtectionLevel.getProtectionLevel((int)Math.floor(amount))){
+                    case NIJIIA -> durabilityLossFactor = 0.1F;
+                    case NIJII -> durabilityLossFactor = 0.4F;
+                    case NIJIIIA -> durabilityLossFactor = 0.7F;
+                    case NIJIII -> durabilityLossFactor = 1.1F;
+                    case NIJIV -> durabilityLossFactor = 1.5F;
                 }
-                else if(amount<9){
-                    durabilityLossFactor=0.7f;
-                }
-                else if(amount<13){
-                    durabilityLossFactor=0.95f;
-                }
-                durabilityLossAmount = (int)Math.round(0.4*Math.pow(amount*durabilityLossFactor,1.5)*(1+hits*0.1f));
+                durabilityLossAmount = (int) Math.round(0.4 * Math.pow(amount * durabilityLossFactor, 1.5) * (1 + hits * 0.1f));
             }
-            stack.getOrCreateTag().putInt("hits",hits);
+            stack.getOrCreateTag().putInt("hits", hits);
             stack.hurtAndBreak(durabilityLossAmount, livingEntity, lv -> {
-                lv.level().playSound(null,lv.getX(),lv.getY(),lv.getZ(), ModSoundEventsReg.ARMOR_BROKEN_PLATE, SoundSource.PLAYERS,1.0f,1.0f);
+                lv.level().playSound(null, lv.getX(), lv.getY(), lv.getZ(), ModSoundEventsReg.ARMOR_BROKEN_PLATE, SoundSource.PLAYERS, 1.0f, 1.0f);
 
                 ModLogger.LOG.info(lv.getName() + "的插板碎掉了！");
             });
@@ -49,7 +47,7 @@ public class PlateDamageEvent {
     public static void DamagePlateRegister(LivingEntity entity, DamageSource damageSource, float amount) {
         if (entity instanceof Player && EventUtil.isDamageSourceValid(damageSource)) {
             CuriosApi.getCuriosInventory(entity).ifPresent(inv -> {
-                    DamagePlateModifier(inv, entity, damageSource, amount, EventUtil.idHitFromBack(entity,damageSource));
+                DamagePlateModifier(inv, entity, damageSource, amount, EventUtil.idHitFromBack(entity, damageSource));
             });
         }
     }

@@ -14,6 +14,7 @@ public class EventUtil {
                 || damageSource.is(DamageTypes.PLAYER_ATTACK)
                 || damageSource.is(DamageTypes.MOB_PROJECTILE)
                 || damageSource.is(ModDamageTypes.BULLET)
+                || damageSource.is(ModDamageTypes.BULLET_IGNORE_ARMOR)
                 || damageSource.is(DamageTypes.EXPLOSION)
                 || damageSource.is(DamageTypes.PLAYER_EXPLOSION);
     }
