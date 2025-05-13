@@ -27,12 +27,14 @@ public class SapiIVImpl extends SapiIV implements ICurioItem {
     private final ArmorMaterial material;
     private final int defense;
     private final int absorb;
-    public SapiIVImpl(ArmorMaterial material, Type type, Properties properties, int defense, int absorb) {
+    private final float mass;
+    public SapiIVImpl(ArmorMaterial material, Type type, Properties properties, int defense, int absorb, float mass) {
         super(material, type, properties.defaultDurability(material.getDurabilityForType(type)));
         this.type = type;
         this.material = material;
         this.defense = defense;
         this.absorb = absorb;
+        this.mass = mass;
     }
 
     public int getAbsorb() {
@@ -68,6 +70,7 @@ public class SapiIVImpl extends SapiIV implements ICurioItem {
         if (slotContext.entity() instanceof Player) {
             modifiers.put(Attributes.ARMOR, new AttributeModifier(UUID.nameUUIDFromBytes(("Armor" + uuid).getBytes()), "CuriosArmorDefense", this.getDefense(), AttributeModifier.Operation.ADDITION));
             modifiers.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(UUID.nameUUIDFromBytes(("ArmorToughness" + uuid).getBytes()), "CuriosArmorToughness", this.material.getToughness(), AttributeModifier.Operation.ADDITION));
+            modifiers.put(Attributes.MOVEMENT_SPEED,new AttributeModifier(UUID.nameUUIDFromBytes(("MoveSpeed"+uuid).getBytes()),"MoveSpeed",mass, AttributeModifier.Operation.MULTIPLY_TOTAL));
         }
         return modifiers;
     }
@@ -88,8 +91,8 @@ public class SapiIVImpl extends SapiIV implements ICurioItem {
         PlateInteract.onArmorUnequip(slotContext,stack);
     }
 
-    public static SapiIV create(ArmorMaterial armorMaterial, Type type, Properties properties, int defense, int absorb) {
-        return new SapiIVImpl(armorMaterial, type, properties, defense, absorb);
+    public static SapiIV create(ArmorMaterial armorMaterial, Type type, Properties properties, int defense, int absorb, float mass) {
+        return new SapiIVImpl(armorMaterial, type, properties, defense, absorb,mass);
     }
 
     @Override

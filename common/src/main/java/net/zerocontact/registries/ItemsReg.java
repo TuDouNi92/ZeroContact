@@ -23,14 +23,13 @@ public class ItemsReg {
                     () -> new ItemStack(ItemsReg.STEEL_PLATE.get())));
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(MOD_ID, Registries.ITEM);
     public static final RegistrySupplier<Item> STEEL_PLATE = ITEMS.register("steel_plate", () ->
-            SapiIV.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT),10,7));
+            SapiIV.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT),10,7,-0.04f));
     public static final RegistrySupplier<Item> JPC_ARMOR = ITEMS.register("jpc_armor", () ->
             JpcArmor.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT)));
     public static final RegistrySupplier<Item> SLIME_INDUSTRIES_PLATE = ITEMS.register("si_plate",
-            () -> SapiIV.create(SLIME_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT),5,4));
-
+            () -> SapiIV.create(SLIME_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT),5,4,-0.01f));
     public static final RegistrySupplier<Item> BALLISTIC_CONVOY_PLATE = ITEMS.register("bc_plate",
-            () -> SapiIV.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT),10,10));
+            () -> SapiIV.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT),10,10,-0.05f));
 
     public static void register() {
         TABS.register();

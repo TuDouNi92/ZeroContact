@@ -28,7 +28,7 @@ public abstract class SapiIV extends ArmorItem {
 
 
     @ExpectPlatform
-    public static SapiIV create(ArmorMaterial armorMaterial, ArmorItem.Type type, Item.Properties properties, int defense, int absorb) {
+    public static SapiIV create(ArmorMaterial armorMaterial, ArmorItem.Type type, Item.Properties properties, int defense, int absorb, float mass) {
         throw new AssertionError();
     }
 }

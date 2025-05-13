@@ -38,7 +38,6 @@ public class PlateDamageEvent {
             stack.getOrCreateTag().putInt("hits", hits);
             stack.hurtAndBreak(durabilityLossAmount, livingEntity, lv -> {
                 lv.level().playSound(null, lv.getX(), lv.getY(), lv.getZ(), ModSoundEventsReg.ARMOR_BROKEN_PLATE, SoundSource.PLAYERS, 1.0f, 1.0f);
-
                 ModLogger.LOG.info(lv.getName() + "的插板碎掉了！");
             });
         });
