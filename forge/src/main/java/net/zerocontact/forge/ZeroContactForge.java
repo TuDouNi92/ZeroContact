@@ -10,6 +10,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.zerocontact.events.EventUtil;
 import net.zerocontact.events.PlateDamageEvent;
 import net.zerocontact.events.PlateEntityHurtEvent;
+import net.zerocontact.network.ModMessages;
 import net.zerocontact.stamina.PlayerStamina;
 import software.bernie.geckolib.GeckoLib;
 
@@ -20,6 +21,7 @@ public class ZeroContactForge {
         EventBuses.registerModEventBus(ZeroContact.MOD_ID, FMLJavaModLoadingContext.get().getModEventBus());
         ZeroContact.init();
         GeckoLib.initialize();
+        ModMessages.register();
         TickEvent.PLAYER_POST.register(PlayerStamina::staminaTick);
         EntityEvent.LIVING_HURT.register((lv, source, amount) -> {
                     PlateDamageEvent.DamagePlateRegister(lv, source, amount);

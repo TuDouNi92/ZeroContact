@@ -29,9 +29,7 @@ public class EventUtil {
             } else if (incidentAngle > 180) {
                 incidentAngle -= 360;
             }
-            ModLogger.LOG.info(incidentAngle);
             if ((Math.abs(incidentAngleAbs - 90) < 30) && (Math.abs(incidentAngleAbs - 90) >= 10)) {
-                ModLogger.LOG.info("跳弹！");
                 return true;
             }
         }
@@ -42,10 +40,8 @@ public class EventUtil {
         double incidentAngleAbs = Math.abs(getAngle(lv, source));
         if(incidentAngleAbs !=361){
             if (incidentAngleAbs > 90 ) {
-                ModLogger.LOG.info("正面着弹");
                 return "front_plate";
             } else {
-                ModLogger.LOG.info("反面着弹");
                 return "back_plate";
             }
         }

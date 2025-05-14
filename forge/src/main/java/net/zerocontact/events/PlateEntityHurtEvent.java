@@ -37,7 +37,6 @@ public class PlateEntityHurtEvent {
                         if (EventUtil.isIncidentAngleValid(lv, source, amount)) {
                             float hurtAmount = amount * 0.05f;
                             lv.hurt(modifiedDamageSource, hurtAmount);
-                            ModLogger.LOG.info("跳弹伤害{}", hurtAmount);
                             result.set(true);
                         } else {
                             result.set(false);
@@ -47,11 +46,9 @@ public class PlateEntityHurtEvent {
                         if (hurtCanHold > amount) {
                             //钝伤
                             hurtAmount = amount * 0.1f;
-                            ModLogger.LOG.info("blunt hurt:{}", hurtAmount);
                         } else {
                             //贯穿
                             hurtAmount = amount * 0.7f;
-                            ModLogger.LOG.info("penetrate hurt:{}", hurtAmount);
                         }
                         lv.hurt(modifiedDamageSource, hurtAmount);
                         result.set(true);
