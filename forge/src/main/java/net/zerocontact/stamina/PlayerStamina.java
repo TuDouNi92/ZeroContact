@@ -33,10 +33,12 @@ public class PlayerStamina {
         player.getCapability(PlayerStaminaProvider.PLAYER_STAMINA).ifPresent(playerStamina -> {
             playerStamina.tickCounter++;
             float stamina = playerStamina.getStamina();
+            if(playerStamina.cooldownTicks!=0){
+                player.setSprinting(false);
+            }
             if (player.isSprinting()) {
                 if (stamina < 1 && playerStamina.cooldownTicks == 0) {
                     playerStamina.cooldownTicks = 60;
-                    player.setSprinting(false);
                 }
                 playerStamina.setStamina(stamina - 1.0f);
                 if (playerStamina.tickCounter >= 10) {

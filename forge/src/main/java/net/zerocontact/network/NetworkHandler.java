@@ -7,6 +7,7 @@ import net.zerocontact.client.ClientStaminaData;
 import java.util.function.Supplier;
 
 public class NetworkHandler {
+
     public static class SyncStaminaPacket {
         private final float stamina;
 

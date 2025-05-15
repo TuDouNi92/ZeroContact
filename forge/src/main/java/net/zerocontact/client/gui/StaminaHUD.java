@@ -25,13 +25,16 @@ public class StaminaHUD {
             float percent = stamina / maxStamina;
             int barWidth = 100;
             int barHeight = 2;
-            int x = mc.getWindow().getGuiScaledWidth() / 2 - barWidth / 2;
+            int centerX = mc.getWindow().getGuiScaledWidth() / 2;
             int y = mc.getWindow().getGuiScaledHeight() - 40;
             int fillWidth = (int) Math.floor(barWidth * percent);
+            int fillHalfWidth = fillWidth/2;
+            int leftX = centerX -fillHalfWidth;
+            int rightX = centerX+fillHalfWidth;
             GuiGraphics graphics = event.getGuiGraphics();
-            graphics.fill(x, y, x + barWidth, y + barHeight, 0x885B5B5B);
-            graphics.fill(x, y, x + fillWidth, y + barHeight, 0x88FFFFFF);
-            graphics.drawString(mc.font, "stamina:" + stamina, x, y - 10, 0xFFFFFFFF);
+            graphics.fill(centerX-barWidth/2, y, centerX + barWidth/2, y + barHeight, 0x885B5B5B);
+            graphics.fill(leftX, y, rightX, y + barHeight, 0x88FFFFFF);
+            graphics.drawString(mc.font, "stamina:" + stamina, centerX-40, y - 10, 0xFFFFFFFF);
         });
     }
 
