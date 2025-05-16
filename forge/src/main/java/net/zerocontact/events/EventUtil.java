@@ -4,7 +4,6 @@ import com.tacz.guns.init.ModDamageTypes;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
-import net.zerocontact.ModLogger;
 
 public class EventUtil {
 

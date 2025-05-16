@@ -10,6 +10,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.item.SapiIV;
+import net.zerocontact.item.armor.AvsArmor;
 import net.zerocontact.item.armor.JpcArmor;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
@@ -30,7 +31,8 @@ public class ItemsReg {
             () -> SapiIV.create(SLIME_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT),5,4,-0.01f));
     public static final RegistrySupplier<Item> BALLISTIC_CONVOY_PLATE = ITEMS.register("bc_plate",
             () -> SapiIV.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT),10,10,-0.05f));
-
+    public static final RegistrySupplier<Item> AVS_ARMOR = ITEMS.register("avs_armor", () ->
+            AvsArmor.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT)));
     public static void register() {
         TABS.register();
         ITEMS.register();
