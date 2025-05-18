@@ -10,7 +10,7 @@ import top.theillusivec4.curios.api.SlotContext;
 import java.util.Set;
 
 public class PlateInteract {
-    private static final Set<String> ALL_ARMOR_IDS = Set.of("jpc_armor");
+    private static final Set<String> ALL_ARMOR_IDS = Set.of("jpc_armor","avs_armor");
 
     public static boolean isPlateArmorEquipped(LivingEntity entity) {
         ItemStack stack = entity.getItemBySlot(EquipmentSlot.CHEST);
@@ -22,8 +22,7 @@ public class PlateInteract {
     public static void onArmorUnequip(SlotContext context, ItemStack stack) {
         LivingEntity entity = context.entity();
         ItemStack ArmorItemStack = entity.getItemBySlot(EquipmentSlot.CHEST);
-        if (ArmorItemStack.isEmpty() && !isPlateArmorEquipped(entity) && entity instanceof Player) {
-            Player player = (Player) entity;
+        if (ArmorItemStack.isEmpty() && !isPlateArmorEquipped(entity) && entity instanceof Player player) {
             ItemStack dropStack = stack.split(1);
             rollBackItem(dropStack, player);
         }

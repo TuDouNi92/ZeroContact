@@ -1,0 +1,11 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "zerocontact:item/steel_sheet"
+  },
+  "display": {
+    "thirdperson_righthand": {
+      "scale": [1.2,1.2,1.2]
+    }
+  }
+}

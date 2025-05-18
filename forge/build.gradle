@@ -1,7 +1,6 @@
 plugins {
     id "com.github.johnrengelman.shadow" version "7.1.2"
 }
-
 architectury {
     platformSetupLoomIde()
     forge()
@@ -9,7 +8,6 @@ architectury {
 
 loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
-
     forge {
         convertAccessWideners = true
         extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
@@ -40,6 +38,11 @@ dependencies {
     modLocalRuntime files("libs/Jade-1.20.1-Forge-11.12.3.jar")
     modCompileOnly('software.bernie.geckolib:geckolib-forge-1.20.1:4.2.1')
     modLocalRuntime('software.bernie.geckolib:geckolib-forge-1.20.1:4.2.1')
+    modLocalRuntime("com.simibubi.create:create-1.20.1:6.0.4-79:slim") { transitive = false }
+    modLocalRuntime("com.tterrag.registrate:Registrate:${registrate_version}")
+    modLocalRuntime("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
+    modLocalRuntime("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}")
+
 }
 
 processResources {

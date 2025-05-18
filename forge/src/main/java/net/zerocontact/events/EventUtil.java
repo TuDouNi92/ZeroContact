@@ -23,12 +23,7 @@ public class EventUtil {
         double incidentAngle = getAngle(lv, source);
         double incidentAngleAbs = Math.abs(incidentAngle);
         if(incidentAngle!=-361){
-            if (incidentAngle < -180) {
-                incidentAngle += 360;
-            } else if (incidentAngle > 180) {
-                incidentAngle -= 360;
-            }
-            if ((Math.abs(incidentAngleAbs - 90) < 30) && (Math.abs(incidentAngleAbs - 90) >= 10)) {
+            if ((Math.abs(incidentAngleAbs - 90) <= 30) && (Math.abs(incidentAngleAbs - 90) >= 10)) {
                 return true;
             }
         }

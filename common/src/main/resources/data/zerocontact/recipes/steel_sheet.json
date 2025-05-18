@@ -5,17 +5,16 @@
       "modid": "create"
     }
   ],
-  "type": "create:cutting",
+  "type": "create:compacting",
   "ingredients": [
     {
-      "item": "zerocontact:steel_sheet"
+      "tag": "forge:ingots/steel"
     }
   ],
   "results": [
     {
-      "item": "zerocontact:steel_plate",
-      "count": 2
+      "item": "zerocontact:steel_sheet",
+      "count": 1
     }
-  ],
-  "processingTime": 1200
+  ]
 }

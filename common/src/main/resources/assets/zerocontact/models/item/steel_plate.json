@@ -2,5 +2,10 @@
   "parent": "item/handheld",
   "textures": {
     "layer0": "zerocontact:item/steel_plate"
+  },
+  "display": {
+    "thirdperson_righthand": {
+      "scale": [0.8,0.8,0.8]
+    }
   }
 }
