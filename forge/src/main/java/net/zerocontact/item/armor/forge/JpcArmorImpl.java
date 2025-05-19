@@ -6,6 +6,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.zerocontact.api.ArmorTypeTag;
 import net.zerocontact.item.armor.JpcArmor;
 import net.zerocontact.renderer.JpcRender;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +17,7 @@ import software.bernie.geckolib.core.animation.AnimatableManager;
 
 import java.util.function.Consumer;
 
-public class JpcArmorImpl extends JpcArmor implements GeoItem {
+public class JpcArmorImpl extends JpcArmor implements GeoItem, ArmorTypeTag {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     public JpcArmorImpl(Type type, ArmorMaterial material, Properties properties) {
         super(type, material, properties);

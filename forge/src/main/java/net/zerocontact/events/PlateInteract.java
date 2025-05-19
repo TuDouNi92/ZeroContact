@@ -4,17 +4,13 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.zerocontact.api.ArmorTypeTag;
 import top.theillusivec4.curios.api.SlotContext;
 
-import java.util.Set;
-
 public class PlateInteract {
-    private static final Set<String> ALL_ARMOR_IDS = Set.of("jpc_armor","avs_armor");
-
     public static boolean isPlateArmorEquipped(LivingEntity entity) {
         ItemStack stack = entity.getItemBySlot(EquipmentSlot.CHEST);
-        if (!ALL_ARMOR_IDS.contains(ForgeRegistries.ITEMS.getKey(stack.getItem()).toString().replace("zerocontact:", "")))
+        if (!(stack.getItem() instanceof ArmorTypeTag))
             return false;
         return true;
     }
