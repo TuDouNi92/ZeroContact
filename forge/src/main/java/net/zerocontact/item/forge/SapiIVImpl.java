@@ -9,8 +9,10 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
+import net.zerocontact.api.DurabilityLossProvider;
+import net.zerocontact.api.EntityHurtProvider;
 import net.zerocontact.events.PlateInteract;
-import net.zerocontact.events.ProtectionLevel;
+import net.zerocontact.events.ProtectionLevelHelper;
 import net.zerocontact.registries.ModSoundEventsReg;
 import net.zerocontact.item.SapiIV;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +24,7 @@ import java.util.List;
 import java.util.UUID;
 
 //ArmorItem的实现需要盔甲材料类的各种属性与基础的防御值，也是从材料里拿
-public class SapiIVImpl extends SapiIV implements ICurioItem {
+public class SapiIVImpl extends SapiIV implements ICurioItem, DurabilityLossProvider, EntityHurtProvider {
     private final Type type;
     private final ArmorMaterial material;
     private final int defense;
@@ -97,7 +99,7 @@ public class SapiIVImpl extends SapiIV implements ICurioItem {
 
     @Override
     public List<Component> getAttributesTooltip(List<Component> tooltips, ItemStack stack) {
-        Component tipsToAdd = Component.translatable(ProtectionLevel.getProtectionLevel(absorb).name());
+        Component tipsToAdd = Component.translatable(ProtectionLevelHelper.get(absorb).name());
         if(tooltips.contains(tipsToAdd))return tooltips;
         tooltips.add(tipsToAdd);
         return tooltips;

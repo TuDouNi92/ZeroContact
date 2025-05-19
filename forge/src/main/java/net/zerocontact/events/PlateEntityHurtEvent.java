@@ -9,7 +9,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.ModLogger;
+import net.zerocontact.api.EntityHurtProvider;
 import net.zerocontact.item.SapiIV;
+import net.zerocontact.item.forge.SapiIVImpl;
 import net.zerocontact.registries.ModSoundEventsReg;
 import top.theillusivec4.curios.api.CuriosApi;
 
@@ -21,34 +23,30 @@ public class PlateEntityHurtEvent {
         Holder<DamageType> customDamageType = lv.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.MAGIC);
         DamageSource modifiedDamageSource = new DamageSource(customDamageType);
         AtomicBoolean result = new AtomicBoolean();
-
         result.set(false);
         CuriosApi.getCuriosInventory(lv).ifPresent(iCuriosItemHandler -> {
             iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
                 ItemStack stack = stacksHandler.getStacks().getStackInSlot(0);
+                float hurtAmount;
                 int hurtCanHold = stack.getOrCreateTag().getInt("absorb");
                 if (!(stack.isEmpty() && source.type() != modifiedDamageSource.type())) {
                     lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
-
-                    if (lv instanceof Player && EventUtil.isDamageSourceValid(source)
-                    ) {
+                    if (lv instanceof Player && EventUtil.isDamageSourceValid(source) && stack.getItem() instanceof EntityHurtProvider provider) {
                         ModLogger.LOG.info(source);
 
                         if (EventUtil.isIncidentAngleValid(lv, source, amount)) {
-                            float hurtAmount = amount * 0.05f;
+                            hurtAmount = provider.generateRicochet();
                             lv.hurt(modifiedDamageSource, hurtAmount);
                             result.set(true);
                         } else {
                             result.set(false);
                         }
-
-                        float hurtAmount;
                         if (hurtCanHold > amount) {
                             //钝伤
-                            hurtAmount = amount * 0.1f;
+                            hurtAmount = provider.generateBlunt();
                         } else {
                             //贯穿
-                            hurtAmount = amount * 0.7f;
+                            hurtAmount = provider.generatePenetrated();
                         }
                         lv.hurt(modifiedDamageSource, hurtAmount);
                         result.set(true);

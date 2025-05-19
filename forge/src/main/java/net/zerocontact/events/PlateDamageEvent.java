@@ -7,6 +7,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.ModLogger;
+import net.zerocontact.api.DurabilityLossProvider;
 import net.zerocontact.registries.ModSoundEventsReg;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
@@ -26,14 +27,16 @@ public class PlateDamageEvent {
             int hits = stack.getOrCreateTag().getInt("hits") + 1;
             int durabilityLossAmount = 1;
             if (!stack.isEmpty() && (damageSource.is(ModDamageTypes.BULLET) || damageSource.is(ModDamageTypes.BULLET_IGNORE_ARMOR))) {
-                switch (ProtectionLevel.getProtectionLevel((int)Math.floor(amount))){
+                switch (ProtectionLevelHelper.get((int)Math.floor(amount))){
                     case NIJIIA -> durabilityLossFactor = 0.1F;
                     case NIJII -> durabilityLossFactor = 0.4F;
                     case NIJIIIA -> durabilityLossFactor = 0.7F;
                     case NIJIII -> durabilityLossFactor = 1.1F;
                     case NIJIV -> durabilityLossFactor = 1.5F;
                 }
-                durabilityLossAmount = (int) Math.round(0.4 * Math.pow(amount * durabilityLossFactor, 1.5) * (1 + hits * 0.1f));
+                if(stack.getItem() instanceof DurabilityLossProvider provider){
+                    durabilityLossAmount = provider.generate(amount,durabilityLossFactor,hits);
+                }
             }
             stack.getOrCreateTag().putInt("hits", hits);
             stack.hurtAndBreak(durabilityLossAmount, livingEntity, lv -> {

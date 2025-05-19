@@ -1,16 +1,18 @@
 package net.zerocontact.events;
 
-public enum ProtectionLevel {
+import net.minecraft.world.item.ItemStack;
+
+public enum ProtectionLevelHelper {
     NIJIIA(5),
     NIJII(6),
     NIJIIIA(7),
     NIJIII(9),
     NIJIV(13);
-    private int protectionAmount;
-    ProtectionLevel(int amount){
+    private final int protectionAmount;
+    ProtectionLevelHelper(int amount){
         this.protectionAmount = amount;
     }
-    public static ProtectionLevel getProtectionLevel(int amount){
+    public static ProtectionLevelHelper get(int amount){
         if(amount<=NIJIIA.protectionAmount){
             return NIJIIA;
         }
