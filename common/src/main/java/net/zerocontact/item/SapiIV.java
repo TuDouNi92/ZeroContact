@@ -7,14 +7,10 @@ import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class SapiIV extends ArmorItem {
-    private final Type type;
-    private final ArmorMaterial material;
 
 
     public SapiIV(ArmorMaterial armorMaterial, Type type, Properties properties) {
         super(armorMaterial, type, properties.defaultDurability(armorMaterial.getDurabilityForType(type)));
-        this.material = armorMaterial;
-        this.type = type;
     }
 
     @Override

@@ -35,7 +35,7 @@ public class PlateDamageEvent {
                     case NIJIV -> durabilityLossFactor = 1.5F;
                 }
                 if(stack.getItem() instanceof DurabilityLossProvider provider){
-                    durabilityLossAmount = provider.generate(amount,durabilityLossFactor,hits);
+                    durabilityLossAmount = provider.generateLoss(amount,durabilityLossFactor,hits);
                 }
             }
             stack.getOrCreateTag().putInt("hits", hits);

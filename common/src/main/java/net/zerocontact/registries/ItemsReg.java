@@ -9,6 +9,7 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.zerocontact.item.Ceramic;
 import net.zerocontact.item.SapiIV;
 import net.zerocontact.item.armor.AvsArmor;
 import net.zerocontact.item.armor.JpcArmor;
@@ -34,10 +35,14 @@ public class ItemsReg {
                 () -> SapiIV.create(SLIME_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT),5,4,-0.01f));
         ITEMS.register("bc_plate",
                 () -> SapiIV.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT),10,10,-0.05f));
+        ITEMS.register("ceramic_plate",
+                ()-> Ceramic.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE,new Item.Properties().arch$tab(ZERO_CONTACT),10,8,-0.03f));
         ITEMS.register("avs_armor", () ->
                 AvsArmor.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT)));
         ITEMS.register("steel_ingot",()->new Item(new Item.Properties().arch$tab(ZERO_CONTACT)));
         ITEMS.register("steel_sheet",()->new Item(new Item.Properties().arch$tab(ZERO_CONTACT)));
+        ITEMS.register("ceramic_shatters",()->new Item(new Item.Properties().arch$tab(ZERO_CONTACT)));
+        ITEMS.register("fabric_roll",()->new Item(new Item.Properties().arch$tab(ZERO_CONTACT)));
         ITEMS.register();
     }
 }
