@@ -10,6 +10,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.zerocontact.events.EventUtil;
 import net.zerocontact.events.PlateDamageEvent;
 import net.zerocontact.events.PlateEntityHurtEvent;
+import net.zerocontact.forge_registries.ModEntitiesReg;
 import net.zerocontact.network.ModMessages;
 import net.zerocontact.stamina.PlayerStamina;
 import software.bernie.geckolib.GeckoLib;
@@ -31,6 +32,6 @@ public class ZeroContactForge {
                     return EventResult.pass();
                 }
         );
-
+        ModEntitiesReg.register();
     }
 }

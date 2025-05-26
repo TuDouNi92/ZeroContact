@@ -1,20 +1,32 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "111",
-    "121",
-    "111"
-  ],
-  "key": {
-    "1": {
-      "item": "minecraft:leather"
-    },
-    "2": {
-      "item": "minecraft:slimeball"
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "create"
     }
-  },
-  "result": {
-    "item": "zerocontact:si_plate",
-    "count": 2
-  }
+  ],
+  "type": "create:compacting",
+  "ingredients": [
+    {
+      "item": "minecraft:slime_ball"
+    },
+    {
+      "item": "minecraft:slime_ball"
+    },
+    {
+      "item": "minecraft:slime_ball"
+    },
+    {
+      "item": "minecraft:slime_ball"
+    },
+    {
+      "item": "zerocontact:fabric_roll"
+    }
+  ],
+  "results": [
+    {
+      "item": "zerocontact:si_plate",
+      "count": 2
+    }
+  ]
 }

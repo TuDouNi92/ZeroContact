@@ -1,0 +1,33 @@
+{
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:compacting",
+  "ingredients": [
+    {
+      "item": "zerocontact:fabric_roll"
+    },
+    {
+      "item": "zerocontact:ceramic_shatters"
+    },
+    {
+      "item": "zerocontact:ceramic_shatters"
+    },
+    {
+      "item": "zerocontact:ceramic_shatters"
+    },
+    {
+      "item": "zerocontact:ceramic_shatters"
+    }
+  ],
+  "results": [
+    {
+      "item": "zerocontact:ceramic_plate",
+      "count": 2
+    }
+  ],
+  "processingTime": 1200
+}

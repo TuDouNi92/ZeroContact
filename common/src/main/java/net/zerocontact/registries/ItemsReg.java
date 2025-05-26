@@ -32,7 +32,7 @@ public class ItemsReg {
         ITEMS.register("jpc_armor", () ->
                 JpcArmor.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT)));
         ITEMS.register("si_plate",
-                () -> SapiIV.create(SLIME_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT),5,4,-0.01f));
+                () -> SapiIV.create(SLIME_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT),5,6,-0.01f));
         ITEMS.register("bc_plate",
                 () -> SapiIV.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT),10,10,-0.05f));
         ITEMS.register("ceramic_plate",
