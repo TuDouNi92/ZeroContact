@@ -8,5 +8,6 @@ import software.bernie.geckolib.renderer.GeoEntityRenderer;
 public class ArmedRaiderRender extends GeoEntityRenderer<ArmedRaider> {
     public ArmedRaiderRender(EntityRendererProvider.Context renderManager) {
         super(renderManager, new ArmedRaiderModel());
+        this.addRenderLayer(new ArmedRaiderItemLayer(this));
     }
 }

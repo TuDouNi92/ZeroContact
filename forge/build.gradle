@@ -36,8 +36,8 @@ dependencies {
     forgeRuntimeLibrary('org.luaj:luaj-jse:3.0.1')
     forgeRuntimeLibrary('org.apache.commons:commons-math3:3.6.1')
     modLocalRuntime files("libs/Jade-1.20.1-Forge-11.12.3.jar")
-    modCompileOnly('software.bernie.geckolib:geckolib-forge-1.20.1:4.2.1')
-    modLocalRuntime('software.bernie.geckolib:geckolib-forge-1.20.1:4.2.1')
+    modCompileOnly('software.bernie.geckolib:geckolib-forge-1.20.1:4.2.2')
+    modLocalRuntime('software.bernie.geckolib:geckolib-forge-1.20.1:4.2.2')
     modLocalRuntime("com.simibubi.create:create-1.20.1:6.0.4-79:slim") { transitive = false }
     modLocalRuntime("com.tterrag.registrate:Registrate:${registrate_version}")
     modLocalRuntime("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")

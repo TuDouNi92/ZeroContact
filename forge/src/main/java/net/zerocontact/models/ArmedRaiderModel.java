@@ -3,7 +3,11 @@ package net.zerocontact.models;
 import net.minecraft.resources.ResourceLocation;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.entity.ArmedRaider;
+import software.bernie.geckolib.constant.DataTickets;
+import software.bernie.geckolib.core.animatable.model.CoreGeoBone;
+import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.model.data.EntityModelData;
 
 public class ArmedRaiderModel extends GeoModel<ArmedRaider> {
     @Override
@@ -19,5 +23,18 @@ public class ArmedRaiderModel extends GeoModel<ArmedRaider> {
     @Override
     public ResourceLocation getAnimationResource(ArmedRaider armedRaider) {
         return null;
+    }
+
+    @Override
+    public void setCustomAnimations(ArmedRaider animatable, long instanceId, AnimationState<ArmedRaider> animationState) {
+        super.setCustomAnimations(animatable, instanceId, animationState);
+        EntityModelData entityModelData = animationState.getData(DataTickets.ENTITY_MODEL_DATA);
+        setHeadRot(entityModelData);
+    }
+
+    private void setHeadRot(EntityModelData entityModelData) {
+        CoreGeoBone head = this.getAnimationProcessor().getBone("Head");
+        head.setRotX(entityModelData.headPitch()*((float)Math.PI / 180F));
+        head.setRotY(entityModelData.netHeadYaw()*((float)Math.PI / 180F));
     }
 }

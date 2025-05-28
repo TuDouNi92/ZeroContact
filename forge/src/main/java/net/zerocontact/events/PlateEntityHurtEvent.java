@@ -24,37 +24,35 @@ public class PlateEntityHurtEvent {
         DamageSource modifiedDamageSource = new DamageSource(customDamageType);
         AtomicBoolean result = new AtomicBoolean();
         result.set(false);
-        CuriosApi.getCuriosInventory(lv).ifPresent(iCuriosItemHandler -> {
-            iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
-                ItemStack stack = stacksHandler.getStacks().getStackInSlot(0);
-                float hurtAmount;
-                int hurtCanHold = stack.getOrCreateTag().getInt("absorb");
-                if (!(stack.isEmpty() && source.type() != modifiedDamageSource.type())) {
-                    lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
-                    if (lv instanceof Player && EventUtil.isDamageSourceValid(source) && stack.getItem() instanceof EntityHurtProvider provider) {
-                        ModLogger.LOG.info(source);
-
-                        if (EventUtil.isIncidentAngleValid(lv, source, amount)) {
-                            hurtAmount = provider.generateRicochet();
-                            lv.hurt(modifiedDamageSource, hurtAmount);
-                            result.set(true);
-                        } else {
-                            result.set(false);
-                        }
-                        if (hurtCanHold > amount) {
+        CuriosApi.getCuriosInventory(lv).ifPresent(iCuriosItemHandler -> iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
+            ItemStack stack = stacksHandler.getStacks().getStackInSlot(0);
+            float hurtAmount;
+            int hurtCanHold = stack.getOrCreateTag().getInt("absorb");
+            if (!(stack.isEmpty() && source.type() != modifiedDamageSource.type())) {
+                lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
+                if (lv instanceof Player && EventUtil.isDamageSourceValid(source) && stack.getItem() instanceof EntityHurtProvider provider) {
+                    ModLogger.LOG.info(source);
+                    if (EventUtil.isIncidentAngleValid(lv, source, amount)) {
+                        hurtAmount = provider.generateRicochet() * amount;
+                        lv.hurt(modifiedDamageSource, hurtAmount);
+                    } else {
+                        if (hurtCanHold >= amount) {
                             //钝伤
-                            hurtAmount = provider.generateBlunt();
+                            hurtAmount = provider.generateBlunt() * amount;
+                            ModLogger.LOG.info(hurtAmount);
                         } else {
                             //贯穿
-                            hurtAmount = provider.generatePenetrated();
+                            hurtAmount = provider.generatePenetrated() * amount;
+                            ModLogger.LOG.info(hurtAmount);
                         }
-                        lv.hurt(modifiedDamageSource, hurtAmount);
-                        result.set(true);
                     }
+                    lv.hurt(modifiedDamageSource, hurtAmount);
+                    result.set(true);
+                } else {
                     result.set(false);
                 }
-            });
-        });
+            }
+        }));
         return result.get();
     }
 }
