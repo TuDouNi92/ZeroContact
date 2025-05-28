@@ -25,12 +25,29 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.ModLogger;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.*;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedAttackMob {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
+    private boolean isContact =false;
+    private <E extends GeoAnimatable> PlayState predicate(AnimationState<E> state) {
+        if (state.isMoving()) {
+            state.getController().setAnimation(RawAnimation.begin().then("raider.animation.walk", Animation.LoopType.LOOP));
+            return PlayState.CONTINUE;
+        }
+        if (this.isContact){
+            state.getController().setAnimation(RawAnimation.begin().then("raider.animation.alert", Animation.LoopType.HOLD_ON_LAST_FRAME));
+            isContact = false;
+            return PlayState.CONTINUE;
+        }
+        state.getController().setAnimation(RawAnimation.begin().then("raider.animation.idle", Animation.LoopType.LOOP));
+        return PlayState.CONTINUE;
+    }
 
     public ArmedRaider(EntityType<? extends PatrollingMonster> entityType, Level level) {
         super(entityType, level);
@@ -44,8 +61,8 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
         this.goalSelector.addGoal(4, new FollowMobGoal(this, 0.6, 8, 8));
         this.goalSelector.addGoal(3, new RandomStrollGoal(this, 0.6));
         this.goalSelector.addGoal(2, new RangedAttackGoal(this, 1.0f, 20, 25));
-        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true,false));
-        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Monster.class,true,false));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true, false));
+        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Monster.class, true, false));
 
     }
 
@@ -59,7 +76,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-
+        controllerRegistrar.add(new AnimationController<>(this,"controller",10,this::predicate));
     }
 
     @Override
@@ -72,10 +89,10 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
         Item gun = ForgeRegistries.ITEMS.getValue(new ResourceLocation("tacz", "modern_kinetic_gun"));
         ItemStack gunStack = new ItemStack(gun);
         CompoundTag tag = new CompoundTag();
-        tag.putByte("HasBulletInBarrel",(byte) 1);
+        tag.putByte("HasBulletInBarrel", (byte) 1);
         tag.putString("GunId", "tacz:ak47");
-        tag.putString("GunFireMode","AUTO");
-        tag.putInt("GunCurrentAmmoCount",120);
+        tag.putString("GunFireMode", "AUTO");
+        tag.putInt("GunCurrentAmmoCount", 120);
         gunStack.setTag(tag);
         this.setItemInHand(InteractionHand.MAIN_HAND, gunStack);
         return super.finalizeSpawn(level, difficulty, reason, spawnData, dataTag);
@@ -91,6 +108,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
 
     @Override
     public void performRangedAttack(LivingEntity target, float velocity) {
+        isContact = true;
         double x = target.getX() - this.getX();
         double y = target.getEyeY() - this.getEyeY();
         double z = target.getZ() - this.getZ();
@@ -99,9 +117,9 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
         if (!IGun.mainhandHoldGun(this)) return;
         IGunOperator operator = IGunOperator.fromLivingEntity(this);
         operator.initialData();
-        ShootResult result=operator.shoot(()->pitch,()->yaw);
-        if(result ==ShootResult.NOT_DRAW)operator.draw(this::getMainHandItem);
-        if(result ==ShootResult.NO_AMMO)operator.reload();
-        ModLogger.LOG.info("Tried to shoot"+result);
+        ShootResult result = operator.shoot(() -> pitch, () -> yaw);
+        if (result == ShootResult.NOT_DRAW) operator.draw(this::getMainHandItem);
+        if (result == ShootResult.NO_AMMO) operator.reload();
+        ModLogger.LOG.info("Tried to shoot" + result);
     }
 }
