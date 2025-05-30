@@ -26,7 +26,6 @@ public class ItemsReg {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(MOD_ID, Registries.ITEM);
     public static final RegistrySupplier<Item> STEEL_PLATE = ITEMS.register("steel_plate", () ->
             SapiIV.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT),10,7,-0.04f));
-
     public static void register() {
         TABS.register();
         ITEMS.register("jpc_armor", () ->

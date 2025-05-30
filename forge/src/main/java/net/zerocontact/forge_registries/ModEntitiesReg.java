@@ -2,13 +2,11 @@ package net.zerocontact.forge_registries;
 
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
-import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.zerocontact.entity.ArmedRaider;
-import net.zerocontact.renderer.ArmedRaiderRender;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
 public class ModEntitiesReg {

@@ -22,7 +22,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.zerocontact.ModLogger;
+import net.zerocontact.ZeroContactLogger;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
@@ -120,6 +120,6 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
         ShootResult result = operator.shoot(() -> pitch, () -> yaw);
         if (result == ShootResult.NOT_DRAW) operator.draw(this::getMainHandItem);
         if (result == ShootResult.NO_AMMO) operator.reload();
-        ModLogger.LOG.info("Tried to shoot" + result);
+        ZeroContactLogger.LOG.info("Tried to shoot" + result);
     }
 }

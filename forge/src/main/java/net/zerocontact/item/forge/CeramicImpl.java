@@ -1,5 +1,6 @@
 package net.zerocontact.item.forge;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ArmorMaterial;
 import net.zerocontact.api.DurabilityLossProvider;
 import net.zerocontact.api.EntityHurtProvider;
@@ -65,4 +66,5 @@ public class CeramicImpl extends Ceramic implements EntityHurtProvider, Durabili
     public int getAbsorb() {
         return this.absorb;
     }
+
 }

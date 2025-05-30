@@ -3,7 +3,7 @@ package net.zerocontact.stamina;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.zerocontact.ModLogger;
+import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.network.ModMessages;
 import net.zerocontact.network.NetworkHandler;
 
@@ -51,7 +51,7 @@ public class PlayerStamina {
                 }
             }
             playerStamina.cooldownTicks = Math.max(0, --playerStamina.cooldownTicks);
-            ModLogger.LOG.debug(playerStamina.cooldownTicks);
+            ZeroContactLogger.LOG.debug(playerStamina.cooldownTicks);
             ModMessages.sendToPlayer(new NetworkHandler.SyncStaminaPacket(playerStamina.getStamina()), (ServerPlayer) player);
         });
 

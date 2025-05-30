@@ -8,10 +8,8 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.zerocontact.ModLogger;
+import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.EntityHurtProvider;
-import net.zerocontact.item.SapiIV;
-import net.zerocontact.item.forge.SapiIVImpl;
 import net.zerocontact.registries.ModSoundEventsReg;
 import top.theillusivec4.curios.api.CuriosApi;
 
@@ -31,7 +29,7 @@ public class PlateEntityHurtEvent {
             if (!(stack.isEmpty() && source.type() != modifiedDamageSource.type())) {
                 lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
                 if (lv instanceof Player && EventUtil.isDamageSourceValid(source) && stack.getItem() instanceof EntityHurtProvider provider) {
-                    ModLogger.LOG.info(source);
+                    ZeroContactLogger.LOG.info(source);
                     if (EventUtil.isIncidentAngleValid(lv, source, amount)) {
                         hurtAmount = provider.generateRicochet() * amount;
                         lv.hurt(modifiedDamageSource, hurtAmount);
@@ -39,11 +37,11 @@ public class PlateEntityHurtEvent {
                         if (hurtCanHold >= amount) {
                             //钝伤
                             hurtAmount = provider.generateBlunt() * amount;
-                            ModLogger.LOG.info(hurtAmount);
+                            ZeroContactLogger.LOG.info(hurtAmount);
                         } else {
                             //贯穿
                             hurtAmount = provider.generatePenetrated() * amount;
-                            ModLogger.LOG.info(hurtAmount);
+                            ZeroContactLogger.LOG.info(hurtAmount);
                         }
                     }
                     lv.hurt(modifiedDamageSource, hurtAmount);

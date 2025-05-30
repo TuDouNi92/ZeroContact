@@ -7,6 +7,7 @@ import dev.architectury.platform.forge.EventBuses;
 import net.zerocontact.ZeroContact;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.zerocontact.datagen.Predicate;
 import net.zerocontact.events.EventUtil;
 import net.zerocontact.events.PlateDamageEvent;
 import net.zerocontact.events.PlateEntityHurtEvent;
@@ -33,5 +34,6 @@ public class ZeroContactForge {
                 }
         );
         ModEntitiesReg.register();
+        Predicate.predicateCurios();
     }
 }
