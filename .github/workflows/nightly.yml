@@ -4,6 +4,7 @@ on:
     - cron: '0 0 * * *'
   pull_request:
     branches: [main]
+  workflow_dispatch:
 jobs:
   build:
     name: Build for Forge
