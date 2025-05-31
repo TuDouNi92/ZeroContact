@@ -45,7 +45,7 @@ jobs:
       - name: Rename file
         run: |
           mkdir -p nightly 
-          original_jar=$(ls forge/build/libs/zerocontact-[0-9]*.jar) 
+          original_jar=$(ls forge/build/libs/zerocontact-*.*.[0-9].jar) 
           new_jar="ZeroContact-${{ github.ref_name }}-build-${{ github.run_number }}-${{steps.vars.outputs.SHORT_SHA}}.jar" 
           cp "$original_jar" "nightly/$new_jar" 
 
