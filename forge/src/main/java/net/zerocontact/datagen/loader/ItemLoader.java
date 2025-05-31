@@ -53,14 +53,14 @@ public class ItemLoader {
 
     private static void loadItemJson(Path itemPath) throws IOException {
         try (Stream<Path> stream = Files.walk(itemPath)) {
-            ZeroContactLogger.LOG.info("Try path: {} ",itemPath);
-            stream.filter(name->name.toString().endsWith(".json")).toList().forEach(itemJsonPath -> {
-                ZeroContactLogger.LOG.info("Try json: {} ",itemJsonPath);
+            ZeroContactLogger.LOG.info("Try path: {} ", itemPath);
+            stream.filter(name -> name.toString().endsWith(".json")).toList().forEach(itemJsonPath -> {
+                ZeroContactLogger.LOG.info("Try json: {} ", itemJsonPath);
                 if (Files.exists(itemJsonPath)) {
                     try {
                         ItemGenData item = GSON.fromJson(Files.newBufferedReader(itemJsonPath), ItemGenData.class);
                         itemGenData.add(item);
-                        ZeroContactLogger.LOG.info("Added item: {}", (Object) item.getClass().getDeclaredFields());
+                        ZeroContactLogger.LOG.info("Added item: {}", item.id);
                     } catch (IOException e) {
                         ZeroContactLogger.LOG.error(e);
                     }
