@@ -4,7 +4,6 @@ on:
     - cron: '0 0 * * *'
   pull_request:
     branches: [main]
-  workflow_dispatch:
 jobs:
   build:
     name: Build for Forge
@@ -42,4 +41,16 @@ jobs:
           name: ZeroContact-${{ github.ref_name }}-build-${{ github.run_number }}-${{steps.vars.outputs.SHORT_SHA}}
           path: forge/build/libs/zerocontact-*.*.*.jar
 
+      - name: Rename file
+        run: |
+          mkdir -p nightly 
+          original_jar=$(ls forge/build/libs/zerocontact-[0-9]*.jar) 
+          new_jar="ZeroContact-${{ github.ref_name }}-build-${{ github.run_number }}-${{steps.vars.outputs.SHORT_SHA}}.jar" 
+          cp "$original_jar" "nightly/$new_jar" 
+
+      - name: Upload to Discord
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEB_HOOK }}
+          filename: "nightly/ZeroContact-${{ github.ref_name }}-build-${{ github.run_number }}-${{steps.vars.outputs.SHORT_SHA}}.jar"
 
