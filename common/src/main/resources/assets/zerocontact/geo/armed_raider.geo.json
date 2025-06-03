@@ -744,6 +744,11 @@
 					]
 				},
 				{
+					"name": "gun_fix",
+					"parent": "RightArm",
+					"pivot": [-6, 14, 0]
+				},
+				{
 					"name": "Body",
 					"parent": "bone",
 					"pivot": [0, 24, 0],
