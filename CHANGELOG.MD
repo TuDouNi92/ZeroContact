@@ -38,3 +38,8 @@ Fixed the issue with plates do not absorb damage.
 ### Add
 This is a Data-driven feature update, you can customize your own ballistic plate from now on.
 Tutorials about customize your own datapack can be found in GitHub wiki.
+
+## indev.1.0.6
+### Add
+This is a Data-driven feature update, you can customize your own ballistic plate from now on.
+Tutorials about customize your own datapack can be found in GitHub wiki.
