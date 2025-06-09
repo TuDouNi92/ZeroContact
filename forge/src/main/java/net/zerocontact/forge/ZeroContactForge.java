@@ -24,7 +24,7 @@ public class ZeroContactForge {
         ZeroContact.init();
         GeckoLib.initialize();
         ModMessages.register();
-        TickEvent.PLAYER_POST.register(PlayerStamina::staminaTick);
+        TickEvent.PLAYER_PRE.register(PlayerStamina::staminaTick);
         EntityEvent.LIVING_HURT.register((lv, source, amount) -> {
                     PlateDamageEvent.DamagePlateRegister(lv, source, amount);
                     if (PlateEntityHurtEvent.changeHurtAmountRicochet(lv, source, amount, EventUtil.idHitFromBack(lv, source))) {

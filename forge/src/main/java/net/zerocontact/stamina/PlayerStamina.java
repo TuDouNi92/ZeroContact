@@ -1,5 +1,6 @@
 package net.zerocontact.stamina;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -9,8 +10,8 @@ import net.zerocontact.network.NetworkHandler;
 
 public class PlayerStamina {
     private float stamina = 120f;
-    private  int tickCounter = 0;
-    private  int cooldownTicks = 0;
+    private int tickCounter = 0;
+    private int cooldownTicks = 0;
 
     public float getStamina() {
         return stamina;
@@ -28,13 +29,20 @@ public class PlayerStamina {
         stamina = nbt.getFloat("stamina");
     }
 
+    public static void interruptSprint(Player player) {
+        if (player.isCreative()) return;
+        if(!player.level().isClientSide()){
+            player.setSprinting(false);
+        }
+        Minecraft.getInstance().options.keySprint.setDown(false);
+    }
+
     public static void staminaTick(Player player) {
-        if (player.level().isClientSide) return;
         player.getCapability(PlayerStaminaProvider.PLAYER_STAMINA).ifPresent(playerStamina -> {
             playerStamina.tickCounter++;
             float stamina = playerStamina.getStamina();
-            if(playerStamina.cooldownTicks!=0){
-                player.setSprinting(false);
+            if (playerStamina.cooldownTicks != 0) {
+                interruptSprint(player);
             }
             if (player.isSprinting()) {
                 if (stamina < 1 && playerStamina.cooldownTicks == 0) {
@@ -52,7 +60,9 @@ public class PlayerStamina {
             }
             playerStamina.cooldownTicks = Math.max(0, --playerStamina.cooldownTicks);
             ZeroContactLogger.LOG.debug(playerStamina.cooldownTicks);
-            ModMessages.sendToPlayer(new NetworkHandler.SyncStaminaPacket(playerStamina.getStamina()), (ServerPlayer) player);
+            if (!player.level().isClientSide) {
+                ModMessages.sendToPlayer(new NetworkHandler.SyncStaminaPacket(playerStamina.getStamina()), (ServerPlayer) player);
+            }
         });
 
     }
