@@ -22,5 +22,21 @@
         "type": "file"
       }
     ]
+  },
+  "usec1_enemy_contact_01_n_01":{
+    "sounds": [
+      {
+        "name": "zerocontact:usec1_enemy_contact_01_n_01",
+        "type": "file"
+      }
+    ]
+  },
+  "usec1_weap_reload_01_n_01":{
+    "sounds": [
+      {
+        "name": "zerocontact:usec1_weap_reload_01_n_01",
+        "type": "file"
+      }
+    ]
   }
 }

@@ -12,6 +12,8 @@ public class ModSoundEventsReg {
     public static final SoundEvent ARMOR_EQUIP_PLATE = SoundEvent.createFixedRangeEvent(new ResourceLocation(MOD_ID,"armor/plate_equip"),8f);
     public static final SoundEvent ARMOR_HIT_PLATE = SoundEvent.createFixedRangeEvent(new ResourceLocation(MOD_ID,"armor/plate_hit"),22f);
     public static final SoundEvent ARMOR_BROKEN_PLATE = SoundEvent.createVariableRangeEvent(new ResourceLocation(MOD_ID,"armor/plate_broke"));
+    public static final SoundEvent RAIDER_CONTACT = SoundEvent.createVariableRangeEvent(new ResourceLocation(MOD_ID,"usec1_enemy_contact_01_n_01"));
+    public static final SoundEvent RAIDER_RELOAD = SoundEvent.createVariableRangeEvent(new ResourceLocation(MOD_ID,"usec1_weap_reload_01_n_01"));
     public static void register(){
         MOD_SOUND_REG.register();
     }

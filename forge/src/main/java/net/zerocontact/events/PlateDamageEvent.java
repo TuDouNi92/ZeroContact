@@ -27,20 +27,20 @@ public class PlateDamageEvent {
             int hits = stack.getOrCreateTag().getInt("hits") + 1;
             int durabilityLossAmount = 1;
             if (!stack.isEmpty() && (damageSource.is(ModDamageTypes.BULLET) || damageSource.is(ModDamageTypes.BULLET_IGNORE_ARMOR))) {
-                switch (ProtectionLevelHelper.get((int)Math.floor(amount))){
+                switch (ProtectionLevelHelper.get((int) Math.floor(amount))) {
                     case NIJIIA -> durabilityLossFactor = 0.1F;
                     case NIJII -> durabilityLossFactor = 0.4F;
                     case NIJIIIA -> durabilityLossFactor = 0.7F;
                     case NIJIII -> durabilityLossFactor = 1.1F;
                     case NIJIV -> durabilityLossFactor = 1.5F;
                 }
-                if(stack.getItem() instanceof DurabilityLossProvider provider){
-                    durabilityLossAmount = provider.generateLoss(amount,durabilityLossFactor,hits);
+                if (stack.getItem() instanceof DurabilityLossProvider provider) {
+                    durabilityLossAmount = provider.generateLoss(amount, durabilityLossFactor, hits);
                 }
             }
             stack.getOrCreateTag().putInt("hits", hits);
             stack.hurtAndBreak(durabilityLossAmount, livingEntity, lv -> {
-                lv.level().playSound(null, lv.getX(), lv.getY(), lv.getZ(), ModSoundEventsReg.ARMOR_BROKEN_PLATE, SoundSource.PLAYERS, 1.0f, 1.0f);
+                lv.playSound(ModSoundEventsReg.ARMOR_BROKEN_PLATE, 1.0f, 1.0f);
                 ZeroContactLogger.LOG.info(lv.getName() + "的插板碎掉了！");
             });
         });
