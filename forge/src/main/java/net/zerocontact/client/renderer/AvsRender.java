@@ -1,4 +1,4 @@
-package net.zerocontact.renderer;
+package net.zerocontact.client.renderer;
 
 import net.minecraft.world.entity.Entity;
 import net.zerocontact.item.armor.forge.AvsArmorImpl;

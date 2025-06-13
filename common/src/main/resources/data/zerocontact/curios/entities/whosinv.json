@@ -1,4 +1,4 @@
 {
-  "entities": ["player"],
+  "entities": ["player","zerocontact:armed_raider"],
   "slots": ["front_plate","back_plate"]
 }

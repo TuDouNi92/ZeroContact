@@ -17,7 +17,6 @@ import net.zerocontact.item.armor.JpcArmor;
 import static net.zerocontact.ZeroContact.MOD_ID;
 import static net.zerocontact.item.PlateBaseMaterial.ARMOR_STEEL;
 import static net.zerocontact.item.PlateBaseMaterial.SLIME_STEEL;
-
 public class ItemsReg {
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(MOD_ID, Registries.CREATIVE_MODE_TAB);
     public static final RegistrySupplier<CreativeModeTab> ZERO_CONTACT = TABS.register("zero_contact", () ->

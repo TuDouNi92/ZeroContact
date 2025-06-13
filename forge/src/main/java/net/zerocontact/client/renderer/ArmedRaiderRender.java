@@ -1,7 +1,5 @@
-package net.zerocontact.renderer;
+package net.zerocontact.client.renderer;
 
-import com.tacz.guns.client.renderer.item.GunItemRenderer;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.models.ArmedRaiderModel;

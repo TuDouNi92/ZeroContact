@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.api.ArmorTypeTag;
 import net.zerocontact.item.armor.JpcArmor;
-import net.zerocontact.renderer.JpcRender;
+import net.zerocontact.client.renderer.JpcRender;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;

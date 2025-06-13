@@ -2,7 +2,7 @@
   "armor/plate_equip": {
     "sounds": [
       {
-        "name":"zerocontact:armor/plate_equip",
+        "name": "zerocontact:armor/plate_equip",
         "type": "file"
       }
     ]
@@ -23,7 +23,7 @@
       }
     ]
   },
-  "usec1_enemy_contact_01_n_01":{
+  "usec1_enemy_contact_01_n_01": {
     "sounds": [
       {
         "name": "zerocontact:usec1_enemy_contact_01_n_01",
@@ -31,10 +31,58 @@
       }
     ]
   },
-  "usec1_weap_reload_01_n_01":{
+  "usec1_weap_reload_01_n_01": {
     "sounds": [
       {
         "name": "zerocontact:usec1_weap_reload_01_n_01",
+        "type": "file"
+      }
+    ]
+  },
+  "bullet_1": {
+    "sounds": [
+      {
+        "name": "zerocontact:bullets/bullet_1",
+        "type": "file"
+      }
+    ]
+  },
+  "bullet_2": {
+    "sounds": [
+      {
+        "name": "zerocontact:bullets/bullet_2",
+        "type": "file"
+      }
+    ]
+  },
+  "bullet_3": {
+    "sounds": [
+      {
+        "name": "zerocontact:bullets/bullet_3",
+        "type": "file"
+      }
+    ]
+  },
+  "bullet_4": {
+    "sounds": [
+      {
+        "name": "zerocontact:bullets/bullet_4",
+        "type": "file"
+      }
+    ]
+  },
+  "bullet_5": {
+    "sounds": [
+      {
+        "name": "zerocontact:bullets/bullet_5",
+        "type": "file"
+      }
+    ]
+  },
+  "bullet_6": {
+    "sounds": [
+      {
+        "name": "zerocontact:bullets/bullet_6",
         "type": "file"
       }
     ]

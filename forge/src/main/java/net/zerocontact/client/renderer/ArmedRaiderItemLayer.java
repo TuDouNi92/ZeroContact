@@ -1,4 +1,4 @@
-package net.zerocontact.renderer;
+package net.zerocontact.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;

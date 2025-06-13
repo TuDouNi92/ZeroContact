@@ -1,9 +1,10 @@
 package net.zerocontact.entity;
 
+import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
-import com.tacz.guns.api.item.gun.FireMode;
 import com.tacz.guns.item.AmmoItem;
+import com.tacz.guns.resource.pojo.data.gun.GunData;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -26,6 +27,7 @@ import net.minecraft.world.entity.monster.PatrollingMonster;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.npc.InventoryCarrier;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -35,6 +37,8 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.zerocontact.entity.ai.MTeam;
+import net.zerocontact.entity.ai.goal.MAvoidEntityGoal;
 import net.zerocontact.entity.ai.goal.PerformGunAttackGoal;
 import net.zerocontact.registries.ModSoundEventsReg;
 import org.jetbrains.annotations.NotNull;
@@ -46,6 +50,7 @@ import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
+import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.Objects;
 
@@ -56,6 +61,17 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
     private final SimpleContainer inventory = new SimpleContainer(5);
     private final LazyOptional<IItemHandler> itemHandlerLazyOptional = LazyOptional.of(() -> new InvWrapper(inventory));
     private final IGunOperator operator;
+    private String factionId;
+    public boolean isHurt = false;
+    private int hurtExpiredTicks = 40;
+
+    public String getFactionId() {
+        return this.factionId;
+    }
+
+    public void setFactionId(String factionId) {
+        this.factionId = factionId;
+    }
 
     private enum SoundState {
         IDLE,
@@ -63,7 +79,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
         RELOAD
     }
 
-    enum Weapon {
+    protected enum Weapon {
         AK(),
         SKS("tacz:sks_tactical", "tacz:762x39"),
         M4("tacz:m4a1", "tacz:556x45"),
@@ -79,22 +95,25 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
             this.ammoName = ammoName;
         }
 
-        @NotNull ItemStack getWeapon() {
+        ItemStack getWeapon() {
             AbstractGunItem gun = (AbstractGunItem) ForgeRegistries.ITEMS.getValue(new ResourceLocation("tacz", "modern_kinetic_gun"));
-            assert gun != null;
+            if (gun == null) return null;
             ItemStack gunStack = new ItemStack(gun);
             gun.setGunId(gunStack, new ResourceLocation(Objects.requireNonNullElse(gunName, "tacz:ak47")));
-            gun.hasBulletInBarrel(gunStack);
-            gun.setFireMode(gunStack, FireMode.AUTO);
-            gun.setCurrentAmmoCount(gunStack, 30);
+            TimelessAPI.getCommonGunIndex(gun.getGunId(gunStack)).ifPresent(commonGunIndex -> {
+                GunData gunData = commonGunIndex.getGunData();
+                gun.hasBulletInBarrel(gunStack);
+                gun.setFireMode(gunStack, gunData.getFireModeSet().get(0));
+                gun.setCurrentAmmoCount(gunStack, gunData.getAmmoAmount());
+            });
             return gunStack;
         }
 
-        @NotNull ItemStack getAmmo() {
+        ItemStack getAmmo() {
             CompoundTag tag = new CompoundTag();
             AmmoItem ammo = (AmmoItem) ForgeRegistries.ITEMS.getValue(new ResourceLocation("tacz", "ammo"));
             tag.putString("AmmoId", Objects.requireNonNullElse(ammoName, "tacz:762x39"));
-            assert ammo != null;
+            if (ammo == null) return null;
             ItemStack ammoStack = new ItemStack(ammo, 30);
             ammoStack.setTag(tag);
             return ammoStack;
@@ -114,6 +133,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
     public ArmedRaider(EntityType<? extends PatrollingMonster> entityType, Level level) {
         super(entityType, level);
         operator = IGunOperator.fromLivingEntity(this);
+        MTeam.registerEntity(this);
     }
 
     @Override
@@ -123,10 +143,10 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
         this.goalSelector.addGoal(1, new HurtByTargetGoal(this, Monster.class));
         this.goalSelector.addGoal(2, new AvoidEntityGoal<>(this, Monster.class, 5, 1.0F, 1.5F));
         this.goalSelector.addGoal(2, new AvoidEntityGoal<>(this, IronGolem.class, 10, 1.0F, 1.5F));
-        this.goalSelector.addGoal(5, new RandomStrollGoal(this, 1.0F));
+        this.goalSelector.addGoal(5, new RandomStrollGoal(this, 0.8F));
         this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 15.0F, 0.5F));
         this.goalSelector.addGoal(3, new RangedAttackGoal(this, 1.0f, 10, 30, 30));
-        this.goalSelector.addGoal(4, new PerformGunAttackGoal(this, 10));
+        this.goalSelector.addGoal(4, new PerformGunAttackGoal(this, 0));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true, false));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Monster.class, true, false));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, IronGolem.class, true, false));
@@ -138,7 +158,8 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
                 .add(Attributes.MOVEMENT_SPEED, 0.35F)
                 .add(Attributes.MAX_HEALTH, 30.0F)
                 .add(Attributes.ATTACK_DAMAGE, 3.0F)
-                .add(Attributes.FOLLOW_RANGE, 25.0F);
+                .add(Attributes.FOLLOW_RANGE, 35.0F)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 0.6F);
     }
 
     @Override
@@ -154,7 +175,6 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
         return geoCache;
     }
 
-
     private <E extends GeoAnimatable> PlayState predicate(AnimationState<E> state) {
         if (state.isMoving()) {
             state.getController().setAnimation(RawAnimation.begin().then("raider.animation.walk", Animation.LoopType.LOOP));
@@ -167,15 +187,35 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor level, @NotNull DifficultyInstance difficulty, @NotNull MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
         Weapon weapon = randomEnum();
-        this.setItemInHand(InteractionHand.MAIN_HAND, weapon.getWeapon());
+        ItemStack gun = weapon.getWeapon();
+        if (gun == null) return null;
+        this.setItemInHand(InteractionHand.MAIN_HAND, gun);
         finalizeInvs(weapon);
+        finalizeArmors();
         operator.initialData();
         return super.finalizeSpawn(level, difficulty, reason, spawnData, dataTag);
     }
 
-    public void finalizeInvs(Weapon weapon) {
+    private void finalizeInvs(Weapon weapon) {
         for (int i = 0; i < inventory.getContainerSize(); i++) {
-            inventory.addItem(weapon.getAmmo());
+            ItemStack ammo = weapon.getAmmo();
+            if (ammo == null) return;
+            inventory.addItem(ammo);
+        }
+    }
+
+    private void finalizeArmors() {
+        Item armor = ForgeRegistries.ITEMS.getValue(new ResourceLocation("zerocontact", "jpc_armor"));
+        if (armor != null) {
+            this.setItemSlot(EquipmentSlot.CHEST, new ItemStack(armor));
+            CuriosApi.getCuriosInventory(this).ifPresent(handler -> {
+                Item plate = ForgeRegistries.ITEMS.getValue(new ResourceLocation("zerocontact", "steel_plate"));
+                if (plate != null) {
+                    ItemStack plateStack = new ItemStack(plate);
+                    handler.setEquippedCurio("front_plate", 0, plateStack);
+                    handler.setEquippedCurio("back_plate", 0, plateStack.copy());
+                }
+            });
         }
     }
 
@@ -187,13 +227,12 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
             this.spawnAtLocation(mainHandItem.copy());
         }
         Containers.dropContents(this.level(), this.getOnPos(), randomAddLootsList());
-        super.dropCustomDeathLoot(damageSource, looting, hitByPlayer);
     }
 
     private @NotNull NonNullList<ItemStack> randomAddLootsList() {
         NonNullList<ItemStack> stackList = NonNullList.create();
         for (int i = 0; i < inventory.getContainerSize(); i++) {
-            if (random.nextFloat() <= .3F && !inventory.getItem(i).isEmpty()) {
+            if (random.nextFloat() <= .2F && !inventory.getItem(i).isEmpty()) {
                 stackList.add(inventory.getItem(i).copy());
             }
         }
@@ -223,6 +262,15 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
             return itemHandlerLazyOptional.cast();
         }
         return super.getCapability(cap, null);
+    }
+
+    @Override
+    public boolean hurt(@NotNull DamageSource source, float amount) {
+        isHurt = true;
+        if (hurtExpiredTicks == 0) {
+            hurtExpiredTicks = 40;
+        }
+        return super.hurt(source, amount);
     }
 
     @Override
@@ -264,24 +312,35 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
         }
     }
 
+    private void tickHurtTime() {
+        hurtExpiredTicks--;
+        if (hurtExpiredTicks == 0) {
+            isHurt = false;
+        }
+    }
 
     @Override
     public void tick() {
         super.tick();
         listenSoundState();
+        tickHurtTime();
     }
 
-
     @Override
-    public boolean isAlliedTo(@NotNull Entity entity) {
-        if (entity instanceof ArmedRaider) {
-            return true;
+    public boolean isAlliedTo(@NotNull Entity other) {
+        if (other instanceof ArmedRaider) {
+            return this.factionId != null && Objects.equals(this.getFactionId(), ((ArmedRaider) other).getFactionId());
         }
-        return super.isAlliedTo(entity);
+        return false;
     }
 
     @Override
     public @NotNull SimpleContainer getInventory() {
         return this.inventory;
+    }
+
+    @Override
+    public boolean removeWhenFarAway(double distanceToClosestPlayer) {
+        return distanceToClosestPlayer > 256.0F;
     }
 }

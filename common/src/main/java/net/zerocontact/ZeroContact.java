@@ -14,7 +14,6 @@ public class ZeroContact {
 
     public static void init() {
         ItemsReg.register();
-        ModSoundEventsReg.register();
         System.out.println(ZeroContactExpectPlatform.getConfigDirectory().toAbsolutePath().normalize().toString());
     }
 }

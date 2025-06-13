@@ -47,7 +47,7 @@ public class PlateDamageEvent {
     }
 
     public static void DamagePlateRegister(LivingEntity entity, DamageSource damageSource, float amount) {
-        if (entity instanceof Player && EventUtil.isDamageSourceValid(damageSource)) {
+        if (EventUtil.isDamageSourceValid(damageSource)) {
             CuriosApi.getCuriosInventory(entity).ifPresent(inv -> {
                 DamagePlateModifier(inv, entity, damageSource, amount, EventUtil.idHitFromBack(entity, damageSource));
             });

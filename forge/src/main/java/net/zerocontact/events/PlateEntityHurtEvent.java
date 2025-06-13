@@ -28,7 +28,7 @@ public class PlateEntityHurtEvent {
             int hurtCanHold = stack.getOrCreateTag().getInt("absorb");
             if (!(stack.isEmpty() && source.type() != modifiedDamageSource.type())) {
                 lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
-                if (lv instanceof Player && EventUtil.isDamageSourceValid(source) && stack.getItem() instanceof EntityHurtProvider provider) {
+                if (EventUtil.isDamageSourceValid(source) && stack.getItem() instanceof EntityHurtProvider provider) {
                     ZeroContactLogger.LOG.info(source);
                     if (EventUtil.isIncidentAngleValid(lv, source, amount)) {
                         hurtAmount = provider.generateRicochet() * amount;
