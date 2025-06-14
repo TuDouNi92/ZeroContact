@@ -10,9 +10,7 @@ import top.theillusivec4.curios.api.SlotContext;
 public class PlateInteract {
     public static boolean isPlateArmorEquipped(LivingEntity entity) {
         ItemStack stack = entity.getItemBySlot(EquipmentSlot.CHEST);
-        if (!(stack.getItem() instanceof ArmorTypeTag))
-            return false;
-        return true;
+        return stack.getItem() instanceof ArmorTypeTag;
     }
 
     public static void onArmorUnequip(SlotContext context, ItemStack stack) {
