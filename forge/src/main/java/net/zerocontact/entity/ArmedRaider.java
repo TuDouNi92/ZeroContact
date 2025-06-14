@@ -54,7 +54,7 @@ import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.Objects;
 
-public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedAttackMob, InventoryCarrier {
+public class ArmedRaider extends PatrollingMonster implements GeoEntity, InventoryCarrier {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final RawAnimation SHOOT_ANIM = RawAnimation.begin().then("raider.animation.alert", Animation.LoopType.HOLD_ON_LAST_FRAME);
     private final RandomSource random = this.getRandom();
@@ -146,7 +146,6 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
         this.goalSelector.addGoal(2, new AvoidEntityGoal<>(this, IronGolem.class, 10, 1.0F, 1.5F));
         this.goalSelector.addGoal(2, new MAvoidGoal(this, 5));
         this.goalSelector.addGoal(5, new RandomStrollGoal(this, 0.8F));
-        this.goalSelector.addGoal(3, new RangedAttackGoal(this, 1.0f, 10, 30, 30));
         this.goalSelector.addGoal(4, new PerformGunAttackGoal(this));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true, false));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Monster.class, true, false));
@@ -240,8 +239,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
         return stackList;
     }
 
-    @Override
-    public void performRangedAttack(@NotNull LivingEntity target, float velocity) {
+    public void performAttackAnim() {
         triggerAnim("shoot_controller", "shoot");
     }
 

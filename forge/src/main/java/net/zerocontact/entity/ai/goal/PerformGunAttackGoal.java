@@ -4,12 +4,12 @@ import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.entity.ShootResult;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.gun.FireMode;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
-import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.entity.ArmedRaider;
 
 public class PerformGunAttackGoal extends Goal {
@@ -18,6 +18,7 @@ public class PerformGunAttackGoal extends Goal {
     private int burstInterval = 0;
     private final RandomSource random;
     private final IGunOperator operator;
+
     public PerformGunAttackGoal(ArmedRaider shooter) {
         this.shooter = shooter;
         this.operator = IGunOperator.fromLivingEntity(shooter);
@@ -26,26 +27,22 @@ public class PerformGunAttackGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return shooter.getTarget() != null;
-    }
-
-    @Override
-    public void start() {
-        ZeroContactLogger.LOG.info("START GOAL");
-    }
-
-    @Override
-    public void stop() {
-        ZeroContactLogger.LOG.info("STOP GOAL");
+        return shooter.getTarget() != null && !shooter.isHurt;
     }
 
     @Override
     public boolean canContinueToUse() {
-        return shooter.isShooting && !shooter.isHurt;
+        return !shooter.isHurt;
+    }
+
+    @Override
+    public void stop() {
+        shooter.isShooting = false;
     }
 
     @Override
     public void tick() {
+        shooter.performAttackAnim();
         burstFire();
     }
 
@@ -86,7 +83,8 @@ public class PerformGunAttackGoal extends Goal {
 
     private void burstFire() {
         LivingEntity target = shooter.getTarget();
-        if (target != null) {
+        if (target != null && shooter.getNavigation().isDone()) {
+            shooter.lookAt(EntityAnchorArgument.Anchor.EYES,target.position());
             if (shootCoolDown > 0) {
                 shootCoolDown--;
                 FireMode fireMode = IGun.getMainhandFireMode(shooter);
