@@ -9,6 +9,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
+import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.entity.ArmedRaider;
 
 public class PerformGunAttackGoal extends Goal {
@@ -17,7 +18,6 @@ public class PerformGunAttackGoal extends Goal {
     private int burstInterval = 0;
     private final RandomSource random;
     private final IGunOperator operator;
-
     public PerformGunAttackGoal(ArmedRaider shooter) {
         this.shooter = shooter;
         this.operator = IGunOperator.fromLivingEntity(shooter);
@@ -30,14 +30,23 @@ public class PerformGunAttackGoal extends Goal {
     }
 
     @Override
+    public void start() {
+        ZeroContactLogger.LOG.info("START GOAL");
+    }
+
+    @Override
     public void stop() {
-        shooter.isShooting = false;
+        ZeroContactLogger.LOG.info("STOP GOAL");
+    }
+
+    @Override
+    public boolean canContinueToUse() {
+        return shooter.isShooting && !shooter.isHurt;
     }
 
     @Override
     public void tick() {
         burstFire();
-        strafe();
     }
 
     private boolean canSee(LivingEntity target) {
@@ -97,15 +106,6 @@ public class PerformGunAttackGoal extends Goal {
                     burstInterval = random.nextInt(15);
                 }
             }
-        }
-    }
-    private void strafe(){
-        if(shooter.getTarget()!=null){
-            double vecX = (random.nextBoolean()?1:-1)*random.nextFloat()/10;
-            double vecZ = (random.nextBoolean()?1:-1)*random.nextFloat()/10;
-            Vec3 direction = new Vec3(vecX,0,vecZ);
-            Vec3 targetPos = shooter.position().add(direction);
-            shooter.moveTo(targetPos);
         }
     }
 }
