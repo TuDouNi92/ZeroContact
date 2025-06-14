@@ -232,7 +232,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     private @NotNull NonNullList<ItemStack> randomAddLootsList() {
         NonNullList<ItemStack> stackList = NonNullList.create();
         for (int i = 0; i < inventory.getContainerSize(); i++) {
-            if (random.nextFloat() <= .2F && !inventory.getItem(i).isEmpty()) {
+            if (random.nextFloat() <= .07F && !inventory.getItem(i).isEmpty()) {
                 stackList.add(inventory.getItem(i).copy());
             }
         }
