@@ -41,7 +41,6 @@ public class ItemsReg {
         ITEMS.register("steel_sheet",()->new Item(new Item.Properties().arch$tab(ZERO_CONTACT)));
         ITEMS.register("ceramic_shatters",()->new Item(new Item.Properties().arch$tab(ZERO_CONTACT)));
         ITEMS.register("fabric_roll",()->new Item(new Item.Properties().arch$tab(ZERO_CONTACT)));
-        ITEMS.register("raider_egg",()-> new Item(new Item.Properties().arch$tab(ZERO_CONTACT)));
         ITEMS.register();
     }
 }
