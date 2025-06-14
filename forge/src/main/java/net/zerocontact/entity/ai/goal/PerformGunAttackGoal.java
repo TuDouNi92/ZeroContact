@@ -57,9 +57,9 @@ public class PerformGunAttackGoal extends Goal {
     private float provideInaccuracy() {
         float baseSpread = 5;
         if (random.nextFloat() < .1F) {
-            return (float) random.triangle(baseSpread / 2, 2);
+            return (float) random.triangle(baseSpread / 2, baseSpread);
         }
-        return (float) random.triangle(baseSpread, 1);
+        return (float) random.triangle(baseSpread, baseSpread*1.25F);
     }
 
     private void shoot(LivingEntity target) {
