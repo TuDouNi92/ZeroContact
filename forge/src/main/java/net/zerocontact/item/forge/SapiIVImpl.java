@@ -58,19 +58,6 @@ public class SapiIVImpl extends SapiIV implements DurabilityLossProvider, Entity
         return this.defense;
     }
 
-
-    @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext, UUID uuid, ItemStack stack) {
-        Multimap<Attribute, AttributeModifier> modifiers = HashMultimap.create();
-        stack.getOrCreateTag().putInt("absorb", getAbsorb());
-        if (slotContext.entity() instanceof Player) {
-            modifiers.put(Attributes.ARMOR, new AttributeModifier(UUID.nameUUIDFromBytes(("Armor" + uuid).getBytes()), "CuriosArmorDefense", this.getDefense(), AttributeModifier.Operation.ADDITION));
-            modifiers.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(UUID.nameUUIDFromBytes(("ArmorToughness" + uuid).getBytes()), "CuriosArmorToughness", this.material.getToughness(), AttributeModifier.Operation.ADDITION));
-            modifiers.put(Attributes.MOVEMENT_SPEED,new AttributeModifier(UUID.nameUUIDFromBytes(("MoveSpeed"+uuid).getBytes()),"MoveSpeed",mass, AttributeModifier.Operation.MULTIPLY_TOTAL));
-        }
-        return modifiers;
-    }
-
     public static SapiIV create(ArmorMaterial armorMaterial, Type type, Properties properties, int defense, int absorb, float mass) {
         return new SapiIVImpl(armorMaterial, type, properties, defense, absorb,mass);
     }

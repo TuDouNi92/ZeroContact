@@ -39,6 +39,7 @@ public interface PlateInfoProvider extends ICurioItem {
         if (slotContext.entity() instanceof Player) {
             modifiers.put(Attributes.ARMOR, new AttributeModifier(UUID.nameUUIDFromBytes(("Armor" + uuid).getBytes()), "CuriosArmorDefense", this.getDefense(), AttributeModifier.Operation.ADDITION));
             modifiers.put(Attributes.MOVEMENT_SPEED,new AttributeModifier(UUID.nameUUIDFromBytes(("MoveSpeed"+uuid).getBytes()),"MoveSpeed",getMass(), AttributeModifier.Operation.MULTIPLY_TOTAL));
+            modifiers.put(Attributes.KNOCKBACK_RESISTANCE,new AttributeModifier(UUID.nameUUIDFromBytes(("KnockBack"+uuid).getBytes()),"KnockBack",.4f, AttributeModifier.Operation.MULTIPLY_TOTAL));
         }
         return modifiers;
     }
