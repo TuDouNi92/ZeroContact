@@ -14,3 +14,5 @@ Adding ballistic SAPI plates/Body armors to Modded Minecraft providing unique cl
         - Protection is conntected with durability and bullet damage. The more plate get hit, the more durability get consumed.
   - Ricochet!
       - The plate will immune damages if incident angle is big.
+## Contributors
+  - Raider Modelling -> TG@Faldskimerkh
