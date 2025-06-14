@@ -29,7 +29,6 @@ public class PlateEntityHurtEvent {
             if (!(stack.isEmpty() && source.type() != modifiedDamageSource.type())) {
                 lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
                 if (EventUtil.isDamageSourceValid(source) && stack.getItem() instanceof EntityHurtProvider provider) {
-                    ZeroContactLogger.LOG.info(source);
                     if (EventUtil.isIncidentAngleValid(lv, source, amount)) {
                         hurtAmount = provider.generateRicochet() * amount;
                         lv.hurt(modifiedDamageSource, hurtAmount);
@@ -37,11 +36,11 @@ public class PlateEntityHurtEvent {
                         if (hurtCanHold >= amount) {
                             //钝伤
                             hurtAmount = provider.generateBlunt() * amount;
-                            ZeroContactLogger.LOG.info(hurtAmount);
+
                         } else {
                             //贯穿
                             hurtAmount = provider.generatePenetrated() * amount;
-                            ZeroContactLogger.LOG.info(hurtAmount);
+
                         }
                     }
                     lv.hurt(modifiedDamageSource, hurtAmount);
