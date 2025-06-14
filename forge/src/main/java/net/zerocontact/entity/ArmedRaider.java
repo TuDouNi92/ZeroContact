@@ -38,7 +38,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.entity.ai.MTeam;
-import net.zerocontact.entity.ai.goal.MAvoidEntityGoal;
+import net.zerocontact.entity.ai.goal.MAvoidGoal;
 import net.zerocontact.entity.ai.goal.PerformGunAttackGoal;
 import net.zerocontact.registries.ModSoundEventsReg;
 import org.jetbrains.annotations.NotNull;
@@ -63,7 +63,8 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
     private final IGunOperator operator;
     private String factionId;
     public boolean isHurt = false;
-    private int hurtExpiredTicks = 40;
+    public boolean isShooting =false;
+    private int hurtExpiredTicks = 0;
 
     public String getFactionId() {
         return this.factionId;
@@ -140,13 +141,13 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
     protected void registerGoals() {
         super.registerGoals();
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(1, new HurtByTargetGoal(this, Monster.class));
+        this.goalSelector.addGoal(1, new HurtByTargetGoal(this, PathfinderMob.class));
         this.goalSelector.addGoal(2, new AvoidEntityGoal<>(this, Monster.class, 5, 1.0F, 1.5F));
         this.goalSelector.addGoal(2, new AvoidEntityGoal<>(this, IronGolem.class, 10, 1.0F, 1.5F));
+        this.goalSelector.addGoal(2, new MAvoidGoal(this, 5));
         this.goalSelector.addGoal(5, new RandomStrollGoal(this, 0.8F));
-        this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 15.0F, 0.5F));
         this.goalSelector.addGoal(3, new RangedAttackGoal(this, 1.0f, 10, 30, 30));
-        this.goalSelector.addGoal(4, new PerformGunAttackGoal(this, 0));
+        this.goalSelector.addGoal(4, new PerformGunAttackGoal(this));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true, false));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Monster.class, true, false));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, IronGolem.class, true, false));
@@ -267,9 +268,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, RangedA
     @Override
     public boolean hurt(@NotNull DamageSource source, float amount) {
         isHurt = true;
-        if (hurtExpiredTicks == 0) {
-            hurtExpiredTicks = 40;
-        }
+        hurtExpiredTicks = 40;
         return super.hurt(source, amount);
     }
 

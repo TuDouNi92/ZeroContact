@@ -7,23 +7,19 @@ import com.tacz.guns.api.item.gun.FireMode;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
 import net.zerocontact.entity.ArmedRaider;
 
 public class PerformGunAttackGoal extends Goal {
-    private final Mob shooter;
-    private final int coolDownTicks;
-    private int coolDown = 0;
+    private final ArmedRaider shooter;
     private int shootCoolDown = 0;
     private int burstInterval = 0;
     private final RandomSource random;
     private final IGunOperator operator;
 
-    public PerformGunAttackGoal(Mob shooter, int coolDownTicks) {
+    public PerformGunAttackGoal(ArmedRaider shooter) {
         this.shooter = shooter;
-        this.coolDownTicks = coolDownTicks;
         this.operator = IGunOperator.fromLivingEntity(shooter);
         this.random = shooter.getRandom();
     }
@@ -34,25 +30,14 @@ public class PerformGunAttackGoal extends Goal {
     }
 
     @Override
-    public boolean canContinueToUse() {
-        shooter.getTarget();
-        boolean isHurt = false;
-        if (shooter.getTarget() != null) {
-            ArmedRaider raider = (ArmedRaider) shooter;
-            isHurt = raider.isHurt;
-        }
-        return coolDown == 0 || !isHurt;
-    }
-
-    @Override
-    public void start() {
-        coolDown = coolDownTicks;
+    public void stop() {
+        shooter.isShooting = false;
     }
 
     @Override
     public void tick() {
         burstFire();
-        coolDown--;
+        strafe();
     }
 
     private boolean canSee(LivingEntity target) {
@@ -103,13 +88,24 @@ public class PerformGunAttackGoal extends Goal {
                 }
             } else {
                 if (burstInterval > 0) {
+                    shooter.isShooting = true;
                     shoot(shooter.getTarget());
                     burstInterval--;
                 } else {
+                    shooter.isShooting = false;
                     shootCoolDown = 40;
                     burstInterval = random.nextInt(15);
                 }
             }
+        }
+    }
+    private void strafe(){
+        if(shooter.getTarget()!=null){
+            double vecX = (random.nextBoolean()?1:-1)*random.nextFloat()/10;
+            double vecZ = (random.nextBoolean()?1:-1)*random.nextFloat()/10;
+            Vec3 direction = new Vec3(vecX,0,vecZ);
+            Vec3 targetPos = shooter.position().add(direction);
+            shooter.moveTo(targetPos);
         }
     }
 }
