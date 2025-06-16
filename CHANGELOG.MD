@@ -43,3 +43,10 @@ Tutorials about customize your own datapack can be found in GitHub wiki.
 ### Add
 This is a Data-driven feature update, you can customize your own ballistic plate from now on.
 Tutorials about customize your own datapack can be found in GitHub wiki.
+
+## indev.1.0.7
+### Add
+ - Added new hostile entity `Armed Raider`, can be spawn from the spawn egg.  
+ - Added bullet whizz sound effect, you can hear bullet pass by you.
+### Fix
+ - Changed the behaviour the stamina system interrupt player from sprinting. But absolute normal functioning is not guaranteed.
