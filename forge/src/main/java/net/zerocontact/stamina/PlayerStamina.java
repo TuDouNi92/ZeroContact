@@ -1,12 +1,16 @@
 package net.zerocontact.stamina;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.network.ModMessages;
 import net.zerocontact.network.NetworkHandler;
+
+import java.util.UUID;
 
 public class PlayerStamina {
     private float stamina = 120f;
@@ -29,41 +33,44 @@ public class PlayerStamina {
         stamina = nbt.getFloat("stamina");
     }
 
-    public static void interruptSprint(Player player) {
+    public static void interruptSprint(Player player, boolean active) {
         if (player.isCreative()) return;
-        if(!player.level().isClientSide()){
-            player.setSprinting(false);
+        AttributeInstance speedAttr = player.getAttribute(Attributes.MOVEMENT_SPEED);
+        UUID uuid = UUID.nameUUIDFromBytes("StaminaRunOut".getBytes());
+        if (speedAttr == null) return;
+        if (active) {
+            if(speedAttr.getModifier(uuid)==null){
+                speedAttr.addTransientModifier(new AttributeModifier(
+                        uuid,
+                        "StaminaRunOut",
+                        -0.05,
+                        AttributeModifier.Operation.ADDITION
+                ));
+            }
         }
-        Minecraft.getInstance().options.keySprint.setDown(false);
+        else{
+            speedAttr.removeModifier(uuid);
+        }
     }
 
     public static void staminaTick(Player player) {
         player.getCapability(PlayerStaminaProvider.PLAYER_STAMINA).ifPresent(playerStamina -> {
             playerStamina.tickCounter++;
             float stamina = playerStamina.getStamina();
-            if (playerStamina.cooldownTicks != 0) {
-                interruptSprint(player);
-            }
             if (player.isSprinting()) {
-                if (stamina < 1 && playerStamina.cooldownTicks == 0) {
-                    playerStamina.cooldownTicks = 60;
-                }
+                playerStamina.cooldownTicks = 60;
                 playerStamina.setStamina(stamina - 1.0f);
-                if (playerStamina.tickCounter >= 10) {
-                    playerStamina.tickCounter = 0;
-                }
-            } else {
-                if (playerStamina.tickCounter >= 10 && playerStamina.cooldownTicks == 0) {
-                    playerStamina.setStamina(stamina + 8.0f);
-                    playerStamina.tickCounter = 0;
-                }
+            }
+            if (playerStamina.tickCounter >= 20 && playerStamina.cooldownTicks == 0) {
+                playerStamina.setStamina(stamina + 4.0f);
+                playerStamina.tickCounter = 0;
             }
             playerStamina.cooldownTicks = Math.max(0, --playerStamina.cooldownTicks);
             ZeroContactLogger.LOG.debug(playerStamina.cooldownTicks);
             if (!player.level().isClientSide) {
                 ModMessages.sendToPlayer(new NetworkHandler.SyncStaminaPacket(playerStamina.getStamina()), (ServerPlayer) player);
             }
+            interruptSprint(player, stamina==0);
         });
-
     }
 }
