@@ -1,15 +1,13 @@
-package net.zerocontact.item.forge;
+package net.zerocontact.api;
 
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
 
 import java.util.function.Consumer;
 
-interface HelmetInfoProvider {
+public interface HelmetInfoProvider {
     ArmorItem.Type getType();
     ArmorMaterial getMaterial();
     int getDefense();
