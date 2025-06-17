@@ -1,4 +1,4 @@
-package net.zerocontact.item.forge;
+package net.zerocontact.item.helmet;
 
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;

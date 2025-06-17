@@ -9,15 +9,12 @@ import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.RegisterEvent;
-import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.item.forge.GenerateImpl;
-import net.zerocontact.item.forge.Helmet;
+import net.zerocontact.item.helmet.Helmet;
 import net.zerocontact.registries.ItemsReg;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class OnRegisterItem {

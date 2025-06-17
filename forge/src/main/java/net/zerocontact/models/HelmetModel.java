@@ -2,8 +2,7 @@ package net.zerocontact.models;
 
 import net.minecraft.resources.ResourceLocation;
 import net.zerocontact.ZeroContact;
-import net.zerocontact.item.forge.Helmet;
-import software.bernie.geckolib.cache.object.BakedGeoModel;
+import net.zerocontact.item.helmet.Helmet;
 import software.bernie.geckolib.model.GeoModel;
 
 public class HelmetModel extends GeoModel<Helmet> {

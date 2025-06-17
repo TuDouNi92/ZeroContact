@@ -1,6 +1,6 @@
 package net.zerocontact.client.renderer;
 
-import net.zerocontact.item.forge.Helmet;
+import net.zerocontact.item.helmet.Helmet;
 import net.zerocontact.models.HelmetModel;
 import software.bernie.geckolib.renderer.GeoArmorRenderer;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
