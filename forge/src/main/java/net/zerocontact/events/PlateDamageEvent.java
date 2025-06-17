@@ -27,6 +27,7 @@ public class PlateDamageEvent {
             int hits = stack.getOrCreateTag().getInt("hits") + 1;
             int durabilityLossAmount = 1;
             if (!stack.isEmpty() && (damageSource.is(ModDamageTypes.BULLET) || damageSource.is(ModDamageTypes.BULLET_IGNORE_ARMOR))) {
+                if(PlateEntityHurtEvent.isHeadShot)return;
                 switch (ProtectionLevelHelper.get((int) Math.floor(amount))) {
                     case NIJIIA -> durabilityLossFactor = 0.1F;
                     case NIJII -> durabilityLossFactor = 0.4F;
