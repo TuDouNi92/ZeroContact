@@ -1,7 +1,11 @@
 package net.zerocontact.item.forge;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
@@ -13,6 +17,7 @@ import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.renderer.GeoItemRenderer;
 
 import java.util.function.Consumer;
 
@@ -66,11 +71,16 @@ public class Helmet extends ArmorItem implements HelmetInfoProvider, GeoItem {
             private HelmetRender render;
             @Override
             public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
-                if(this.render==null){
+                if (this.render == null) {
                     this.render = new HelmetRender();
                 }
-                this.render.prepForRender(livingEntity,itemStack,equipmentSlot,original);
+                this.render.prepForRender(livingEntity, itemStack, equipmentSlot, original);
                 return this.render;
+            }
+
+            @Override
+            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                    return new HelmetRender.HelmetItemRender();
             }
         });
     }
