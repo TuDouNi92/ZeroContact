@@ -37,29 +37,35 @@ public class PlayerStamina {
         if (player.isCreative()) return;
         AttributeInstance speedAttr = player.getAttribute(Attributes.MOVEMENT_SPEED);
         UUID uuid = UUID.nameUUIDFromBytes("StaminaRunOut".getBytes());
+        double walkSpeed = player.getAttributeBaseValue(Attributes.MOVEMENT_SPEED);
+        double currentSpeed = player.getAttributeValue(Attributes.MOVEMENT_SPEED);
+        double diff = walkSpeed - currentSpeed;
         if (speedAttr == null) return;
         if (active) {
-            if(speedAttr.getModifier(uuid)==null){
-                speedAttr.addTransientModifier(new AttributeModifier(
+            if (speedAttr.getModifier(uuid) == null) {
+                speedAttr.addPermanentModifier(new AttributeModifier(
                         uuid,
                         "StaminaRunOut",
-                        -0.05,
+                        diff,
                         AttributeModifier.Operation.ADDITION
                 ));
             }
-        }
-        else{
+        } else {
             speedAttr.removeModifier(uuid);
         }
     }
 
     public static void staminaTick(Player player) {
+        if (player.level().isClientSide) return;
         player.getCapability(PlayerStaminaProvider.PLAYER_STAMINA).ifPresent(playerStamina -> {
             playerStamina.tickCounter++;
             float stamina = playerStamina.getStamina();
             if (player.isSprinting()) {
                 playerStamina.cooldownTicks = 60;
                 playerStamina.setStamina(stamina - 1.0f);
+                interruptSprint(player, stamina == 0);
+            } else {
+                interruptSprint(player, false);
             }
             if (playerStamina.tickCounter >= 20 && playerStamina.cooldownTicks == 0) {
                 playerStamina.setStamina(stamina + 4.0f);
@@ -67,10 +73,7 @@ public class PlayerStamina {
             }
             playerStamina.cooldownTicks = Math.max(0, --playerStamina.cooldownTicks);
             ZeroContactLogger.LOG.debug(playerStamina.cooldownTicks);
-            if (!player.level().isClientSide) {
-                ModMessages.sendToPlayer(new NetworkHandler.SyncStaminaPacket(playerStamina.getStamina()), (ServerPlayer) player);
-            }
-            interruptSprint(player, stamina==0);
+            ModMessages.sendToPlayer(new NetworkHandler.SyncStaminaPacket(playerStamina.getStamina()), (ServerPlayer) player);
         });
     }
 }
