@@ -75,7 +75,6 @@ public class PlateEntityHurtEvent {
                 Holder<DamageType> customDamageType = livingEntity.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(ModDamageTypes.BULLET);
                 DamageSource modifiedDamageSource = new DamageSource(customDamageType);
                 float amount = event.getBaseAmount();
-                livingEntity.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
                 Optional.of(helmet).ifPresent(stack -> {
                     if (!(stack.getItem() instanceof HelmetInfoProvider && stack.getItem() instanceof EntityHurtProvider entityHurtProvider))
                         return;
@@ -89,6 +88,7 @@ public class PlateEntityHurtEvent {
                         hurtAmount = entityHurtProvider.generatePenetrated() * amount;
                     }
                     livingEntity.hurt(modifiedDamageSource, hurtAmount);
+                    livingEntity.playSound(ModSoundEventsReg.HELMET_HIT);
                     event.setCanceled(true);
                 });
             }

@@ -22,6 +22,7 @@ public class ModSoundEventsReg {
     public static final SoundEvent BULLET_SOUND_4 = SoundEvent.createVariableRangeEvent(new ResourceLocation(MOD_ID, "bullet_4"));
     public static final SoundEvent BULLET_SOUND_5 = SoundEvent.createVariableRangeEvent(new ResourceLocation(MOD_ID, "bullet_5"));
     public static final SoundEvent BULLET_SOUND_6 = SoundEvent.createVariableRangeEvent(new ResourceLocation(MOD_ID, "bullet_6"));
+    public static final SoundEvent HELMET_HIT = SoundEvent.createVariableRangeEvent(new ResourceLocation(MOD_ID, "armor/helmet_hit"));
     public static final Random random = new Random();
     public static SoundEvent randomBulletSound() {
         Set<SoundEvent> BULLET_SOUNDS =
