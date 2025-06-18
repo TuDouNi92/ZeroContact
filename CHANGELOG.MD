@@ -50,3 +50,7 @@ Tutorials about customize your own datapack can be found in GitHub wiki.
  - Added bullet whizz sound effect, you can hear bullet pass by you.
 ### Fix
  - Changed the behaviour the stamina system interrupt player from sprinting. But absolute normal functioning is not guaranteed.
+
+## indev.1.0.7-hotfix1
+### Fix
+- Fixed the behaviour the stamina system interrupt player from sprinting or jumping.
