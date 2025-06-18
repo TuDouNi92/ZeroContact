@@ -32,7 +32,7 @@ public class OnRegisterItem {
     public static void onReg(RegisterEvent event) {
         if (!event.getRegistryKey().equals(Registries.ITEM)) return;
         RegistrySupplier<ForgeSpawnEggItem> RAIDER_EGG =ItemsReg.ITEMS.register("raider_egg", () -> new ForgeSpawnEggItem(ModEntitiesReg.ARMED_RAIDER, 0x3d6145, 0xcfc08a, new Item.Properties()));
-        RegistrySupplier<Helmet> FAST_MT = ItemsReg.ITEMS.register("fast_mt",()->new Helmet(ArmorMaterials.IRON, ArmorItem.Type.HELMET,new Item.Properties()));
+        RegistrySupplier<Helmet> FAST_MT = ItemsReg.ITEMS.register("fast_mt",()->new Helmet(ArmorMaterials.IRON, ArmorItem.Type.HELMET,new Item.Properties(),8));
         ITEMS_TO_REG.add(RAIDER_EGG);
         ITEMS_TO_REG.add(FAST_MT);
         GenerateImpl.regItems();

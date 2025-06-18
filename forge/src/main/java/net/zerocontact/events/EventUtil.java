@@ -19,7 +19,7 @@ public class EventUtil {
     }
 
     //判断入射角是否合法，服务于判断跳弹功能
-    public static boolean isIncidentAngleValid(LivingEntity lv, DamageSource source, float amount) {
+    public static boolean isIncidentAngleValid(LivingEntity lv, DamageSource source) {
         double incidentAngle = getAngle(lv, source);
         double incidentAngleAbs = Math.abs(incidentAngle);
         if(incidentAngle!=-361){

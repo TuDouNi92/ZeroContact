@@ -1,35 +1,52 @@
 package net.zerocontact.item.helmet;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.zerocontact.api.DurabilityLossProvider;
+import net.zerocontact.api.EntityHurtProvider;
 import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.client.renderer.HelmetRender;
+import net.zerocontact.events.ProtectionLevelHelper;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 
+import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
-public class Helmet extends ArmorItem implements HelmetInfoProvider, GeoItem {
+public class Helmet extends ArmorItem implements HelmetInfoProvider, GeoItem, EntityHurtProvider, DurabilityLossProvider {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     private final Type type;
     private final ArmorMaterial material;
     private final int defense;
-    protected static final int defaultDurability = 64;
-
-    public Helmet(ArmorMaterial material, Type type, Properties properties) {
+    private static final int defaultDurability = 64;
+    private final int absorb;
+    public Helmet(ArmorMaterial material, Type type, Properties properties, int absorb) {
         super(material, type, properties.defaultDurability(defaultDurability));
         this.type = type;
         this.material = material;
         this.defense = 4;
+        this.absorb = absorb;
     }
 
     @Override
@@ -53,6 +70,24 @@ public class Helmet extends ArmorItem implements HelmetInfoProvider, GeoItem {
     }
 
     @Override
+    public int getAbsorb() {
+        return absorb;
+    }
+
+    @Override
+    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
+        Multimap<Attribute, AttributeModifier> modifierMultimap = HashMultimap.create();
+        stack.getOrCreateTag().putInt("absorb", getAbsorb());
+        return modifierMultimap;
+    }
+
+    @Override
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
+        Component tipsToAdd = Component.translatable(ProtectionLevelHelper.get(getAbsorb()).name()).withStyle(ChatFormatting.AQUA);
+        tooltipComponents.add(tipsToAdd);
+    }
+
+    @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
 
     }
@@ -61,7 +96,6 @@ public class Helmet extends ArmorItem implements HelmetInfoProvider, GeoItem {
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
     }
-
     @Override
     public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new IClientItemExtensions() {

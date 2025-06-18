@@ -44,8 +44,9 @@ public class ZeroContactForge {
             );
         }
         @SubscribeEvent
-        public static void entityHurtByGunEvent(EntityHurtByGunEvent event){
+        public static void entityHurtByGunEvent(EntityHurtByGunEvent.Pre event){
             PlateEntityHurtEvent.entityHurtByGunHeadShot(event);
+            PlateDamageEvent.DamageHelmet(event);
         }
     }
 
