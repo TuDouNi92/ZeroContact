@@ -33,7 +33,7 @@ public class PlayerStamina {
         stamina = nbt.getFloat("stamina");
     }
 
-    public static void interruptSprint(Player player, boolean active) {
+    public static void interruptSprintAndJump(Player player, boolean active) {
         if (player.isCreative()) return;
         AttributeInstance speedAttr = player.getAttribute(Attributes.MOVEMENT_SPEED);
         UUID uuid = UUID.nameUUIDFromBytes("StaminaRunOut".getBytes());
@@ -50,6 +50,7 @@ public class PlayerStamina {
                         AttributeModifier.Operation.ADDITION
                 ));
             }
+            player.setDeltaMovement(player.getDeltaMovement().x,0,player.getDeltaMovement().z);
         } else {
             speedAttr.removeModifier(uuid);
         }
@@ -63,13 +64,14 @@ public class PlayerStamina {
             if (player.isSprinting()) {
                 playerStamina.cooldownTicks = 60;
                 playerStamina.setStamina(stamina - 1.0f);
-                interruptSprint(player, stamina == 0);
-            } else if (!player.onGround() && player.getDeltaMovement().y > 0) {
+                interruptSprintAndJump(player, stamina == 0);
+            } else {
+                interruptSprintAndJump(player, false);
+            }
+            if (!player.onGround() && player.getDeltaMovement().y > 0) {
                 playerStamina.cooldownTicks = 60;
                 playerStamina.setStamina(stamina - 1.0f);
-
-            } else {
-                interruptSprint(player, false);
+                interruptSprintAndJump(player, stamina == 0);
             }
             if (playerStamina.tickCounter >= 20 && playerStamina.cooldownTicks == 0) {
                 playerStamina.setStamina(stamina + 4.0f);
