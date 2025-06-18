@@ -64,6 +64,10 @@ public class PlayerStamina {
                 playerStamina.cooldownTicks = 60;
                 playerStamina.setStamina(stamina - 1.0f);
                 interruptSprint(player, stamina == 0);
+            } else if (!player.onGround() && player.getDeltaMovement().y > 0) {
+                playerStamina.cooldownTicks = 60;
+                playerStamina.setStamina(stamina - 1.0f);
+
             } else {
                 interruptSprint(player, false);
             }
