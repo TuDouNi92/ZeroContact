@@ -32,12 +32,12 @@ public class PlateEntityHurtEvent {
         DamageSource modifiedDamageSource = new DamageSource(customDamageType);
         AtomicBoolean result = new AtomicBoolean();
         result.set(false);
+        if (isHeadShot) return false;
         CuriosApi.getCuriosInventory(lv).ifPresent(iCuriosItemHandler -> iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
             ItemStack stack = stacksHandler.getStacks().getStackInSlot(0);
             float hurtAmount;
             int hurtCanHold = stack.getOrCreateTag().getInt("absorb");
             if (!(stack.isEmpty() && source.type() != modifiedDamageSource.type())) {
-                if (isHeadShot) return;
                 lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
                 if (EventUtil.isDamageSourceValid(source) && stack.getItem() instanceof EntityHurtProvider provider) {
                     if (EventUtil.isIncidentAngleValid(lv, source)) {
