@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.RegisterEvent;
 import net.zerocontact.item.forge.GenerateImpl;
 import net.zerocontact.item.helmet.FastMt;
+import net.zerocontact.item.helmet.Ratnik;
 import net.zerocontact.registries.ItemsReg;
 
 import java.util.HashSet;
@@ -33,8 +34,11 @@ public class OnRegisterItem {
         if (!event.getRegistryKey().equals(Registries.ITEM)) return;
         RegistrySupplier<ForgeSpawnEggItem> RAIDER_EGG =ItemsReg.ITEMS.register("raider_egg", () -> new ForgeSpawnEggItem(ModEntitiesReg.ARMED_RAIDER, 0x3d6145, 0xcfc08a, new Item.Properties()));
         RegistrySupplier<FastMt> FAST_MT = ItemsReg.ITEMS.register("fast_mt",()->new FastMt(ArmorMaterials.IRON, ArmorItem.Type.HELMET,new Item.Properties(),8));
+        RegistrySupplier<Ratnik> RATNIK = ItemsReg.ITEMS.register("6b47_ratnik",()->new Ratnik(ArmorMaterials.IRON, ArmorItem.Type.HELMET,new Item.Properties(),6));
+
         ITEMS_TO_REG.add(RAIDER_EGG);
         ITEMS_TO_REG.add(FAST_MT);
+        ITEMS_TO_REG.add(RATNIK);
         GenerateImpl.regItems();
         if (GenerateImpl.items.isEmpty()) return;
         GenerateImpl.items.forEach(item -> ItemsReg.ITEMS.register(item.id, () -> item));

@@ -21,6 +21,7 @@ import net.zerocontact.api.EntityHurtProvider;
 import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.client.renderer.HelmetRender;
 import net.zerocontact.events.ProtectionLevelHelper;
+import net.zerocontact.models.RatnikModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoItem;
@@ -38,6 +39,7 @@ public class Ratnik extends ArmorItem implements HelmetInfoProvider, GeoItem, En
     private final int defense;
     private static final int defaultDurability = 16;
     private final int absorb;
+
     public Ratnik(ArmorMaterial material, Type type, Properties properties, int absorb) {
         super(material, type, properties.defaultDurability(defaultDurability));
         this.type = type;
@@ -93,14 +95,16 @@ public class Ratnik extends ArmorItem implements HelmetInfoProvider, GeoItem, En
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
     }
+
     @Override
     public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new IClientItemExtensions() {
-            private HelmetRender render;
+            private HelmetRender.HelmetArmorRender<Ratnik> render;
+
             @Override
             public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
                 if (this.render == null) {
-                    this.render = new HelmetRender();
+                    this.render = new HelmetRender.HelmetArmorRender<>(new RatnikModel());
                 }
                 this.render.prepForRender(livingEntity, itemStack, equipmentSlot, original);
                 return this.render;
@@ -108,7 +112,7 @@ public class Ratnik extends ArmorItem implements HelmetInfoProvider, GeoItem, En
 
             @Override
             public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return new HelmetRender.HelmetItemRender();
+                return new HelmetRender.HelmetItemRender<>(new RatnikModel());
             }
         });
     }
