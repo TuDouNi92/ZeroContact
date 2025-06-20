@@ -37,7 +37,7 @@ public class FastMt extends ArmorItem implements HelmetInfoProvider, GeoItem, En
     private final Type type;
     private final ArmorMaterial material;
     private final int defense;
-    private static final int defaultDurability = 64;
+    private static final int defaultDurability = 24;
     private final int absorb;
 
     public FastMt(ArmorMaterial material, Type type, Properties properties, int absorb) {
