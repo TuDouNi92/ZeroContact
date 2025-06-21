@@ -28,8 +28,7 @@ public class PlateEntityHurtEvent {
     public static boolean isHeadShot;
 
     public static boolean changeHurtAmountRicochet(LivingEntity lv, DamageSource source, float amount, String identifier) {
-        Holder<DamageType> customDamageType = lv.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(ModDamageTypes.BULLET);
-        DamageSource modifiedDamageSource = new DamageSource(customDamageType);
+        DamageSource modifiedDamageSource = ModDamageTypes.Sources.bulletVoid(lv.level().registryAccess(),source.getDirectEntity(), source.getEntity(), false);
         AtomicBoolean result = new AtomicBoolean();
         result.set(false);
         if (isHeadShot) return false;
