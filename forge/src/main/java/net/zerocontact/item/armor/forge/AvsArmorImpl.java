@@ -7,8 +7,9 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.api.ArmorTypeTag;
+import net.zerocontact.client.renderer.ArmorRender;
 import net.zerocontact.item.armor.AvsArmor;
-import net.zerocontact.client.renderer.AvsRender;
+import net.zerocontact.models.AvsModel;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -39,11 +40,11 @@ public class AvsArmorImpl extends AvsArmor implements GeoItem, ArmorTypeTag {
     @Override
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new IClientItemExtensions() {
-            private AvsRender renderer;
+            private ArmorRender<AvsArmorImpl> renderer;
             @Override
             public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
                 if(this.renderer ==null){
-                    this.renderer = new AvsRender();
+                    this.renderer = new ArmorRender<>(new AvsModel());
                 }
                 this.renderer.prepForRender(livingEntity,itemStack,equipmentSlot,original);
                 return this.renderer;

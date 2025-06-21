@@ -7,8 +7,9 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.api.ArmorTypeTag;
+import net.zerocontact.client.renderer.ArmorRender;
 import net.zerocontact.item.armor.JpcArmor;
-import net.zerocontact.client.renderer.JpcRender;
+import net.zerocontact.models.JpcModel;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -39,11 +40,11 @@ public class JpcArmorImpl extends JpcArmor implements GeoItem, ArmorTypeTag {
     @Override
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new IClientItemExtensions() {
-            private JpcRender renderer;
+            private ArmorRender<JpcArmorImpl> renderer;
             @Override
             public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
                 if(this.renderer ==null){
-                    this.renderer = new JpcRender();
+                    this.renderer = new ArmorRender<>(new JpcModel());
                 }
                 this.renderer.prepForRender(livingEntity,itemStack,equipmentSlot,original);
                 return this.renderer;
