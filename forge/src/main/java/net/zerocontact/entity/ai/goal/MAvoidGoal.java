@@ -30,6 +30,6 @@ public class MAvoidGoal extends Goal {
         int targetZ = (random.nextBoolean() ? 1 : -1) * random.nextInt(distance);
         Vec3 targetPos = mob.position().add(targetX, 0, targetZ);
         if (!mob.getNavigation().isDone()) return;
-        mob.getNavigation().moveTo(targetPos.x, targetPos.y, targetPos.z, 1.2D);
+        mob.getNavigation().moveTo(targetPos.x, targetPos.y, targetPos.z, 1.5D);
     }
 }
