@@ -27,7 +27,7 @@ public class PerformGunAttackGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return shooter.getTarget() != null && !shooter.isHurt;
+        return canSee();
     }
 
     @Override
@@ -46,12 +46,15 @@ public class PerformGunAttackGoal extends Goal {
         burstFire();
     }
 
-    private boolean canSee(LivingEntity target) {
+    private boolean canSee() {
+        LivingEntity target = shooter.getTarget();
+        if(target==null)return false;
         Vec3 lookVec = shooter.getLookAngle().normalize();
         Vec3 toTargetVec = target.position().subtract(shooter.position()).normalize();
         double dot = lookVec.dot(toTargetVec);
         double fovCos = Math.cos(Math.toRadians(90));
-        return (dot >= fovCos || shooter.isSprinting()) && dot >= fovCos;
+        boolean bodyFacing = shooter.yBodyRot == shooter.yHeadRot;
+        return (dot >= fovCos || shooter.isSprinting()) && dot >= fovCos && bodyFacing;
     }
 
     private float provideInaccuracy() {
@@ -70,7 +73,7 @@ public class PerformGunAttackGoal extends Goal {
         float yaw = (float) -Math.toDegrees(Math.atan2(x, z)) + Mth.randomBetween(random, -spread, spread);
         float pitch = (float) -Math.toDegrees(Math.atan2(y, Math.sqrt(x * x + z * z))) + Mth.randomBetween(random, -spread, spread);
         if (!IGun.mainhandHoldGun(shooter) || operator == null) return;
-        if (!canSee(target)) return;
+        if (!canSee()) return;
         ShootResult result = operator.shoot(() -> pitch, () -> yaw);
         if (result == ShootResult.NOT_DRAW) {
             operator.draw(shooter::getMainHandItem);
