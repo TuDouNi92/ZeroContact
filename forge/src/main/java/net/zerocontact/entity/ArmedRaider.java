@@ -63,7 +63,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     private final IGunOperator operator;
     private String factionId;
     public boolean isHurt = false;
-    public boolean isShooting =false;
+    public boolean isShooting = false;
     private int hurtExpiredTicks = 0;
 
     public String getFactionId() {
@@ -140,13 +140,13 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     @Override
     protected void registerGoals() {
         super.registerGoals();
+        PerformGunAttackGoal performGunAttackGoal = new PerformGunAttackGoal(this);
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new HurtByTargetGoal(this, PathfinderMob.class));
-        this.goalSelector.addGoal(2, new AvoidEntityGoal<>(this, Monster.class, 5, 1.0F, 1.5F));
         this.goalSelector.addGoal(2, new AvoidEntityGoal<>(this, IronGolem.class, 10, 1.0F, 1.5F));
-        this.goalSelector.addGoal(2, new MAvoidGoal(this, 5));
+        this.goalSelector.addGoal(2, new MAvoidGoal(this, 5, performGunAttackGoal));
         this.goalSelector.addGoal(5, new RandomStrollGoal(this, 0.8F));
-        this.goalSelector.addGoal(4, new PerformGunAttackGoal(this));
+        this.goalSelector.addGoal(4, performGunAttackGoal);
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true, false));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Monster.class, true, false));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, IronGolem.class, true, false));

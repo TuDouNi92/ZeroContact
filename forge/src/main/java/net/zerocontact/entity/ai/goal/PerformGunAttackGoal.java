@@ -46,7 +46,7 @@ public class PerformGunAttackGoal extends Goal {
         burstFire();
     }
 
-    private boolean canSee() {
+    public boolean canSee() {
         LivingEntity target = shooter.getTarget();
         if(target==null)return false;
         Vec3 lookVec = shooter.getLookAngle().normalize();
