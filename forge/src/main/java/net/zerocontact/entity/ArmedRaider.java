@@ -2,8 +2,10 @@ package net.zerocontact.entity;
 
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.entity.IGunOperator;
+import com.tacz.guns.api.item.IAmmo;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.item.AmmoItem;
+import com.tacz.guns.resource.index.CommonAmmoIndex;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -87,7 +89,8 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         AK(),
         SKS("tacz:sks_tactical", "tacz:762x39"),
         M4("tacz:m4a1", "tacz:556x45"),
-        SCAR_L("tacz:scar_l", "tacz:556x45");
+        SCAR_L("tacz:scar_l", "tacz:556x45"),
+        M320("tacz:m320", "tacz:40mm");
         private String gunName;
         private String ammoName;
 
@@ -117,8 +120,9 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
             CompoundTag tag = new CompoundTag();
             AmmoItem ammo = (AmmoItem) ForgeRegistries.ITEMS.getValue(new ResourceLocation("tacz", "ammo"));
             tag.putString("AmmoId", Objects.requireNonNullElse(ammoName, "tacz:762x39"));
-            if (ammo == null) return null;
-            ItemStack ammoStack = new ItemStack(ammo, 30);
+            if (ammo == null || ammoName == null) return null;
+            Integer stackSize = TimelessAPI.getCommonAmmoIndex(new ResourceLocation(ammoName)).map(CommonAmmoIndex::getStackSize).orElse(1);
+            ItemStack ammoStack = new ItemStack(ammo, stackSize);
             ammoStack.setTag(tag);
             return ammoStack;
         }
@@ -139,6 +143,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         operator = IGunOperator.fromLivingEntity(this);
         MTeam.registerEntity(this);
     }
+
     @Override
     protected void registerGoals() {
         super.registerGoals();
@@ -147,7 +152,8 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         this.goalSelector.addGoal(1, new HurtByTargetGoal(this, PathfinderMob.class));
         this.goalSelector.addGoal(2, new AvoidEntityGoal<>(this, IronGolem.class, 10, 1.0F, 1.5F));
         this.goalSelector.addGoal(2, new MAvoidGoal(this, 5));
-        this.goalSelector.addGoal(3,new TailGoal(this));
+        this.goalSelector.addGoal(2, new OpenDoorGoal(this,false));
+        this.goalSelector.addGoal(3, new TailGoal(this));
         this.goalSelector.addGoal(4, performGunAttackGoal);
         this.goalSelector.addGoal(5, new RandomStrollGoal(this, 0.8F));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true, false));
@@ -346,7 +352,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
 
     @Override
     protected @NotNull PathNavigation createNavigation(@NotNull Level level) {
-        GroundPathNavigation groundPathNavigation =new GroundPathNavigation(this,level);
+        GroundPathNavigation groundPathNavigation = new GroundPathNavigation(this, level);
         groundPathNavigation.setCanPassDoors(true);
         groundPathNavigation.setCanOpenDoors(true);
         return groundPathNavigation;
