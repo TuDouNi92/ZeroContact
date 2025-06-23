@@ -21,6 +21,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.PatrollingMonster;
@@ -137,7 +139,6 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         operator = IGunOperator.fromLivingEntity(this);
         MTeam.registerEntity(this);
     }
-
     @Override
     protected void registerGoals() {
         super.registerGoals();
@@ -341,5 +342,13 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     @Override
     public boolean removeWhenFarAway(double distanceToClosestPlayer) {
         return distanceToClosestPlayer > 256.0F;
+    }
+
+    @Override
+    protected @NotNull PathNavigation createNavigation(@NotNull Level level) {
+        GroundPathNavigation groundPathNavigation =new GroundPathNavigation(this,level);
+        groundPathNavigation.setCanPassDoors(true);
+        groundPathNavigation.setCanOpenDoors(true);
+        return groundPathNavigation;
     }
 }
