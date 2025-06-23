@@ -11,7 +11,7 @@ import net.zerocontact.entity.ArmedRaider;
 import static net.zerocontact.ZeroContact.MOD_ID;
 public class ModEntitiesReg {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPE_DEFERRED_REGISTER = DeferredRegister.create(MOD_ID, Registries.ENTITY_TYPE);
-    public static final RegistrySupplier<EntityType<ArmedRaider>> ARMED_RAIDER = ENTITY_TYPE_DEFERRED_REGISTER.register("armed_raider",()->EntityType.Builder.of(ArmedRaider::new,MobCategory.MONSTER).sized(.6f,2f).build(new ResourceLocation(MOD_ID,"armed_raider").toString()));
+    public static final RegistrySupplier<EntityType<ArmedRaider>> ARMED_RAIDER = ENTITY_TYPE_DEFERRED_REGISTER.register("armed_raider",()->EntityType.Builder.of(ArmedRaider::new,MobCategory.MONSTER).sized(.6f,1.8f).build(new ResourceLocation(MOD_ID,"armed_raider").toString()));
     public static void register() {
         ENTITY_TYPE_DEFERRED_REGISTER.register();
     }
