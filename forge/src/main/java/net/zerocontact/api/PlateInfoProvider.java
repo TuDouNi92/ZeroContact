@@ -3,11 +3,14 @@ package net.zerocontact.api;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.events.PlateInteract;
 import net.zerocontact.events.ProtectionLevelHelper;
 import net.zerocontact.registries.ModSoundEventsReg;
@@ -62,5 +65,17 @@ public interface PlateInfoProvider extends ICurioItem {
         if (tooltips.contains(tipsToAdd)) return tooltips;
         tooltips.add(tipsToAdd);
         return tooltips;
+    }
+
+    @NotNull
+    default ICurio.DropRule getDropRule(SlotContext slotContext, DamageSource source, int lootingLevel, boolean recentlyHit, ItemStack stack) {
+        if(slotContext.entity() instanceof ArmedRaider){
+            RandomSource randomSource =RandomSource.create();
+            if(randomSource.nextFloat()<=0.8F){
+                return ICurio.DropRule.DESTROY;
+            }
+            return ICurioItem.super.getDropRule(slotContext, source, lootingLevel, recentlyHit, stack);
+        }
+        return ICurioItem.super.getDropRule(slotContext, source, lootingLevel, recentlyHit, stack);
     }
 }
