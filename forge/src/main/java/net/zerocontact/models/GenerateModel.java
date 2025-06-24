@@ -4,7 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.zerocontact.item.armor.forge.GenerateArmorImpl;
 import software.bernie.geckolib.model.GeoModel;
 
-public class GenerateModel extends GeoModel<GenerateArmorImpl> {
+public class GenerateModel<T extends GenerateArmorImpl> extends GeoModel<T> {
     private final ResourceLocation texture;
     private final ResourceLocation model;
     private final ResourceLocation animation;

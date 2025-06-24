@@ -40,7 +40,7 @@ public class GenerateArmorImpl extends ArmorItem implements GeoItem, ArmorTypeTa
     public final ResourceLocation animation;
     public String id;
 
-    GenerateArmorImpl(Type type, String id, int defense, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+    public GenerateArmorImpl(Type type, String id, int defense, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
         super(material, type, new Properties().defaultDurability(defaultDurability));
         this.type = type;
         this.id = id;
@@ -107,6 +107,7 @@ public class GenerateArmorImpl extends ArmorItem implements GeoItem, ArmorTypeTa
             int defense = data.defense;
             int defaultDurability = data.defaultDurability;
             ArmorItem.Type equipmentSlotType = getArmorType(data.equipmentSlot);
+            if(equipmentSlotType.equals(Type.HELMET))continue;
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);

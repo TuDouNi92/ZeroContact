@@ -15,6 +15,7 @@ import net.zerocontact.datagen.loader.ItemLoader;
 import net.zerocontact.item.armor.forge.GenerateArmorImpl;
 import net.zerocontact.item.forge.GenerateImpl;
 import net.zerocontact.item.helmet.FastMt;
+import net.zerocontact.item.helmet.GenerateHelmetImpl;
 import net.zerocontact.item.helmet.Ratnik;
 import net.zerocontact.registries.ItemsReg;
 
@@ -47,15 +48,18 @@ public class OnRegisterItem {
         ZeroContactLogger.LOG.info("On Register ItemData:{}",new Gson().toJson(ItemLoader.itemGenData).formatted());
         GenerateImpl.regItems();
         GenerateArmorImpl.regItems();
-        if (GenerateImpl.items.isEmpty()) return;
+        GenerateHelmetImpl.regItems();
         GenerateImpl.items.forEach(item -> {
             ItemsReg.ITEMS.register(item.id, () -> item);
-            ZeroContactLogger.LOG.info("Reg for:{}", item);
+            ZeroContactLogger.LOG.info("Reg plate for:{}", item);
         });
-        if (GenerateArmorImpl.items.isEmpty()) return;
         GenerateArmorImpl.items.forEach(item -> {
             ItemsReg.ITEMS.register(item.id, () -> item);
-            ZeroContactLogger.LOG.info("Reg for:{}",item);
+            ZeroContactLogger.LOG.info("Reg armor for:{}",item);
+        });
+        GenerateHelmetImpl.items.forEach(item->{
+            ItemsReg.ITEMS.register(item.id, () -> item);
+            ZeroContactLogger.LOG.info("Reg helmet for:{}",item);
         });
     }
 }
