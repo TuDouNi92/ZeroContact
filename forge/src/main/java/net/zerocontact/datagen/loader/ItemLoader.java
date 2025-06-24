@@ -1,6 +1,7 @@
 package net.zerocontact.datagen.loader;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackType;
@@ -12,7 +13,9 @@ import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.zerocontact.ZeroContactLogger;
+import net.zerocontact.api.IItemLoader;
 import net.zerocontact.datagen.ItemGenData;
+import net.zerocontact.datagen.RuntimeTypeAdapterFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,9 +28,14 @@ import java.util.stream.Stream;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
 
-public class ItemLoader {
+public class ItemLoader{
     public static ArrayList<ItemGenData> itemGenData = new ArrayList<>();
-    private static final Gson GSON = new Gson();
+    private static final RuntimeTypeAdapterFactory<ItemGenData> typeFactory =
+            RuntimeTypeAdapterFactory
+                    .of(ItemGenData.class, "type")
+                    .registerSubtype(ItemGenData.Plate.class, "plate")
+                    .registerSubtype(ItemGenData.Armor.class, "armor");
+    private static final Gson GSON = new GsonBuilder().registerTypeAdapterFactory(typeFactory).create();
     private static final Path LOAD_PATH = Paths.get("config/zerocontact/packs");
     private static final Set<Path> RPACK_PATHS = new HashSet<>();
     private static final Set<Pack> DATA_PACKS = new HashSet<>();
@@ -63,29 +71,9 @@ public class ItemLoader {
                         }
                         Path resoucePackPath = packPath.resolve("assets").resolve(MOD_ID);
                         Path itemPath = resoucePackPath.resolve("items");
-                        loadItemJson(itemPath);
+                        ZeroContactLogger.LOG.info("loading ItemPath");
+                        IItemLoader.loadItemJson(itemPath,GSON);
                     });
-        }
-    }
-
-    private static void loadItemJson(Path itemPath) {
-        if (!Files.exists(itemPath)) return;
-        try (Stream<Path> stream = Files.walk(itemPath)) {
-            ZeroContactLogger.LOG.info("Try path: {} ", itemPath);
-            stream.filter(name -> name.toString().endsWith(".json")).forEach(itemJsonPath -> {
-                ZeroContactLogger.LOG.info("Try json: {} ", itemJsonPath);
-                if (Files.exists(itemJsonPath)) {
-                    try {
-                        ItemGenData item = GSON.fromJson(Files.newBufferedReader(itemJsonPath), ItemGenData.class);
-                        itemGenData.add(item);
-                        ZeroContactLogger.LOG.info("Added item: {}", item.id);
-                    } catch (IOException e) {
-                        ZeroContactLogger.LOG.error(e);
-                    }
-                }
-            });
-        } catch (IOException e) {
-            ZeroContactLogger.LOG.error(e);
         }
     }
 

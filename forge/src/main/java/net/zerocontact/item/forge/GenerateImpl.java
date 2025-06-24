@@ -1,7 +1,9 @@
 package net.zerocontact.item.forge;
 
+import com.google.gson.Gson;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
+import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.DurabilityLossProvider;
 import net.zerocontact.api.EntityHurtProvider;
 import net.zerocontact.api.PlateInfoProvider;
@@ -41,10 +43,11 @@ public class GenerateImpl extends SapiIV implements DurabilityLossProvider, Plat
     }
 
     public static void regItems() {
-        ItemLoader.loadFromJson();
         ArrayList<ItemGenData> itemGenDataList = ItemLoader.itemGenData;
         if (itemGenDataList.isEmpty()) return;
-        for (ItemGenData data : itemGenDataList) {
+        for (ItemGenData data0 : itemGenDataList) {
+            if(!(data0 instanceof ItemGenData.Plate data))continue;
+            ZeroContactLogger.LOG.info(new Gson().toJson(data0));
             String name = data.languageName;
             String id = data.id;
             float bluntDamage = data.hurtModifier.bluntMultiplier;
