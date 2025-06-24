@@ -29,9 +29,21 @@ public class OnRegisterItem {
     @SubscribeEvent
     public static void attachToTabs(BuildCreativeModeTabContentsEvent event) {
         if (event.getTab().equals(ItemsReg.ZERO_CONTACT.get())) {
-            if (GenerateImpl.items.isEmpty()) return;
-            GenerateImpl.items.forEach(event::accept);
+            attachGenerated(
+                    event,
+                    GenerateImpl.items,
+                    GenerateArmorImpl.items,
+                    GenerateHelmetImpl.items
+                    );
             ITEMS_TO_REG.forEach(event::accept);
+        }
+    }
+
+    @SafeVarargs
+    private static void attachGenerated(BuildCreativeModeTabContentsEvent event, Set<? extends ItemLike>... itemLists) {
+        for (Set<? extends ItemLike> itemList : itemLists) {
+            if (itemList.isEmpty()) return;
+            itemList.forEach(event::accept);
         }
     }
 
@@ -45,7 +57,7 @@ public class OnRegisterItem {
         ITEMS_TO_REG.add(FAST_MT);
         ITEMS_TO_REG.add(RATNIK);
         ItemLoader.loadFromJson();
-        ZeroContactLogger.LOG.info("On Register ItemData:{}",new Gson().toJson(ItemLoader.itemGenData).formatted());
+        ZeroContactLogger.LOG.info("On Register ItemData:{}", new Gson().toJson(ItemLoader.itemGenData).formatted());
         GenerateImpl.regItems();
         GenerateArmorImpl.regItems();
         GenerateHelmetImpl.regItems();
@@ -55,11 +67,11 @@ public class OnRegisterItem {
         });
         GenerateArmorImpl.items.forEach(item -> {
             ItemsReg.ITEMS.register(item.id, () -> item);
-            ZeroContactLogger.LOG.info("Reg armor for:{}",item);
+            ZeroContactLogger.LOG.info("Reg armor for:{}", item);
         });
-        GenerateHelmetImpl.items.forEach(item->{
+        GenerateHelmetImpl.items.forEach(item -> {
             ItemsReg.ITEMS.register(item.id, () -> item);
-            ZeroContactLogger.LOG.info("Reg helmet for:{}",item);
+            ZeroContactLogger.LOG.info("Reg helmet for:{}", item);
         });
     }
 }
