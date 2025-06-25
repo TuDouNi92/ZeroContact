@@ -87,6 +87,7 @@ public class GenerateHelmetGeoImpl extends AbstractGenerateGeoImpl implements He
 
     @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
+        if(slot !=EquipmentSlot.HEAD)return super.getAttributeModifiers(slot,stack);
         Multimap<Attribute, AttributeModifier> modifierMultimap = HashMultimap.create();
         stack.getOrCreateTag().putInt("absorb", getAbsorb());
         modifierMultimap.put(Attributes.ARMOR, new AttributeModifier(UUID.nameUUIDFromBytes(("Armor").getBytes()), "CuriosArmorDefense", this.getDefense(), AttributeModifier.Operation.ADDITION));
