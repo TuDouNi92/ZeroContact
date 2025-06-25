@@ -1,9 +1,0 @@
-{
-  "replace": false,
-  "values": [
-    "zerocontact:steel_plate",
-    "zerocontact:si_plate",
-    "zerocontact:bc_plate",
-    "zerocontact:ceramic_plate"
-  ]
-}
