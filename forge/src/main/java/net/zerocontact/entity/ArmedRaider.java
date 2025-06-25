@@ -2,7 +2,6 @@ package net.zerocontact.entity;
 
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.entity.IGunOperator;
-import com.tacz.guns.api.item.IAmmo;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.item.AmmoItem;
 import com.tacz.guns.resource.index.CommonAmmoIndex;
@@ -28,7 +27,6 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.PatrollingMonster;
-import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.npc.InventoryCarrier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -42,6 +40,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.entity.ai.MTeam;
+import net.zerocontact.entity.ai.controller.GlobalStateController;
 import net.zerocontact.entity.ai.goal.MAvoidGoal;
 import net.zerocontact.entity.ai.goal.PerformGunAttackGoal;
 import net.zerocontact.entity.ai.goal.TailGoal;
@@ -58,6 +57,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class ArmedRaider extends PatrollingMonster implements GeoEntity, InventoryCarrier {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
@@ -67,9 +67,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     private final LazyOptional<IItemHandler> itemHandlerLazyOptional = LazyOptional.of(() -> new InvWrapper(inventory));
     private final IGunOperator operator;
     private String factionId;
-    public boolean isHurt = false;
-    public boolean isShooting = false;
-    private int hurtExpiredTicks = 0;
+    public GlobalStateController stateController;
 
     public String getFactionId() {
         return this.factionId;
@@ -147,19 +145,20 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        PerformGunAttackGoal performGunAttackGoal = new PerformGunAttackGoal(this);
+        stateController = new GlobalStateController(this);
+        TailGoal tailGoal = new TailGoal(this);
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new HurtByTargetGoal(this, PathfinderMob.class));
         this.goalSelector.addGoal(2, new AvoidEntityGoal<>(this, IronGolem.class, 10, 1.0F, 1.5F));
         this.goalSelector.addGoal(2, new MAvoidGoal(this, 5));
-        this.goalSelector.addGoal(2, new OpenDoorGoal(this,false));
-        this.goalSelector.addGoal(3, new TailGoal(this));
-        this.goalSelector.addGoal(4, performGunAttackGoal);
+        this.goalSelector.addGoal(2, new OpenDoorGoal(this, false));
+        this.goalSelector.addGoal(3, tailGoal);
+        this.goalSelector.addGoal(4, new PerformGunAttackGoal(this));
         this.goalSelector.addGoal(5, new RandomStrollGoal(this, 0.8F));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true, false));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Monster.class, true, false));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, IronGolem.class, true, false));
-
+        stateController.appendGoals(tailGoal);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -273,13 +272,6 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     }
 
     @Override
-    public boolean hurt(@NotNull DamageSource source, float amount) {
-        isHurt = true;
-        hurtExpiredTicks = 40;
-        return super.hurt(source, amount);
-    }
-
-    @Override
     public void invalidateCaps() {
         super.invalidateCaps();
         itemHandlerLazyOptional.invalidate();
@@ -318,18 +310,17 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         }
     }
 
-    private void tickHurtTime() {
-        hurtExpiredTicks--;
-        if (hurtExpiredTicks == 0) {
-            isHurt = false;
-        }
-    }
-
     @Override
     public void tick() {
         super.tick();
         listenSoundState();
-        tickHurtTime();
+        Optional.ofNullable(stateController).ifPresent(GlobalStateController::tick);
+    }
+
+    @Override
+    public boolean hurt(@NotNull DamageSource source, float amount) {
+        Optional.ofNullable(stateController).ifPresent(GlobalStateController::onHurt);
+        return super.hurt(source, amount);
     }
 
     @Override

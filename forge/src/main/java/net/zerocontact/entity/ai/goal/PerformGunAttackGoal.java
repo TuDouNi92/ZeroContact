@@ -8,9 +8,11 @@ import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
 import net.zerocontact.entity.ArmedRaider;
+import net.zerocontact.entity.ai.controller.GlobalStateController;
 
 public class PerformGunAttackGoal extends Goal {
     private final ArmedRaider shooter;
@@ -27,17 +29,7 @@ public class PerformGunAttackGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return canSee();
-    }
-
-    @Override
-    public boolean canContinueToUse() {
-        return !shooter.isHurt;
-    }
-
-    @Override
-    public void stop() {
-        shooter.isShooting = false;
+        return shooter.stateController.getPhase() == GlobalStateController.Phase.ATTACK;
     }
 
     @Override
@@ -46,7 +38,7 @@ public class PerformGunAttackGoal extends Goal {
         burstFire();
     }
 
-    public boolean canSee() {
+    public static boolean canSee(Mob shooter) {
         LivingEntity target = shooter.getTarget();
         if(target==null)return false;
         Vec3 lookVec = shooter.getLookAngle().normalize();
@@ -73,7 +65,7 @@ public class PerformGunAttackGoal extends Goal {
         float yaw = (float) -Math.toDegrees(Math.atan2(x, z)) + Mth.randomBetween(random, -spread, spread);
         float pitch = (float) -Math.toDegrees(Math.atan2(y, Math.sqrt(x * x + z * z))) + Mth.randomBetween(random, -spread, spread);
         if (!IGun.mainhandHoldGun(shooter) || operator == null) return;
-        if (!canSee()) return;
+        if (!canSee(shooter)) return;
         ShootResult result = operator.shoot(() -> pitch, () -> yaw);
         if (result == ShootResult.NOT_DRAW) {
             operator.draw(shooter::getMainHandItem);
@@ -98,11 +90,9 @@ public class PerformGunAttackGoal extends Goal {
                 }
             } else {
                 if (burstInterval > 0) {
-                    shooter.isShooting = true;
                     shoot(shooter.getTarget());
                     burstInterval--;
                 } else {
-                    shooter.isShooting = false;
                     shootCoolDown = 40;
                     burstInterval = random.nextInt(15);
                 }

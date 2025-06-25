@@ -2,14 +2,13 @@ package net.zerocontact.entity.ai.goal;
 
 import com.tacz.guns.entity.EntityKineticBullet;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.util.LandRandomPos;
 import net.minecraft.world.phys.Vec3;
 import net.zerocontact.entity.ArmedRaider;
+import net.zerocontact.entity.ai.controller.GlobalStateController;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 public class MAvoidGoal extends Goal {
     private final ArmedRaider mob;
@@ -24,7 +23,7 @@ public class MAvoidGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return mob.isHurt;
+        return mob.stateController.getPhase() == GlobalStateController.Phase.ESCAPE;
     }
 
     @Override
