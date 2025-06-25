@@ -12,10 +12,10 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.RegisterEvent;
 import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.datagen.loader.ItemLoader;
-import net.zerocontact.item.armor.forge.GenerateArmorImpl;
-import net.zerocontact.item.forge.GenerateImpl;
+import net.zerocontact.item.armor.forge.GenerateArmorGeoImpl;
+import net.zerocontact.item.forge.GeneratePlateImpl;
 import net.zerocontact.item.helmet.FastMt;
-import net.zerocontact.item.helmet.GenerateHelmetImpl;
+import net.zerocontact.item.helmet.GenerateHelmetGeoImpl;
 import net.zerocontact.item.helmet.Ratnik;
 import net.zerocontact.registries.ItemsReg;
 
@@ -31,9 +31,9 @@ public class OnRegisterItem {
         if (event.getTab().equals(ItemsReg.ZERO_CONTACT.get())) {
             attachGenerated(
                     event,
-                    GenerateImpl.items,
-                    GenerateArmorImpl.items,
-                    GenerateHelmetImpl.items
+                    GeneratePlateImpl.items,
+                    GenerateArmorGeoImpl.items,
+                    GenerateHelmetGeoImpl.items
                     );
             ITEMS_TO_REG.forEach(event::accept);
         }
@@ -58,18 +58,18 @@ public class OnRegisterItem {
         ITEMS_TO_REG.add(RATNIK);
         ItemLoader.loadFromJson();
         ZeroContactLogger.LOG.info("On Register ItemData:{}", new Gson().toJson(ItemLoader.itemGenData).formatted());
-        GenerateImpl.regItems();
-        GenerateArmorImpl.regItems();
-        GenerateHelmetImpl.regItems();
-        GenerateImpl.items.forEach(item -> {
+        GeneratePlateImpl.regItems();
+        GenerateArmorGeoImpl.regItems();
+        GenerateHelmetGeoImpl.regItems();
+        GeneratePlateImpl.items.forEach(item -> {
             ItemsReg.ITEMS.register(item.id, () -> item);
             ZeroContactLogger.LOG.info("Reg plate for:{}", item);
         });
-        GenerateArmorImpl.items.forEach(item -> {
+        GenerateArmorGeoImpl.items.forEach(item -> {
             ItemsReg.ITEMS.register(item.id, () -> item);
             ZeroContactLogger.LOG.info("Reg armor for:{}", item);
         });
-        GenerateHelmetImpl.items.forEach(item -> {
+        GenerateHelmetGeoImpl.items.forEach(item -> {
             ItemsReg.ITEMS.register(item.id, () -> item);
             ZeroContactLogger.LOG.info("Reg helmet for:{}", item);
         });

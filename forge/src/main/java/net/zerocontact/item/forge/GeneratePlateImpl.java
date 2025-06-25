@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class GenerateImpl extends SapiIV implements DurabilityLossProvider, PlateInfoProvider, EntityHurtProvider {
+ public class GeneratePlateImpl extends SapiIV implements DurabilityLossProvider, PlateInfoProvider, EntityHurtProvider {
     private final int defense;
     private final int absorb;
     private final float movementFix;
@@ -28,9 +28,9 @@ public class GenerateImpl extends SapiIV implements DurabilityLossProvider, Plat
     private final float ricochetDamage;
     private final int durabilityLossProvider;
     public String id;
-    public static Set<GenerateImpl> items = new HashSet<>();
+    public static Set<GeneratePlateImpl> items = new HashSet<>();
 
-    public GenerateImpl(String id, float bluntDamage,float penetrateDamage, float ricochetDamage, int defense, int absorb, float movementFix, int durabilityLossProvider) {
+    public GeneratePlateImpl(String id, float bluntDamage, float penetrateDamage, float ricochetDamage, int defense, int absorb, float movementFix, int durabilityLossProvider) {
         super(material, type, new Properties());
         this.id = id;
         this.defense = defense;
@@ -57,7 +57,7 @@ public class GenerateImpl extends SapiIV implements DurabilityLossProvider, Plat
             int absorb = data.absorb;
             float movementFix = data.movementFix;
             int durabilityLossProvider = data.durabilityLossModifier;
-            items.add(new GenerateImpl(id,bluntDamage,penetrateDamage,ricochetDamage,defense,absorb,movementFix,durabilityLossProvider));
+            items.add(new GeneratePlateImpl(id,bluntDamage,penetrateDamage,ricochetDamage,defense,absorb,movementFix,durabilityLossProvider));
         }
     }
 
