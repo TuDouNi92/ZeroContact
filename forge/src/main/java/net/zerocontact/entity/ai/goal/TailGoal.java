@@ -28,12 +28,12 @@ public class TailGoal extends Goal {
         chase();
     }
 
-    public  <T extends ArmedRaider>boolean canChaseTarget(T raider) {
+    public  static <T extends ArmedRaider>boolean canChaseTarget(T raider,TailGoal goal) {
         if (raider.getTarget() != null) {
-            cacheTargetPos = raider.getTarget().position();
+            goal.cacheTargetPos = raider.getTarget().position();
             return false;
         }
-        return cacheTargetPos != null && raider.getTarget()==null;
+        return goal.cacheTargetPos != null && raider.getTarget()==null;
     }
     private void chase(){
         if(intervalCooldown==40 && raider.getNavigation().isDone()){

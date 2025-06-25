@@ -34,7 +34,6 @@ public class PerformGunAttackGoal extends Goal {
 
     @Override
     public void tick() {
-        shooter.performAttackAnim();
         burstFire();
     }
 

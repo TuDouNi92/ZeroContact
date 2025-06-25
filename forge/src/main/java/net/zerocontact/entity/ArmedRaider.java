@@ -60,8 +60,10 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class ArmedRaider extends PatrollingMonster implements GeoEntity, InventoryCarrier {
-    private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
+    private final AnimatableInstanceCache geoCache;
     private static final RawAnimation SHOOT_ANIM = RawAnimation.begin().then("raider.animation.alert", Animation.LoopType.HOLD_ON_LAST_FRAME);
+    private static final RawAnimation WALK = RawAnimation.begin().then("raider.animation.walk", Animation.LoopType.LOOP);
+    private static final RawAnimation IDLE = RawAnimation.begin().then("raider.animation.idle", Animation.LoopType.LOOP);
     private final RandomSource random = this.getRandom();
     private final SimpleContainer inventory = new SimpleContainer(5);
     private final LazyOptional<IItemHandler> itemHandlerLazyOptional = LazyOptional.of(() -> new InvWrapper(inventory));
@@ -140,6 +142,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         super(entityType, level);
         operator = IGunOperator.fromLivingEntity(this);
         MTeam.registerEntity(this);
+        geoCache = GeckoLibUtil.createInstanceCache(this);
     }
 
     @Override
@@ -173,9 +176,23 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
         controllerRegistrar.add(new AnimationController<>(this, "controller", 10, this::predicate));
-        controllerRegistrar.add(new AnimationController<>(this, "shoot_controller", animationState -> PlayState.STOP)
+        controllerRegistrar.add(new AnimationController<>(this, "triggerable", 10, this::triggerable)
                 .triggerableAnim("shoot", SHOOT_ANIM));
+    }
 
+    private PlayState triggerable(AnimationState<ArmedRaider> armedRaiderAnimationState) {
+        return PlayState.CONTINUE;
+    }
+
+    private void triggerablePredicate() {
+        Optional.ofNullable(stateController).ifPresent(state -> {
+            if (state.getPhase() == GlobalStateController.Phase.ATTACK) {
+                this.triggerAnim("triggerable", "shoot");
+            } else {
+                this.stopTriggeredAnimation("triggerable", "shoot");
+            }
+
+        });
     }
 
     @Override
@@ -185,9 +202,9 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
 
     private <E extends GeoAnimatable> PlayState predicate(AnimationState<E> state) {
         if (state.isMoving()) {
-            state.getController().setAnimation(RawAnimation.begin().then("raider.animation.walk", Animation.LoopType.LOOP));
+            state.getController().setAnimation(WALK);
         } else {
-            state.getController().setAnimation(RawAnimation.begin().then("raider.animation.idle", Animation.LoopType.LOOP));
+            state.getController().setAnimation(IDLE);
         }
         return PlayState.CONTINUE;
     }
@@ -247,10 +264,6 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         return stackList;
     }
 
-    public void performAttackAnim() {
-        triggerAnim("shoot_controller", "shoot");
-    }
-
     @Override
     public void addAdditionalSaveData(@NotNull CompoundTag compound) {
         this.writeInventoryToTag(compound);
@@ -300,8 +313,6 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     private void getSoundState() {
         if (this.getTarget() != null) {
             currentState = SoundState.CONTACT;
-        } else if (this.random.nextInt(200) == 0) {
-            currentState = SoundState.IDLE;
         } else {
             currentState = SoundState.IDLE;
         }
@@ -315,6 +326,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         super.tick();
         listenSoundState();
         Optional.ofNullable(stateController).ifPresent(GlobalStateController::tick);
+        triggerablePredicate();
     }
 
     @Override

@@ -30,11 +30,11 @@ public class GlobalStateController {
 
         for (Goal goal : goals) {
             if (goal instanceof TailGoal tailGoal) {
-                if (tailGoal.canChaseTarget(entity)) {
+                if (TailGoal.canChaseTarget(entity,tailGoal)) {
                     updatePhase(Phase.CHASE);
                 }
                 else{
-                    updatePhase(Phase.ATTACK);
+                    updatePhase(Phase.IDLE);
                 }
             }
         }
