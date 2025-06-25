@@ -1,7 +1,6 @@
 package net.zerocontact.entity.ai.controller;
 
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.entity.ai.goal.PerformGunAttackGoal;
 import net.zerocontact.entity.ai.goal.TailGoal;
