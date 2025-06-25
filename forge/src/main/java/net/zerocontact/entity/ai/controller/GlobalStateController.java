@@ -33,6 +33,9 @@ public class GlobalStateController {
                 if (tailGoal.canChaseTarget(entity)) {
                     updatePhase(Phase.CHASE);
                 }
+                else{
+                    updatePhase(Phase.ATTACK);
+                }
             }
         }
 
