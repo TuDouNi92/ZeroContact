@@ -8,7 +8,6 @@ import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
 import net.zerocontact.entity.ArmedRaider;
@@ -37,15 +36,20 @@ public class PerformGunAttackGoal extends Goal {
         burstFire();
     }
 
-    public static boolean canSee(Mob shooter) {
+    public static <T extends ArmedRaider>boolean canSee(T shooter) {
         LivingEntity target = shooter.getTarget();
-        if(target==null)return false;
+        if (target == null) return false;
         Vec3 lookVec = shooter.getLookAngle().normalize();
         Vec3 toTargetVec = target.position().subtract(shooter.position()).normalize();
         double dot = lookVec.dot(toTargetVec);
         double fovCos = Math.cos(Math.toRadians(90));
         boolean bodyFacing = shooter.yBodyRot == shooter.yHeadRot;
-        return (dot >= fovCos || shooter.isSprinting()) && dot >= fovCos && bodyFacing;
+        if ((dot >= fovCos || shooter.isSprinting()) && dot >= fovCos && bodyFacing) {
+            shooter.stateController.getShareContext().canSeeTarget =true;
+            return true;
+        }
+        shooter.stateController.getShareContext().canSeeTarget =false;
+        return false;
     }
 
     private float provideInaccuracy() {
@@ -53,18 +57,24 @@ public class PerformGunAttackGoal extends Goal {
         if (random.nextFloat() < .1F) {
             return (float) random.triangle(baseSpread / 2, baseSpread);
         }
-        return (float) random.triangle(baseSpread, baseSpread*1.25F);
+        return (float) random.triangle(baseSpread, baseSpread * 1.25F);
     }
 
     private void shoot(LivingEntity target) {
-        double x = target.getX() - shooter.getX();
-        double y = target.getEyeY() - shooter.getEyeY();
-        double z = target.getZ() - shooter.getZ();
+        double x, y, z;
+        Vec3 cacheTarget = shooter.stateController.getShareContext().cacheTarget;
+        if (target == null || cacheTarget != null) {
+            x = cacheTarget.x() - shooter.getX();
+            y = cacheTarget.y() - shooter.getEyeY();
+            z = cacheTarget.z() - shooter.getZ();
+        } else {
+            x = target.getX() - shooter.getX();
+            y = target.getEyeY() - shooter.getEyeY();
+            z = target.getZ() - shooter.getZ();
+        }
         float spread = provideInaccuracy();
         float yaw = (float) -Math.toDegrees(Math.atan2(x, z)) + Mth.randomBetween(random, -spread, spread);
         float pitch = (float) -Math.toDegrees(Math.atan2(y, Math.sqrt(x * x + z * z))) + Mth.randomBetween(random, -spread, spread);
-        if (!IGun.mainhandHoldGun(shooter) || operator == null) return;
-        if (!canSee(shooter)) return;
         ShootResult result = operator.shoot(() -> pitch, () -> yaw);
         if (result == ShootResult.NOT_DRAW) {
             operator.draw(shooter::getMainHandItem);
@@ -73,28 +83,36 @@ public class PerformGunAttackGoal extends Goal {
         if (result == ShootResult.NO_AMMO) {
             operator.reload();
         }
+
     }
 
     private void burstFire() {
+        if (!IGun.mainhandHoldGun(shooter) || operator == null) return;
+        if (!shooter.getNavigation().isDone()) return;
         LivingEntity target = shooter.getTarget();
-        if (target != null && shooter.getNavigation().isDone()) {
-            shooter.lookAt(EntityAnchorArgument.Anchor.EYES,target.position());
-            if (shootCoolDown > 0) {
-                shootCoolDown--;
-                FireMode fireMode = IGun.getMainhandFireMode(shooter);
-                if (fireMode == FireMode.SEMI || fireMode == FireMode.BURST) {
-                    burstInterval = random.nextInt(10);
-                } else {
-                    burstInterval = random.nextInt(15);
-                }
+        Vec3 cacheTarget = shooter.stateController.getShareContext().cacheTarget;
+        if (target != null) {
+            shooter.lookAt(EntityAnchorArgument.Anchor.EYES, target.position());
+        } else if (cacheTarget != null) {
+            shooter.lookAt(EntityAnchorArgument.Anchor.EYES, cacheTarget);
+        } else {
+            return;
+        }
+        if (shootCoolDown > 0) {
+            shootCoolDown--;
+            FireMode fireMode = IGun.getMainhandFireMode(shooter);
+            if (fireMode == FireMode.SEMI || fireMode == FireMode.BURST) {
+                burstInterval = random.nextInt(10);
             } else {
-                if (burstInterval > 0) {
-                    shoot(shooter.getTarget());
-                    burstInterval--;
-                } else {
-                    shootCoolDown = 40;
-                    burstInterval = random.nextInt(15);
-                }
+                burstInterval = random.nextInt(15);
+            }
+        } else {
+            if (burstInterval > 0 && canSee(shooter)) {
+                shoot(target);
+                burstInterval--;
+            } else {
+                shootCoolDown = 40;
+                burstInterval = random.nextInt(15);
             }
         }
     }

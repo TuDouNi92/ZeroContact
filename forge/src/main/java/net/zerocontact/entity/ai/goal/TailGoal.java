@@ -5,10 +5,12 @@ import net.minecraft.world.phys.Vec3;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.entity.ai.controller.GlobalStateController;
 
+import java.util.function.Supplier;
+
 public class TailGoal extends Goal {
-    private Vec3 cacheTargetPos;
     private final ArmedRaider raider;
     private int intervalCooldown;
+
     public TailGoal(ArmedRaider mob) {
         this.raider = mob;
     }
@@ -25,22 +27,26 @@ public class TailGoal extends Goal {
 
     @Override
     public void tick() {
-        chase();
+        chase(()->canChaseTarget(raider));
     }
 
-    public  static <T extends ArmedRaider>boolean canChaseTarget(T raider,TailGoal goal) {
+    private static <T extends ArmedRaider> boolean canChaseTarget(T raider) {
         if (raider.getTarget() != null) {
-            goal.cacheTargetPos = raider.getTarget().position();
+            raider.stateController.getShareContext().cacheTarget = raider.getTarget().position();
+            raider.stateController.getShareContext().canChaseTarget =false;
             return false;
         }
-        return goal.cacheTargetPos != null && raider.getTarget()==null;
+        raider.stateController.getShareContext().canChaseTarget =true;
+        return true;
     }
-    private void chase(){
-        if(intervalCooldown==40 && raider.getNavigation().isDone()){
-            intervalCooldown=0;
+
+    private void chase(Supplier<Boolean> canChase) {
+        if(!canChase.get())return;
+        Vec3 cacheTargetPos = raider.stateController.getShareContext().cacheTarget;
+        if (intervalCooldown == 40 && raider.getNavigation().isDone()) {
+            intervalCooldown = 0;
             raider.getNavigation().moveTo(cacheTargetPos.x, cacheTargetPos.y, cacheTargetPos.z, 1.2D);
-        }
-        else{
+        } else {
             intervalCooldown++;
         }
     }

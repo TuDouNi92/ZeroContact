@@ -161,7 +161,6 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true, false));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Monster.class, true, false));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, IronGolem.class, true, false));
-        stateController.appendGoals(tailGoal);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -311,7 +310,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     }
 
     private void getSoundState() {
-        if (this.getTarget() != null) {
+        if (PerformGunAttackGoal.canSee(this)) {
             currentState = SoundState.CONTACT;
         } else {
             currentState = SoundState.IDLE;
