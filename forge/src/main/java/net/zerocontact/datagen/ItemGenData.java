@@ -13,16 +13,16 @@ public class ItemGenData {
         @SerializedName("movement_fix")
         public float movementFix;
         @SerializedName("durability_loss_modifier")
-        public int durabilityLossModifier;
+        public int durabilityLossModifier =1;
         @SerializedName("hurt_modifier")
         public HurtModifier hurtModifier;
         public static class HurtModifier {
             @SerializedName("ricochet_multiplier")
-            public  Float ricochetMultiplier;
+            public  Float ricochetMultiplier =0.05f;
             @SerializedName("penetrate_multiplier")
-            public  Float penetrateMultiplier;
+            public  Float penetrateMultiplier =0.7f;
             @SerializedName("blunt_multiplier")
-            public  Float bluntMultiplier;
+            public  Float bluntMultiplier = 0.1f;
         }
     }
     public static class Armor extends ItemGenData{
@@ -39,16 +39,16 @@ public class ItemGenData {
         @SerializedName("movement_fix")
         public float movementFix;
         @SerializedName("durability_loss_modifier")
-        public int durabilityLossModifier;
+        public int durabilityLossModifier =1;
         @SerializedName("hurt_modifier")
-        public Armor.HurtModifier hurtModifier;
+        public Armor.HurtModifier hurtModifier = new HurtModifier();
         public static class HurtModifier {
             @SerializedName("ricochet_multiplier")
-            public  Float ricochetMultiplier;
+            public  Float ricochetMultiplier =0.05f;
             @SerializedName("penetrate_multiplier")
-            public  Float penetrateMultiplier;
+            public  Float penetrateMultiplier =0.7f;
             @SerializedName("blunt_multiplier")
-            public  Float bluntMultiplier;
+            public  Float bluntMultiplier =0.1f;
         }
     }
 }
