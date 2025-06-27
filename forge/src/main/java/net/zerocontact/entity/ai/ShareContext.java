@@ -6,4 +6,5 @@ public class ShareContext {
     public Vec3 cacheTarget;
     public boolean canChaseTarget;
     public boolean canSeeTarget;
+    public boolean isHurt;
 }

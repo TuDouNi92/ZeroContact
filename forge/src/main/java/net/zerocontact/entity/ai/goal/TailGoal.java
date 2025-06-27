@@ -5,7 +5,7 @@ import net.minecraft.world.phys.Vec3;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.entity.ai.controller.GlobalStateController;
 
-import java.util.function.Supplier;
+import java.util.Objects;
 
 public class TailGoal extends Goal {
     private final ArmedRaider raider;
@@ -27,27 +27,31 @@ public class TailGoal extends Goal {
 
     @Override
     public void tick() {
-        chase(()->canChaseTarget(raider));
+        chase();
     }
 
-    private static <T extends ArmedRaider> boolean canChaseTarget(T raider) {
-        if (raider.getTarget() != null) {
-            raider.stateController.getShareContext().cacheTarget = raider.getTarget().position();
-            raider.stateController.getShareContext().canChaseTarget =false;
+    public static <T extends ArmedRaider> boolean canChaseTarget(T raider) {
+        boolean canSee = PerformGunAttackGoal.canSee(raider);
+        if (canSee) {
+            raider.stateController.getShareContext().cacheTarget = Objects.requireNonNull(raider.getTarget()).position();
+            raider.stateController.getShareContext().canChaseTarget = false;
             return false;
         }
-        raider.stateController.getShareContext().canChaseTarget =true;
-        return true;
+        if (raider.stateController.getShareContext().cacheTarget != null) {
+            raider.stateController.getShareContext().canChaseTarget = true;
+            return true;
+        }
+        return false;
     }
 
-    private void chase(Supplier<Boolean> canChase) {
-        if(!canChase.get())return;
+    private void chase() {
         Vec3 cacheTargetPos = raider.stateController.getShareContext().cacheTarget;
         if (intervalCooldown == 40 && raider.getNavigation().isDone()) {
             intervalCooldown = 0;
             raider.getNavigation().moveTo(cacheTargetPos.x, cacheTargetPos.y, cacheTargetPos.z, 1.2D);
-        } else {
-            intervalCooldown++;
+        } else if (raider.getTarget() != null) {
+            raider.getNavigation().stop();
         }
+        intervalCooldown++;
     }
 }

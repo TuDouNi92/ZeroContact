@@ -36,7 +36,7 @@ public class PerformGunAttackGoal extends Goal {
         burstFire();
     }
 
-    public static <T extends ArmedRaider>boolean canSee(T shooter) {
+    public static <T extends ArmedRaider> boolean canSee(T shooter) {
         LivingEntity target = shooter.getTarget();
         if (target == null) return false;
         Vec3 lookVec = shooter.getLookAngle().normalize();
@@ -45,10 +45,10 @@ public class PerformGunAttackGoal extends Goal {
         double fovCos = Math.cos(Math.toRadians(90));
         boolean bodyFacing = shooter.yBodyRot == shooter.yHeadRot;
         if ((dot >= fovCos || shooter.isSprinting()) && dot >= fovCos && bodyFacing) {
-            shooter.stateController.getShareContext().canSeeTarget =true;
+            shooter.stateController.getShareContext().canSeeTarget = true;
             return true;
         }
-        shooter.stateController.getShareContext().canSeeTarget =false;
+        shooter.stateController.getShareContext().canSeeTarget = false;
         return false;
     }
 
@@ -62,16 +62,9 @@ public class PerformGunAttackGoal extends Goal {
 
     private void shoot(LivingEntity target) {
         double x, y, z;
-        Vec3 cacheTarget = shooter.stateController.getShareContext().cacheTarget;
-        if (target == null || cacheTarget != null) {
-            x = cacheTarget.x() - shooter.getX();
-            y = cacheTarget.y() - shooter.getEyeY();
-            z = cacheTarget.z() - shooter.getZ();
-        } else {
-            x = target.getX() - shooter.getX();
-            y = target.getEyeY() - shooter.getEyeY();
-            z = target.getZ() - shooter.getZ();
-        }
+        x = target.getX() - shooter.getX();
+        y = target.getEyeY() - shooter.getEyeY();
+        z = target.getZ() - shooter.getZ();
         float spread = provideInaccuracy();
         float yaw = (float) -Math.toDegrees(Math.atan2(x, z)) + Mth.randomBetween(random, -spread, spread);
         float pitch = (float) -Math.toDegrees(Math.atan2(y, Math.sqrt(x * x + z * z))) + Mth.randomBetween(random, -spread, spread);
@@ -90,11 +83,8 @@ public class PerformGunAttackGoal extends Goal {
         if (!IGun.mainhandHoldGun(shooter) || operator == null) return;
         if (!shooter.getNavigation().isDone()) return;
         LivingEntity target = shooter.getTarget();
-        Vec3 cacheTarget = shooter.stateController.getShareContext().cacheTarget;
         if (target != null) {
             shooter.lookAt(EntityAnchorArgument.Anchor.EYES, target.position());
-        } else if (cacheTarget != null) {
-            shooter.lookAt(EntityAnchorArgument.Anchor.EYES, cacheTarget);
         } else {
             return;
         }
