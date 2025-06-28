@@ -48,7 +48,6 @@ import java.util.Set;
         for (ItemGenData data0 : itemGenDataList) {
             if(!(data0 instanceof ItemGenData.Plate data))continue;
             ZeroContactLogger.LOG.info(new Gson().toJson(data0));
-            String name = data.languageName;
             String id = data.id;
             float bluntDamage = data.hurtModifier.bluntMultiplier;
             float penetrateDamage = data.hurtModifier.penetrateMultiplier;
