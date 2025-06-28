@@ -6,8 +6,6 @@ import net.minecraft.resources.ResourceLocation;
 public class ItemGenData {
     public static class Plate extends ItemGenData{
         public String id;
-        @SerializedName("language_name")
-        public String languageName;
         public int defense;
         public int absorb;
         @SerializedName("movement_fix")
@@ -36,8 +34,6 @@ public class ItemGenData {
         public String texture;
         public String model;
         public String animation;
-        @SerializedName("movement_fix")
-        public float movementFix;
         @SerializedName("durability_loss_modifier")
         public int durabilityLossModifier =1;
         @SerializedName("hurt_modifier")
