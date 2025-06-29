@@ -3,6 +3,7 @@ package net.zerocontact.item.armor.forge;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
+import net.zerocontact.api.ArmorTypeTag;
 import net.zerocontact.item.PlateBaseMaterial;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
@@ -10,7 +11,7 @@ import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 
-public abstract class AbstractGenerateGeoImpl extends ArmorItem implements GeoItem {
+public abstract class AbstractGenerateGeoImpl extends ArmorItem implements GeoItem, ArmorTypeTag {
     protected final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     protected final Type type;
     protected final int defense;
@@ -50,6 +51,5 @@ public abstract class AbstractGenerateGeoImpl extends ArmorItem implements GeoIt
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
     }
-
 }
 
