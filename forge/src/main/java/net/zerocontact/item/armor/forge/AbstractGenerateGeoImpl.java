@@ -51,11 +51,5 @@ public abstract class AbstractGenerateGeoImpl extends ArmorItem implements GeoIt
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
     }
 
-    protected static ArmorItem.Type getArmorType(String equipmentSlot) {
-        if (equipmentSlot.equals("HEAD")) {
-            return Type.HELMET;
-        }
-        return Type.CHESTPLATE;
-    }
 }
 

@@ -1,10 +1,10 @@
 package net.zerocontact.models;
 
 import net.minecraft.resources.ResourceLocation;
-import net.zerocontact.item.armor.forge.AbstractGenerateGeoImpl;
+import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.model.GeoModel;
 
-public class GenerateModel<T extends AbstractGenerateGeoImpl> extends GeoModel<T> {
+public class GenerateModel<T extends GeoAnimatable> extends GeoModel<T> {
     private final ResourceLocation texture;
     private final ResourceLocation model;
     private final ResourceLocation animation;

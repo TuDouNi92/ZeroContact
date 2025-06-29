@@ -75,12 +75,11 @@ public class GenerateArmorGeoImpl extends AbstractGenerateGeoImpl implements Geo
             String id = data.id;
             int defense = data.defense;
             int defaultDurability = data.defaultDurability;
-            ArmorItem.Type equipmentSlotType = getArmorType(data.equipmentSlot);
-            if (equipmentSlotType.equals(Type.HELMET)) continue;
+            if (!data.equipmentSlot.equals("ARMOR") ) continue;
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerateArmorGeoImpl(equipmentSlotType, id, defense, defaultDurability, texture, model, animation));
+            items.add(new GenerateArmorGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, texture, model, animation));
         }
     }
 

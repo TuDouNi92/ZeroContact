@@ -135,12 +135,11 @@ public class GenerateHelmetGeoImpl extends AbstractGenerateGeoImpl implements He
             int absorb = data.absorb;
             int durabilityLossProvider = data.durabilityLossModifier;
             int default_durability = data.defaultDurability;
-            ArmorItem.Type equipmentSlotType = getArmorType(data.equipmentSlot);
-            if (equipmentSlotType.equals(Type.CHESTPLATE)) continue;
+            if (!data.equipmentSlot.equals("HELMET")) continue;
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerateHelmetGeoImpl(id, equipmentSlotType, texture, model, animation, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, durabilityLossProvider,default_durability));
+            items.add(new GenerateHelmetGeoImpl(id, Type.HELMET, texture, model, animation, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, durabilityLossProvider,default_durability));
         }
     }
 
