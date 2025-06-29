@@ -7,7 +7,7 @@
     "gui": {
       "rotation": [
         45,
-        45,
+        135,
         0
       ],
       "translation": [

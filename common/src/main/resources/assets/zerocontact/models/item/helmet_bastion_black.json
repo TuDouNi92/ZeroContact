@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/fast_mt"
+    "layer0": "zerocontact:item/helmet_bastion_black"
   },
   "display": {
     "gui": {
