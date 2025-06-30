@@ -63,7 +63,8 @@ public class PerformGunAttackGoal extends Goal {
     private void shoot(LivingEntity target) {
         double x, y, z;
         x = target.getX() - shooter.getX();
-        y = target.getEyeY() - shooter.getEyeY();
+        double targetY = target.getY()+target.getBbHeight()*0.5;
+        y = targetY - shooter.getEyeY();
         z = target.getZ() - shooter.getZ();
         float spread = provideInaccuracy();
         float yaw = (float) -Math.toDegrees(Math.atan2(x, z)) + Mth.randomBetween(random, -spread, spread);
