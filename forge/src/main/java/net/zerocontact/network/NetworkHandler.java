@@ -1,9 +1,16 @@
 package net.zerocontact.network;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
+import net.zerocontact.api.Togglable;
 import net.zerocontact.client.ClientStaminaData;
+import net.zerocontact.client.interaction.ToggleInteraction;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class NetworkHandler {
@@ -16,14 +23,47 @@ public class NetworkHandler {
         }
 
         public SyncStaminaPacket(FriendlyByteBuf buf) {
-            this.stamina =buf.readFloat();
+            this.stamina = buf.readFloat();
         }
-        public void toBytes(FriendlyByteBuf buf){
+
+        public void toBytes(FriendlyByteBuf buf) {
             buf.writeFloat(stamina);
         }
-        public void handle(Supplier<NetworkEvent.Context> supplier){
+
+        public void handle(Supplier<NetworkEvent.Context> supplier) {
             NetworkEvent.Context context = supplier.get();
-            context.enqueueWork(()-> ClientStaminaData.setStamina(stamina));
+            context.enqueueWork(() -> ClientStaminaData.setStamina(stamina));
+        }
+    }
+
+    public static class ToggleVisorPacket {
+        public ToggleVisorPacket() {
+        }
+
+        public ToggleVisorPacket(FriendlyByteBuf buf) {
+
+        }
+
+        public void toBytes(FriendlyByteBuf buf) {
+
+        }
+
+        public void handle(Supplier<NetworkEvent.Context> supplier) {
+            NetworkEvent.Context context = supplier.get();
+            context.enqueueWork(() -> {
+                ServerPlayer player = context.getSender();
+                if (player == null) return;
+                Optional<ItemStack> helmet = Optional.of(player.getItemBySlot(EquipmentSlot.HEAD));
+                helmet.ifPresent(stack -> {
+                    if (!(stack.getItem() instanceof Togglable togglable)) return;
+                    Item item = togglable.getToggleBrother();
+                    Optional<ItemStack> newStack = ToggleInteraction.toggleHelmetVisor(stack, item, item.getClass().getSuperclass());
+                    newStack.ifPresent(stack1->{
+                        stack1.setTag(stack.getTag());
+                        player.setItemSlot(EquipmentSlot.HEAD,stack1);
+                    });
+                });
+            });
         }
     }
 }

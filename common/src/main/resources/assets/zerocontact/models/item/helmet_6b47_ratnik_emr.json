@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/6b47_ratnik"
+    "layer0": "zerocontact:item/helmet_6b47_ratnik_emr"
   },
   "display": {
     "gui": {

@@ -19,22 +19,29 @@ public class ModMessages {
 
     public static void register() {
         SimpleChannel net = NetworkRegistry.ChannelBuilder
-                .named(new ResourceLocation(MOD_ID,"messages"))
-                .networkProtocolVersion(()->"1.0f")
-                .clientAcceptedVersions(s->true)
-                .serverAcceptedVersions(s->true)
+                .named(new ResourceLocation(MOD_ID, "messages"))
+                .networkProtocolVersion(() -> "1.0f")
+                .clientAcceptedVersions(s -> true)
+                .serverAcceptedVersions(s -> true)
                 .simpleChannel();
         INSTANCE = net;
-        net.messageBuilder(NetworkHandler.SyncStaminaPacket.class,id(), NetworkDirection.PLAY_TO_CLIENT)
+        net.messageBuilder(NetworkHandler.SyncStaminaPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(NetworkHandler.SyncStaminaPacket::new)
                 .encoder(NetworkHandler.SyncStaminaPacket::toBytes)
                 .consumerMainThread(NetworkHandler.SyncStaminaPacket::handle)
                 .add();
+        net.messageBuilder(NetworkHandler.ToggleVisorPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(NetworkHandler.ToggleVisorPacket::new)
+                .encoder(NetworkHandler.ToggleVisorPacket::toBytes)
+                .consumerMainThread(NetworkHandler.ToggleVisorPacket::handle)
+                .add();
     }
-    public static <MSG> void sendToServer(MSG msg){
+
+    public static <MSG> void sendToServer(MSG msg) {
         INSTANCE.sendToServer(msg);
     }
-    public static <MSG> void sendToPlayer(MSG msg, ServerPlayer player){
-        INSTANCE.send(PacketDistributor.PLAYER.with(()->player),msg);
+
+    public static <MSG> void sendToPlayer(MSG msg, ServerPlayer player) {
+        INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), msg);
     }
 }
