@@ -8,7 +8,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.client.renderer.HelmetRender;
-import net.zerocontact.item.armor.forge.AbstractGenerateGeoImpl;
+import net.zerocontact.item.armor.forge.BaseArmorGeoImpl;
 import net.zerocontact.models.GenerateModel;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
 
-public class Bastion extends BaseHelmet{
+public class Bastion extends BaseGeoHelmet {
     private static final ResourceLocation  texture= new ResourceLocation(MOD_ID,"textures/models/helmet/helmet_bastion_black.png") ;
     private static final ResourceLocation  model= new ResourceLocation(MOD_ID,"geo/helmet_bastion_black.geo.json") ;
     private static final ResourceLocation  animation= null;
@@ -27,7 +27,7 @@ public class Bastion extends BaseHelmet{
     @Override
     public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new IClientItemExtensions() {
-            private HelmetRender.HelmetArmorRender<AbstractGenerateGeoImpl> render;
+            private HelmetRender.HelmetArmorRender<BaseArmorGeoImpl> render;
             @Override
             public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
                 if(render==null){

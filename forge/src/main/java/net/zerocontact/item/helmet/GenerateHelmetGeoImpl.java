@@ -26,7 +26,7 @@ import net.zerocontact.client.renderer.HelmetRender;
 import net.zerocontact.datagen.ItemGenData;
 import net.zerocontact.datagen.loader.ItemLoader;
 import net.zerocontact.events.ProtectionLevelHelper;
-import net.zerocontact.item.armor.forge.AbstractGenerateGeoImpl;
+import net.zerocontact.item.armor.forge.BaseArmorGeoImpl;
 import net.zerocontact.models.GenerateModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,7 +35,7 @@ import software.bernie.geckolib.animatable.GeoItem;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class GenerateHelmetGeoImpl extends AbstractGenerateGeoImpl implements HelmetInfoProvider, GeoItem, EntityHurtProvider, DurabilityLossProvider {
+public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInfoProvider, GeoItem, EntityHurtProvider, DurabilityLossProvider {
     private final int defaultDurability;
     private final int absorb;
     public static Set<GenerateHelmetGeoImpl> items = new HashSet<>();

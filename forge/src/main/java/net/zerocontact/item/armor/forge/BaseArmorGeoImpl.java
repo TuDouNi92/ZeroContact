@@ -11,14 +11,14 @@ import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 
-public abstract class AbstractGenerateGeoImpl extends ArmorItem implements GeoItem, ArmorTypeTag {
+public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, ArmorTypeTag {
     protected final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     protected final Type type;
     protected final int defense;
     public final String id;
     protected final ResourceLocation texture, model, animation;
 
-    public AbstractGenerateGeoImpl(Type type, String id, int defense, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+    public BaseArmorGeoImpl(Type type, String id, int defense, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
         super(PlateBaseMaterial.ARMOR_STEEL, type, new Properties().defaultDurability(defaultDurability));
         this.type = type;
         this.id = id;

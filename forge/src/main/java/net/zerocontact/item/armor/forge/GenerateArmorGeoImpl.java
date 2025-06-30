@@ -28,7 +28,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class GenerateArmorGeoImpl extends AbstractGenerateGeoImpl implements GeoItem, ArmorTypeTag {
+public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, ArmorTypeTag {
     protected final int defaultDurability;
     public static Set<GenerateArmorGeoImpl> items = new HashSet<>();
 

@@ -23,7 +23,6 @@ import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.client.renderer.HelmetRender;
 import net.zerocontact.events.ProtectionLevelHelper;
 import net.zerocontact.item.PlateBaseMaterial;
-import net.zerocontact.models.FastMtModel;
 import net.zerocontact.models.GenerateModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,7 +34,7 @@ import software.bernie.geckolib.core.animation.AnimatableManager;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class BaseHelmet extends ArmorItem implements HelmetInfoProvider, GeoItem, EntityHurtProvider, DurabilityLossProvider {
+public class BaseGeoHelmet extends ArmorItem implements HelmetInfoProvider, GeoItem, EntityHurtProvider, DurabilityLossProvider {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     private final int defense;
     private final int defaultDurability;
@@ -43,7 +42,7 @@ public class BaseHelmet extends ArmorItem implements HelmetInfoProvider, GeoItem
     private final ResourceLocation texture;
     private final ResourceLocation model;
     private final ResourceLocation animation;
-    public BaseHelmet(int absorb,int defaultDurability,ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+    public BaseGeoHelmet(int absorb, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
         super(PlateBaseMaterial.ARMOR_STEEL, Type.HELMET, new Properties().defaultDurability(defaultDurability));
         this.defense = 4;
         this.absorb = absorb;
