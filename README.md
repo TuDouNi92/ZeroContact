@@ -16,3 +16,4 @@ Adding ballistic SAPI plates/Body armors to Modded Minecraft providing unique cl
       - The plate will immune damages if incident angle is big.
 ## Contributors
   - Raider Modelling -> TG@Faldskimerkh
+  - Items Modelling -> DC@SkyRofls
