@@ -7,7 +7,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.zerocontact.client.ClientStaminaData;
+import net.zerocontact.client.ClientData;
 import net.zerocontact.stamina.PlayerStaminaProvider;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
@@ -24,7 +24,7 @@ public class StaminaHUD {
 
     private static void drawStamina(RenderGuiOverlayEvent.Post event, Minecraft mc) {
         float maxStamina = 120f;
-        float stamina = ClientStaminaData.getStamina();
+        float stamina = ClientData.getStamina();
         float percent = stamina / maxStamina;
         int barWidth = 100;
         int barHeight = 2;

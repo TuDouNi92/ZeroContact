@@ -35,6 +35,13 @@ public class ModMessages {
                 .encoder(NetworkHandler.ToggleVisorPacket::toBytes)
                 .consumerMainThread(NetworkHandler.ToggleVisorPacket::handle)
                 .add();
+        net.messageBuilder(NetworkHandler.ToggleVisorResultPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(NetworkHandler.ToggleVisorResultPacket::decode)
+                .encoder(NetworkHandler.ToggleVisorResultPacket::encode)
+                .consumerMainThread(NetworkHandler.ToggleVisorResultPacket::handle)
+                .add();
+
+
     }
 
     public static <MSG> void sendToServer(MSG msg) {
