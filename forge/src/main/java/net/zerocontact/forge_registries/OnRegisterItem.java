@@ -16,7 +16,7 @@ import net.zerocontact.item.armor.forge.GenerateArmorGeoImpl;
 import net.zerocontact.item.armor.forge.ThorArmorImpl;
 import net.zerocontact.item.armor.forge.UntarArmorImpl;
 import net.zerocontact.item.forge.GeneratePlateImpl;
-import net.zerocontact.item.forge.GenerateUniformGeoImpl;
+import net.zerocontact.item.forge.GenerateBackpackGeoImpl;
 import net.zerocontact.item.forge.HexgridArmorImpl;
 import net.zerocontact.item.helmet.*;
 import net.zerocontact.registries.ItemsReg;
@@ -76,7 +76,7 @@ public class OnRegisterItem {
         GeneratePlateImpl.regItems();
         GenerateArmorGeoImpl.regItems();
         GenerateHelmetGeoImpl.regItems();
-        GenerateUniformGeoImpl.regItems();
+        GenerateBackpackGeoImpl.regItems();
         GeneratePlateImpl.items.forEach(item -> {
             ItemsReg.ITEMS.register(item.id, () -> item);
             ZeroContactLogger.LOG.info("Reg plate for:{}", item);
@@ -89,7 +89,7 @@ public class OnRegisterItem {
             ItemsReg.ITEMS.register(item.id, () -> item);
             ZeroContactLogger.LOG.info("Reg helmet for:{}", item);
         });
-        GenerateUniformGeoImpl.items.forEach(item -> {
+        GenerateBackpackGeoImpl.items.forEach(item -> {
             ItemsReg.ITEMS.register(item.id, () -> item);
             ZeroContactLogger.LOG.info("Reg uniform for:{}", item);
         });
