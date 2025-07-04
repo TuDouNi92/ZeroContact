@@ -1,12 +1,11 @@
 package net.zerocontact.item.forge;
 
-import com.google.gson.Gson;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
-import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.DurabilityLossProvider;
 import net.zerocontact.api.EntityHurtProvider;
 import net.zerocontact.api.PlateInfoProvider;
+import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
 import net.zerocontact.datagen.loader.ItemLoader;
 import net.zerocontact.item.PlateBaseMaterial;
@@ -28,7 +27,7 @@ import java.util.Set;
     private final float ricochetDamage;
     private final int durabilityLossProvider;
     public String id;
-    public static Set<GeneratePlateImpl> items = new HashSet<>();
+    public static Set<GenerationRecord> items = new HashSet<>();
 
     public GeneratePlateImpl(String id, float bluntDamage, float penetrateDamage, float ricochetDamage, int defense, int absorb, float movementFix, int durabilityLossProvider) {
         super(material, type, new Properties());
@@ -47,7 +46,6 @@ import java.util.Set;
         if (itemGenDataList.isEmpty()) return;
         for (ItemGenData data0 : itemGenDataList) {
             if(!(data0 instanceof ItemGenData.Plate data))continue;
-            ZeroContactLogger.LOG.info(new Gson().toJson(data0));
             String id = data.id;
             float bluntDamage = data.hurtModifier.bluntMultiplier;
             float penetrateDamage = data.hurtModifier.penetrateMultiplier;
@@ -56,7 +54,7 @@ import java.util.Set;
             int absorb = data.absorb;
             float movementFix = data.movementFix;
             int durabilityLossProvider = data.durabilityLossModifier;
-            items.add(new GeneratePlateImpl(id,bluntDamage,penetrateDamage,ricochetDamage,defense,absorb,movementFix,durabilityLossProvider));
+            items.add(new GenerationRecord(id,new GeneratePlateImpl(id,bluntDamage,penetrateDamage,ricochetDamage,defense,absorb,movementFix,durabilityLossProvider)));
         }
     }
 

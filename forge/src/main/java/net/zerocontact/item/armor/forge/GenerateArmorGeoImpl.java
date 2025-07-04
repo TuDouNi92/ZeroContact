@@ -15,6 +15,7 @@ import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.ArmorTypeTag;
 import net.zerocontact.client.renderer.ArmorRender;
+import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
 import net.zerocontact.datagen.loader.ItemLoader;
 import net.zerocontact.models.GenerateModel;
@@ -30,7 +31,7 @@ import java.util.function.Consumer;
 
 public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, ArmorTypeTag {
     protected final int defaultDurability;
-    public static Set<GenerateArmorGeoImpl> items = new HashSet<>();
+    public static Set<GenerationRecord> items = new HashSet<>();
 
     public GenerateArmorGeoImpl(Type type, String id, int defense, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
         super(type, id, defense, defaultDurability, texture, model, animation);
@@ -78,7 +79,7 @@ public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, A
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerateArmorGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, texture, model, animation));
+            items.add(new GenerationRecord(id,new GenerateArmorGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, texture, model, animation)));
         }
     }
 

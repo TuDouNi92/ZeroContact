@@ -2,7 +2,6 @@ package net.zerocontact.item.helmet;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.google.gson.Gson;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
@@ -18,11 +17,11 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.ZeroContact;
-import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.DurabilityLossProvider;
 import net.zerocontact.api.EntityHurtProvider;
 import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.client.renderer.HelmetRender;
+import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
 import net.zerocontact.datagen.loader.ItemLoader;
 import net.zerocontact.events.ProtectionLevelHelper;
@@ -38,7 +37,7 @@ import java.util.function.Consumer;
 public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInfoProvider, GeoItem, EntityHurtProvider, DurabilityLossProvider {
     private final int defaultDurability;
     private final int absorb;
-    public static Set<GenerateHelmetGeoImpl> items = new HashSet<>();
+    public static Set<GenerationRecord> items = new HashSet<>();
     private final float bluntDamage;
     private final float penetrateDamage;
     private final float ricochetDamage;
@@ -125,7 +124,6 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
         if (itemGenDataList.isEmpty()) return;
         for (ItemGenData data0 : itemGenDataList) {
             if (!(data0 instanceof ItemGenData.Armor data)) continue;
-            ZeroContactLogger.LOG.info(new Gson().toJson(data0));
             String id = data.id;
             float bluntDamage = data.hurtModifier.bluntMultiplier;
             float penetrateDamage = data.hurtModifier.penetrateMultiplier;
@@ -138,7 +136,7 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerateHelmetGeoImpl(id, Type.HELMET, texture, model, animation, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, durabilityLossProvider,default_durability));
+            items.add(new GenerationRecord(id,new GenerateHelmetGeoImpl(id, Type.HELMET, texture, model, animation, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, durabilityLossProvider,default_durability)));
         }
     }
 
