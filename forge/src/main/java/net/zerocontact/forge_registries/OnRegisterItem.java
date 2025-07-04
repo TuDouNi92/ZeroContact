@@ -60,7 +60,6 @@ public class OnRegisterItem {
         RegistrySupplier<Untar> UNTAR_HELMET = ItemsReg.ITEMS.register("helmet_untar_blue", () -> new Untar(6,24));
         RegistrySupplier<UntarArmorImpl> UNTAR_ARMOR = ItemsReg.ITEMS.register("armor_untar_blue", () -> new UntarArmorImpl(9,72));
         RegistrySupplier<HexgridArmorImpl> HEXGRID_ARMOR = ItemsReg.ITEMS.register("armor_hexgrid_black", () -> new HexgridArmorImpl(9,128));
-        RegistrySupplier<AltynVisor.WithoutVisor> ALTYN_HELMET = ItemsReg.ITEMS.register("helmet_altyn", () -> new AltynVisor.WithoutVisor(10,72));
         RegistrySupplier<AltynVisor.WithVisor> ALTYN_VISOR_HELMET = ItemsReg.ITEMS.register("helmet_altyn_visor", () -> new AltynVisor.WithVisor(10,72));
         ITEMS_TO_REG.add(RAIDER_EGG);
         ITEMS_TO_REG.add(FAST_MT);
