@@ -1,7 +1,6 @@
-package net.zerocontact.item.forge;
+package net.zerocontact.item.armor.forge;
 
 import net.minecraft.resources.ResourceLocation;
-import net.zerocontact.item.armor.forge.BaseArmorGeoImpl;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
 
