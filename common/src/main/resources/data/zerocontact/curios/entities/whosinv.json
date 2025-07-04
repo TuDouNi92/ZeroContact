@@ -1,4 +1,4 @@
 {
   "entities": ["player","zerocontact:armed_raider"],
-  "slots": ["front_plate","back_plate","uniform_top","uniform_pants"]
+  "slots": ["front_plate","back_plate","uniform_top","uniform_pants","armband"]
 }
