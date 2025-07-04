@@ -16,7 +16,7 @@ This is an example description! Tell everyone what your mod is about!
 [[dependencies.zerocontact]]
 modId = "forge"
 mandatory = true
-versionRange = "[47,)"
+versionRange = "[47.2.20,)"
 ordering = "NONE"
 side = "BOTH"
 
@@ -51,7 +51,7 @@ side = "BOTH"
 [[dependencies.zerocontact]]
 modId = "geckolib"
 mandatory = true
-versionRange = "[4.2.1,)"
+versionRange = "[4.7.1.2,)"
 ordering = "NONE"
 side = "BOTH"
 

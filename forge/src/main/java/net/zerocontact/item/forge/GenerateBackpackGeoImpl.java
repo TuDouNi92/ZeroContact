@@ -12,10 +12,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class GenerateUniformGeoImpl extends AbstractGenerateGeoCurioItemImpl implements ArmorTypeTag.Uniform {
-    public static Set<GenerateUniformGeoImpl> items = new HashSet<>();
+public class GenerateBackpackGeoImpl extends AbstractGenerateGeoCurioItemImpl implements ArmorTypeTag.Backpack {
+    public static Set<GenerateBackpackGeoImpl> items = new HashSet<>();
 
-    public GenerateUniformGeoImpl(String id, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+    public GenerateBackpackGeoImpl(String id, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
         super(id, defaultDurability, texture, model, animation);
     }
 
@@ -31,7 +31,7 @@ public class GenerateUniformGeoImpl extends AbstractGenerateGeoCurioItemImpl imp
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
             if (!(data.equipmentSlot).equals(Type.UNIFORM.getName())) continue;
-            items.add(new GenerateUniformGeoImpl(id, defaultDurability, texture, model, animation));
+            items.add(new GenerateBackpackGeoImpl(id, defaultDurability, texture, model, animation));
         }
     }
 

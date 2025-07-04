@@ -21,7 +21,7 @@ public class Predicate {
             )) {
                 return true;
             }
-            if (slotResult.stack().getItem() instanceof ArmorTypeTag.Uniform && Objects.equals(slotResult.slotContext().identifier(), "uniform")) {
+            if (slotResult.stack().getItem() instanceof ArmorTypeTag.Backpack && Objects.equals(slotResult.slotContext().identifier(), "uniform")) {
                 return true;
             }
             return false;

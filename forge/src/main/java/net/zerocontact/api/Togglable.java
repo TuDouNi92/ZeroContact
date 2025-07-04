@@ -5,7 +5,6 @@ import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.Nullable;
 
 public interface Togglable {
-     boolean isVisor();
-     Item getToggleBrother();
      ResourceLocation getVisorTexture();
+     boolean getEnabled();
 }

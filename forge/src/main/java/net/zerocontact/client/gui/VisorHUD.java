@@ -17,7 +17,7 @@ public class VisorHUD {
     public static void onRenderGameOverlay(RenderGuiOverlayEvent.Pre event) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
-        boolean success = ClientData.isLastToggleVisorSuccess();
+        boolean success = ClientData.isLastToggleVisorEnabled();
         if (success) {
             drawHUD(event, mc);
         }

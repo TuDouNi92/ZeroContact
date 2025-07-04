@@ -3,12 +3,11 @@ package net.zerocontact.network;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
+import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.Togglable;
 import net.zerocontact.client.ClientData;
-import net.zerocontact.client.interaction.ToggleInteraction;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -55,14 +54,11 @@ public class NetworkHandler {
                 if (player == null) return;
                 Optional<ItemStack> helmet = Optional.of(player.getItemBySlot(EquipmentSlot.HEAD));
                 helmet.ifPresent(stack -> {
-                    if (!(stack.getItem() instanceof Togglable togglable)) return;
-                    Item item = togglable.getToggleBrother();
-                    Optional<ItemStack> newStack = ToggleInteraction.toggleHelmetVisor(stack, item, item.getClass().getSuperclass());
-                    newStack.ifPresentOrElse(stack1 -> {
-                        stack1.setTag(stack.getTag());
-                        player.setItemSlot(EquipmentSlot.HEAD, stack1);
-                        ModMessages.sendToPlayer(new ToggleVisorResultPacket(!togglable.isVisor()), player);
-                    }, () -> ModMessages.sendToPlayer(new ToggleVisorResultPacket(false), player));
+                    if(stack.getItem() instanceof Togglable togglable){
+                        boolean isEnabled = togglable.getEnabled();
+                        ZeroContactLogger.LOG.info(isEnabled);
+                        ModMessages.sendToPlayer(new ToggleVisorResultPacket(isEnabled),player);
+                    }
                 });
             });
         }
@@ -79,7 +75,7 @@ public class NetworkHandler {
 
         public static void handle(ToggleVisorResultPacket msg, Supplier<NetworkEvent.Context> supplier) {
             NetworkEvent.Context context = supplier.get();
-            context.enqueueWork(() -> ClientData.setLastToggleVisorSuccess(msg.success));
+            context.enqueueWork(() -> ClientData.setLastToggleVisorEnabled(msg.success));
         }
     }
 }

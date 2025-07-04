@@ -16,7 +16,7 @@ import net.zerocontact.item.armor.forge.GenerateArmorGeoImpl;
 import net.zerocontact.item.armor.forge.ThorArmorImpl;
 import net.zerocontact.item.armor.forge.UntarArmorImpl;
 import net.zerocontact.item.forge.GeneratePlateImpl;
-import net.zerocontact.item.forge.GenerateUniformGeoImpl;
+import net.zerocontact.item.forge.GenerateBackpackGeoImpl;
 import net.zerocontact.item.forge.HexgridArmorImpl;
 import net.zerocontact.item.helmet.*;
 import net.zerocontact.registries.ItemsReg;
@@ -60,7 +60,6 @@ public class OnRegisterItem {
         RegistrySupplier<Untar> UNTAR_HELMET = ItemsReg.ITEMS.register("helmet_untar_blue", () -> new Untar(6,24));
         RegistrySupplier<UntarArmorImpl> UNTAR_ARMOR = ItemsReg.ITEMS.register("armor_untar_blue", () -> new UntarArmorImpl(9,72));
         RegistrySupplier<HexgridArmorImpl> HEXGRID_ARMOR = ItemsReg.ITEMS.register("armor_hexgrid_black", () -> new HexgridArmorImpl(9,128));
-        RegistrySupplier<AltynVisor.WithoutVisor> ALTYN_HELMET = ItemsReg.ITEMS.register("helmet_altyn", () -> new AltynVisor.WithoutVisor(10,72));
         RegistrySupplier<AltynVisor.WithVisor> ALTYN_VISOR_HELMET = ItemsReg.ITEMS.register("helmet_altyn_visor", () -> new AltynVisor.WithVisor(10,72));
         ITEMS_TO_REG.add(RAIDER_EGG);
         ITEMS_TO_REG.add(FAST_MT);
@@ -76,7 +75,7 @@ public class OnRegisterItem {
         GeneratePlateImpl.regItems();
         GenerateArmorGeoImpl.regItems();
         GenerateHelmetGeoImpl.regItems();
-        GenerateUniformGeoImpl.regItems();
+        GenerateBackpackGeoImpl.regItems();
         GeneratePlateImpl.items.forEach(item -> {
             ItemsReg.ITEMS.register(item.id, () -> item);
             ZeroContactLogger.LOG.info("Reg plate for:{}", item);
@@ -89,7 +88,7 @@ public class OnRegisterItem {
             ItemsReg.ITEMS.register(item.id, () -> item);
             ZeroContactLogger.LOG.info("Reg helmet for:{}", item);
         });
-        GenerateUniformGeoImpl.items.forEach(item -> {
+        GenerateBackpackGeoImpl.items.forEach(item -> {
             ItemsReg.ITEMS.register(item.id, () -> item);
             ZeroContactLogger.LOG.info("Reg uniform for:{}", item);
         });
