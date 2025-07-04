@@ -2,11 +2,15 @@ package net.zerocontact.item.forge;
 
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.client.renderer.ArmorRender;
 import net.zerocontact.item.PlateBaseMaterial;
@@ -16,6 +20,7 @@ import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 import java.util.function.Consumer;
@@ -33,22 +38,6 @@ public abstract class AbstractGenerateGeoCurioItemImpl extends ArmorItem impleme
         this.animation = animation;
         this.render =null;
     }
-
-    public enum Type {
-        UNIFORM("UNIFORM"),
-        HEADSET("HEADSET"),
-        BACKPACK("BACKPACK");
-        private final String name;
-
-        Type(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-    }
-
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
 
@@ -62,6 +51,11 @@ public abstract class AbstractGenerateGeoCurioItemImpl extends ArmorItem impleme
     @Override
     public boolean canEquip(ItemStack stack, EquipmentSlot armorType, Entity entity) {
         return false;
+    }
+
+    @Override
+    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand usedHand) {
+        return InteractionResultHolder.fail(player.getItemInHand(InteractionHand.MAIN_HAND));
     }
 
     @Override
