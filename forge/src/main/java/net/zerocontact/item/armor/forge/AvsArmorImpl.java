@@ -51,4 +51,9 @@ public class AvsArmorImpl extends AvsArmor implements GeoItem, ArmorTypeTag {
             }
         });
     }
+
+    @Override
+    public @NotNull ArmorType getArmorType() {
+        return ArmorType.PLATE_CARRIER;
+    }
 }

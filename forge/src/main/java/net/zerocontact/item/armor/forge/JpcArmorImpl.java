@@ -51,4 +51,9 @@ public class JpcArmorImpl extends JpcArmor implements GeoItem, ArmorTypeTag {
             }
         });
     }
+
+    @Override
+    public @NotNull ArmorType getArmorType() {
+        return ArmorType.PLATE_CARRIER;
+    }
 }

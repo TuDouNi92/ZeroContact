@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 public interface ArmorTypeTag {
     enum ArmorType {
+        PLATE_CARRIER("PLATE_CARRIER"),
         ARMOR("ARMOR"),
         UNIFORM_TOP("UNIFORM_TOP"),
         UNIFORM_PANTS("UNIFORM_PANTS"),

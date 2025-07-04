@@ -41,7 +41,7 @@ import java.util.Set;
         this.durabilityLossProvider = durabilityLossProvider;
     }
 
-    public static void regItems() {
+    public static void deserializeItems() {
         ArrayList<ItemGenData> itemGenDataList = ItemLoader.itemGenData;
         if (itemGenDataList.isEmpty()) return;
         for (ItemGenData data0 : itemGenDataList) {

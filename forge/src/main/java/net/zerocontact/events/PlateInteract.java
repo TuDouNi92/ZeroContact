@@ -13,15 +13,21 @@ public class PlateInteract {
     public static void onArmorUnequip(SlotContext context, ItemStack stack) {
         LivingEntity entity = context.entity();
         ItemStack ArmorItemStack = entity.getItemBySlot(EquipmentSlot.CHEST);
-        if (!(ArmorItemStack.getItem() instanceof ArmorTypeTag) && entity instanceof ServerPlayer player) {
-            ItemStack dropStack = stack.split(1);
-            rollBackItem(dropStack, player);
+        if(entity instanceof ServerPlayer player){
+            if (!(ArmorItemStack.getItem() instanceof ArmorTypeTag armorTypeTag)) {
+                rollBackItem(stack, player);
+            }
+            else if(armorTypeTag.getArmorType() != ArmorTypeTag.ArmorType.PLATE_CARRIER){
+                rollBackItem(stack, player);
+            }
         }
+
     }
 
     private static void rollBackItem(ItemStack stack, Player player) {
-        if (!stack.isEmpty()) {
-            player.getInventory().add(stack);
+        ItemStack dropStack = stack.split(1);
+        if (!dropStack.isEmpty()) {
+            player.getInventory().add(dropStack);
         }
     }
 }

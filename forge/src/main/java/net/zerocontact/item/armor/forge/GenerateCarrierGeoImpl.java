@@ -23,17 +23,15 @@ import net.zerocontact.registries.ModSoundEventsReg;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
-public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, ArmorTypeTag {
+public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem, ArmorTypeTag {
     protected final int defaultDurability;
     public static Set<GenerationRecord> items = new HashSet<>();
+    private static final ArmorType armorType = ArmorType.PLATE_CARRIER;
 
-    public GenerateArmorGeoImpl(Type type, String id, int defense, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+    public GenerateCarrierGeoImpl(Type type, String id, int defense, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
         super(type, id, defense, defaultDurability, texture, model, animation);
         this.defaultDurability = defaultDurability;
     }
@@ -59,9 +57,10 @@ public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, A
             }
         });
     }
+
     @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
-        if(slot !=EquipmentSlot.CHEST)return super.getAttributeModifiers(slot,stack);
+        if (slot != EquipmentSlot.CHEST) return super.getAttributeModifiers(slot, stack);
         Multimap<Attribute, AttributeModifier> modifierMultimap = HashMultimap.create();
         modifierMultimap.put(Attributes.ARMOR, new AttributeModifier(UUID.nameUUIDFromBytes(("Armor").getBytes()), "CuriosArmorDefense", this.getDefense(), AttributeModifier.Operation.ADDITION));
         return modifierMultimap;
@@ -75,12 +74,16 @@ public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, A
             String id = data.id;
             int defense = data.defense;
             int defaultDurability = data.defaultDurability;
-            if (!data.equipmentSlot.equals("ARMOR") ) continue;
+            if (!(Objects.equals(data.equipmentSlot, armorType.getTypeId()))) continue;
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerationRecord(id,new GenerateArmorGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, texture, model, animation)));
+            items.add(new GenerationRecord(id, new GenerateCarrierGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, texture, model, animation)));
         }
     }
 
+    @Override
+    public @NotNull ArmorType getArmorType() {
+        return armorType;
+    }
 }

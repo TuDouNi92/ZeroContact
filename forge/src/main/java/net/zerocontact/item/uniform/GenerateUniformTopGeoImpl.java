@@ -19,7 +19,7 @@ public class GenerateUniformTopGeoImpl extends AbstractGenerateGeoCurioItemImpl 
     public GenerateUniformTopGeoImpl(String id, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
         super(id, defaultDurability, texture, model, animation);
     }
-    public static void regItems() {
+    public static void deserializeItems() {
         ArrayList<ItemGenData> itemGenDataList = ItemLoader.itemGenData;
         if (itemGenDataList.isEmpty()) return;
         for (ItemGenData data0 : itemGenDataList) {
