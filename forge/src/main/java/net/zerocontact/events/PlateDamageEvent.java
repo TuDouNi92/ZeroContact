@@ -3,11 +3,7 @@ package net.zerocontact.events;
 import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
 import com.tacz.guns.init.ModDamageTypes;
 import dev.architectury.event.EventResult;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageType;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -35,22 +31,26 @@ public class PlateDamageEvent {
         if (isHeadshot) return EventResult.pass();
         iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
             ItemStack stackInSlot = stacksHandler.getStacks().getStackInSlot(0);
-            float durabilityLossFactor = 1;
-            int hits = stackInSlot.getOrCreateTag().getInt("hits") + 1;
-            int durabilityLossAmount = 1;
-            if (!stackInSlot.isEmpty() && (damageSource.is(ModDamageTypes.BULLET) || damageSource.is(ModDamageTypes.BULLET_IGNORE_ARMOR))) {
-                durabilityLossFactor = getDurabilityLossFactor(amount, durabilityLossFactor);
-                if (stackInSlot.getItem() instanceof DurabilityLossProvider provider) {
-                    durabilityLossAmount = provider.generateLoss(amount, durabilityLossFactor, hits);
-                }
-                stackInSlot.getOrCreateTag().putInt("hits", hits);
-                stackInSlot.hurtAndBreak(durabilityLossAmount, livingEntity, lv -> {
-                    lv.playSound(ModSoundEventsReg.ARMOR_BROKEN_PLATE, 1.0f, 1.0f);
-                    ZeroContactLogger.LOG.info(lv.getName() + "的插板碎掉了！");
-                });
-            }
+            damage(livingEntity, damageSource, amount, stackInSlot);
         });
         return EventResult.pass();
+    }
+
+    private static void damage(LivingEntity livingEntity, DamageSource damageSource, float amount, ItemStack stackInSlot) {
+        float durabilityLossFactor = 1;
+        int hits = stackInSlot.getOrCreateTag().getInt("hits") + 1;
+        int durabilityLossAmount = 1;
+        if (!stackInSlot.isEmpty() && (damageSource.is(ModDamageTypes.BULLET) || damageSource.is(ModDamageTypes.BULLET_IGNORE_ARMOR))) {
+            durabilityLossFactor = getDurabilityLossFactor(amount, durabilityLossFactor);
+            if (stackInSlot.getItem() instanceof DurabilityLossProvider provider) {
+                durabilityLossAmount = provider.generateLoss(amount, durabilityLossFactor, hits);
+            }
+            stackInSlot.getOrCreateTag().putInt("hits", hits);
+            stackInSlot.hurtAndBreak(durabilityLossAmount, livingEntity, lv -> {
+                lv.playSound(ModSoundEventsReg.ARMOR_BROKEN_PLATE, 1.0f, 1.0f);
+                ZeroContactLogger.LOG.info(lv.getName() + "的插板碎掉了！");
+            });
+        }
     }
 
     private static float getDurabilityLossFactor(float amount, float durabilityLossFactor) {

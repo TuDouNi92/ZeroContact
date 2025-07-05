@@ -31,8 +31,8 @@ public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem,
     public static Set<GenerationRecord> items = new HashSet<>();
     private static final ArmorType armorType = ArmorType.PLATE_CARRIER;
 
-    public GenerateCarrierGeoImpl(Type type, String id, int defense, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
-        super(type, id, defense, defaultDurability, texture, model, animation);
+    public GenerateCarrierGeoImpl(Type type, String id, int defense, int defaultDurability,int absorb,float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+        super(type, id, defense, defaultDurability,absorb,mass, texture, model, animation);
         this.defaultDurability = defaultDurability;
     }
 
@@ -74,11 +74,13 @@ public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem,
             String id = data.id;
             int defense = data.defense;
             int defaultDurability = data.defaultDurability;
+            int absorb = data.absorb;
+            int mass =0;
             if (!(Objects.equals(data.equipmentSlot, armorType.getTypeId()))) continue;
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerationRecord(id, new GenerateCarrierGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, texture, model, animation)));
+            items.add(new GenerationRecord(id, new GenerateCarrierGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability,absorb,mass, texture, model, animation)));
         }
     }
 

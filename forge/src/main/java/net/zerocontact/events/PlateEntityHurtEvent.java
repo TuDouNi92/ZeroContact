@@ -7,65 +7,72 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.Event;
-import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.EntityHurtProvider;
 import net.zerocontact.api.HelmetInfoProvider;
+import net.zerocontact.item.armor.forge.BaseArmorGeoImpl;
 import net.zerocontact.registries.ModSoundEventsReg;
 import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class PlateEntityHurtEvent {
     public static boolean isHeadShot;
 
     public static boolean changeHurtAmountRicochet(LivingEntity lv, DamageSource source, float amount, String identifier) {
-        DamageSource modifiedDamageSource = ModDamageTypes.Sources.bulletVoid(lv.level().registryAccess(),source.getDirectEntity(), source.getEntity(), false);
+        DamageSource modifiedDamageSource = ModDamageTypes.Sources.bulletVoid(lv.level().registryAccess(), source.getDirectEntity(), source.getEntity(), false);
         AtomicBoolean result = new AtomicBoolean();
+        AtomicReference<Float> updatedHurtAmountFromCurio = new AtomicReference<>((float) 0);
         result.set(false);
         if (isHeadShot) return false;
         CuriosApi.getCuriosInventory(lv).ifPresent(iCuriosItemHandler -> iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
             ItemStack stack = stacksHandler.getStacks().getStackInSlot(0);
-            float hurtAmount;
-            int hurtCanHold = stack.getOrCreateTag().getInt("absorb");
-            if (!(stack.isEmpty() && source.type() != modifiedDamageSource.type())) {
-                lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
-                if (EventUtil.isDamageSourceValid(source) && stack.getItem() instanceof EntityHurtProvider provider) {
-                    if (EventUtil.isIncidentAngleValid(lv, source)) {
-                        hurtAmount = provider.generateRicochet() * amount;
-                        lv.hurt(modifiedDamageSource, hurtAmount);
-                    } else {
-                        if (hurtCanHold >= amount) {
-                            //钝伤
-                            hurtAmount = provider.generateBlunt() * amount;
-
-                        } else {
-                            //贯穿
-                            hurtAmount = provider.generatePenetrated() * amount;
-
-                        }
-                    }
-                    lv.hurt(modifiedDamageSource, hurtAmount);
-                    result.set(true);
-                } else {
-                    result.set(false);
-                }
-            }
+            updatedHurtAmountFromCurio.set(hurtIt(lv, source, amount, stack, modifiedDamageSource, result));
         }));
+        ItemStack stackInVanillaSlot = lv.getItemBySlot(EquipmentSlot.CHEST);
+        if (stackInVanillaSlot.getItem() instanceof BaseArmorGeoImpl) {
+            hurtIt(lv, source, updatedHurtAmountFromCurio.get() == 0 ? amount : updatedHurtAmountFromCurio.get(), stackInVanillaSlot, modifiedDamageSource, result);
+        }
         return result.get();
+    }
+
+    private static float hurtIt(LivingEntity lv, DamageSource source, float amount, ItemStack stack, DamageSource modifiedDamageSource, AtomicBoolean result) {
+        float hurtAmount = 0;
+        int hurtCanHold = stack.getOrCreateTag().getInt("absorb");
+        if (!(stack.isEmpty() && source.type() != modifiedDamageSource.type())) {
+            lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
+            if (EventUtil.isDamageSourceValid(source) && stack.getItem() instanceof EntityHurtProvider provider) {
+                if (EventUtil.isIncidentAngleValid(lv, source)) {
+                    hurtAmount = provider.generateRicochet() * amount;
+                    lv.hurt(modifiedDamageSource, hurtAmount);
+                } else {
+                    if (hurtCanHold >= amount) {
+                        //钝伤
+                        hurtAmount = provider.generateBlunt() * amount;
+
+                    } else {
+                        //贯穿
+                        hurtAmount = provider.generatePenetrated() * amount;
+
+                    }
+                }
+                lv.hurt(modifiedDamageSource, hurtAmount);
+                result.set(true);
+            } else {
+                result.set(false);
+            }
+        }
+        return hurtAmount;
     }
 
     public static void entityHurtByGunHeadShot(EntityHurtByGunEvent.Pre event) {
         isHeadShot = event.isHeadShot();
-        if(!isHeadShot)return;
+        if (!isHeadShot) return;
         Optional<Entity> entity = Optional.ofNullable(event.getHurtEntity());
         DamageSource damageSource = event.getDamageSource(GunDamageSourcePart.ARMOR_PIERCING);
         entity.ifPresent(e -> {

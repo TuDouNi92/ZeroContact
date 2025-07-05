@@ -3,6 +3,7 @@ package net.zerocontact.item.forge;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -68,5 +69,10 @@ public class SapiIVImpl extends SapiIV implements DurabilityLossProvider, Entity
         if(tooltips.contains(tipsToAdd))return tooltips;
         tooltips.add(tipsToAdd);
         return tooltips;
+    }
+
+    @Override
+    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
+        return super.getAttributeModifiers(slot, stack);
     }
 }

@@ -1,7 +1,12 @@
 package net.zerocontact.item.forge;
 
+import com.google.common.collect.Multimap;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.ItemStack;
 import net.zerocontact.api.DurabilityLossProvider;
 import net.zerocontact.api.EntityHurtProvider;
 import net.zerocontact.api.PlateInfoProvider;
@@ -102,4 +107,9 @@ import java.util.Set;
     public float generateRicochet() {
         return this.ricochetDamage;
     }
-}
+
+     @Override
+     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
+         return super.getAttributeModifiers(slot, stack);
+     }
+ }

@@ -33,8 +33,8 @@ public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, A
     protected final int defaultDurability;
     public static Set<GenerationRecord> items = new HashSet<>();
 
-    public GenerateArmorGeoImpl(Type type, String id, int defense, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
-        super(type, id, defense, defaultDurability, texture, model, animation);
+    public GenerateArmorGeoImpl(Type type, String id, int defense, int defaultDurability, int absorb, float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+        super(type, id, defense, defaultDurability, absorb, mass, texture, model, animation);
         this.defaultDurability = defaultDurability;
     }
 
@@ -59,9 +59,10 @@ public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, A
             }
         });
     }
+
     @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
-        if(slot !=EquipmentSlot.CHEST)return super.getAttributeModifiers(slot,stack);
+        if (slot != EquipmentSlot.CHEST) return super.getAttributeModifiers(slot, stack);
         Multimap<Attribute, AttributeModifier> modifierMultimap = HashMultimap.create();
         modifierMultimap.put(Attributes.ARMOR, new AttributeModifier(UUID.nameUUIDFromBytes(("Armor").getBytes()), "CuriosArmorDefense", this.getDefense(), AttributeModifier.Operation.ADDITION));
         return modifierMultimap;
@@ -75,11 +76,13 @@ public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, A
             String id = data.id;
             int defense = data.defense;
             int defaultDurability = data.defaultDurability;
-            if (!data.equipmentSlot.equals("ARMOR") ) continue;
+            int absorb = data.absorb;
+            int mass = 0;
+            if (!data.equipmentSlot.equals("ARMOR")) continue;
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerationRecord(id,new GenerateArmorGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, texture, model, animation)));
+            items.add(new GenerationRecord(id, new GenerateArmorGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, absorb, mass, texture, model, animation)));
         }
     }
 

@@ -21,19 +21,7 @@ import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import java.util.List;
 import java.util.UUID;
 
-public interface PlateInfoProvider extends ICurioItem {
-    default int getAbsorb() {
-        return 0;
-    }
-
-    default int getDefense() {
-        return 0;
-    }
-
-    default float getMass() {
-        return 0;
-    }
-
+public interface PlateInfoProvider extends ICurioItem, ProtectionInfoProvider {
     default ICurio.@NotNull SoundInfo getEquipSound(SlotContext slotContext, ItemStack stack) {
         return new ICurio.SoundInfo(ModSoundEventsReg.ARMOR_EQUIP_PLATE, 1.5f, 1.0f);
     }
