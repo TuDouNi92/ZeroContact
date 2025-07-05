@@ -10,7 +10,8 @@ public interface ArmorTypeTag {
         UNIFORM_PANTS("UNIFORM_PANTS"),
         ARMBAND("ARMBAND"),
         HEADSET("HEADSET"),
-        BACKPACK("BACKPACK");
+        BACKPACK("BACKPACK"),
+        RIGS("RIGS");
         private final String name;
 
         ArmorType(String name) {

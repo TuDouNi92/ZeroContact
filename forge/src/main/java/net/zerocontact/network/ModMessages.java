@@ -31,8 +31,8 @@ public class ModMessages {
                 .consumerMainThread(NetworkHandler.SyncStaminaPacket::handle)
                 .add();
         net.messageBuilder(NetworkHandler.ToggleVisorPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(NetworkHandler.ToggleVisorPacket::new)
-                .encoder(NetworkHandler.ToggleVisorPacket::toBytes)
+                .decoder(NetworkHandler.ToggleVisorPacket::decode)
+                .encoder(NetworkHandler.ToggleVisorPacket::encode)
                 .consumerMainThread(NetworkHandler.ToggleVisorPacket::handle)
                 .add();
         net.messageBuilder(NetworkHandler.ToggleVisorResultPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)

@@ -8,7 +8,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.zerocontact.api.Togglable;
+import net.zerocontact.api.Toggleable;
 import net.zerocontact.client.ClientData;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT)
@@ -28,9 +28,9 @@ public class VisorHUD {
         int width = mc.getWindow().getGuiScaledWidth();
         int height = mc.getWindow().getGuiScaledHeight();
         if (mc.player == null) return;
-        if (mc.player.getItemBySlot(EquipmentSlot.HEAD).getItem() instanceof Togglable togglable){
+        if (mc.player.getItemBySlot(EquipmentSlot.HEAD).getItem() instanceof Toggleable toggleable){
             RenderSystem.enableBlend();
-            graphics.blit(togglable.getVisorTexture(),0,0,-100,0,0,width,height,width,height);
+            graphics.blit(toggleable.getVisorTexture(),0,0,-100,0,0,width,height,width,height);
             RenderSystem.disableBlend();
         }
     }

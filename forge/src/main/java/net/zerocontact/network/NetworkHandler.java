@@ -6,7 +6,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 import net.zerocontact.ZeroContactLogger;
-import net.zerocontact.api.Togglable;
+import net.zerocontact.api.Toggleable;
 import net.zerocontact.client.ClientData;
 
 import java.util.Optional;
@@ -35,18 +35,13 @@ public class NetworkHandler {
         }
     }
 
-    public static class ToggleVisorPacket {
-        public ToggleVisorPacket() {
+    public record ToggleVisorPacket(boolean isToggle) {
+        public void encode(FriendlyByteBuf buf) {
+            buf.writeBoolean(isToggle);
         }
-
-        public ToggleVisorPacket(FriendlyByteBuf buf) {
-
+        public static ToggleVisorPacket decode(FriendlyByteBuf buf){
+            return new ToggleVisorPacket(buf.readBoolean());
         }
-
-        public void toBytes(FriendlyByteBuf buf) {
-
-        }
-
         public void handle(Supplier<NetworkEvent.Context> supplier) {
             NetworkEvent.Context context = supplier.get();
             context.enqueueWork(() -> {
@@ -54,19 +49,20 @@ public class NetworkHandler {
                 if (player == null) return;
                 Optional<ItemStack> helmet = Optional.of(player.getItemBySlot(EquipmentSlot.HEAD));
                 helmet.ifPresent(stack -> {
-                    if(stack.getItem() instanceof Togglable togglable){
-                        boolean isEnabled = togglable.getEnabled();
+                    if (stack.getItem() instanceof Toggleable toggleable) {
+                        boolean isEnabled = toggleable.getEnabled();
+                        toggleable.setToggling(true);
                         ZeroContactLogger.LOG.info(isEnabled);
-                        ModMessages.sendToPlayer(new ToggleVisorResultPacket(isEnabled),player);
+                        ModMessages.sendToPlayer(new ToggleVisorResultPacket(isEnabled), player);
                     }
                 });
             });
         }
     }
 
-    record ToggleVisorResultPacket(boolean success) {
+    record ToggleVisorResultPacket(boolean lastSwitch) {
         public void encode(FriendlyByteBuf buf) {
-            buf.writeBoolean(success);
+            buf.writeBoolean(lastSwitch);
         }
 
         public static ToggleVisorResultPacket decode(FriendlyByteBuf buf) {
@@ -75,7 +71,7 @@ public class NetworkHandler {
 
         public static void handle(ToggleVisorResultPacket msg, Supplier<NetworkEvent.Context> supplier) {
             NetworkEvent.Context context = supplier.get();
-            context.enqueueWork(() -> ClientData.setLastToggleVisorEnabled(msg.success));
+            context.enqueueWork(() -> ClientData.setLastToggleVisorEnabled(msg.lastSwitch));
         }
     }
 }
