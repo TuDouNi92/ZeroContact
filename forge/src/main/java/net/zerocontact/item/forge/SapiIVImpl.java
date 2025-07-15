@@ -3,6 +3,9 @@ package net.zerocontact.item.forge;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -10,6 +13,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.zerocontact.api.DurabilityLossProvider;
 import net.zerocontact.api.EntityHurtProvider;
 import net.zerocontact.api.PlateInfoProvider;
@@ -74,5 +78,10 @@ public class SapiIVImpl extends SapiIV implements DurabilityLossProvider, Entity
     @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
         return super.getAttributeModifiers(slot, stack);
+    }
+
+    @Override
+    public boolean canEquip(ItemStack stack, EquipmentSlot armorType, Entity entity) {
+        return PlateInfoProvider.super.canEquip(stack,armorType,entity);
     }
 }

@@ -4,11 +4,17 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.events.PlateInteract;
 import net.zerocontact.events.ProtectionLevelHelper;
@@ -60,5 +66,9 @@ public interface PlateInfoProvider extends ICurioItem, ProtectionInfoProvider {
             return ICurioItem.super.getDropRule(slotContext, source, lootingLevel, recentlyHit, stack);
         }
         return ICurioItem.super.getDropRule(slotContext, source, lootingLevel, recentlyHit, stack);
+    }
+
+    default boolean canEquip(ItemStack stack, EquipmentSlot armorType, Entity entity) {
+        return false;
     }
 }

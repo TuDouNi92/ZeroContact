@@ -1,7 +1,7 @@
 package net.zerocontact.item.forge;
 
 import com.google.common.collect.Multimap;
-import net.minecraft.core.HolderLookup;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -75,5 +75,10 @@ public class CeramicImpl extends Ceramic implements EntityHurtProvider, Durabili
     @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
         return super.getAttributeModifiers(slot, stack);
+    }
+
+    @Override
+    public boolean canEquip(ItemStack stack, EquipmentSlot armorType, Entity entity) {
+        return PlateInfoProvider.super.canEquip(stack,armorType,entity);
     }
 }
