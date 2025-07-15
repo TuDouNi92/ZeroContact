@@ -1,5 +1,6 @@
 package net.zerocontact.events;
 
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
@@ -7,8 +8,9 @@ import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.zerocontact.api.ArmorTypeTag;
+import net.zerocontact.client.gui.BackpackScreen;
 import net.zerocontact.client.interaction.KeyBindingHandler;
+import net.zerocontact.forge_registries.ModMenus;
 import net.zerocontact.client.renderer.AccessoriesRender;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.forge_registries.ModEntitiesReg;
@@ -29,6 +31,7 @@ public class ModRegEventBus {
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         EntityRenderers.register(ModEntitiesReg.ARMED_RAIDER.get(), ArmedRaiderRender::new);
+        MenuScreens.register(ModMenus.BACKPACK_CONTAINER.get(), BackpackScreen::new);
         RegCurioGeoItemRender();
     }
 

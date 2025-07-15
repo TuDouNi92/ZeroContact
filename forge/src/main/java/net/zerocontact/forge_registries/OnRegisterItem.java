@@ -15,6 +15,7 @@ import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.loader.ItemLoader;
 import net.zerocontact.item.armband.GenerateUniformArmbandGeoImpl;
 import net.zerocontact.item.armor.forge.*;
+import net.zerocontact.item.backpack.T20;
 import net.zerocontact.item.forge.GeneratePlateImpl;
 import net.zerocontact.item.uniform.GenerateUniformPantsGeoImpl;
 import net.zerocontact.item.uniform.GenerateUniformTopGeoImpl;
@@ -53,7 +54,7 @@ public class OnRegisterItem {
         RegistrySupplier<R6b23IArmorImpl>  R6B23I = ItemsReg.ITEMS.register("armor_6b23_1", () -> new R6b23IArmorImpl(7, 128,7,-0.025F));
         RegistrySupplier<R6b23IIArmorImpl>  R6B23II = ItemsReg.ITEMS.register("armor_6b23_2", () -> new R6b23IIArmorImpl(7, 128,7,-0.025F));
         RegistrySupplier<Defender2ArmorImpl>  DEFENDER = ItemsReg.ITEMS.register("armor_defender_2", () -> new Defender2ArmorImpl(7, 128,4,-0.015F));
-
+        RegistrySupplier<T20> T20_BACKPACK = ItemsReg.ITEMS.register("backpack_t20",()->new T20(1,25));
 
         ITEMS_TO_REG.add(RAIDER_EGG);
         ITEMS_TO_REG.add(FAST_MT);
@@ -69,7 +70,7 @@ public class OnRegisterItem {
         ITEMS_TO_REG.add(R6B23I);
         ITEMS_TO_REG.add(R6B23II);
         ITEMS_TO_REG.add(DEFENDER);
-
+        ITEMS_TO_REG.add(T20_BACKPACK);
         ItemLoader.loadFromJson();
         ZeroContactLogger.LOG.info("On Register ItemData:{}", new Gson().toJson(ItemLoader.itemGenData).formatted());
         GeneratePlateImpl.deserializeItems();
@@ -86,6 +87,7 @@ public class OnRegisterItem {
         registerGeneratedItems(GenerateUniformTopGeoImpl.items, "UNIFORM_TOP");
         registerGeneratedItems(GenerateUniformPantsGeoImpl.items, "UNIFORM_PANTS");
         registerGeneratedItems(GenerateUniformArmbandGeoImpl.items, "ARMBAND");
+        ModMenus.MENUS.register();
     }
 
     private static void registerGeneratedItems(Set<? extends GenerationRecord> records, String type) {

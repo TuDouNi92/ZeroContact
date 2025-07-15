@@ -40,8 +40,16 @@ public class ModMessages {
                 .encoder(NetworkHandler.ToggleVisorResultPacket::encode)
                 .consumerMainThread(NetworkHandler.ToggleVisorResultPacket::handle)
                 .add();
-
-
+        net.messageBuilder(NetworkHandler.ToggleBackpackPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(NetworkHandler.ToggleBackpackPacket::decode)
+                .encoder(NetworkHandler.ToggleBackpackPacket::encode)
+                .consumerMainThread(NetworkHandler.ToggleBackpackPacket::handle)
+                .add();
+        net.messageBuilder(NetworkHandler.ToggleBackpackResultPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(NetworkHandler.ToggleBackpackResultPacket::decode)
+                .encoder(NetworkHandler.ToggleBackpackResultPacket::encode)
+                .consumerMainThread(NetworkHandler.ToggleBackpackResultPacket::handle)
+                .add();
     }
 
     public static <MSG> void sendToServer(MSG msg) {
