@@ -42,7 +42,9 @@ public class AccessoriesRender<T extends Item & GeoItem & GeoAnimatable, E exten
         render.setAllVisible(true);
         if (stack.getItem() instanceof ArmorTypeTag armorTypeTag) {
             if (armorTypeTag.getArmorType() == ArmorTypeTag.ArmorType.UNIFORM_TOP
-                    || armorTypeTag.getArmorType() == ArmorTypeTag.ArmorType.ARMBAND) {
+                    || armorTypeTag.getArmorType() == ArmorTypeTag.ArmorType.ARMBAND
+                    ||armorTypeTag.getArmorType() == ArmorTypeTag.ArmorType.BACKPACK
+            ) {
                 render.prepForRender(slotContext.entity(), stack, EquipmentSlot.CHEST, (HumanoidModel<?>) renderLayerParent.getModel());
             }
             if (armorTypeTag.getArmorType() == ArmorTypeTag.ArmorType.UNIFORM_PANTS) {
