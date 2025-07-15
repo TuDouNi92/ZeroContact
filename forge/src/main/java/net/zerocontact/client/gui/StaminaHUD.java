@@ -37,7 +37,7 @@ public class StaminaHUD {
         GuiGraphics graphics = event.getGuiGraphics();
         graphics.fill(centerX-barWidth/2, y, centerX + barWidth/2, y + barHeight, 0x885B5B5B);
         graphics.fill(leftX, y, rightX, y + barHeight, 0x88FFFFFF);
-        graphics.drawString(mc.font, "stamina:" + stamina, centerX-40, y - 10, 0xFFFFFFFF);
+//        graphics.drawString(mc.font, "stamina:" + stamina, centerX-40, y - 10, 0xFFFFFFFF);
     }
 
 }
