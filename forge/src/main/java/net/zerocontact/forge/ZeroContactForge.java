@@ -10,6 +10,7 @@ import net.zerocontact.ZeroContact;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.zerocontact.datagen.Predicate;
+import net.zerocontact.events.EntityDeathDogTagEvent;
 import net.zerocontact.events.EventUtil;
 import net.zerocontact.events.PlateDamageEvent;
 import net.zerocontact.events.PlateEntityHurtEvent;
@@ -28,6 +29,7 @@ public class ZeroContactForge {
         EventRegister.regEvents();
         ModEntitiesReg.register();
         Predicate.predicateCurios();
+        EntityDeathDogTagEvent.register();
     }
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
     static class EventRegister {

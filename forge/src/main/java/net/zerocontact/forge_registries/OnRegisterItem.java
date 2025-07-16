@@ -16,6 +16,7 @@ import net.zerocontact.datagen.loader.ItemLoader;
 import net.zerocontact.item.armband.GenerateUniformArmbandGeoImpl;
 import net.zerocontact.item.armor.forge.*;
 import net.zerocontact.item.backpack.T20;
+import net.zerocontact.item.dogtag.DogTag;
 import net.zerocontact.item.forge.GeneratePlateImpl;
 import net.zerocontact.item.uniform.GenerateUniformPantsGeoImpl;
 import net.zerocontact.item.uniform.GenerateUniformTopGeoImpl;
@@ -55,6 +56,7 @@ public class OnRegisterItem {
         RegistrySupplier<R6b23IIArmorImpl>  R6B23II = ItemsReg.ITEMS.register("armor_6b23_2", () -> new R6b23IIArmorImpl(7, 128,7,-0.025F));
         RegistrySupplier<Defender2ArmorImpl>  DEFENDER = ItemsReg.ITEMS.register("armor_defender_2", () -> new Defender2ArmorImpl(7, 128,4,-0.015F));
         RegistrySupplier<T20> T20_BACKPACK = ItemsReg.ITEMS.register("backpack_t20",()->new T20(1,25));
+        RegistrySupplier<DogTag> DOG_TAG = ItemsReg.ITEMS.register("dog_tag",()->new DogTag(new Item.Properties()));
 
         ITEMS_TO_REG.add(RAIDER_EGG);
         ITEMS_TO_REG.add(FAST_MT);
