@@ -5,11 +5,20 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RenderGuiOverlayEvent;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.zerocontact.client.ClientData;
 import net.zerocontact.client.interaction.KeyBindingHandler;
-import net.zerocontact.client.menu.MySimpleContainerMenu;
+import net.zerocontact.client.menu.BackpackContainerMenu;
 import net.zerocontact.network.ModMessages;
 import net.zerocontact.network.NetworkHandler;
 import org.jetbrains.annotations.NotNull;
@@ -17,20 +26,73 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.Optional;
 
-public class BackpackScreen extends AbstractContainerScreen<MySimpleContainerMenu> {
-    public BackpackScreen(MySimpleContainerMenu menu, Inventory playerInventory, Component title) {
+@Mod.EventBusSubscriber(value = Dist.CLIENT)
+public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMenu> {
+    @SubscribeEvent
+    public static void onRenderGameOverlay(RenderGuiOverlayEvent event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen instanceof BackpackScreen) {
+            if (event.getOverlay().id().equals(VanillaGuiOverlay.HOTBAR.id())) {
+                event.setCanceled(true);
+            }
+        }
+    }
+
+    public BackpackScreen(BackpackContainerMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
     }
 
     @Override
     protected void init() {
         super.init();
+        this.titleLabelX = getGuiLeft()+4;
+        this.titleLabelY = getGuiTop()+4;
     }
 
     @Override
     protected void renderBg(@NotNull GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        guiGraphics.fill(0, 0, width, height, 0, 0xaa435570);
-        guiGraphics.fill(getGuiLeft(), getGuiTop(), getGuiLeft() + getXSize(), getGuiTop() + getYSize() + 16, 1, 0x88435570);
+        int guiWidthMax = getGuiLeft() + getXSize();
+        int guiHeightMax = getGuiTop() + getYSize() + 32;
+        guiGraphics.fill(0, 0, width, height, 0, 0x88000000);
+        guiGraphics.fill(getGuiLeft(), getGuiTop(), guiWidthMax, guiHeightMax, 1, 0x88000000);
+        drawBgOutline(guiGraphics, guiWidthMax, guiHeightMax);
+        drawSlotBg(menu, guiGraphics, guiWidthMax, guiHeightMax);
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(getGuiLeft(),getGuiTop()+64,10);
+        guiGraphics.pose().scale(40.0f,-40.0f,40.0f);
+        IClientItemExtensions extensions = IClientItemExtensions.of(menu.renderStack);
+        extensions.getCustomRenderer().renderByItem(
+                menu.renderStack,
+                ItemDisplayContext.GUI,
+                guiGraphics.pose(),
+                guiGraphics.bufferSource(),
+                15728880,
+                OverlayTexture.NO_OVERLAY
+        );
+                guiGraphics.pose().popPose();
+                guiGraphics.flush();
+    }
+
+
+    private void drawSlotBg(BackpackContainerMenu menu, GuiGraphics guiGraphics, int guiWidthMax, int guiHeightMax) {
+        for (Slot slot : menu.slots) {
+            int slotX = leftPos + slot.x;
+            int slotY = topPos + slot.y;
+            guiGraphics.fill(slotX, slotY, slotX + 16, slotY + 16, 2, 0x55FFFFFF);
+        }
+    }
+
+    @Override
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        super.renderTooltip(guiGraphics, mouseX, mouseY);
+    }
+
+    private void drawBgOutline(@NotNull GuiGraphics guiGraphics, int guiWidthMax, int guiHeightMax) {
+        guiGraphics.fill(getGuiLeft(), getGuiTop(), guiWidthMax, getGuiTop() - 1, 0xbb888888);
+        guiGraphics.fill(getGuiLeft(), guiHeightMax, guiWidthMax, guiHeightMax + 1, 0xbb888888);
+        guiGraphics.fill(getGuiLeft(), getGuiTop(), getGuiLeft() - 1, guiHeightMax, 0xbb888888);
+        guiGraphics.fill(guiWidthMax, getGuiTop(), guiWidthMax + 1, guiHeightMax, 0xbb888888);
     }
 
     @Override
