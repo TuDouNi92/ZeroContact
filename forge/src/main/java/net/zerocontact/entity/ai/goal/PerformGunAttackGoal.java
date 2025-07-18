@@ -9,9 +9,13 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.util.LandRandomPos;
 import net.minecraft.world.phys.Vec3;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.entity.ai.controller.GlobalStateController;
+
+import java.util.Objects;
+import java.util.Optional;
 
 public class PerformGunAttackGoal extends Goal {
     private final ArmedRaider shooter;
@@ -33,7 +37,12 @@ public class PerformGunAttackGoal extends Goal {
 
     @Override
     public void tick() {
-        burstFire();
+        if(!shooter.stateController.getShareContext().isHurt){
+            burstFire();
+        }
+        else{
+            burstFireWithExtract();
+        }
     }
 
     public static <T extends ArmedRaider> boolean canSee(T shooter) {
@@ -42,14 +51,9 @@ public class PerformGunAttackGoal extends Goal {
         Vec3 lookVec = shooter.getLookAngle().normalize();
         Vec3 toTargetVec = target.position().subtract(shooter.position()).normalize();
         double dot = lookVec.dot(toTargetVec);
-        double fovCos = Math.cos(Math.toRadians(90));
+        double fovCos = Math.cos(Math.toRadians(120));
         boolean bodyFacing = shooter.yBodyRot == shooter.yHeadRot;
-        if ((dot >= fovCos || shooter.isSprinting()) && dot >= fovCos && bodyFacing) {
-            shooter.stateController.getShareContext().canSeeTarget = true;
-            return true;
-        }
-        shooter.stateController.getShareContext().canSeeTarget = false;
-        return false;
+        return (dot >= fovCos || shooter.isSprinting()) && dot >= fovCos && bodyFacing;
     }
 
     private float provideInaccuracy() {
@@ -105,6 +109,14 @@ public class PerformGunAttackGoal extends Goal {
                 shootCoolDown = 40;
                 burstInterval = random.nextInt(15);
             }
+        }
+    }
+
+    private void burstFireWithExtract() {
+        burstFire();
+        if(shooter.getTarget()!=null){
+            Vec3 targetPos =LandRandomPos.getPosAway(shooter,12,6, shooter.getTarget().position());
+            Optional.ofNullable(targetPos).ifPresent(__-> shooter.getNavigation().moveTo(targetPos.x,targetPos.y,targetPos.z,1.25D));
         }
     }
 }

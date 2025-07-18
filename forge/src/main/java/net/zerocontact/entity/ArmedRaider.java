@@ -64,7 +64,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     private static final RawAnimation SHOOT_ANIM = RawAnimation.begin().then("raider.animation.alert", Animation.LoopType.HOLD_ON_LAST_FRAME);
     private static final RawAnimation WALK = RawAnimation.begin().then("raider.animation.walk", Animation.LoopType.LOOP);
     private static final RawAnimation IDLE = RawAnimation.begin().then("raider.animation.idle", Animation.LoopType.LOOP);
-    private final RandomSource random = this.getRandom();
+    public final RandomSource random = this.getRandom();
     private final SimpleContainer inventory = new SimpleContainer(5);
     private final LazyOptional<IItemHandler> itemHandlerLazyOptional = LazyOptional.of(() -> new InvWrapper(inventory));
     private final IGunOperator operator;

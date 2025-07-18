@@ -1,70 +1,76 @@
 package net.zerocontact.entity.ai.controller;
 
+import net.minecraft.network.chat.Component;
+import net.zerocontact.api.IPhaseContext;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.entity.ai.ShareContext;
-import net.zerocontact.entity.ai.goal.PerformGunAttackGoal;
+import net.zerocontact.entity.ai.controller.phase.AttackPhaseContext;
+import net.zerocontact.entity.ai.controller.phase.ChasePhaseContext;
+import net.zerocontact.entity.ai.controller.phase.EscapePhaseContext;
+import net.zerocontact.entity.ai.controller.phase.IdlePhaseContext;
 import net.zerocontact.entity.ai.goal.TailGoal;
-
-import java.util.List;
-import java.util.function.Predicate;
 
 public class GlobalStateController {
     public enum Phase {
-        IDLE(9999), ATTACK(100), ESCAPE(40), CHASE(100);
-        private final int timeOut;
+        IDLE(9999), ATTACK(200), ESCAPE(40), CHASE(100);
+        public final int timeOut;
 
         Phase(int timeOut) {
             this.timeOut = timeOut;
         }
-
-        public boolean isTimedOut(int ticks) {
-            return ticks >= timeOut;
-        }
+    }
+    public enum SignalPhase{
+        WANTS_ATTACK
     }
 
     private Phase phase = Phase.IDLE;
-    private int phaseTicks = 0;
-    private final ArmedRaider entity;
-    private ShareContext shareContext = new ShareContext();
-    private final List<PhaseRule> phaseRuleList = List.of(
-            new PhaseRule(Phase.ESCAPE, ctx -> ctx.isHurt),
-            new PhaseRule(Phase.CHASE, ctx -> ctx.canChaseTarget),
-            new PhaseRule(Phase.ATTACK, ctx -> ctx.canSeeTarget),
-            new PhaseRule(Phase.IDLE, __ -> phaseTicks >= 100)
-    );
-
-    record PhaseRule(Phase phase, Predicate<ShareContext> condition) {
-    }
+    private final ArmedRaider armedRaider;
+    private final ShareContext shareContext = new ShareContext();
+    private IPhaseContext currentContext;
 
     public <T extends ArmedRaider> GlobalStateController(T entity) {
-        this.entity = entity;
+        this.armedRaider = entity;
+        this.currentContext = new IdlePhaseContext(entity);
     }
 
     public void tick() {
-        phaseTicks++;
-        updateContext();
-        for (PhaseRule rule : phaseRuleList) {
-            if (rule.condition.test(shareContext)) {
-                updatePhase(rule.phase, false);
-                break;
-            }
+        currentContext.tick();
+        updatePhase();
+        checkSignal();
+    }
+
+    void checkSignal(){
+        if(shareContext.signalPhases.contains(SignalPhase.WANTS_ATTACK)){
+            updateContext(Phase.ATTACK);
+        }
+        shareContext.signalPhases.clear();
+    }
+
+    void updatePhase() {
+        if (this.currentContext.isTimedOut() || this.currentContext.shouldTransition()) {
+            Phase nextPhase = currentContext.getNextPhase();
+            if (nextPhase == phase) return;
+            updateContext(nextPhase);
         }
     }
 
-    public void updatePhase(Phase newPhase, boolean force) {
-        if (!force) {
-            if (newPhase == phase) return;
-        }
-        this.phaseTicks = 0;
+    private void updateContext(Phase newPhase) {
+
         this.phase = newPhase;
+        this.currentContext.onExit();
+        this.currentContext = switch (newPhase) {
+            case IDLE -> new IdlePhaseContext(armedRaider);
+            case ATTACK -> new AttackPhaseContext(armedRaider);
+            case ESCAPE -> new EscapePhaseContext(armedRaider);
+            case CHASE -> new ChasePhaseContext(armedRaider);
+        };
+        this.currentContext.onEnter();
+        armedRaider.setCustomName(Component.literal(phase.name() +"\n"+ armedRaider.stateController.shareContext.isHurt+"\n"+ TailGoal.canChaseTarget(armedRaider)));
+        armedRaider.setCustomNameVisible(true);
     }
 
     public Phase getPhase() {
         return this.phase;
-    }
-
-    public int getPhaseTicks() {
-        return this.phaseTicks;
     }
 
     public ShareContext getShareContext() {
@@ -75,16 +81,5 @@ public class GlobalStateController {
         shareContext.isHurt = true;
     }
 
-    void updateContext() {
-        if (phase.isTimedOut(phaseTicks)) {
-            shareContext = new ShareContext();
-            updatePhase(Phase.IDLE,true);
-        }
-        if (shareContext.canChaseTarget != TailGoal.canChaseTarget(entity)) {
-            shareContext.canChaseTarget = TailGoal.canChaseTarget(entity);
-        }
-        if (shareContext.canSeeTarget != PerformGunAttackGoal.canSee(entity)) {
-            shareContext.canChaseTarget = PerformGunAttackGoal.canSee(entity);
-        }
-    }
+
 }

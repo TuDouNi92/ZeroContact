@@ -1,10 +1,16 @@
 package net.zerocontact.entity.ai;
 
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.entity.LivingEntity;
+import net.zerocontact.entity.ai.controller.GlobalStateController;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class ShareContext {
-    public Vec3 cacheTarget;
-    public boolean canChaseTarget;
-    public boolean canSeeTarget;
+    public final Set<GlobalStateController.SignalPhase> signalPhases;
+    public LivingEntity cacheTarget;
     public boolean isHurt;
+    public ShareContext(){
+        this.signalPhases = new HashSet<>();
+    }
 }
