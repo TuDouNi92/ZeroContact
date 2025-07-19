@@ -45,8 +45,12 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
     @Override
     protected void init() {
         super.init();
-        this.titleLabelX = getGuiLeft()+4;
-        this.titleLabelY = getGuiTop()+4;
+        this.titleLabelX = (getXSize()- this.font.width(title))/2;
+    }
+
+    @Override
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        guiGraphics.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xccc3bdbd, false);
     }
 
     @Override
@@ -54,12 +58,12 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
         int guiWidthMax = getGuiLeft() + getXSize();
         int guiHeightMax = getGuiTop() + getYSize() + 32;
         guiGraphics.fill(0, 0, width, height, 0, 0x88000000);
-        guiGraphics.fill(getGuiLeft(), getGuiTop(), guiWidthMax, guiHeightMax, 1, 0x88000000);
+        guiGraphics.fill(getGuiLeft(), getGuiTop(), guiWidthMax, guiHeightMax, 0x88000000);
         drawBgOutline(guiGraphics, guiWidthMax, guiHeightMax);
         drawSlotBg(menu, guiGraphics, guiWidthMax, guiHeightMax);
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(getGuiLeft(),getGuiTop()+64,10);
-        guiGraphics.pose().scale(40.0f,-40.0f,40.0f);
+        guiGraphics.pose().translate(getGuiLeft(), getGuiTop() + 64, 10);
+        guiGraphics.pose().scale(40.0f, -40.0f, 40.0f);
         IClientItemExtensions extensions = IClientItemExtensions.of(menu.renderStack);
         extensions.getCustomRenderer().renderByItem(
                 menu.renderStack,
@@ -69,8 +73,7 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
                 15728880,
                 OverlayTexture.NO_OVERLAY
         );
-                guiGraphics.pose().popPose();
-                guiGraphics.flush();
+        guiGraphics.pose().popPose();
     }
 
 
