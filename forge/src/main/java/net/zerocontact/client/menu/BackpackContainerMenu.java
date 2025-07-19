@@ -6,6 +6,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -37,10 +38,9 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
         super(ModMenus.BACKPACK_CONTAINER.get(), containerId);
         this.container = new IndexSimpleContainer(size);
         this.triggerSource = source;
-        ItemStack mainHandStack = playerInv.player.getMainHandItem();
         if (triggerSource == BackpackContainerMenu.TriggerSource.USE) {
-            renderStack = mainHandStack;
-            readInvfromTag(mainHandStack);
+            renderStack = getHandStack(playerInv.player);
+            readInvfromTag(renderStack);
         } else if (source == BackpackContainerMenu.TriggerSource.KEY) {
             CuriosApi.getCuriosInventory(playerInv.player).ifPresent(inventoryHandler -> inventoryHandler.getStacksHandler("backpack").ifPresent(stacksHandler -> {
                 ItemStack backpackStack = stacksHandler.getStacks().getStackInSlot(0);
@@ -51,6 +51,16 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
 
         CustomInventory customInventory = new CustomInventory(this, size);
         new PlayerInventory(playerInv, customInventory);
+    }
+
+    private ItemStack getHandStack(Player player) {
+        ItemStack mainHandStack = player.getMainHandItem();
+        ItemStack offHandStack = player.getItemInHand(InteractionHand.OFF_HAND);
+        if (mainHandStack == ItemStack.EMPTY && offHandStack == ItemStack.EMPTY) {
+            return ItemStack.EMPTY;
+        } else {
+            return mainHandStack == ItemStack.EMPTY ? offHandStack : mainHandStack;
+        }
     }
 
     private void readInvfromTag(ItemStack backpackStack) {
@@ -89,7 +99,12 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
             for (int i = 0; i < rows; ++i) {
                 for (int j = 0; j < cols; ++j) {
                     customInvY = 16 + i * 18;
-                    menu.addSlot(new Slot(container, j + i * cols, startX + j * 18, customInvY));
+                    menu.addSlot(new Slot(container, j + i * cols, startX + j * 18, customInvY){
+                        @Override
+                        public boolean mayPlace(@NotNull ItemStack stack) {
+                            return !(stack.getItem() instanceof BaseBackpack);
+                        }
+                    });
                 }
             }
         }
@@ -123,7 +138,7 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
         if (triggerSource == BackpackContainerMenu.TriggerSource.USE
                 && player instanceof ServerPlayer serverPlayer
         ) {
-            writeInvToTag(serverPlayer.getMainHandItem());
+            writeInvToTag(getHandStack(serverPlayer));
         } else if (triggerSource == TriggerSource.KEY) {
             CuriosApi.getCuriosInventory(player).ifPresent(inventoryHandler -> inventoryHandler.getStacksHandler("backpack").ifPresent(stacksHandler -> {
                 ItemStack backpackStack = stacksHandler.getStacks().getStackInSlot(0);
