@@ -1,6 +1,5 @@
 package net.zerocontact.item.backpack;
 
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -10,19 +9,13 @@ import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.network.NetworkHooks;
 import net.zerocontact.api.ArmorTypeTag;
 import net.zerocontact.api.Toggleable;
 import net.zerocontact.client.menu.BackpackContainerMenu;
-import net.zerocontact.client.renderer.ArmorRender;
-import net.zerocontact.item.armor.forge.BaseArmorGeoImpl;
 import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
-import net.zerocontact.models.GenerateModel;
 import org.jetbrains.annotations.NotNull;
 import top.theillusivec4.curios.api.SlotContext;
-
-import java.util.function.Consumer;
 
 public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl implements ArmorTypeTag, Toggleable.Backpack {
     private final int containerSize;
@@ -55,7 +48,7 @@ public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl impl
     }
 
     private void callOpenScreen(ServerPlayer serverPlayer, BackpackContainerMenu.TriggerSource source) {
-        NetworkHooks.openScreen(serverPlayer, new SimpleMenuProvider((id, inv, __) -> new BackpackContainerMenu(id, inv, containerSize, source), Component.literal(this.id)), buf -> {
+        NetworkHooks.openScreen(serverPlayer, new SimpleMenuProvider((id, inv, __) -> new BackpackContainerMenu(id, inv, containerSize, source), Component.translatable(this.getDescriptionId())), buf -> {
             buf.writeInt(containerSize);
             buf.writeEnum(source);
         });
@@ -77,18 +70,4 @@ public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl impl
         return 0;
     }
 
-    @Override
-    public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(new IClientItemExtensions() {
-            private ArmorRender.ItemRender<BaseArmorGeoImpl> itemRender;
-
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                if (itemRender == null) {
-                    this.itemRender = new ArmorRender.ItemRender<>(new GenerateModel<>(texture, model, animation));
-                }
-                return itemRender;
-            }
-        });
-    }
 }
