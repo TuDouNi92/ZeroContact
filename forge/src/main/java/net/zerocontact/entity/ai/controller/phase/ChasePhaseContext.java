@@ -35,6 +35,6 @@ public class ChasePhaseContext implements IPhaseContext {
 
     @Override
     public void onExit() {
-        armedRaider.stateController.getShareContext().cacheTarget=null;
+            armedRaider.stateController.getShareContext().cacheTarget=null;
     }
 }

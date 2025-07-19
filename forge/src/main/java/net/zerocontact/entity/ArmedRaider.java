@@ -40,6 +40,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.entity.ai.MTeam;
+import net.zerocontact.entity.ai.NameList;
 import net.zerocontact.entity.ai.controller.GlobalStateController;
 import net.zerocontact.entity.ai.goal.MAvoidGoal;
 import net.zerocontact.entity.ai.goal.PerformGunAttackGoal;
@@ -143,6 +144,8 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         operator = IGunOperator.fromLivingEntity(this);
         MTeam.registerEntity(this);
         geoCache = GeckoLibUtil.createInstanceCache(this);
+        NameList.setName(this,this.random);
+        this.setCustomNameVisible(true);
     }
 
     @Override

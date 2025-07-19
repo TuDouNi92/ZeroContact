@@ -1,6 +1,5 @@
 package net.zerocontact.entity.ai.controller;
 
-import net.minecraft.network.chat.Component;
 import net.zerocontact.api.IPhaseContext;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.entity.ai.ShareContext;
@@ -8,7 +7,6 @@ import net.zerocontact.entity.ai.controller.phase.AttackPhaseContext;
 import net.zerocontact.entity.ai.controller.phase.ChasePhaseContext;
 import net.zerocontact.entity.ai.controller.phase.EscapePhaseContext;
 import net.zerocontact.entity.ai.controller.phase.IdlePhaseContext;
-import net.zerocontact.entity.ai.goal.TailGoal;
 
 public class GlobalStateController {
     public enum Phase {
@@ -65,8 +63,7 @@ public class GlobalStateController {
             case CHASE -> new ChasePhaseContext(armedRaider);
         };
         this.currentContext.onEnter();
-        armedRaider.setCustomName(Component.literal(phase.name() +"\n"+ armedRaider.stateController.shareContext.isHurt+"\n"+ TailGoal.canChaseTarget(armedRaider)));
-        armedRaider.setCustomNameVisible(true);
+//        armedRaider.setCustomName(Component.literal(phase.name() +"\n"+ armedRaider.stateController.shareContext.isHurt+"\n"+ TailGoal.canChaseTarget(armedRaider)));
     }
 
     public Phase getPhase() {
