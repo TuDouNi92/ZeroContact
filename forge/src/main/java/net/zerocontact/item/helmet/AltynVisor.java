@@ -22,7 +22,7 @@ public class AltynVisor {
         private static final ResourceLocation texture = new ResourceLocation(MOD_ID, "textures/models/helmet/helmet_altyn_visor_olive.png");
         private static final ResourceLocation model = new ResourceLocation(MOD_ID, "geo/helmet_altyn_enabled_visor_olive.geo.json");
         private static final ResourceLocation animation = new ResourceLocation(MOD_ID, "animations/visor_altyn_switch.animation.json");
-        private static final ResourceLocation visor = new ResourceLocation(MOD_ID, "textures/gui/altyn_vision.png");
+        private static final ResourceLocation visor = new ResourceLocation(MOD_ID, "textures/gui/altyn_vision.tga");
         private static final RawAnimation Enable = RawAnimation.begin().then("switch_disabled_to_enabled", Animation.LoopType.HOLD_ON_LAST_FRAME);
         private static final RawAnimation DISABLE = RawAnimation.begin().then("switch_enabled_to_disabled", Animation.LoopType.HOLD_ON_LAST_FRAME);
         private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
