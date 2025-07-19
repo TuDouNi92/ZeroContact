@@ -13,6 +13,7 @@ import net.minecraftforge.registries.RegisterEvent;
 import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.loader.ItemLoader;
+import net.zerocontact.item.armband.Armband;
 import net.zerocontact.item.armband.GenerateUniformArmbandGeoImpl;
 import net.zerocontact.item.armor.forge.*;
 import net.zerocontact.item.backpack.T20;
@@ -24,6 +25,7 @@ import net.zerocontact.item.helmet.*;
 import net.zerocontact.registries.ItemsReg;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -55,24 +57,25 @@ public class OnRegisterItem {
         RegistrySupplier<R6b23IArmorImpl>  R6B23I = ItemsReg.ITEMS.register("armor_6b23_1", () -> new R6b23IArmorImpl(7, 128,7,-0.025F));
         RegistrySupplier<R6b23IIArmorImpl>  R6B23II = ItemsReg.ITEMS.register("armor_6b23_2", () -> new R6b23IIArmorImpl(7, 128,7,-0.025F));
         RegistrySupplier<Defender2ArmorImpl>  DEFENDER = ItemsReg.ITEMS.register("armor_defender_2", () -> new Defender2ArmorImpl(7, 128,4,-0.015F));
-        RegistrySupplier<T20> T20_BACKPACK = ItemsReg.ITEMS.register("backpack_t20",()->new T20(1,25));
+        RegistrySupplier<T20> T20_BACKPACK_UMBRA = ItemsReg.ITEMS.register("backpack_t20_umbra",()->T20.create(T20.Series.UMBRA,25));
+        RegistrySupplier<T20> T20_BACKPACK_MULTICAM = ItemsReg.ITEMS.register("backpack_t20_multicam",()->T20.create(T20.Series.MULTICAM,25));
         RegistrySupplier<DogTag> DOG_TAG = ItemsReg.ITEMS.register("dog_tag",()->new DogTag(new Item.Properties()));
+        RegistrySupplier<Armband> ARMBAND_BLACK = ItemsReg.ITEMS.register("armband_black",()->Armband.create(Armband.Series.BLACK));
+        RegistrySupplier<Armband> ARMBAND_RED = ItemsReg.ITEMS.register("armband_red",()->Armband.create(Armband.Series.RED));
+        RegistrySupplier<Armband> ARMBAND_GREEN = ItemsReg.ITEMS.register("armband_green",()->Armband.create(Armband.Series.GREEN));
+        RegistrySupplier<Armband> ARMBAND_BLUE = ItemsReg.ITEMS.register("armband_blue",()->Armband.create(Armband.Series.BLUE));
+        RegistrySupplier<Armband> ARMBAND_WHITE = ItemsReg.ITEMS.register("armband_white",()->Armband.create(Armband.Series.WHITE));
+        RegistrySupplier<Armband> ARMBAND_YELLOW = ItemsReg.ITEMS.register("armband_yellow",()->Armband.create(Armband.Series.YELLOW));
+        RegistrySupplier<Armband> ARMBAND_VSRF = ItemsReg.ITEMS.register("armband_vsrf",()->Armband.create(Armband.Series.VSRF));
 
-        ITEMS_TO_REG.add(RAIDER_EGG);
-        ITEMS_TO_REG.add(FAST_MT);
-        ITEMS_TO_REG.add(RATNIK);
-        ITEMS_TO_REG.add(BASTION_HELMET);
-        ITEMS_TO_REG.add(ALTYN_VISOR_HELMET);
-        ITEMS_TO_REG.add(AIRFRAME_HELMET);
-        ITEMS_TO_REG.add(UNTAR_HELMET);
-        ITEMS_TO_REG.add(THOR_ARMOR);
-        ITEMS_TO_REG.add(UNTAR_ARMOR);
-        ITEMS_TO_REG.add(HEXGRID_ARMOR);
-        ITEMS_TO_REG.add(R6B2);
-        ITEMS_TO_REG.add(R6B23I);
-        ITEMS_TO_REG.add(R6B23II);
-        ITEMS_TO_REG.add(DEFENDER);
-        ITEMS_TO_REG.add(T20_BACKPACK);
+        ITEMS_TO_REG.addAll(
+                List.of(
+                        RAIDER_EGG,RATNIK,BASTION_HELMET,ALTYN_VISOR_HELMET,AIRFRAME_HELMET,UNTAR_HELMET,
+                        THOR_ARMOR,UNTAR_ARMOR,HEXGRID_ARMOR,R6B2,R6B23I,R6B23II,DEFENDER,
+                        T20_BACKPACK_MULTICAM,T20_BACKPACK_UMBRA,
+                        ARMBAND_BLACK,ARMBAND_RED,ARMBAND_BLUE,ARMBAND_WHITE,ARMBAND_GREEN,ARMBAND_YELLOW,ARMBAND_VSRF
+                )
+        );
         ItemLoader.loadFromJson();
         ZeroContactLogger.LOG.info("On Register ItemData:{}", new Gson().toJson(ItemLoader.itemGenData).formatted());
         GeneratePlateImpl.deserializeItems();
@@ -82,21 +85,25 @@ public class OnRegisterItem {
         GenerateUniformPantsGeoImpl.deserializeItems();
         GenerateUniformArmbandGeoImpl.deserializeItems();
         GenerateCarrierGeoImpl.deserializeItems();
-        registerGeneratedItems(GeneratePlateImpl.items, "PLATE");
-        registerGeneratedItems(GenerateArmorGeoImpl.items, "ARMOR");
-        registerGeneratedItems(GenerateCarrierGeoImpl.items,"PLATE_CARRIER");
-        registerGeneratedItems(GenerateHelmetGeoImpl.items, "HELMET");
-        registerGeneratedItems(GenerateUniformTopGeoImpl.items, "UNIFORM_TOP");
-        registerGeneratedItems(GenerateUniformPantsGeoImpl.items, "UNIFORM_PANTS");
-        registerGeneratedItems(GenerateUniformArmbandGeoImpl.items, "ARMBAND");
+        registerGeneratedItems(
+                new WearableType(GeneratePlateImpl.items, "PLATE"),
+                new WearableType(GenerateArmorGeoImpl.items, "ARMOR"),
+                new WearableType(GenerateCarrierGeoImpl.items,"PLATE_CARRIER"),
+                new WearableType(GenerateHelmetGeoImpl.items, "HELMET"),
+                new WearableType(GenerateUniformTopGeoImpl.items, "UNIFORM_TOP"),
+                new WearableType(GenerateUniformPantsGeoImpl.items, "UNIFORM_PANTS"),
+                new WearableType(GenerateUniformArmbandGeoImpl.items, "ARMBAND")
+        );
         ModMenus.MENUS.register();
     }
-
-    private static void registerGeneratedItems(Set<? extends GenerationRecord> records, String type) {
-        records.forEach(record -> {
-            RegistrySupplier<Item> reg = ItemsReg.ITEMS.register(record.id(), record::item);
-            ITEMS_TO_REG.add(reg);
-            ZeroContactLogger.LOG.info("Reg {} for:{}", type, reg);
-        });
+    private record WearableType(Set<GenerationRecord> records, String logDisplayName){}
+    private static void registerGeneratedItems(WearableType... wearableTypes) {
+        for(WearableType type:wearableTypes){
+            type.records.forEach(generationRecord -> {
+                RegistrySupplier<Item> reg = ItemsReg.ITEMS.register(generationRecord.id(), generationRecord::item);
+                ITEMS_TO_REG.add(reg);
+                ZeroContactLogger.LOG.info("Reg {} for:{}", type.logDisplayName, reg);
+            });
+        }
     }
 }
