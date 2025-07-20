@@ -8,6 +8,7 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.zerocontact.command.ToggleStaminaCommand;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,7 +25,7 @@ public class PlayerStaminaProvider implements ICapabilityProvider, INBTSerializa
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction arg) {
         if(capability !=PLAYER_STAMINA)return LazyOptional.empty();
-        return optional.cast();
+        return ToggleStaminaCommand.isEnabledStamina?optional.cast():LazyOptional.empty();
     }
 
     @Override

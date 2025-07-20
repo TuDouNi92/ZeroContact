@@ -7,6 +7,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.zerocontact.ZeroContactLogger;
+import net.zerocontact.command.ToggleStaminaCommand;
 import net.zerocontact.network.ModMessages;
 import net.zerocontact.network.NetworkHandler;
 
@@ -57,6 +58,7 @@ public class PlayerStamina {
     }
 
     public static void staminaTick(Player player) {
+        if(!ToggleStaminaCommand.isEnabledStamina)return;
         if (player.level().isClientSide) return;
         player.getCapability(PlayerStaminaProvider.PLAYER_STAMINA).ifPresent(playerStamina -> {
             playerStamina.tickCounter++;
