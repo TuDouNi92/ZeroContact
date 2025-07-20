@@ -9,8 +9,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageSources;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
@@ -69,10 +67,10 @@ public abstract class BaseDogTag extends Item implements GeoItem {
         if (stack.getItem() instanceof BaseDogTag) {
             MutableComponent victimName = Component.Serializer.fromJson(stack.getOrCreateTag().getString("victim"));
             String timeStamp = stack.getOrCreateTag().getString("timestamp");
-            MutableComponent killedByName = Component.Serializer.fromJson(stack.getOrCreateTag().getString("attacker"));
+            MutableComponent killedByName = (Component.Serializer.fromJson(stack.getOrCreateTag().getString("attacker")));
+            if(killedByName==null)killedByName = Component.literal("");
             MutableComponent weaponName = Component.Serializer.fromJson(stack.getOrCreateTag().getString("weapon"));
-            assert killedByName != null;
-            assert weaponName != null;
+            if(weaponName==null)weaponName = Component.literal("");
             tooltipComponents.addAll(
                     List.of(
                             Component.translatable("item.zerocontact.dogtag.victim", victimName),
