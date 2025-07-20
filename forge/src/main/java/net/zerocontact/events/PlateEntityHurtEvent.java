@@ -5,6 +5,7 @@ import com.tacz.guns.api.event.common.GunDamageSourcePart;
 import com.tacz.guns.init.ModDamageTypes;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
@@ -25,6 +26,7 @@ public class PlateEntityHurtEvent {
     public static boolean isHeadShot;
 
     public static boolean changeHurtAmountRicochet(LivingEntity lv, DamageSource source, float amount, String identifier) {
+        if(lv instanceof ServerPlayer serverPlayer && serverPlayer.isCreative())return false;
         DamageSource modifiedDamageSource = ModDamageTypes.Sources.bulletVoid(lv.level().registryAccess(), source.getDirectEntity(), source.getEntity(), false);
         AtomicBoolean result = new AtomicBoolean();
         AtomicReference<Float> updatedHurtAmountFromCurio = new AtomicReference<>((float) 0);
@@ -70,7 +72,7 @@ public class PlateEntityHurtEvent {
         return hurtAmount;
     }
 
-    public static void entityHurtByGunHeadShot(EntityHurtByGunEvent.Pre event) {
+    public static void entityHurtByGunHeadShot(EntityHurtByGunEvent.Post event) {
         isHeadShot = event.isHeadShot();
         if (!isHeadShot) return;
         Optional<Entity> entity = Optional.ofNullable(event.getHurtEntity());

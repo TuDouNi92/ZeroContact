@@ -36,7 +36,6 @@ public class ZeroContactForge {
         private static void regEvents() {
             ModMessages.register();
             TickEvent.PLAYER_PRE.register(PlayerStamina::staminaTick);
-            EntityEvent.LIVING_HURT.register(PlateDamageEvent::DamagePlateRegister);
             EntityEvent.LIVING_HURT.register((lv, source, amount) -> {
                         PlateDamageEvent.DamagePlateRegister(lv, source, amount);
                         if (PlateEntityHurtEvent.changeHurtAmountRicochet(lv, source, amount, EventUtil.idHitFromBack(lv, source))) {
@@ -47,7 +46,7 @@ public class ZeroContactForge {
             );
         }
         @SubscribeEvent
-        public static void entityHurtByGunEvent(EntityHurtByGunEvent.Pre event) {
+        public static void entityHurtByGunEvent(EntityHurtByGunEvent.Post event) {
             PlateEntityHurtEvent.entityHurtByGunHeadShot(event);
             PlateDamageEvent.DamageHelmet(event);
         }
