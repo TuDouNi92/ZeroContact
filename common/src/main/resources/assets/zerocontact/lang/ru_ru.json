@@ -1,0 +1,21 @@
+{
+  "item.zerocontact.steel_plate": "Стальная пластина",
+  "item.zerocontact.si_plate": "Пластина от компании \"Слизняк\"",
+  "item.zerocontact.bc_plate": "Пластина от компании \"Конвой Баллистики\"",
+  "item.zerocontact.ceramic_plate": "Керамическая пластина",
+  "item.zerocontact.jpc_armor": "Прыжковый бронежилет \"Dyer Precision 2.0 MultiCam\"",
+  "item.zerocontact.avs_armor": "Система жилетов \"Dyer Precision Armatus\"",
+  "item.zerocontact.steel_ingot": "Стальной слиток",
+  "item.zerocontact.steel_sheet": "Стальной щиток",
+  "item.zerocontact.fabric_roll": "Рулон ткани",
+  "item.zerocontact.ceramic_shatters": "Керамические осколки",
+  "item.zerocontact.dogtag.victim": "Жертва: %s",
+  "item.zerocontact.dogtag.time_stamp":"Время: %s",
+  "item.zerocontact.dogtag.killedBy": "Убийца: %s",
+  "item.zerocontact.dogtag.weaponName": "Оружие: %s",
+  "itemGroup.zerocontact.zero_contact": "ZeroContact",
+  "curios.modifiers.front_plate": "Передняя пластина",
+  "curios.modifiers.back_plate": "Задняя пластина",
+  "curios.identifier.front_plate": "Слот передней пластины",
+  "curios.identifier.back_plate": "Слот задней пластины"
+}
