@@ -45,5 +45,10 @@
   "curios.identifier.armband": "Повязка на руку",
   "curios.modifiers.armband": "Слот повязки на руку",
   "curios.identifier.backpack": "Слот рюкзака",
-  "curios.modifiers.backpack": "Рюкзак"
+  "curios.modifiers.backpack": "Рюкзак",
+  "curios.identifier.uniform_top": "Китель",
+  "curios.modifiers.uniform_top": "Слот кителя",
+  "curios.identifier.uniform_pants": "Брюки",
+  "curios.modifiers.uniform_pants": "Слот брюк"
+
 }
