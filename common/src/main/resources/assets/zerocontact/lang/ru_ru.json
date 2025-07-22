@@ -41,5 +41,9 @@
   "item.zerocontact.armband_blue": "Синяя повязка на руку",
   "item.zerocontact.armband_white": "Белая повязка на руку",
   "item.zerocontact.armband_yellow": "Жёлтая повязка на руку",
-  "item.zerocontact.armband_vsrf": "Повязка на руку Военных сил РФ"
+  "item.zerocontact.armband_vsrf": "Повязка на руку Военных сил РФ",
+  "curios.identifier.armband": "Повязка на руку",
+  "curios.modifiers.armband": "Слот повязки на руку",
+  "curios.identifier.backpack": "Слот рюкзака",
+  "curios.modifiers.backpack": "Рюкзак"
 }
