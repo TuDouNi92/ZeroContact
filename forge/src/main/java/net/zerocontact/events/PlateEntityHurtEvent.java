@@ -3,11 +3,8 @@ package net.zerocontact.events;
 import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
 import com.tacz.guns.api.event.common.GunDamageSourcePart;
 import com.tacz.guns.init.ModDamageTypes;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -26,7 +23,7 @@ public class PlateEntityHurtEvent {
     public static boolean isHeadShot;
 
     public static boolean changeHurtAmountRicochet(LivingEntity lv, DamageSource source, float amount, String identifier) {
-        if(lv instanceof ServerPlayer serverPlayer && serverPlayer.isCreative())return false;
+        if (lv instanceof ServerPlayer serverPlayer && serverPlayer.isCreative()) return false;
         DamageSource modifiedDamageSource = ModDamageTypes.Sources.bulletVoid(lv.level().registryAccess(), source.getDirectEntity(), source.getEntity(), false);
         AtomicBoolean result = new AtomicBoolean();
         AtomicReference<Float> updatedHurtAmountFromCurio = new AtomicReference<>((float) 0);
@@ -72,7 +69,8 @@ public class PlateEntityHurtEvent {
         return hurtAmount;
     }
 
-    public static void entityHurtByGunHeadShot(EntityHurtByGunEvent.Post event) {
+    public static void entityHurtByGunHeadShot(EntityHurtByGunEvent event) {
+        if(!(event instanceof EntityHurtByGunEvent.Pre eventPre))return;
         isHeadShot = event.isHeadShot();
         if (!isHeadShot) return;
         Optional<Entity> entity = Optional.ofNullable(event.getHurtEntity());
@@ -80,8 +78,6 @@ public class PlateEntityHurtEvent {
         entity.ifPresent(e -> {
             if (e instanceof LivingEntity livingEntity) {
                 ItemStack helmet = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
-                Holder<DamageType> customDamageType = livingEntity.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(ModDamageTypes.BULLET);
-                DamageSource modifiedDamageSource = new DamageSource(customDamageType);
                 float amount = event.getBaseAmount();
                 Optional.of(helmet).ifPresent(stack -> {
                     if (!(stack.getItem() instanceof HelmetInfoProvider && stack.getItem() instanceof EntityHurtProvider entityHurtProvider))
@@ -95,9 +91,10 @@ public class PlateEntityHurtEvent {
                     } else {
                         hurtAmount = entityHurtProvider.generatePenetrated() * amount;
                     }
-                    livingEntity.hurt(modifiedDamageSource, hurtAmount);
+                    eventPre.setBaseAmount(hurtAmount);
+                    eventPre.setHeadshotMultiplier(0);
                     livingEntity.playSound(ModSoundEventsReg.HELMET_HIT);
-                    event.setCanceled(true);
+                    livingEntity.hurt(damageSource, hurtAmount);
                 });
             }
         });

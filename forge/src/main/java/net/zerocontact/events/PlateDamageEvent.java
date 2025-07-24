@@ -64,7 +64,7 @@ public class PlateDamageEvent {
         return isHeadshot ? durabilityLossFactor * 1.5f : durabilityLossFactor;
     }
 
-    public static void DamageHelmet(EntityHurtByGunEvent.Post event) {
+    public static void DamageHelmet(EntityHurtByGunEvent event) {
         isHeadshot = event.isHeadShot();
         if (!isHeadshot) return;
         Optional<Entity> entity = Optional.ofNullable(event.getHurtEntity());
