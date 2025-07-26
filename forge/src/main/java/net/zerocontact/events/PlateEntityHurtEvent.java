@@ -24,7 +24,7 @@ public class PlateEntityHurtEvent {
 
     public static boolean changeHurtAmountRicochet(LivingEntity lv, DamageSource source, float amount, String identifier) {
         if (lv instanceof ServerPlayer serverPlayer && serverPlayer.isCreative()) return false;
-        DamageSource modifiedDamageSource = ModDamageTypes.Sources.bulletVoid(lv.level().registryAccess(), source.getDirectEntity(), source.getEntity(), false);
+        DamageSource modifiedDamageSource = ModDamageTypes.Sources.bullet(lv.level().registryAccess(), source.getDirectEntity(), source.getEntity(), false);
         AtomicBoolean result = new AtomicBoolean();
         AtomicReference<Float> updatedHurtAmountFromCurio = new AtomicReference<>((float) 0);
         result.set(false);
@@ -92,9 +92,8 @@ public class PlateEntityHurtEvent {
                         hurtAmount = entityHurtProvider.generatePenetrated() * amount;
                     }
                     eventPre.setBaseAmount(hurtAmount);
-                    eventPre.setHeadshotMultiplier(0);
+                    eventPre.setHeadshotMultiplier(1.25f);
                     livingEntity.playSound(ModSoundEventsReg.HELMET_HIT);
-                    livingEntity.hurt(damageSource, hurtAmount);
                 });
             }
         });
