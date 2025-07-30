@@ -47,8 +47,12 @@ public class OnRegisterItem {
         RegistrySupplier<FastMt> FAST_MT = ItemsReg.ITEMS.register("fast_mt", () -> new FastMt(ArmorMaterials.IRON, ArmorItem.Type.HELMET, new Item.Properties(), 8));
         RegistrySupplier<Ratnik> RATNIK = ItemsReg.ITEMS.register("helmet_6b47_ratnik_emr", () -> new Ratnik(ArmorMaterials.IRON, ArmorItem.Type.HELMET, new Item.Properties(), 6));
         RegistrySupplier<ThorArmorImpl> THOR_ARMOR = ItemsReg.ITEMS.register("armor_thor_black", () -> new ThorArmorImpl(4, 128,4,-0.01F));
-        RegistrySupplier<Bastion> BASTION_HELMET = ItemsReg.ITEMS.register("helmet_bastion_black", () -> new Bastion(9, 48));
+        RegistrySupplier<Bastion> BASTION_HELMET = ItemsReg.ITEMS.register("helmet_bastion_black", () -> Bastion.create(9,48, Bastion.Color.BLACK));
+        RegistrySupplier<Bastion> BASTION_HELMET_MULTICAM = ItemsReg.ITEMS.register("helmet_bastion_multicam", () -> Bastion.create(9,48, Bastion.Color.MULTICAM));
+        RegistrySupplier<Bastion> BASTION_HELMET_GREEN = ItemsReg.ITEMS.register("helmet_bastion_green", () -> Bastion.create(9,48, Bastion.Color.GREEN));
         RegistrySupplier<Untar> UNTAR_HELMET = ItemsReg.ITEMS.register("helmet_untar_blue", () -> new Untar(6, 24));
+        RegistrySupplier<TagillaMask> TAGILLA_MASK_MANHUNT = ItemsReg.ITEMS.register("mask_tagilla_manhunt",()->TagillaMask.create(12,64, TagillaMask.Color.MANHUNT));
+        RegistrySupplier<TagillaMask> TAGILLA_MASK_YBEY = ItemsReg.ITEMS.register("mask_tagilla_ybey",()->TagillaMask.create(12,64, TagillaMask.Color.YBEY));
         RegistrySupplier<UntarArmorImpl> UNTAR_ARMOR = ItemsReg.ITEMS.register("armor_untar_blue", () -> new UntarArmorImpl(9, 72,6,-0.03F));
         RegistrySupplier<HexgridArmorImpl> HEXGRID_ARMOR = ItemsReg.ITEMS.register("armor_hexgrid_black", () -> new HexgridArmorImpl(9, 128,2,0.01F));
         RegistrySupplier<AltynVisor.WithVisor> ALTYN_VISOR_HELMET = ItemsReg.ITEMS.register("helmet_altyn_visor", () -> new AltynVisor.WithVisor(10, 72));
@@ -70,7 +74,9 @@ public class OnRegisterItem {
 
         ITEMS_TO_REG.addAll(
                 List.of(
-                        RAIDER_EGG,RATNIK,BASTION_HELMET,ALTYN_VISOR_HELMET,AIRFRAME_HELMET,UNTAR_HELMET,
+                        RAIDER_EGG,
+                        RATNIK,BASTION_HELMET,BASTION_HELMET_MULTICAM,BASTION_HELMET_GREEN,
+                        ALTYN_VISOR_HELMET,AIRFRAME_HELMET,UNTAR_HELMET,TAGILLA_MASK_MANHUNT,TAGILLA_MASK_YBEY,
                         THOR_ARMOR,UNTAR_ARMOR,HEXGRID_ARMOR,R6B2,R6B23I,R6B23II,DEFENDER,
                         T20_BACKPACK_MULTICAM,T20_BACKPACK_UMBRA,
                         ARMBAND_BLACK,ARMBAND_RED,ARMBAND_BLUE,ARMBAND_WHITE,ARMBAND_GREEN,ARMBAND_YELLOW,ARMBAND_VSRF
