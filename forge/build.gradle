@@ -22,10 +22,6 @@ configurations {
     developmentForge.extendsFrom common
 }
 
-configurations.configureEach {
-    exclude group:"net.minecrell", module: "terminalconsoleappender"
-}
-
 dependencies {
     forge "net.minecraftforge:forge:${forge_version}"
     // Remove the next line if you don't want to depend on the API
