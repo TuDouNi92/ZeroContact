@@ -8,12 +8,12 @@ import software.bernie.geckolib.model.GeoModel;
 public class AvsModel extends GeoModel<AvsArmorImpl> {
     @Override
     public ResourceLocation getModelResource(AvsArmorImpl animatable) {
-        return new ResourceLocation(ZeroContact.MOD_ID,"geo/avs_armor.geo.json");
+        return new ResourceLocation(ZeroContact.MOD_ID,"geo/vest_avs_tagilla_desert.geo.json");
     }
 
     @Override
     public ResourceLocation getTextureResource(AvsArmorImpl armor) {
-        return new ResourceLocation(ZeroContact.MOD_ID,"textures/models/armor/avs.png");
+        return new ResourceLocation(ZeroContact.MOD_ID,"textures/models/armor/vest_avs_tagilla_desert.png");
     }
 
     @Override
