@@ -5,10 +5,41 @@ import net.minecraft.resources.ResourceLocation;
 import static net.zerocontact.ZeroContact.MOD_ID;
 
 public class Bastion extends BaseGeoHelmet {
-    private static final ResourceLocation  texture= new ResourceLocation(MOD_ID,"textures/models/helmet/helmet_bastion_black.png") ;
-    private static final ResourceLocation  model= new ResourceLocation(MOD_ID,"geo/helmet_bastion_black.geo.json") ;
-    private static final ResourceLocation  animation= null;
-    public Bastion(int absorb,int durability) {
-        super(absorb,durability,texture,model,animation);
+    public Bastion(int absorb, int durability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+        super(absorb, durability, texture, model, animation);
+    }
+
+    public record ColorResources(ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+    }
+
+    public enum Color {
+        BLACK(
+                new ColorResources(
+                        new ResourceLocation(MOD_ID, "textures/models/helmet/helmet_bastion_black.png"),
+                        new ResourceLocation(MOD_ID, "geo/helmet_bastion_black.geo.json"),
+                        null
+                )
+        ),
+        MULTICAM(
+                new ColorResources(
+                        new ResourceLocation(MOD_ID, "textures/models/helmet/helmet_bastion_multicam.png"),
+                        new ResourceLocation(MOD_ID, "geo/helmet_bastion_multicam.geo.json"),
+                        null
+                )
+        ),
+        GREEN(
+                new ColorResources(
+                        new ResourceLocation(MOD_ID, "textures/models/helmet/helmet_bastion_green.png"),
+                        new ResourceLocation(MOD_ID, "geo/helmet_bastion_green.geo.json"),
+                        null
+                )
+        );
+        private final ColorResources colorResources;
+        Color(ColorResources colorResources) {
+            this.colorResources = colorResources;
+        }
+    }
+    public static Bastion create(int absorb, int durability,Color color){
+        return new Bastion(absorb,durability,color.colorResources.texture, color.colorResources.model, color.colorResources.animation);
     }
 }
