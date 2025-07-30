@@ -43,7 +43,7 @@ public class PlateEntityHurtEvent {
     private static float hurtIt(LivingEntity lv, DamageSource source, float amount, ItemStack stack, DamageSource modifiedDamageSource, AtomicBoolean result) {
         float hurtAmount = 0;
         int hurtCanHold = stack.getOrCreateTag().getInt("absorb");
-        if (!(stack.isEmpty() && source.type() != modifiedDamageSource.type())) {
+        if (!stack.isEmpty() && source.type() != modifiedDamageSource.type()) {
             lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
             if (EventUtil.isDamageSourceValid(source) && stack.getItem() instanceof EntityHurtProvider provider) {
                 if (EventUtil.isIncidentAngleValid(lv, source)) {
