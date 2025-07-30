@@ -44,7 +44,7 @@ side = "BOTH"
 [[dependencies.zerocontact]]
 modId = "tacz"
 mandatory = true
-versionRange = "[1.0.2,)"
+versionRange = "[1.1.5,)"
 ordering = "NONE"
 side = "BOTH"
 
