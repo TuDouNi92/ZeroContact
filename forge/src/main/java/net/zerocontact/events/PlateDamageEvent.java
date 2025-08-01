@@ -52,8 +52,8 @@ public class PlateDamageEvent {
 
     private static float getDurabilityLossFactor(float amount, float durabilityLossFactor) {
         switch (ProtectionLevelHelper.get((int) Math.floor(amount))) {
-            case NIJIIA -> durabilityLossFactor = 0.1F;
-            case NIJII -> durabilityLossFactor = 0.4F;
+            case NIJIIA -> durabilityLossFactor = 1.2F;
+            case NIJII -> durabilityLossFactor = 1.25F;
             case NIJIIIA -> durabilityLossFactor = 0.7F;
             case NIJIII -> durabilityLossFactor = 1.1F;
             case NIJIV -> durabilityLossFactor = 1.5F;

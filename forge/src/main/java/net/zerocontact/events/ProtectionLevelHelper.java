@@ -3,11 +3,11 @@ package net.zerocontact.events;
 import net.minecraft.world.item.ItemStack;
 
 public enum ProtectionLevelHelper {
-    NIJIIA(5),
-    NIJII(6),
-    NIJIIIA(7),
-    NIJIII(9),
-    NIJIV(13);
+    NIJIIA(3),
+    NIJII(4),
+    NIJIIIA(5),
+    NIJIII(7),
+    NIJIV(12);
     private final int protectionAmount;
     ProtectionLevelHelper(int amount){
         this.protectionAmount = amount;

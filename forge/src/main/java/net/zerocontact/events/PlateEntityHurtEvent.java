@@ -49,25 +49,31 @@ public class PlateEntityHurtEvent {
         if (!stack.isEmpty() && source.getEntity() != null) {
             lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
             if (EventUtil.isDamageSourceValid(source) && stack.getItem() instanceof EntityHurtProvider provider) {
-                if (EventUtil.isIncidentAngleValid(lv, source)) {
-                    hurtAmount = provider.generateRicochet() * amount;
-                } else {
-                    if (hurtCanHold >= amount) {
-                        //钝伤
-                        hurtAmount = provider.generateBlunt() * amount;
-
-                    } else {
-                        //贯穿
-                        hurtAmount = provider.generatePenetrated() * amount;
-                    }
-                }
+                hurtAmount = getHurtAmount(lv, source, amount, provider, hurtCanHold);
                 lv.hurt(modifiedDamageSource, hurtAmount);
             }
             interruptResult.set(true);
-        }
-        else{
+        } else {
             interruptResult.set(false);
         }
+    }
+
+    private static float getHurtAmount(LivingEntity lv, DamageSource source, float amount, EntityHurtProvider provider, int hurtCanHold) {
+        float hurtAmount;
+        float generateCaliberDamageAmount = CaliberVariantDamageHelper.generateDamageAmount(amount,source);
+        if (EventUtil.isIncidentAngleValid(lv, source)) {
+            hurtAmount = provider.generateRicochet() * generateCaliberDamageAmount;
+        } else {
+            if (hurtCanHold >= generateCaliberDamageAmount) {
+                //钝伤
+                hurtAmount = provider.generateBlunt() * generateCaliberDamageAmount;
+
+            } else {
+                //贯穿
+                hurtAmount = provider.generatePenetrated() * generateCaliberDamageAmount;
+            }
+        }
+        return hurtAmount;
     }
 
     public static void entityHurtByGunHeadShot(EntityHurtByGunEvent event) {
@@ -83,15 +89,8 @@ public class PlateEntityHurtEvent {
                 Optional.of(helmet).ifPresent(stack -> {
                     if (!(stack.getItem() instanceof HelmetInfoProvider && stack.getItem() instanceof EntityHurtProvider entityHurtProvider))
                         return;
-                    float hurtAmount;
                     int absorb = stack.getOrCreateTag().getInt("absorb");
-                    if (EventUtil.isIncidentAngleValid(livingEntity, damageSource)) {
-                        hurtAmount = entityHurtProvider.generateRicochet() * amount;
-                    } else if (absorb >= amount) {
-                        hurtAmount = entityHurtProvider.generateBlunt() * amount;
-                    } else {
-                        hurtAmount = entityHurtProvider.generatePenetrated() * amount;
-                    }
+                    float hurtAmount = getHurtAmount(livingEntity, damageSource, amount, entityHurtProvider, absorb);
                     eventPre.setBaseAmount(hurtAmount);
                     eventPre.setHeadshotMultiplier(1.25f);
                     playHeadshotSound(livingEntity);
