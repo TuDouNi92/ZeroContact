@@ -2,7 +2,6 @@ package net.zerocontact.events;
 
 import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
 import com.tacz.guns.entity.EntityKineticBullet;
-import dev.architectury.event.EventResult;
 import dev.architectury.event.events.common.TickEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
@@ -35,10 +34,7 @@ public class ModForgeEventBus {
         TickEvent.PLAYER_PRE.register(PlayerStamina::staminaTick);
         dev.architectury.event.events.common.EntityEvent.LIVING_HURT.register((lv, source, amount) -> {
                     PlateDamageEvent.DamagePlateRegister(lv, source, amount);
-                    if (PlateEntityHurtEvent.changeHurtAmountRicochet(lv, source, amount, EventUtil.idHitFromBack(lv, source))) {
-                        return EventResult.interruptFalse();
-                    }
-                    return EventResult.pass();
+                    return PlateEntityHurtEvent.entityHurtRegister(lv, source, amount);
                 }
         );
     }

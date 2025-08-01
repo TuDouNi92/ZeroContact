@@ -2,7 +2,6 @@ package net.zerocontact.events;
 
 import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
 import com.tacz.guns.init.ModDamageTypes;
-import dev.architectury.event.EventResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -16,24 +15,22 @@ import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class PlateDamageEvent {
     private static boolean isHeadshot;
 
-    private static EventResult DamagePlateModifier(
+    private static void DamagePlateModifier(
             ICuriosItemHandler iCuriosItemHandler,
             LivingEntity livingEntity,
             DamageSource damageSource,
             float amount,
             String identifier
     ) {
-        if (isHeadshot) return EventResult.pass();
+        if (isHeadshot) return;
         iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
             ItemStack stackInSlot = stacksHandler.getStacks().getStackInSlot(0);
             damage(livingEntity, damageSource, amount, stackInSlot);
         });
-        return EventResult.pass();
     }
 
     private static void damage(LivingEntity livingEntity, DamageSource damageSource, float amount, ItemStack stackInSlot) {
@@ -87,11 +84,9 @@ public class PlateDamageEvent {
         });
     }
 
-    public static EventResult DamagePlateRegister(LivingEntity entity, DamageSource damageSource, float amount) {
-        AtomicReference<EventResult> eventResult = new AtomicReference<>(EventResult.pass());
+    public static void DamagePlateRegister(LivingEntity entity, DamageSource damageSource, float amount) {
         if (EventUtil.isDamageSourceValid(damageSource)) {
-            CuriosApi.getCuriosInventory(entity).ifPresent(inv -> eventResult.set(DamagePlateModifier(inv, entity, damageSource, amount, EventUtil.idHitFromBack(entity, damageSource))));
+            CuriosApi.getCuriosInventory(entity).ifPresent(inv -> DamagePlateModifier(inv, entity, damageSource, amount, EventUtil.idHitFromBack(entity, damageSource)));
         }
-        return eventResult.get();
     }
 }
