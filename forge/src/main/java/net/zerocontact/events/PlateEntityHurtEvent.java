@@ -3,12 +3,16 @@ package net.zerocontact.events;
 import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
 import com.tacz.guns.api.event.common.GunDamageSourcePart;
 import com.tacz.guns.init.ModDamageTypes;
+import dev.architectury.event.EventResult;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.zerocontact.api.ArmorTypeTag;
 import net.zerocontact.api.EntityHurtProvider;
 import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.item.armor.forge.BaseArmorGeoImpl;
@@ -17,38 +21,36 @@ import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class PlateEntityHurtEvent {
     public static boolean isHeadShot;
-
     public static boolean changeHurtAmountRicochet(LivingEntity lv, DamageSource source, float amount, String identifier) {
         if (lv instanceof ServerPlayer serverPlayer && serverPlayer.isCreative()) return false;
-        DamageSource modifiedDamageSource = ModDamageTypes.Sources.bullet(lv.level().registryAccess(), source.getDirectEntity(), source.getEntity(), false);
-        AtomicBoolean result = new AtomicBoolean();
-        AtomicReference<Float> updatedHurtAmountFromCurio = new AtomicReference<>((float) 0);
-        result.set(false);
-        if (isHeadShot) return false;
-        CuriosApi.getCuriosInventory(lv).ifPresent(iCuriosItemHandler -> iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
-            ItemStack stack = stacksHandler.getStacks().getStackInSlot(0);
-            updatedHurtAmountFromCurio.set(hurtIt(lv, source, amount, stack, modifiedDamageSource, result));
-        }));
+        DamageSource modifiedDamageSource = ModDamageTypes.Sources.bullet(lv.level().registryAccess(), null, null, false);
+        AtomicBoolean interruptResult = new AtomicBoolean();
         ItemStack stackInVanillaSlot = lv.getItemBySlot(EquipmentSlot.CHEST);
-        if (stackInVanillaSlot.getItem() instanceof BaseArmorGeoImpl) {
-            hurtIt(lv, source, updatedHurtAmountFromCurio.get() == 0 ? amount : updatedHurtAmountFromCurio.get(), stackInVanillaSlot, modifiedDamageSource, result);
+        if (isHeadShot) return false;
+        if (stackInVanillaSlot.getItem() instanceof BaseArmorGeoImpl baseArmorGeo && baseArmorGeo.getArmorType().equals(ArmorTypeTag.ArmorType.ARMOR)) {
+            hurtIt(lv, source, amount, stackInVanillaSlot, modifiedDamageSource, interruptResult);
+        } else {
+            CuriosApi.getCuriosInventory(lv).ifPresent(iCuriosItemHandler -> iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
+                ItemStack stack = stacksHandler.getStacks().getStackInSlot(0);
+                hurtIt(lv, source, amount, stack, modifiedDamageSource, interruptResult);
+            }));
         }
-        return result.get();
+        return interruptResult.get();
     }
 
-    private static float hurtIt(LivingEntity lv, DamageSource source, float amount, ItemStack stack, DamageSource modifiedDamageSource, AtomicBoolean result) {
-        float hurtAmount = 0;
+    private static void hurtIt(LivingEntity lv, DamageSource source, float amount, ItemStack stack, DamageSource modifiedDamageSource, AtomicBoolean interruptResult) {
+        float hurtAmount;
         int hurtCanHold = stack.getOrCreateTag().getInt("absorb");
-        if (!stack.isEmpty() && source.type() != modifiedDamageSource.type()) {
+
+        //This guard pattern is important to prevent recursively call from event
+        if (!stack.isEmpty() && source.getEntity() != null) {
             lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
             if (EventUtil.isDamageSourceValid(source) && stack.getItem() instanceof EntityHurtProvider provider) {
                 if (EventUtil.isIncidentAngleValid(lv, source)) {
                     hurtAmount = provider.generateRicochet() * amount;
-                    lv.hurt(modifiedDamageSource, hurtAmount);
                 } else {
                     if (hurtCanHold >= amount) {
                         //钝伤
@@ -57,20 +59,19 @@ public class PlateEntityHurtEvent {
                     } else {
                         //贯穿
                         hurtAmount = provider.generatePenetrated() * amount;
-
                     }
                 }
                 lv.hurt(modifiedDamageSource, hurtAmount);
-                result.set(true);
-            } else {
-                result.set(false);
             }
+            interruptResult.set(true);
         }
-        return hurtAmount;
+        else{
+            interruptResult.set(false);
+        }
     }
 
     public static void entityHurtByGunHeadShot(EntityHurtByGunEvent event) {
-        if(!(event instanceof EntityHurtByGunEvent.Pre eventPre))return;
+        if (!(event instanceof EntityHurtByGunEvent.Pre eventPre)) return;
         isHeadShot = event.isHeadShot();
         if (!isHeadShot) return;
         Optional<Entity> entity = Optional.ofNullable(event.getHurtEntity());
@@ -93,9 +94,23 @@ public class PlateEntityHurtEvent {
                     }
                     eventPre.setBaseAmount(hurtAmount);
                     eventPre.setHeadshotMultiplier(1.25f);
-                    livingEntity.playSound(ModSoundEventsReg.HELMET_HIT);
+                    playHeadshotSound(livingEntity);
                 });
             }
         });
+    }
+
+    private static void playHeadshotSound(LivingEntity livingEntity) {
+        if (livingEntity instanceof Player player) {
+            player.level().playLocalSound(player.getX(), player.getY(), player.getZ(), ModSoundEventsReg.HELMET_HIT, SoundSource.PLAYERS, 1.0f, 1.0f, false);
+        }
+        livingEntity.playSound(ModSoundEventsReg.HELMET_HIT);
+    }
+
+    public static EventResult entityHurtRegister(LivingEntity lv, DamageSource source, float amount) {
+        if (PlateEntityHurtEvent.changeHurtAmountRicochet(lv, source, amount, EventUtil.idHitFromBack(lv, source))) {
+            return EventResult.interruptFalse();
+        }
+        return EventResult.pass();
     }
 }
