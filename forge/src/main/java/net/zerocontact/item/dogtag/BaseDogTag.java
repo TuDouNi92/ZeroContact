@@ -16,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.zerocontact.command.CommandManager;
 import net.zerocontact.entity.ArmedRaider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -82,7 +83,8 @@ public abstract class BaseDogTag extends Item implements GeoItem {
         }
     }
 
-    public static boolean onKillEntity(LivingEntity livingEntity, DamageSource damageSource) {
+    public static boolean spawnTagOnKillEntity(LivingEntity livingEntity, DamageSource damageSource) {
+        if(!CommandManager.isEnabledDogTag)return false;
         if (livingEntity instanceof ServerPlayer || livingEntity instanceof ArmedRaider) {
             Item dogTag = ForgeRegistries.ITEMS.getValue(new ResourceLocation(MOD_ID, "dog_tag"));
             if (!(dogTag instanceof BaseDogTag baseDogTag)) return true;

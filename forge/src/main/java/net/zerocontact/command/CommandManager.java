@@ -10,8 +10,9 @@ import net.minecraft.network.chat.Component;
 
 import java.util.Optional;
 
-public class ToggleStaminaCommand {
+public class CommandManager {
     public static boolean isEnabledStamina = false;
+    public static boolean isEnabledDogTag = true;
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("stamina")
                 .then(Commands.argument("toggle", StringArgumentType.word()))
@@ -21,6 +22,18 @@ public class ToggleStaminaCommand {
                     Component message = Component.literal("Enable Stamina:")
                             .withStyle(ChatFormatting.GOLD)
                             .append(Component.literal(String.valueOf(isEnabledStamina)));
+                    context.getSource().sendSuccess(()->message,true);
+                    return Command.SINGLE_SUCCESS;
+                })
+        );
+        dispatcher.register(Commands.literal("dogtag")
+                .requires(commandSourceStack ->
+                    Optional.ofNullable(commandSourceStack.getPlayer()).isPresent())
+                .executes(context -> {
+                    isEnabledDogTag = !isEnabledDogTag;
+                    Component message = Component.literal("Enable Dogtag drop:")
+                            .withStyle(ChatFormatting.GOLD)
+                            .append(Component.literal(String.valueOf(isEnabledDogTag)));
                     context.getSource().sendSuccess(()->message,true);
                     return Command.SINGLE_SUCCESS;
                 })

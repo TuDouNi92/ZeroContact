@@ -10,7 +10,7 @@ import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.zerocontact.client.interaction.BulletPassBy;
-import net.zerocontact.command.ToggleStaminaCommand;
+import net.zerocontact.command.CommandManager;
 import net.zerocontact.network.ModMessages;
 import net.zerocontact.stamina.PlayerStamina;
 
@@ -26,7 +26,7 @@ public class ModForgeEventBus {
 
     @SubscribeEvent
     public static void RegCommands(RegisterCommandsEvent event) {
-        ToggleStaminaCommand.register(event.getDispatcher());
+        CommandManager.register(event.getDispatcher());
     }
 
     public static void regEvents() {
