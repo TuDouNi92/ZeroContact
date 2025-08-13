@@ -5,6 +5,8 @@ import com.tacz.guns.entity.EntityKineticBullet;
 import dev.architectury.event.events.common.TickEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -17,6 +19,7 @@ import net.zerocontact.stamina.PlayerStamina;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ModForgeEventBus {
     @SubscribeEvent
+    @OnlyIn(Dist.CLIENT)
     public static void onEntity(EntityEvent event) {
         Entity entity = event.getEntity();
         if (entity instanceof EntityKineticBullet) {

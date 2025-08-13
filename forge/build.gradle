@@ -36,9 +36,6 @@ dependencies {
     modLocalRuntime files("libs/Jade-1.20.1-Forge-11.12.3.jar")
     modImplementation("software.bernie.geckolib:geckolib-forge-1.20.1:${geckolib_version}")
     forgeRuntimeLibrary("com.eliotlash.mclib:mclib:20")
-    modLocalRuntime("com.simibubi.create:create-1.20.1:${create_version}:slim") { transitive = false }
-    modLocalRuntime("com.tterrag.registrate:Registrate:${registrate_version}")
-    modLocalRuntime("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
 }
 
 processResources {

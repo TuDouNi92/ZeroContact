@@ -82,7 +82,7 @@ public class OnRegisterItem {
                         ARMBAND_BLACK,ARMBAND_RED,ARMBAND_BLUE,ARMBAND_WHITE,ARMBAND_GREEN,ARMBAND_YELLOW,ARMBAND_VSRF
                 )
         );
-        ItemLoader.loadFromJson();
+        //ItemLoader.loadFromJson();
         ZeroContactLogger.LOG.info("On Register ItemData:{}", new Gson().toJson(ItemLoader.itemGenData).formatted());
         GeneratePlateImpl.deserializeItems();
         GenerateArmorGeoImpl.deserializeItems();

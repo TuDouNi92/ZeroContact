@@ -3,6 +3,7 @@ package net.zerocontact.events;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.world.item.Item;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -19,20 +20,27 @@ import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
 import net.zerocontact.registries.ItemsReg;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 
-import static net.zerocontact.ZeroContact.MOD_ID;
 
-@Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModRegEventBus {
-    @SubscribeEvent
-    public static void registerAttr(EntityAttributeCreationEvent event) {
-        event.put(ModEntitiesReg.ARMED_RAIDER.get(), ArmedRaider.createAttributes().build());
+    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+    static class ServerDistribution{
+        @SubscribeEvent
+        public static void registerAttr(EntityAttributeCreationEvent event) {
+            event.put(ModEntitiesReg.ARMED_RAIDER.get(), ArmedRaider.createAttributes().build());
+        }
     }
-
-    @SubscribeEvent
-    public static void onClientSetup(FMLClientSetupEvent event) {
-        EntityRenderers.register(ModEntitiesReg.ARMED_RAIDER.get(), ArmedRaiderRender::new);
-        MenuScreens.register(ModMenus.BACKPACK_CONTAINER.get(), BackpackScreen::new);
-        RegCurioGeoItemRender();
+    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD,value = Dist.CLIENT)
+    static class ClientDistribution {
+        @SubscribeEvent
+        public static void onClientSetup(FMLClientSetupEvent event) {
+            EntityRenderers.register(ModEntitiesReg.ARMED_RAIDER.get(), ArmedRaiderRender::new);
+            MenuScreens.register(ModMenus.BACKPACK_CONTAINER.get(), BackpackScreen::new);
+            RegCurioGeoItemRender();
+        }
+        @SubscribeEvent
+        public static void onRegisterMappings(RegisterKeyMappingsEvent event) {
+            KeyBindingHandler.register(event);
+        }
     }
 
     private static void RegCurioGeoItemRender() {
@@ -43,10 +51,4 @@ public class ModRegEventBus {
             }
         });
     }
-
-    @SubscribeEvent
-    public static void onRegisterMappings(RegisterKeyMappingsEvent event) {
-        KeyBindingHandler.register(event);
-    }
-
 }
