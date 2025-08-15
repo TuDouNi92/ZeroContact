@@ -1,6 +1,5 @@
 package net.zerocontact.network;
 
-import dev.architectury.platform.Mod;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -18,22 +17,25 @@ public class NetworkHandler {
 
     public static class SyncStaminaPacket {
         private final float stamina;
-
-        public SyncStaminaPacket(float stamina) {
+        private final boolean enabled;
+        public SyncStaminaPacket(float stamina, boolean enabled) {
             this.stamina = stamina;
+            this.enabled =enabled;
         }
 
         public SyncStaminaPacket(FriendlyByteBuf buf) {
             this.stamina = buf.readFloat();
+            this.enabled = buf.readBoolean();
         }
 
         public void toBytes(FriendlyByteBuf buf) {
             buf.writeFloat(stamina);
+            buf.writeBoolean(enabled);
         }
 
         public void handle(Supplier<NetworkEvent.Context> supplier) {
             NetworkEvent.Context context = supplier.get();
-            context.enqueueWork(() -> ClientData.setStamina(stamina));
+            context.enqueueWork(() -> ClientData.setStamina(stamina,enabled));
         }
     }
 

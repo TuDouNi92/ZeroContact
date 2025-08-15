@@ -23,6 +23,7 @@ public class StaminaHUD {
     }
 
     private static void drawStamina(RenderGuiOverlayEvent.Post event, Minecraft mc) {
+        if(!ClientData.isEnableStamina())return;
         float maxStamina = 120f;
         float stamina = ClientData.getStamina();
         float percent = stamina / maxStamina;

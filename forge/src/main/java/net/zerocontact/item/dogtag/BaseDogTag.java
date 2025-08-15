@@ -6,6 +6,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.damagesource.DamageSource;
@@ -37,11 +38,10 @@ public abstract class BaseDogTag extends Item implements GeoItem {
 
     //For normal damage source
     public static void appendInfos(ItemStack stack, @NotNull Entity killedByName, @NotNull Entity victimName, @NotNull ItemStack weapon, DamageSource source) {
-        if(source.getEntity()==null){
+        if (source.getEntity() == null) {
             stack.getOrCreateTag().putString("attacker", Component.Serializer.toJson(Component.literal(source.toString())));
             stack.getOrCreateTag().putString("weapon", Component.Serializer.toJson(Component.literal(source.toString())));
-        }
-        else{
+        } else {
             stack.getOrCreateTag().putString("attacker", Component.Serializer.toJson(killedByName.getDisplayName()));
 
             stack.getOrCreateTag().putString("weapon", Component.Serializer.toJson(weapon.getDisplayName()));
@@ -69,9 +69,9 @@ public abstract class BaseDogTag extends Item implements GeoItem {
             MutableComponent victimName = Component.Serializer.fromJson(stack.getOrCreateTag().getString("victim"));
             String timeStamp = stack.getOrCreateTag().getString("timestamp");
             MutableComponent killedByName = (Component.Serializer.fromJson(stack.getOrCreateTag().getString("attacker")));
-            if(killedByName==null)killedByName = Component.literal("");
+            if (killedByName == null) killedByName = Component.literal("");
             MutableComponent weaponName = Component.Serializer.fromJson(stack.getOrCreateTag().getString("weapon"));
-            if(weaponName==null)weaponName = Component.literal("");
+            if (weaponName == null) weaponName = Component.literal("");
             tooltipComponents.addAll(
                     List.of(
                             Component.translatable("item.zerocontact.dogtag.victim", victimName),
@@ -84,7 +84,8 @@ public abstract class BaseDogTag extends Item implements GeoItem {
     }
 
     public static boolean spawnTagOnKillEntity(LivingEntity livingEntity, DamageSource damageSource) {
-        if(!CommandManager.isEnabledDogTag)return false;
+        if (!(livingEntity.level() instanceof ServerLevel serverLevel)) return false;
+        if (!CommandManager.CommandSavedData.get(serverLevel).dogTagState) return false;
         if (livingEntity instanceof ServerPlayer || livingEntity instanceof ArmedRaider) {
             Item dogTag = ForgeRegistries.ITEMS.getValue(new ResourceLocation(MOD_ID, "dog_tag"));
             if (!(dogTag instanceof BaseDogTag baseDogTag)) return true;

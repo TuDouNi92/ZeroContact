@@ -1,6 +1,7 @@
 package net.zerocontact.stamina;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -51,37 +52,38 @@ public class PlayerStamina {
                         AttributeModifier.Operation.ADDITION
                 ));
             }
-            player.setDeltaMovement(player.getDeltaMovement().x,0,player.getDeltaMovement().z);
+            player.setDeltaMovement(player.getDeltaMovement().x, 0, player.getDeltaMovement().z);
         } else {
             speedAttr.removeModifier(uuid);
         }
     }
 
     public static void staminaTick(Player player) {
-        if(!CommandManager.isEnabledStamina)return;
-        if (player.level().isClientSide) return;
+        if (!(player.level() instanceof ServerLevel serverLevel)) return;
         player.getCapability(PlayerStaminaProvider.PLAYER_STAMINA).ifPresent(playerStamina -> {
-            playerStamina.tickCounter++;
-            float stamina = playerStamina.getStamina();
-            if (player.isSprinting()) {
-                playerStamina.cooldownTicks = 60;
-                playerStamina.setStamina(stamina - 1.0f);
-                interruptSprintAndJump(player, stamina == 0);
-            } else {
-                interruptSprintAndJump(player, false);
+            if (CommandManager.CommandSavedData.get(serverLevel).staminaState) {
+                playerStamina.tickCounter++;
+                float stamina = playerStamina.getStamina();
+                if (player.isSprinting()) {
+                    playerStamina.cooldownTicks = 60;
+                    playerStamina.setStamina(stamina - 1.0f);
+                    interruptSprintAndJump(player, stamina == 0);
+                } else {
+                    interruptSprintAndJump(player, false);
+                }
+                if (!player.onGround() && player.getDeltaMovement().y > 0) {
+                    playerStamina.cooldownTicks = 60;
+                    playerStamina.setStamina(stamina - 1.0f);
+                    interruptSprintAndJump(player, stamina == 0);
+                }
+                if (playerStamina.tickCounter >= 20 && playerStamina.cooldownTicks == 0) {
+                    playerStamina.setStamina(stamina + 4.0f);
+                    playerStamina.tickCounter = 0;
+                }
+                playerStamina.cooldownTicks = Math.max(0, --playerStamina.cooldownTicks);
+                ZeroContactLogger.LOG.debug(playerStamina.cooldownTicks);
             }
-            if (!player.onGround() && player.getDeltaMovement().y > 0) {
-                playerStamina.cooldownTicks = 60;
-                playerStamina.setStamina(stamina - 1.0f);
-                interruptSprintAndJump(player, stamina == 0);
-            }
-            if (playerStamina.tickCounter >= 20 && playerStamina.cooldownTicks == 0) {
-                playerStamina.setStamina(stamina + 4.0f);
-                playerStamina.tickCounter = 0;
-            }
-            playerStamina.cooldownTicks = Math.max(0, --playerStamina.cooldownTicks);
-            ZeroContactLogger.LOG.debug(playerStamina.cooldownTicks);
-            ModMessages.sendToPlayer(new NetworkHandler.SyncStaminaPacket(playerStamina.getStamina()), (ServerPlayer) player);
+            ModMessages.sendToPlayer(new NetworkHandler.SyncStaminaPacket(playerStamina.getStamina(), CommandManager.CommandSavedData.get(serverLevel).staminaState), (ServerPlayer) player);
         });
     }
 }

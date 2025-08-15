@@ -2,6 +2,8 @@ package net.zerocontact.stamina;
 
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
@@ -17,15 +19,22 @@ public class PlayerStaminaProvider implements ICapabilityProvider, INBTSerializa
     });
     private PlayerStamina playerStamina = null;
     private final LazyOptional<PlayerStamina> optional = LazyOptional.of(this::createPlayerStamina);
-    private PlayerStamina createPlayerStamina(){
-        if(this.playerStamina !=null)return playerStamina;
+    private final Player player;
+
+    private PlayerStamina createPlayerStamina() {
+        if (this.playerStamina != null) return playerStamina;
         this.playerStamina = new PlayerStamina();
         return playerStamina;
     }
+
+    public PlayerStaminaProvider(Player player) {
+        this.player = player;
+    }
+
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction arg) {
-        if(capability !=PLAYER_STAMINA)return LazyOptional.empty();
-        return CommandManager.isEnabledStamina?optional.cast():LazyOptional.empty();
+        if (capability != PLAYER_STAMINA)return LazyOptional.empty();
+        return optional.cast();
     }
 
     @Override
