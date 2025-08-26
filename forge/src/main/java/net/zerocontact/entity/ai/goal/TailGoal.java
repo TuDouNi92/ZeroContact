@@ -6,7 +6,6 @@ import net.minecraft.world.phys.Vec3;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.entity.ai.controller.GlobalStateController;
 
-import java.util.Objects;
 import java.util.Optional;
 
 public class TailGoal extends Goal {
@@ -34,7 +33,7 @@ public class TailGoal extends Goal {
     public static <T extends ArmedRaider> boolean canChaseTarget(T raider) {
         boolean canSee = PerformGunAttackGoal.canSee(raider);
         if (canSee) {
-            raider.stateController.getShareContext().cacheTarget = Objects.requireNonNull(raider.getTarget());
+            raider.stateController.getShareContext().cacheTarget = raider.getTarget();
             return false;
         }
         return raider.stateController.getShareContext().cacheTarget != null
