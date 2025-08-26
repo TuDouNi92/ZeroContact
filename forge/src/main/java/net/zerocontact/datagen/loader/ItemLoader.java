@@ -2,12 +2,10 @@ package net.zerocontact.datagen.loader;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.PathPackResources;
 import net.minecraft.server.packs.repository.Pack;
-import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -38,7 +36,7 @@ public class ItemLoader{
     private static final Gson GSON = new GsonBuilder().registerTypeAdapterFactory(typeFactory).create();
     private static final Path LOAD_PATH = Paths.get("config/zerocontact/packs");
     private static final Set<Path> RPACK_PATHS = new HashSet<>();
-    private static final Set<Pack> DATA_PACKS = new HashSet<>();
+    private static final Set<Pack> PACKS = new HashSet<>();
 
     public static void loadFromJson() {
         if (Files.notExists(LOAD_PATH)) {
@@ -78,18 +76,17 @@ public class ItemLoader{
     }
 
     private static void loadResourceAndDataPack() {
-        PackRepository resourcePackRepository = Minecraft.getInstance().getResourcePackRepository();
         if (RPACK_PATHS.isEmpty()) return;
         RPACK_PATHS.forEach((path) -> {
             String packId = path.getFileName().toString();
             Pack resourcePack = Pack.readMetaAndCreate(packId, Component.literal("ZeroContact ResPack"), true, (id) -> new PathPackResources(id, path, true), PackType.CLIENT_RESOURCES, Pack.Position.TOP, PackSource.BUILT_IN);
             Pack dataPack = Pack.readMetaAndCreate(packId, Component.literal("ZeroContact DataPack"), true, (id) -> new PathPackResources(id, path, true), PackType.SERVER_DATA, Pack.Position.TOP, PackSource.BUILT_IN);
             try {
-                DATA_PACKS.add(dataPack);
+                PACKS.add(dataPack);
+                PACKS.add(resourcePack);
             } catch (IllegalArgumentException e) {
                 ZeroContactLogger.LOG.info("Error Adding pack {}", packId, e);
             }
-            resourcePackRepository.addPackFinder((consumer) -> consumer.accept(resourcePack));
             ZeroContactLogger.LOG.info("Added pack {}", packId);
         });
     }
@@ -98,9 +95,8 @@ public class ItemLoader{
     static class DataPackLoader {
         @SubscribeEvent
         public static void loadDataPacks(AddPackFindersEvent event) {
-            if (DATA_PACKS.isEmpty()) return;
-            if (event.getPackType() != PackType.SERVER_DATA) return;
-            DATA_PACKS.forEach(pack -> event.addRepositorySource(consumer -> consumer.accept(pack)));
+            if (PACKS.isEmpty()) return;
+            PACKS.forEach(pack -> event.addRepositorySource(consumer -> consumer.accept(pack)));
         }
     }
 }
