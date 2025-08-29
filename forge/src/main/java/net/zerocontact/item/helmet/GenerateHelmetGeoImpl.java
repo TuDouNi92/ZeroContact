@@ -129,7 +129,7 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
             float penetrateDamage = data.hurtModifier.penetrateMultiplier;
             float ricochetDamage = data.hurtModifier.ricochetMultiplier;
             int defense = data.defense;
-            int absorb = data.absorb;
+            int absorb = data.protectionClass;
             int durabilityLossProvider = data.durabilityLossModifier;
             int default_durability = data.defaultDurability;
             if (!data.equipmentSlot.equals("HELMET")) continue;

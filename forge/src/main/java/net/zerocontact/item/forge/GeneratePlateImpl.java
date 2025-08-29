@@ -57,7 +57,7 @@ import java.util.Set;
             float penetrateDamage = data.hurtModifier.penetrateMultiplier;
             float ricochetDamage = data.hurtModifier.ricochetMultiplier;
             int defense = data.defense;
-            int absorb = data.absorb;
+            int absorb = data.protectionClass;
             float movementFix = data.movementFix;
             int durabilityLossProvider = data.durabilityLossModifier;
             items.add(new GenerationRecord(id,new GeneratePlateImpl(id,bluntDamage,penetrateDamage,ricochetDamage,defense,absorb,movementFix,durabilityLossProvider)));

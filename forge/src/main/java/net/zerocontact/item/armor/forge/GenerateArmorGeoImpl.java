@@ -96,7 +96,7 @@ public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, A
             String id = data.id;
             int defense = data.defense;
             int defaultDurability = data.defaultDurability;
-            int absorb = data.absorb;
+            int absorb = data.protectionClass;
             int mass = 0;
             float bluntFactor = data.hurtModifier.bluntMultiplier;
             float penetratedFactor = data.hurtModifier.penetrateMultiplier;

@@ -74,7 +74,7 @@ public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem,
             String id = data.id;
             int defense = data.defense;
             int defaultDurability = data.defaultDurability;
-            int absorb = data.absorb;
+            int absorb = data.protectionClass;
             int mass =0;
             if (!(Objects.equals(data.equipmentSlot, armorType.getTypeId()))) continue;
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);

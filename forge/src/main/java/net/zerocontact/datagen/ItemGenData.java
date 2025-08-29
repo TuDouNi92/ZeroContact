@@ -1,20 +1,28 @@
 package net.zerocontact.datagen;
 
 import com.google.gson.annotations.SerializedName;
-import net.minecraft.resources.ResourceLocation;
 
 public class ItemGenData {
     public static class Plate extends ItemGenData{
+        //Item identifier under namespace of zerocontact
         public String id;
+        //Vanilla armor defense
         public int defense;
-        public int absorb;
+        //Protection level,ranges unlimited.
+        @SerializedName("protection_class")
+        public int protectionClass;
+        //Movement fix for the plate, usually at ranges of [-0.01,0.1], but you can make it crazy.
         @SerializedName("movement_fix")
         public float movementFix;
+        //Indicates the amount of durability loss when get hit.
         @SerializedName("durability_loss_modifier")
         public int durabilityLossModifier =1;
+        //Indicates the amount of damage when get hurt, check the list of variants below
         @SerializedName("hurt_modifier")
         public HurtModifier hurtModifier;
         public static class HurtModifier {
+            //The multiplier represents the proportion of the original damage that is applied after mitigation,
+            // reduces incoming damage to percentage of its initial value
             @SerializedName("ricochet_multiplier")
             public  Float ricochetMultiplier =0.05f;
             @SerializedName("penetrate_multiplier")
@@ -28,7 +36,8 @@ public class ItemGenData {
         @SerializedName("equipment_slot")
         public String equipmentSlot;
         public int defense;
-        public int absorb;
+        @SerializedName("protection_class")
+        public int protectionClass;
         @SerializedName("default_durability")
         public int defaultDurability;
         public String texture;
