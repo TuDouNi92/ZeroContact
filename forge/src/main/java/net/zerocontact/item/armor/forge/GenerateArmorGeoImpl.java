@@ -32,10 +32,15 @@ import java.util.function.Consumer;
 public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, ArmorTypeTag {
     protected final int defaultDurability;
     public static Set<GenerationRecord> items = new HashSet<>();
-
-    public GenerateArmorGeoImpl(Type type, String id, int defense, int defaultDurability, int absorb, float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+    private final float bluntFactor;
+    private final float penetrateFactor;
+    private final float ricochetFactor;
+    private GenerateArmorGeoImpl(Type type, String id, int defense, int defaultDurability, int absorb, float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, float bluntFactor, float penetrateFactor, float ricochetFactor) {
         super(type, id, defense, defaultDurability, absorb, mass, texture, model, animation);
         this.defaultDurability = defaultDurability;
+        this.bluntFactor = bluntFactor;
+        this.penetrateFactor = penetrateFactor;
+        this.ricochetFactor = ricochetFactor;
     }
 
     @Override
@@ -61,6 +66,21 @@ public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, A
     }
 
     @Override
+    public float generateBlunt() {
+        return this.bluntFactor;
+    }
+
+    @Override
+    public float generateRicochet() {
+        return this.ricochetFactor;
+    }
+
+    @Override
+    public float generatePenetrated() {
+        return this.penetrateFactor;
+    }
+
+    @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
         if (slot != EquipmentSlot.CHEST) return super.getAttributeModifiers(slot, stack);
         Multimap<Attribute, AttributeModifier> modifierMultimap = HashMultimap.create();
@@ -78,11 +98,14 @@ public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, A
             int defaultDurability = data.defaultDurability;
             int absorb = data.absorb;
             int mass = 0;
+            float bluntFactor = data.hurtModifier.bluntMultiplier;
+            float penetratedFactor = data.hurtModifier.penetrateMultiplier;
+            float ricochetFactor = data.hurtModifier.ricochetMultiplier;
             if (!data.equipmentSlot.equals("ARMOR")) continue;
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerationRecord(id, new GenerateArmorGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, absorb, mass, texture, model, animation)));
+            items.add(new GenerationRecord(id, new GenerateArmorGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, absorb, mass, texture, model, animation,bluntFactor,penetratedFactor,ricochetFactor)));
         }
     }
 
