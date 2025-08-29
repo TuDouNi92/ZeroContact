@@ -78,6 +78,11 @@ public class BaseGeoHelmet extends ArmorItem implements HelmetInfoProvider, GeoI
     }
 
     @Override
+    public int generateLoss(float damageAmount, float durabilityLossFactor, int hits) {
+        return 1;
+    }
+
+    @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
         Multimap<Attribute, AttributeModifier> modifierMultimap = HashMultimap.create();
         stack.getOrCreateTag().putInt("absorb", getAbsorb());
