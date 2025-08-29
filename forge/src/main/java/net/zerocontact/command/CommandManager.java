@@ -18,7 +18,7 @@ public class CommandManager {
     public static class CommandSavedData extends SavedData {
         public boolean staminaState = false;
         public boolean dogTagState = false;
-
+        public boolean experimentalBallistic = false;
         CommandSavedData() {
         }
 
@@ -26,6 +26,7 @@ public class CommandManager {
             CommandSavedData data = new CommandSavedData();
             data.staminaState = compoundTag.getBoolean("staminaState");
             data.dogTagState = compoundTag.getBoolean("dogTagState");
+            data.experimentalBallistic = compoundTag.getBoolean("experimentalBallistic");
             return data;
         }
 
@@ -33,6 +34,7 @@ public class CommandManager {
         public @NotNull CompoundTag save(@NotNull CompoundTag compoundTag) {
             compoundTag.putBoolean("staminaState", staminaState);
             compoundTag.putBoolean("dogTagState", dogTagState);
+            compoundTag.putBoolean("experimentalBallistic", experimentalBallistic);
             return compoundTag;
         }
 
@@ -43,6 +45,11 @@ public class CommandManager {
 
         public void setDogTagState(boolean dogTagState) {
             this.dogTagState = dogTagState;
+            setDirty();
+        }
+
+        public void setExperimentalBallistic(boolean experimentalBallistic){
+            this.experimentalBallistic = experimentalBallistic;
             setDirty();
         }
 
@@ -86,6 +93,22 @@ public class CommandManager {
                             return Command.SINGLE_SUCCESS;
                         }))
 
+        );
+
+        dispatcher.register(Commands.literal("experimentalBallistic")
+                .requires(commandSourceStack ->
+                        Optional.ofNullable(commandSourceStack.getPlayer()).isPresent() && commandSourceStack.hasPermission(2))
+                .then(Commands.argument("boolean",BoolArgumentType.bool())
+                .executes(context->{
+                    boolean isEnableBallistic = context.getArgument("boolean", Boolean.class);
+                    CommandSavedData data = CommandSavedData.get(context.getSource().getLevel());
+                    data.setExperimentalBallistic(isEnableBallistic);
+                    Component message = Component.literal("Enable ExperimentalBallistic feature:")
+                            .withStyle(ChatFormatting.GOLD)
+                            .append(Component.literal(String.valueOf(isEnableBallistic)).withStyle(isEnableBallistic ? ChatFormatting.GREEN : ChatFormatting.DARK_RED));
+                    context.getSource().sendSuccess(()->message,true);
+                    return Command.SINGLE_SUCCESS;
+                }))
         );
     }
 }

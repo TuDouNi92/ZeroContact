@@ -60,18 +60,11 @@ public class PlateEntityHurtEvent {
 
     private static float getHurtAmount(LivingEntity lv, DamageSource source, float amount, EntityHurtProvider provider, int hurtCanHold) {
         float hurtAmount;
-        float generateCaliberDamageAmount = CaliberVariantDamageHelper.generateDamageAmount(amount,source);
+        float generateCaliberDamageAmount = CaliberVariantDamageHelper.generateDamageAmount(amount,source,hurtCanHold,provider);
         if (EventUtil.isIncidentAngleValid(lv, source)) {
             hurtAmount = provider.generateRicochet() * generateCaliberDamageAmount;
         } else {
-            if (hurtCanHold >= generateCaliberDamageAmount) {
-                //钝伤
-                hurtAmount = provider.generateBlunt() * generateCaliberDamageAmount;
-
-            } else {
-                //贯穿
-                hurtAmount = provider.generatePenetrated() * generateCaliberDamageAmount;
-            }
+            hurtAmount = generateCaliberDamageAmount;
         }
         return hurtAmount;
     }
@@ -92,7 +85,7 @@ public class PlateEntityHurtEvent {
                     int absorb = stack.getOrCreateTag().getInt("absorb");
                     float hurtAmount = getHurtAmount(livingEntity, damageSource, amount, entityHurtProvider, absorb);
                     eventPre.setBaseAmount(hurtAmount);
-                    eventPre.setHeadshotMultiplier(1.25f);
+                    eventPre.setHeadshotMultiplier(1f);
                     playHeadshotSound(livingEntity);
                 });
             }
