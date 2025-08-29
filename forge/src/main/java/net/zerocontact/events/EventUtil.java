@@ -4,6 +4,10 @@ import com.tacz.guns.init.ModDamageTypes;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import top.theillusivec4.curios.api.CuriosApi;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 public class EventUtil {
 
@@ -22,7 +26,7 @@ public class EventUtil {
     public static boolean isIncidentAngleValid(LivingEntity lv, DamageSource source) {
         double incidentAngle = getAngle(lv, source);
         double incidentAngleAbs = Math.abs(incidentAngle);
-        if(incidentAngle!=-361){
+        if (incidentAngle != -361) {
             if ((Math.abs(incidentAngleAbs - 90) <= 30) && (Math.abs(incidentAngleAbs - 90) >= 10)) {
                 return true;
             }
@@ -30,16 +34,20 @@ public class EventUtil {
         return false;
     }
 
-    public static String idHitFromBack(LivingEntity lv, DamageSource source) {
+    public static ItemStack idHitFromBack(LivingEntity lv, DamageSource source) {
         double incidentAngleAbs = Math.abs(getAngle(lv, source));
-        if(incidentAngleAbs !=361){
-            if (incidentAngleAbs > 90 ) {
-                return "front_plate";
-            } else {
-                return "back_plate";
+        AtomicReference<ItemStack> plate_stack = new AtomicReference<>(ItemStack.EMPTY);
+        CuriosApi.getCuriosInventory(lv).ifPresent(iCuriosItemHandler -> {
+            if (incidentAngleAbs != 361) {
+                if (incidentAngleAbs > 90) {
+                    iCuriosItemHandler.getStacksHandler("front_plate").ifPresent(stacksHandler -> plate_stack.set(stacksHandler.getStacks().getStackInSlot(0)));
+
+                } else {
+                    iCuriosItemHandler.getStacksHandler("back_plate").ifPresent(stacksHandler -> plate_stack.set(stacksHandler.getStacks().getStackInSlot(0)));
+                }
             }
-        }
-        return "";
+        });
+        return plate_stack.get();
     }
 
     private static double getAngle(LivingEntity lv, DamageSource source) {

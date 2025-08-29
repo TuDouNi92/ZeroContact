@@ -12,7 +12,6 @@ import net.zerocontact.api.DurabilityLossProvider;
 import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.registries.ModSoundEventsReg;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
 import java.util.Optional;
 
@@ -20,17 +19,14 @@ public class PlateDamageEvent {
     private static boolean isHeadshot;
 
     private static void DamagePlateModifier(
-            ICuriosItemHandler iCuriosItemHandler,
             LivingEntity livingEntity,
             DamageSource damageSource,
             float amount,
-            String identifier
+            ItemStack plateSlot
     ) {
         if (isHeadshot) return;
-        iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
-            ItemStack stackInSlot = stacksHandler.getStacks().getStackInSlot(0);
-            damage(livingEntity, damageSource, amount, stackInSlot);
-        });
+        if(plateSlot.isEmpty())return;
+        damage(livingEntity, damageSource, amount, plateSlot);
     }
 
     private static void damage(LivingEntity livingEntity, DamageSource damageSource, float amount, ItemStack stackInSlot) {
@@ -86,7 +82,7 @@ public class PlateDamageEvent {
 
     public static void DamagePlateRegister(LivingEntity entity, DamageSource damageSource, float amount) {
         if (EventUtil.isDamageSourceValid(damageSource)) {
-            CuriosApi.getCuriosInventory(entity).ifPresent(inv -> DamagePlateModifier(inv, entity, damageSource, amount, EventUtil.idHitFromBack(entity, damageSource)));
+            CuriosApi.getCuriosInventory(entity).ifPresent(inv -> DamagePlateModifier(entity, damageSource, amount, EventUtil.idHitFromBack(entity, damageSource)));
         }
     }
 }

@@ -17,14 +17,13 @@ import net.zerocontact.api.EntityHurtProvider;
 import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.item.armor.forge.BaseArmorGeoImpl;
 import net.zerocontact.registries.ModSoundEventsReg;
-import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PlateEntityHurtEvent {
     public static boolean isHeadShot;
-    public static boolean changeHurtAmountRicochet(LivingEntity lv, DamageSource source, float amount, String identifier) {
+    public static boolean changeHurtAmountRicochet(LivingEntity lv, DamageSource source, float amount, ItemStack plateSlot) {
         if (lv instanceof ServerPlayer serverPlayer && serverPlayer.isCreative()) return false;
         DamageSource modifiedDamageSource = ModDamageTypes.Sources.bullet(lv.level().registryAccess(), null, null, false);
         AtomicBoolean interruptResult = new AtomicBoolean();
@@ -33,10 +32,7 @@ public class PlateEntityHurtEvent {
         if (stackInVanillaSlot.getItem() instanceof BaseArmorGeoImpl baseArmorGeo && baseArmorGeo.getArmorType().equals(ArmorTypeTag.ArmorType.ARMOR)) {
             hurtIt(lv, source, amount, stackInVanillaSlot, modifiedDamageSource, interruptResult);
         } else {
-            CuriosApi.getCuriosInventory(lv).ifPresent(iCuriosItemHandler -> iCuriosItemHandler.getStacksHandler(identifier).ifPresent(stacksHandler -> {
-                ItemStack stack = stacksHandler.getStacks().getStackInSlot(0);
-                hurtIt(lv, source, amount, stack, modifiedDamageSource, interruptResult);
-            }));
+            hurtIt(lv, source, amount, plateSlot, modifiedDamageSource, interruptResult);
         }
         return interruptResult.get();
     }
