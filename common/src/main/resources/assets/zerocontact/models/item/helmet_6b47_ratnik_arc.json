@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/avs_armor"
+    "layer0": "zerocontact:item/helmet_6b47_ratnik_arc"
   },
   "display": {
     "gui": {
@@ -12,7 +12,7 @@
       ],
       "translation": [
         0,
-        -13,
+        -20,
         0
       ],
       "scale": [
@@ -109,7 +109,7 @@
       ],
       "translation": [
         0,
-        -15,
+        -24,
         0
       ]
     }

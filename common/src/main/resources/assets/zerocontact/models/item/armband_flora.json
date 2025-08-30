@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/armband/armband_vsrf"
+    "layer0": "zerocontact:item/armband/armband_flora"
   },
   "display": {
     "gui": {

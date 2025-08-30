@@ -1,6 +1,7 @@
 package net.zerocontact.item.armor.forge;
 
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorMaterial;
@@ -41,6 +42,7 @@ public class AvsArmorImpl extends AvsArmor implements GeoItem, ArmorTypeTag {
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new IClientItemExtensions() {
             private ArmorRender<AvsArmorImpl> renderer;
+            private ArmorRender.ItemRender<AvsArmorImpl> itemRender;
             @Override
             public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
                 if(this.renderer ==null){
@@ -48,6 +50,13 @@ public class AvsArmorImpl extends AvsArmor implements GeoItem, ArmorTypeTag {
                 }
                 this.renderer.prepForRender(livingEntity,itemStack,equipmentSlot,original);
                 return this.renderer;
+            }
+            @Override
+            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                if (itemRender == null) {
+                    this.itemRender = new ArmorRender.ItemRender<>(new AvsModel());
+                }
+                return itemRender;
             }
         });
     }

@@ -25,12 +25,13 @@ import net.zerocontact.item.helmet.*;
 import net.zerocontact.registries.ItemsReg;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class OnRegisterItem {
-    private static final Set<RegistrySupplier<? extends ItemLike>> ITEMS_TO_REG = new HashSet<>();
+    private static final LinkedHashSet<RegistrySupplier<? extends ItemLike>> ITEMS_TO_REG = new LinkedHashSet<>();
 
     @SubscribeEvent
     public static void attachToTabs(BuildCreativeModeTabContentsEvent event) {
@@ -45,7 +46,8 @@ public class OnRegisterItem {
         if (!event.getRegistryKey().equals(Registries.ITEM)) return;
         RegistrySupplier<ForgeSpawnEggItem> RAIDER_EGG = ItemsReg.ITEMS.register("raider_egg", () -> new ForgeSpawnEggItem(ModEntitiesReg.ARMED_RAIDER, 0x3d6145, 0xcfc08a, new Item.Properties()));
         RegistrySupplier<FastMt> FAST_MT = ItemsReg.ITEMS.register("fast_mt", () -> new FastMt(ArmorMaterials.IRON, ArmorItem.Type.HELMET, new Item.Properties(), 8));
-        RegistrySupplier<Ratnik> RATNIK = ItemsReg.ITEMS.register("helmet_6b47_ratnik_emr", () -> new Ratnik(ArmorMaterials.IRON, ArmorItem.Type.HELMET, new Item.Properties(), 6));
+        RegistrySupplier<Ratnik> RATNIK_HELMET_EMR = ItemsReg.ITEMS.register("helmet_6b47_ratnik_emr", () -> Ratnik.create(7,32, Ratnik.Color.EMR));
+        RegistrySupplier<Ratnik> RATNIK_HELMET_ARC = ItemsReg.ITEMS.register("helmet_6b47_ratnik_arc", () -> Ratnik.create(7,32, Ratnik.Color.ARCTIC));
         RegistrySupplier<ThorArmorImpl> THOR_ARMOR = ItemsReg.ITEMS.register("armor_thor_black", () -> new ThorArmorImpl(4, 128,4,-0.01F));
         RegistrySupplier<Bastion> BASTION_HELMET = ItemsReg.ITEMS.register("helmet_bastion_black", () -> Bastion.create(9,48, Bastion.Color.BLACK));
         RegistrySupplier<Bastion> BASTION_HELMET_MULTICAM = ItemsReg.ITEMS.register("helmet_bastion_multicam", () -> Bastion.create(9,48, Bastion.Color.MULTICAM));
@@ -53,6 +55,8 @@ public class OnRegisterItem {
         RegistrySupplier<Untar> UNTAR_HELMET = ItemsReg.ITEMS.register("helmet_untar_blue", () -> new Untar(6, 24));
         RegistrySupplier<TagillaMask> TAGILLA_MASK_MANHUNT = ItemsReg.ITEMS.register("mask_tagilla_manhunt",()->TagillaMask.create(12,64, TagillaMask.Color.MANHUNT));
         RegistrySupplier<TagillaMask> TAGILLA_MASK_YBEY = ItemsReg.ITEMS.register("mask_tagilla_ybey",()->TagillaMask.create(12,64, TagillaMask.Color.YBEY));
+        RegistrySupplier<ColdFearMask> COLD_FEAR_MASK = ItemsReg.ITEMS.register("mask_cold_fear",()->new ColdFearMask(8,24));
+        RegistrySupplier<CyanCap> CYAN_CAP = ItemsReg.ITEMS.register("cap_cyan",()->new CyanCap(2,24));
         RegistrySupplier<UntarArmorImpl> UNTAR_ARMOR = ItemsReg.ITEMS.register("armor_untar_blue", () -> new UntarArmorImpl(9, 72,6,-0.03F));
         RegistrySupplier<HexgridArmorImpl> HEXGRID_ARMOR = ItemsReg.ITEMS.register("armor_hexgrid_black", () -> new HexgridArmorImpl(9, 128,2,0.01F));
         RegistrySupplier<AltynVisor.WithVisor> ALTYN_VISOR_HELMET = ItemsReg.ITEMS.register("helmet_altyn_visor", () -> new AltynVisor.WithVisor(10, 72));
@@ -70,16 +74,16 @@ public class OnRegisterItem {
         RegistrySupplier<Armband> ARMBAND_BLUE = ItemsReg.ITEMS.register("armband_blue",()->Armband.create(Armband.Series.BLUE));
         RegistrySupplier<Armband> ARMBAND_WHITE = ItemsReg.ITEMS.register("armband_white",()->Armband.create(Armband.Series.WHITE));
         RegistrySupplier<Armband> ARMBAND_YELLOW = ItemsReg.ITEMS.register("armband_yellow",()->Armband.create(Armband.Series.YELLOW));
-        RegistrySupplier<Armband> ARMBAND_VSRF = ItemsReg.ITEMS.register("armband_vsrf",()->Armband.create(Armband.Series.VSRF));
+        RegistrySupplier<Armband> ARMBAND_FLORA = ItemsReg.ITEMS.register("armband_flora",()->Armband.create(Armband.Series.FLORA));
 
         ITEMS_TO_REG.addAll(
                 List.of(
                         RAIDER_EGG,
-                        RATNIK,BASTION_HELMET,BASTION_HELMET_MULTICAM,BASTION_HELMET_GREEN,
-                        ALTYN_VISOR_HELMET,AIRFRAME_HELMET,UNTAR_HELMET,TAGILLA_MASK_MANHUNT,TAGILLA_MASK_YBEY,
+                        RATNIK_HELMET_EMR,RATNIK_HELMET_ARC,BASTION_HELMET,BASTION_HELMET_MULTICAM,BASTION_HELMET_GREEN,
+                        ALTYN_VISOR_HELMET,AIRFRAME_HELMET,UNTAR_HELMET,TAGILLA_MASK_MANHUNT,TAGILLA_MASK_YBEY,COLD_FEAR_MASK,CYAN_CAP,
                         THOR_ARMOR,UNTAR_ARMOR,HEXGRID_ARMOR,R6B2,R6B23I,R6B23II,DEFENDER,
                         T20_BACKPACK_MULTICAM,T20_BACKPACK_UMBRA,
-                        ARMBAND_BLACK,ARMBAND_RED,ARMBAND_BLUE,ARMBAND_WHITE,ARMBAND_GREEN,ARMBAND_YELLOW,ARMBAND_VSRF
+                        ARMBAND_BLACK,ARMBAND_RED,ARMBAND_BLUE,ARMBAND_WHITE,ARMBAND_GREEN,ARMBAND_YELLOW,ARMBAND_FLORA
                 )
         );
         ItemLoader.loadFromJson();

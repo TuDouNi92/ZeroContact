@@ -1,6 +1,6 @@
 {
   "order": 0,
   "size": 1,
-  "icon": "zerocontact:slot/plate_slot_icon",
+  "icon": "zerocontact:slot/f_p_icon",
   "validators": ["zerocontact:zc_predicate"]
 }

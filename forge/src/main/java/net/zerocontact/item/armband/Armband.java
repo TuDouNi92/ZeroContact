@@ -42,10 +42,10 @@ public class Armband extends AbstractGenerateGeoCurioItemImpl implements ArmorTy
                         new ResourceLocation(MOD_ID,"")
                 )
         ),
-        VSRF(
+        FLORA(
                 new ArmbandResources(
                         new ResourceLocation(MOD_ID,"textures/item/armband/armband_vsrf.png"),
-                        new ResourceLocation(MOD_ID,"geo/armband/armband_vsrf.geo.json"),
+                        new ResourceLocation(MOD_ID,"geo/armband/armband_flora.geo.json"),
                         new ResourceLocation(MOD_ID,"")
                 )
         ),
