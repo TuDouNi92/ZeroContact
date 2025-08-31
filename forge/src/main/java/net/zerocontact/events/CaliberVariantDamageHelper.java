@@ -102,7 +102,9 @@ public enum CaliberVariantDamageHelper {
                         if (fleshDamage != 0) {
                             output.set(fleshDamage * provider.generatePenetrated());
                         }
-                        output.set(balanceDamage * provider.generateBlunt());
+                        else{
+                            output.set(balanceDamage * provider.generateBlunt());
+                        }
                     });
                 } else {
                     getMatchedCaliber(source, caliberVariantDamageHelperEnumSet).ifPresent(caliber -> {
@@ -122,7 +124,7 @@ public enum CaliberVariantDamageHelper {
 
     private static double getPenetratedDamage(@NotNull Caliber caliber, int hurtCanHold) {
         RandomSource randomSource = RandomSource.create();
-        if (hurtCanHold >= caliber.penetrationClass) {
+        if (hurtCanHold > caliber.penetrationClass) {
             double penetrateProbability = Math.pow((double) caliber.penetrationClass / hurtCanHold, 2);
             if (randomSource.nextFloat() <= penetrateProbability) {
                 return caliber.fleshDamage;

@@ -132,7 +132,7 @@ public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, Arm
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
         if(slot !=EquipmentSlot.CHEST)return super.getAttributeModifiers(slot,stack);
         Multimap<Attribute, AttributeModifier> modifierMultimap = HashMultimap.create();
-        stack.getOrCreateTag().putInt("absorb", getAbsorb());
+        stack.getOrCreateTag().putInt("protection_class", getAbsorb());
         stack.getOrCreateTag().putFloat("movement_fix",getMass());
         modifierMultimap.put(Attributes.MOVEMENT_SPEED, new AttributeModifier(UUID.nameUUIDFromBytes(("MoveSpeed").getBytes()), "MoveSpeed", getMass(), AttributeModifier.Operation.MULTIPLY_TOTAL));
         return modifierMultimap;

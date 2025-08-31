@@ -39,13 +39,13 @@ public class PlateEntityHurtEvent {
 
     private static void hurtIt(LivingEntity lv, DamageSource source, float amount, ItemStack stack, DamageSource modifiedDamageSource, AtomicBoolean interruptResult) {
         float hurtAmount;
-        int hurtCanHold = stack.getOrCreateTag().getInt("absorb");
+        int protectionClass = stack.getOrCreateTag().getInt("protection_class");
 
         //This guard pattern is important to prevent recursively call from event
         if (!stack.isEmpty() && source.getEntity() != null) {
             lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
             if (EventUtil.isDamageSourceValid(source) && stack.getItem() instanceof EntityHurtProvider provider) {
-                hurtAmount = getHurtAmount(lv, source, amount, provider, hurtCanHold);
+                hurtAmount = getHurtAmount(lv, source, amount, provider, protectionClass);
                 lv.hurt(modifiedDamageSource, hurtAmount);
             }
             interruptResult.set(true);
@@ -78,8 +78,8 @@ public class PlateEntityHurtEvent {
                 Optional.of(helmet).ifPresent(stack -> {
                     if (!(stack.getItem() instanceof HelmetInfoProvider && stack.getItem() instanceof EntityHurtProvider entityHurtProvider))
                         return;
-                    int absorb = stack.getOrCreateTag().getInt("absorb");
-                    float hurtAmount = getHurtAmount(livingEntity, damageSource, amount, entityHurtProvider, absorb);
+                    int protectionClass = stack.getOrCreateTag().getInt("protection_class");
+                    float hurtAmount = getHurtAmount(livingEntity, damageSource, amount, entityHurtProvider, protectionClass);
                     eventPre.setBaseAmount(hurtAmount);
                     eventPre.setHeadshotMultiplier(1f);
                     playHeadshotSound(livingEntity);

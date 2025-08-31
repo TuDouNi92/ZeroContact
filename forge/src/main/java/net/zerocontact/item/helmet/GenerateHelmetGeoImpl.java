@@ -87,7 +87,7 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
         if(slot !=EquipmentSlot.HEAD)return super.getAttributeModifiers(slot,stack);
         Multimap<Attribute, AttributeModifier> modifierMultimap = HashMultimap.create();
-        stack.getOrCreateTag().putInt("absorb", getAbsorb());
+        stack.getOrCreateTag().putInt("protection_class", getAbsorb());
         modifierMultimap.put(Attributes.ARMOR, new AttributeModifier(UUID.nameUUIDFromBytes(("Armor").getBytes()), "CuriosArmorDefense", this.getDefense(), AttributeModifier.Operation.ADDITION));
         return modifierMultimap;
     }

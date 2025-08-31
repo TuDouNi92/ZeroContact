@@ -76,7 +76,7 @@ public class FastMt extends ArmorItem implements HelmetInfoProvider, GeoItem, En
     @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
         Multimap<Attribute, AttributeModifier> modifierMultimap = HashMultimap.create();
-        stack.getOrCreateTag().putInt("absorb", getAbsorb());
+        stack.getOrCreateTag().putInt("protection_class", getAbsorb());
         return modifierMultimap;
     }
 
