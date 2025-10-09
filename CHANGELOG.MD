@@ -111,3 +111,26 @@ Tutorials about customize your own datapack can be found in GitHub wiki.
 - Fixed the issue that `Raider` would stick on an animation phase
 - `Raider` can open doors now
 - Some miscellaneous fix
+
+## indev.1.0.9
+
+- New Items
+    - T-20 backpack
+    - Colorful Armbands
+    - Variants of Bastion helmet
+    - Variants of Tagilla helmet
+    - Updated AVS model
+    - Cold fear mask
+    - Cyan cap
+    - Arctic variant of 6b47 helmet
+- New Slots
+    - Backpack slot
+- New mechanism
+    - `/stamina <true|false>` Command to toggle stamina feature
+    - `/dogtag <true|false>` Command to toggle the spawn of dog tags
+    - `/expermentalBallistic <true|false>` Command to toggle damage interceptor for TACZ guns, see Wiki
+    - Supports expanding formatted datapacks to customize armors, PC plates, helmets, and custom interceptor to modify caliber damages
+### Fix & Optimize
+
+- AI improves for `raider`
+- Fix crashes in specific situations
