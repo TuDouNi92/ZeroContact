@@ -61,7 +61,7 @@ public class OnRegisterItem {
         RegistrySupplier<HexgridArmorImpl> HEXGRID_ARMOR = ItemsReg.ITEMS.register("armor_hexgrid_black", () -> new HexgridArmorImpl(9, 128,2,0.01F));
         RegistrySupplier<AltynVisor.WithVisor> ALTYN_VISOR_HELMET = ItemsReg.ITEMS.register("helmet_altyn_visor", () -> new AltynVisor.WithVisor(10, 72));
         RegistrySupplier<AirFrame> AIRFRAME_HELMET = ItemsReg.ITEMS.register("helmet_airframe", () -> new AirFrame(8, 42));
-        RegistrySupplier<R6b2ArmorImpl>  R6B2 = ItemsReg.ITEMS.register("armor_6b2", () -> new R6b2ArmorImpl(5, 64,4,-0.2F));
+        RegistrySupplier<R6b2ArmorImpl>  R6B2 = ItemsReg.ITEMS.register("armor_6b2", () -> new R6b2ArmorImpl(5, 64,4,-0.05F));
         RegistrySupplier<R6b23IArmorImpl>  R6B23I = ItemsReg.ITEMS.register("armor_6b23_1", () -> new R6b23IArmorImpl(7, 128,7,-0.025F));
         RegistrySupplier<R6b23IIArmorImpl>  R6B23II = ItemsReg.ITEMS.register("armor_6b23_2", () -> new R6b23IIArmorImpl(7, 128,7,-0.025F));
         RegistrySupplier<Defender2ArmorImpl>  DEFENDER = ItemsReg.ITEMS.register("armor_defender_2", () -> new Defender2ArmorImpl(7, 128,4,-0.015F));
