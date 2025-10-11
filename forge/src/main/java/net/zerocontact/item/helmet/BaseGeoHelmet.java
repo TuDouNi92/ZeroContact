@@ -2,10 +2,8 @@ package net.zerocontact.item.helmet;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -14,24 +12,19 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.api.DurabilityLossProvider;
 import net.zerocontact.api.EntityHurtProvider;
 import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.client.renderer.HelmetRender;
-import net.zerocontact.events.ProtectionLevelHelper;
 import net.zerocontact.item.PlateBaseMaterial;
 import net.zerocontact.models.GenerateModel;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 public class BaseGeoHelmet extends ArmorItem implements HelmetInfoProvider, GeoItem, EntityHurtProvider, DurabilityLossProvider {
@@ -87,12 +80,6 @@ public class BaseGeoHelmet extends ArmorItem implements HelmetInfoProvider, GeoI
         Multimap<Attribute, AttributeModifier> modifierMultimap = HashMultimap.create();
         stack.getOrCreateTag().putInt("protection_class", getAbsorb());
         return modifierMultimap;
-    }
-
-    @Override
-    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
-        Component tipsToAdd = Component.translatable(ProtectionLevelHelper.get(getAbsorb()).name()).withStyle(ChatFormatting.AQUA);
-        tooltipComponents.add(tipsToAdd);
     }
 
     @Override

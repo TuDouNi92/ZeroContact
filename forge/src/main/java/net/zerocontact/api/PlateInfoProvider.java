@@ -2,7 +2,6 @@ package net.zerocontact.api;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -13,14 +12,12 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.events.PlateInteract;
-import net.zerocontact.events.ProtectionLevelHelper;
 import net.zerocontact.registries.ModSoundEventsReg;
 import org.jetbrains.annotations.NotNull;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface PlateInfoProvider extends ICurioItem, ProtectionInfoProvider {
@@ -43,13 +40,6 @@ public interface PlateInfoProvider extends ICurioItem, ProtectionInfoProvider {
 
     default void curioTick(SlotContext slotContext, ItemStack stack) {
         PlateInteract.onArmorUnequip(slotContext, stack);
-    }
-
-    default List<Component> getAttributesTooltip(List<Component> tooltips, ItemStack stack) {
-        Component tipsToAdd = Component.translatable(ProtectionLevelHelper.get(getAbsorb()).name());
-        if (tooltips.contains(tipsToAdd)) return tooltips;
-        tooltips.add(tipsToAdd);
-        return tooltips;
     }
 
     @NotNull

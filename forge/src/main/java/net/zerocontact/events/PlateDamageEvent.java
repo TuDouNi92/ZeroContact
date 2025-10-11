@@ -34,7 +34,6 @@ public class PlateDamageEvent {
         int hits = stackInSlot.getOrCreateTag().getInt("hits") + 1;
         int durabilityLossAmount = 1;
         if (!stackInSlot.isEmpty() && (damageSource.is(ModDamageTypes.BULLET) || damageSource.is(ModDamageTypes.BULLET_IGNORE_ARMOR))) {
-            durabilityLossFactor = getDurabilityLossFactor(amount, durabilityLossFactor);
             if (stackInSlot.getItem() instanceof DurabilityLossProvider provider) {
                 durabilityLossAmount = provider.generateLoss(amount, durabilityLossFactor, hits);
             }
@@ -44,17 +43,6 @@ public class PlateDamageEvent {
                 ZeroContactLogger.LOG.info(lv.getName() + "的插板碎掉了！");
             });
         }
-    }
-
-    private static float getDurabilityLossFactor(float amount, float durabilityLossFactor) {
-        switch (ProtectionLevelHelper.get((int) Math.floor(amount))) {
-            case NIJIIA -> durabilityLossFactor = 1.2F;
-            case NIJII -> durabilityLossFactor = 1.25F;
-            case NIJIIIA -> durabilityLossFactor = 0.7F;
-            case NIJIII -> durabilityLossFactor = 1.1F;
-            case NIJIV -> durabilityLossFactor = 1.5F;
-        }
-        return isHeadshot ? durabilityLossFactor * 1.5f : durabilityLossFactor;
     }
 
     public static void DamageHelmet(EntityHurtByGunEvent event) {
@@ -67,9 +55,8 @@ public class PlateDamageEvent {
                 ItemStack stack = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
                 float durabilityLossFactor = 1;
                 int hits = stack.getOrCreateTag().getInt("hits") + 1;
-                int durabilityLossAmount = 1;
+                int durabilityLossAmount;
                 if (stack.getItem() instanceof DurabilityLossProvider durabilityLossProvider && stack.getItem() instanceof HelmetInfoProvider) {
-                    durabilityLossFactor = getDurabilityLossFactor(durabilityLossAmount, durabilityLossFactor);
                     durabilityLossAmount = durabilityLossProvider.generateLoss(amount, durabilityLossFactor, hits);
                     stack.getOrCreateTag().putInt("hits", hits);
                     stack.hurtAndBreak(durabilityLossAmount, livingEntity, broken -> {
