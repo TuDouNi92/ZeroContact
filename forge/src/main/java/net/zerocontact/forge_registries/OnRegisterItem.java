@@ -19,12 +19,12 @@ import net.zerocontact.item.armor.forge.*;
 import net.zerocontact.item.backpack.T20;
 import net.zerocontact.item.dogtag.DogTag;
 import net.zerocontact.item.forge.GeneratePlateImpl;
+import net.zerocontact.item.plate.BasePlate;
 import net.zerocontact.item.uniform.GenerateUniformPantsGeoImpl;
 import net.zerocontact.item.uniform.GenerateUniformTopGeoImpl;
 import net.zerocontact.item.helmet.*;
 import net.zerocontact.registries.ItemsReg;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,6 +44,10 @@ public class OnRegisterItem {
     @SubscribeEvent
     public static void onReg(RegisterEvent event) {
         if (!event.getRegistryKey().equals(Registries.ITEM)) return;
+        RegistrySupplier<BasePlate> CULT_LOCUST_PLATE = ItemsReg.ITEMS.register("plate_cult_locust",
+                ()-> BasePlate.createGeoPlate(0,8,-0.025f,"textures/item/plate/plate_cult_locust.png","geo/plate_cult_locust.geo.json",""));
+        RegistrySupplier<BasePlate> SLIME_PLATE = ItemsReg.ITEMS.register("plate_slime",
+                ()-> BasePlate.createGeoPlate(0,4,0f,"textures/item/plate/plate_slime.png","geo/plate_slime.geo.json",""));
         RegistrySupplier<ForgeSpawnEggItem> RAIDER_EGG = ItemsReg.ITEMS.register("raider_egg", () -> new ForgeSpawnEggItem(ModEntitiesReg.ARMED_RAIDER, 0x3d6145, 0xcfc08a, new Item.Properties()));
         RegistrySupplier<FastMt> FAST_MT = ItemsReg.ITEMS.register("fast_mt", () -> new FastMt(ArmorMaterials.IRON, ArmorItem.Type.HELMET, new Item.Properties(), 8));
         RegistrySupplier<Ratnik> RATNIK_HELMET_EMR = ItemsReg.ITEMS.register("helmet_6b47_ratnik_emr", () -> Ratnik.create(7,32, Ratnik.Color.EMR));
@@ -78,6 +82,7 @@ public class OnRegisterItem {
 
         ITEMS_TO_REG.addAll(
                 List.of(
+                        CULT_LOCUST_PLATE,SLIME_PLATE,
                         RAIDER_EGG,
                         RATNIK_HELMET_EMR,RATNIK_HELMET_ARC,BASTION_HELMET,BASTION_HELMET_MULTICAM,BASTION_HELMET_GREEN,
                         ALTYN_VISOR_HELMET,AIRFRAME_HELMET,UNTAR_HELMET,TAGILLA_MASK_MANHUNT,TAGILLA_MASK_YBEY,COLD_FEAR_MASK,CYAN_CAP,
