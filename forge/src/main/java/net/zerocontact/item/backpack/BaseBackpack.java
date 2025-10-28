@@ -1,5 +1,9 @@
 package net.zerocontact.item.backpack;
 
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -9,13 +13,21 @@ import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.network.NetworkHooks;
 import net.zerocontact.api.ArmorTypeTag;
 import net.zerocontact.api.Toggleable;
 import net.zerocontact.client.menu.BackpackContainerMenu;
 import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.SlotContext;
+
+import java.util.Optional;
 
 public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl implements ArmorTypeTag, Toggleable.Backpack {
     private final int containerSize;
@@ -70,4 +82,27 @@ public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl impl
         return 0;
     }
 
+    private ListTag readInvTags(ItemStack stack){
+        if(stack.getItem() instanceof BaseBackpack){
+            Optional<CompoundTag> inventoryTag = Optional.ofNullable(stack.getTag());
+            if(inventoryTag.isPresent()){
+                return inventoryTag.get().getList("inventory", Tag.TAG_COMPOUND);
+            }
+        }
+        return new ListTag();
+    }
+    @Override
+    public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
+        return new ICapabilityProvider() {
+            @Override
+            public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction arg) {
+                ListTag listTag = readInvTags(stack);
+                CompoundTag compoundTag = new CompoundTag();
+                compoundTag.put("Items",listTag);
+                ItemStackHandler container = new ItemStackHandler(listTag.size());
+                container.deserializeNBT(compoundTag);
+                return ForgeCapabilities.ITEM_HANDLER.orEmpty(capability,LazyOptional.of(()->container));
+            }
+        };
+    }
 }

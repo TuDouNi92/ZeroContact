@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "net.zerocontact.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "mixins": [
+    "TaczModernKinetGunScriptAPIMixin",
+    "TaczAbstractGunItemMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
