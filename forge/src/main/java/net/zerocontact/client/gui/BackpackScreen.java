@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
@@ -37,7 +38,8 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
             }
         }
     }
-
+    private int guiWidthMax;
+    private int guiHeightMax;
     public BackpackScreen(BackpackContainerMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
     }
@@ -45,7 +47,11 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
     @Override
     protected void init() {
         super.init();
-        this.titleLabelX = (getXSize()- this.font.width(title))/2;
+        this.titleLabelX = (getXSize() - this.font.width(title)) / 2;
+        this.guiWidthMax = getGuiLeft()+menu.guiWidth;
+        this.guiHeightMax = getGuiTop()+menu.guiHeight;
+        this.leftPos = (this.width - this.guiWidthMax)/2;
+        this.topPos =(this.height - this.guiHeightMax)/2;
     }
 
     @Override
@@ -55,18 +61,16 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
 
     @Override
     protected void renderBg(@NotNull GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        int guiWidthMax = getGuiLeft() + getXSize();
-        int guiHeightMax = getGuiTop() + getYSize() + 32;
         guiGraphics.fill(0, 0, width, height, 0, 0x88000000);
         guiGraphics.fill(getGuiLeft(), getGuiTop(), guiWidthMax, guiHeightMax, 0x88000000);
         drawBgOutline(guiGraphics, guiWidthMax, guiHeightMax);
-        drawSlotBg(menu, guiGraphics, guiWidthMax, guiHeightMax);
+        drawSlotBg(menu, guiGraphics);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(getGuiLeft(), getGuiTop() + 64, 10);
         guiGraphics.pose().scale(40.0f, -40.0f, 40.0f);
-        IClientItemExtensions extensions = IClientItemExtensions.of(menu.renderStack);
+        IClientItemExtensions extensions = IClientItemExtensions.of(menu.backpackRenderStack);
         extensions.getCustomRenderer().renderByItem(
-                menu.renderStack,
+                menu.backpackRenderStack,
                 ItemDisplayContext.GUI,
                 guiGraphics.pose(),
                 guiGraphics.bufferSource(),
@@ -74,10 +78,12 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
                 OverlayTexture.NO_OVERLAY
         );
         guiGraphics.pose().popPose();
+        Optional.ofNullable(Minecraft.getInstance().player).ifPresent(
+                player -> InventoryScreen.renderEntityInInventoryFollowsAngle(guiGraphics, getGuiLeft() + 20, getGuiTop() + 96, 32, 0, 0, player));
     }
 
 
-    private void drawSlotBg(BackpackContainerMenu menu, GuiGraphics guiGraphics, int guiWidthMax, int guiHeightMax) {
+    private void drawSlotBg(BackpackContainerMenu menu, GuiGraphics guiGraphics) {
         for (Slot slot : menu.slots) {
             int slotX = leftPos + slot.x;
             int slotY = topPos + slot.y;

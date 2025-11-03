@@ -16,7 +16,7 @@ public class TaczAbstractGunItemMixin {
     @Inject(method = "canReload",at = @At("RETURN"),remap = false, cancellable = true)
     public void zeroContact$canReload(LivingEntity shooter, ItemStack gunItem, CallbackInfoReturnable<Boolean> cir){
         CuriosApi.getCuriosInventory(shooter).ifPresent(itemHandler->{
-            itemHandler.getStacksHandler("backpack").ifPresent(stacksHandler -> {
+            itemHandler.getStacksHandler("rigs").ifPresent(stacksHandler -> {
                 ItemStack backpack =stacksHandler.getStacks().getStackInSlot(0);
                 backpack.getCapability(ForgeCapabilities.ITEM_HANDLER,null).map(iItemHandler->{
                     for(int i=0;i<iItemHandler.getSlots();i++){

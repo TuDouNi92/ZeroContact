@@ -20,6 +20,7 @@ import net.zerocontact.item.backpack.T20;
 import net.zerocontact.item.dogtag.DogTag;
 import net.zerocontact.item.forge.GeneratePlateImpl;
 import net.zerocontact.item.plate.BasePlate;
+import net.zerocontact.item.rigs.Thunderbolt;
 import net.zerocontact.item.uniform.GenerateUniformPantsGeoImpl;
 import net.zerocontact.item.uniform.GenerateUniformTopGeoImpl;
 import net.zerocontact.item.helmet.*;
@@ -71,6 +72,7 @@ public class OnRegisterItem {
         RegistrySupplier<Defender2ArmorImpl>  DEFENDER = ItemsReg.ITEMS.register("armor_defender_2", () -> new Defender2ArmorImpl(7, 128,4,-0.015F));
         RegistrySupplier<T20> T20_BACKPACK_UMBRA = ItemsReg.ITEMS.register("backpack_t20_umbra",()->T20.create(T20.Series.UMBRA,25));
         RegistrySupplier<T20> T20_BACKPACK_MULTICAM = ItemsReg.ITEMS.register("backpack_t20_multicam",()->T20.create(T20.Series.MULTICAM,25));
+        RegistrySupplier<Thunderbolt> THUNDERBOLT_RIGS_GREY = ItemsReg.ITEMS.register("rigs_thunderbolt_grey",()->new Thunderbolt(16));
         RegistrySupplier<DogTag> DOG_TAG = ItemsReg.ITEMS.register("dog_tag",()->new DogTag(new Item.Properties()));
         RegistrySupplier<Armband> ARMBAND_BLACK = ItemsReg.ITEMS.register("armband_black",()->Armband.create(Armband.Series.BLACK));
         RegistrySupplier<Armband> ARMBAND_RED = ItemsReg.ITEMS.register("armband_red",()->Armband.create(Armband.Series.RED));

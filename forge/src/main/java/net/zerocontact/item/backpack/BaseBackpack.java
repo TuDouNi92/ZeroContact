@@ -30,7 +30,7 @@ import top.theillusivec4.curios.api.SlotContext;
 import java.util.Optional;
 
 public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl implements ArmorTypeTag, Toggleable.Backpack {
-    private final int containerSize;
+    public final int containerSize;
     private boolean canOpen = false;
 
     public BaseBackpack(String id, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, int containerSize) {
@@ -60,8 +60,7 @@ public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl impl
     }
 
     private void callOpenScreen(ServerPlayer serverPlayer, BackpackContainerMenu.TriggerSource source) {
-        NetworkHooks.openScreen(serverPlayer, new SimpleMenuProvider((id, inv, __) -> new BackpackContainerMenu(id, inv, containerSize, source), Component.translatable(this.getDescriptionId())), buf -> {
-            buf.writeInt(containerSize);
+        NetworkHooks.openScreen(serverPlayer, new SimpleMenuProvider((id, inv, __) -> new BackpackContainerMenu(id, inv, source), Component.translatable(this.getDescriptionId())), buf -> {
             buf.writeEnum(source);
         });
         canOpen = false;
@@ -82,15 +81,16 @@ public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl impl
         return 0;
     }
 
-    private ListTag readInvTags(ItemStack stack){
-        if(stack.getItem() instanceof BaseBackpack){
+    private ListTag readInvTags(ItemStack stack) {
+        if (stack.getItem() instanceof BaseBackpack) {
             Optional<CompoundTag> inventoryTag = Optional.ofNullable(stack.getTag());
-            if(inventoryTag.isPresent()){
+            if (inventoryTag.isPresent()) {
                 return inventoryTag.get().getList("inventory", Tag.TAG_COMPOUND);
             }
         }
         return new ListTag();
     }
+
     @Override
     public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
         return new ICapabilityProvider() {
@@ -98,10 +98,10 @@ public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl impl
             public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction arg) {
                 ListTag listTag = readInvTags(stack);
                 CompoundTag compoundTag = new CompoundTag();
-                compoundTag.put("Items",listTag);
+                compoundTag.put("Items", listTag);
                 ItemStackHandler container = new ItemStackHandler(listTag.size());
                 container.deserializeNBT(compoundTag);
-                return ForgeCapabilities.ITEM_HANDLER.orEmpty(capability,LazyOptional.of(()->container));
+                return ForgeCapabilities.ITEM_HANDLER.orEmpty(capability, LazyOptional.of(() -> container));
             }
         };
     }

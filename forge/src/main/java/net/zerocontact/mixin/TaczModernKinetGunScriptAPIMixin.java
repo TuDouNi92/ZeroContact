@@ -26,7 +26,7 @@ public class TaczModernKinetGunScriptAPIMixin {
     @Inject(method = "consumeAmmoFromPlayer", at = @At("RETURN"), remap = false, cancellable = true)
     public void zeroContact$consumeAmmoFromPlayerRigs(int neededAmount, CallbackInfoReturnable<Integer> cir) {
         CuriosApi.getCuriosInventory(shooter).ifPresent(inv -> {
-            inv.getStacksHandler("backpack").ifPresent(stacksHandler -> {
+            inv.getStacksHandler("rigs").ifPresent(stacksHandler -> {
                 ItemStack rigs = stacksHandler.getStacks().getStackInSlot(0);
                 rigs.getCapability(ForgeCapabilities.ITEM_HANDLER, null).map(cap -> {
                     int result = this.abstractGunItem.findAndExtractInventoryAmmo(cap, itemStack, neededAmount);
