@@ -1,12 +1,12 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/rigs/rigs_thunderbolt_grey"
+    "layer0": "zerocontact:item/backpack/backpack_british23_red"
   },
   "display": {
     "gui": {
       "rotation": [
-        -45,
+        45,
         45,
         0
       ],

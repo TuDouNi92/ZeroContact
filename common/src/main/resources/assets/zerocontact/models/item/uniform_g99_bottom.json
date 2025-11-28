@@ -1,18 +1,18 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/rigs/rigs_thunderbolt_grey"
+    "layer0": "zerocontact:item/uniform_g99_bottom"
   },
   "display": {
     "gui": {
       "rotation": [
-        -45,
         45,
+        135,
         0
       ],
       "translation": [
         0,
-        -13,
+        -6,
         0
       ],
       "scale": [

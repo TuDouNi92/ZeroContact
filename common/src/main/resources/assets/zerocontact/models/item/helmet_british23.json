@@ -1,18 +1,18 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/rigs/rigs_thunderbolt_grey"
+    "layer0": "zerocontact:item/helmet_british23"
   },
   "display": {
     "gui": {
       "rotation": [
-        -45,
         45,
+        135,
         0
       ],
       "translation": [
         0,
-        -13,
+        -20,
         0
       ],
       "scale": [
@@ -109,7 +109,7 @@
       ],
       "translation": [
         0,
-        -15,
+        -24,
         0
       ]
     }
