@@ -6,7 +6,7 @@ import static net.zerocontact.ZeroContact.MOD_ID;
 
 public class T20 extends BaseBackpack {
     public T20(int containerSize, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
-        super("", 0, texture, model, animation, containerSize);
+        super(texture, model, animation, containerSize);
     }
 
     public record BackpackResource(ResourceLocation texture, ResourceLocation model, ResourceLocation animation){};

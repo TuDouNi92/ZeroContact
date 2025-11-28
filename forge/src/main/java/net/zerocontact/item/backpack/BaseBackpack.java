@@ -33,8 +33,8 @@ public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl impl
     public final int containerSize;
     private boolean canOpen = false;
 
-    public BaseBackpack(String id, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, int containerSize) {
-        super(id, defaultDurability, texture, model, animation);
+    public BaseBackpack(ResourceLocation texture, ResourceLocation model, ResourceLocation animation, int containerSize) {
+        super("", 0, texture, model, animation);
         this.containerSize = containerSize;
     }
 

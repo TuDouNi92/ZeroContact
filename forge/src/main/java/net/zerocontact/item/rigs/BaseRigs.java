@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class BaseRigs extends BaseBackpack {
     public BaseRigs(ResourceLocation texture, ResourceLocation model, ResourceLocation animation, int containerSize) {
-        super("", 0, texture, model, animation, containerSize);
+        super(texture, model, animation, containerSize);
     }
 
     @Override
