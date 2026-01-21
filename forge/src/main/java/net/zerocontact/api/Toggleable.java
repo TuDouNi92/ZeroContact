@@ -18,7 +18,7 @@ public interface Toggleable {
         stack.getOrCreateTag().putBoolean("VisorOn", switchOn);
     }
 
-    default Boolean readData(ItemStack stack, String key) {
+    default Boolean readStatus(ItemStack stack, String key) {
         return stack.getOrCreateTag().getBoolean(key);
     }
 
@@ -26,7 +26,7 @@ public interface Toggleable {
         AtomicBoolean state = new AtomicBoolean(false);
         ItemStack helmet = player.getItemBySlot(EquipmentSlot.HEAD);
         if (helmet.getItem() == this) {
-            state.set(readData(helmet, "VisorOn"));
+            state.set(readStatus(helmet, "VisorOn"));
             saveData(helmet, !state.get());
         }
         return !state.get();

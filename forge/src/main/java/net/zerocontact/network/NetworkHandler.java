@@ -66,7 +66,7 @@ public class NetworkHandler {
         }
     }
 
-    record ToggleVisorResultPacket(boolean lastSwitch) {
+    public record ToggleVisorResultPacket(boolean lastSwitch) {
         public void encode(FriendlyByteBuf buf) {
             buf.writeBoolean(lastSwitch);
         }
