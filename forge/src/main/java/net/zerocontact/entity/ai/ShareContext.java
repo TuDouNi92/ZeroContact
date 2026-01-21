@@ -8,7 +8,6 @@ import java.util.Set;
 
 public class ShareContext {
     public final Set<GlobalStateController.SignalPhase> signalPhases;
-    public LivingEntity cacheTarget;
     public boolean isHurt;
     public ShareContext(){
         this.signalPhases = new HashSet<>();

@@ -4,7 +4,6 @@ import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.entity.ShootResult;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.gun.FireMode;
-import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -14,7 +13,6 @@ import net.minecraft.world.phys.Vec3;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.entity.ai.controller.GlobalStateController;
 
-import java.util.Objects;
 import java.util.Optional;
 
 public class PerformGunAttackGoal extends Goal {
@@ -41,19 +39,18 @@ public class PerformGunAttackGoal extends Goal {
             burstFire();
         }
         else{
-            burstFireWithExtract();
+            burstFireWithFallBack();
         }
     }
 
-    public static <T extends ArmedRaider> boolean canSee(T shooter) {
+    public static <T extends ArmedRaider> boolean isInVisionToShoot(T shooter) {
         LivingEntity target = shooter.getTarget();
-        if (target == null) return false;
+        if(target ==null)return false;
         Vec3 lookVec = shooter.getLookAngle().normalize();
         Vec3 toTargetVec = target.position().subtract(shooter.position()).normalize();
         double dot = lookVec.dot(toTargetVec);
         double fovCos = Math.cos(Math.toRadians(120));
-        boolean bodyFacing = shooter.yBodyRot == shooter.yHeadRot;
-        return (dot >= fovCos || shooter.isSprinting()) && dot >= fovCos && bodyFacing;
+        return (dot >= fovCos || shooter.isSprinting()) && dot >= fovCos;
     }
 
     private float provideInaccuracy() {
@@ -86,10 +83,9 @@ public class PerformGunAttackGoal extends Goal {
 
     private void burstFire() {
         if (!IGun.mainhandHoldGun(shooter) || operator == null) return;
-        if (!shooter.getNavigation().isDone()) return;
         LivingEntity target = shooter.getTarget();
         if (target != null) {
-            shooter.lookAt(EntityAnchorArgument.Anchor.EYES, target.position());
+            shooter.getLookControl().setLookAt(target);
         } else {
             return;
         }
@@ -102,17 +98,17 @@ public class PerformGunAttackGoal extends Goal {
                 burstInterval = random.nextInt(15);
             }
         } else {
-            if (burstInterval > 0 && canSee(shooter)) {
+            if (burstInterval > 0 && isInVisionToShoot(shooter)) {
                 shoot(target);
                 burstInterval--;
             } else {
-                shootCoolDown = 40;
+                shootCoolDown = 20;
                 burstInterval = random.nextInt(15);
             }
         }
     }
 
-    private void burstFireWithExtract() {
+    private void burstFireWithFallBack() {
         burstFire();
         if(shooter.getTarget()!=null){
             Vec3 targetPos =LandRandomPos.getPosAway(shooter,12,6, shooter.getTarget().position());

@@ -44,7 +44,6 @@ import net.zerocontact.entity.ai.NameList;
 import net.zerocontact.entity.ai.controller.GlobalStateController;
 import net.zerocontact.entity.ai.goal.MAvoidGoal;
 import net.zerocontact.entity.ai.goal.PerformGunAttackGoal;
-import net.zerocontact.entity.ai.goal.TailGoal;
 import net.zerocontact.registries.ModSoundEventsReg;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -71,6 +70,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     private final IGunOperator operator;
     private String factionId;
     public GlobalStateController stateController;
+    private int voiceTicks;
 
     public String getFactionId() {
         return this.factionId;
@@ -80,11 +80,6 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         this.factionId = factionId;
     }
 
-    private enum SoundState {
-        IDLE,
-        CONTACT,
-        RELOAD
-    }
 
     protected enum Weapon {
         AK(),
@@ -135,32 +130,27 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         return values[random.nextInt(values.length)];
     }
 
-    private SoundState currentState = SoundState.IDLE;
-    private SoundState lastState = SoundState.IDLE;
-    private boolean soundPlayedState = false;
-
     public ArmedRaider(EntityType<? extends PatrollingMonster> entityType, Level level) {
         super(entityType, level);
         operator = IGunOperator.fromLivingEntity(this);
         MTeam.registerEntity(this);
         geoCache = GeckoLibUtil.createInstanceCache(this);
-        NameList.setName(this,this.random);
-        this.setCustomNameVisible(true);
+        NameList.setName(this, this.random);
+//        this.setCustomNameVisible(true);
     }
 
     @Override
     protected void registerGoals() {
         super.registerGoals();
         stateController = new GlobalStateController(this);
-        TailGoal tailGoal = new TailGoal(this);
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new HurtByTargetGoal(this, PathfinderMob.class));
         this.goalSelector.addGoal(2, new AvoidEntityGoal<>(this, IronGolem.class, 10, 1.0F, 1.5F));
         this.goalSelector.addGoal(2, new MAvoidGoal(this, 5));
         this.goalSelector.addGoal(2, new OpenDoorGoal(this, false));
-        this.goalSelector.addGoal(3, tailGoal);
         this.goalSelector.addGoal(4, new PerformGunAttackGoal(this));
         this.goalSelector.addGoal(5, new RandomStrollGoal(this, 0.8F));
+        this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true, false));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Monster.class, true, false));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, IronGolem.class, true, false));
@@ -293,33 +283,22 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     }
 
     private void listenSoundState() {
-        getSoundState();
-        if (currentState != lastState) {
-            soundPlayedState = false;
-            lastState = currentState;
-        }
-        if (!soundPlayedState) {
-            switch (currentState) {
-                case CONTACT -> {
-                    this.playSound(ModSoundEventsReg.RAIDER_CONTACT, 1, 1);
-                    soundPlayedState = true;
-                }
-                case RELOAD -> {
-                    this.playSound(ModSoundEventsReg.RAIDER_RELOAD, 1, 1);
-                    soundPlayedState = true;
-                }
-            }
+        if (voiceTicks == 0) {
+            playVoice();
+            voiceTicks++;
+        } else if (voiceTicks >= 100) {
+            voiceTicks = 0;
         }
     }
 
-    private void getSoundState() {
-        if (PerformGunAttackGoal.canSee(this)) {
-            currentState = SoundState.CONTACT;
-        } else {
-            currentState = SoundState.IDLE;
-        }
+    private void playVoice() {
+        Optional.ofNullable(stateController).ifPresent(sc -> {
+            if (sc.getPhase() == GlobalStateController.Phase.ATTACK) {
+                this.playSound(ModSoundEventsReg.RAIDER_CONTACT, 1, 1);
+            }
+        });
         if (operator.getSynReloadState().getStateType().isReloading()) {
-            currentState = SoundState.RELOAD;
+            this.playSound(ModSoundEventsReg.RAIDER_RELOAD, 1, 1);
         }
     }
 
@@ -348,11 +327,6 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     @Override
     public @NotNull SimpleContainer getInventory() {
         return this.inventory;
-    }
-
-    @Override
-    public boolean removeWhenFarAway(double distanceToClosestPlayer) {
-        return distanceToClosestPlayer > 256.0F;
     }
 
     @Override

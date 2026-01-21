@@ -19,8 +19,13 @@ public class AttackPhaseContext implements IPhaseContext {
     }
 
     @Override
+    public int getTick() {
+        return ticks;
+    }
+
+    @Override
     public boolean shouldTransition() {
-        return !PerformGunAttackGoal.canSee(armedRaider);
+        return !PerformGunAttackGoal.isInVisionToShoot(armedRaider);
     }
 
     @Override
@@ -36,9 +41,8 @@ public class AttackPhaseContext implements IPhaseContext {
     @Override
     public void onExit() {
         Optional.ofNullable(armedRaider.getTarget()).ifPresent(target->{
-            if(!target.isAlive() && target.equals(armedRaider.stateController.getShareContext().cacheTarget)){
+            if(!target.isAlive()){
                 armedRaider.setTarget(null);
-                armedRaider.stateController.getShareContext().cacheTarget =null;
             }
         });
     }

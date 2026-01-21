@@ -18,13 +18,18 @@ public class EscapePhaseContext implements IPhaseContext {
     @Override
     public void tick() {
         ticks++;
-        int disposableTick =1;
+        int disposableTick =15;
         if (armedRaider.random.nextFloat() <= 0.65F && ticks ==disposableTick){
             Optional.ofNullable(armedRaider.getTarget()).ifPresent(target->{
                 armedRaider.lookAt(EntityAnchorArgument.Anchor.EYES,target.position());
             });
             onExit();
         }
+    }
+
+    @Override
+    public int getTick() {
+        return ticks;
     }
 
     @Override
