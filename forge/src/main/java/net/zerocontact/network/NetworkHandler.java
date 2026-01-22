@@ -1,6 +1,9 @@
 package net.zerocontact.network;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
@@ -8,6 +11,7 @@ import net.minecraftforge.network.NetworkEvent;
 import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.Toggleable;
 import net.zerocontact.client.ClientData;
+import net.zerocontact.command.CommandManager;
 import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.Optional;
@@ -18,9 +22,10 @@ public class NetworkHandler {
     public static class SyncStaminaPacket {
         private final float stamina;
         private final boolean enabled;
+
         public SyncStaminaPacket(float stamina, boolean enabled) {
             this.stamina = stamina;
-            this.enabled =enabled;
+            this.enabled = enabled;
         }
 
         public SyncStaminaPacket(FriendlyByteBuf buf) {
@@ -35,7 +40,28 @@ public class NetworkHandler {
 
         public void handle(Supplier<NetworkEvent.Context> supplier) {
             NetworkEvent.Context context = supplier.get();
-            context.enqueueWork(() -> ClientData.setStamina(stamina,enabled));
+            context.enqueueWork(() -> ClientData.setStamina(stamina, enabled));
+        }
+    }
+
+    public record ToggleStaminaPacket(boolean isEnable) {
+        public void encode(FriendlyByteBuf buf) {
+            buf.writeBoolean(isEnable);
+        }
+
+        public static ToggleStaminaPacket decode(FriendlyByteBuf buf) {
+            return new ToggleStaminaPacket(buf.readBoolean());
+        }
+
+        public void handle(Supplier<NetworkEvent.Context> supplier) {
+            NetworkEvent.Context context = supplier.get();
+            context.enqueueWork(() -> {
+                ServerPlayer serverPlayer = context.getSender();
+                Optional.ofNullable(serverPlayer).ifPresent(serverPlayer1 -> {
+                    CommandManager.CommandSavedData data = CommandManager.CommandSavedData.get(serverPlayer1.serverLevel());
+                    data.setStaminaState(isEnable);
+                });
+            });
         }
     }
 
@@ -100,14 +126,15 @@ public class NetworkHandler {
                         if (stacksHandler.getStacks().getStackInSlot(0).getItem() instanceof Toggleable.Backpack backpack) {
                             backpack.setToggling(msg.toggle);
                             boolean switchToggleable = backpack.getToggling();
-                            ModMessages.sendToPlayer(new ToggleBackpackResultPacket(switchToggleable),player);
+                            ModMessages.sendToPlayer(new ToggleBackpackResultPacket(switchToggleable), player);
                         }
                     });
                 });
             });
         }
     }
-    public record ToggleBackpackResultPacket(boolean toggle){
+
+    public record ToggleBackpackResultPacket(boolean toggle) {
         public void encode(FriendlyByteBuf buf) {
             buf.writeBoolean(toggle);
         }
@@ -115,9 +142,10 @@ public class NetworkHandler {
         public static ToggleBackpackResultPacket decode(FriendlyByteBuf buf) {
             return new ToggleBackpackResultPacket(buf.readBoolean());
         }
+
         public static void handle(ToggleBackpackResultPacket msg, Supplier<NetworkEvent.Context> supplier) {
             NetworkEvent.Context context = supplier.get();
-            context.enqueueWork(()-> ClientData.setTriggerBackPackToggle(msg.toggle));
+            context.enqueueWork(() -> ClientData.setTriggerBackPackToggle(msg.toggle));
         }
     }
 }

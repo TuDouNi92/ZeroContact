@@ -30,6 +30,11 @@ public class ModMessages {
                 .encoder(NetworkHandler.SyncStaminaPacket::toBytes)
                 .consumerMainThread(NetworkHandler.SyncStaminaPacket::handle)
                 .add();
+        net.messageBuilder(NetworkHandler.ToggleStaminaPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(NetworkHandler.ToggleStaminaPacket::decode)
+                .encoder(NetworkHandler.ToggleStaminaPacket::encode)
+                .consumerMainThread(NetworkHandler.ToggleStaminaPacket::handle)
+                .add();
         net.messageBuilder(NetworkHandler.ToggleVisorPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .decoder(NetworkHandler.ToggleVisorPacket::decode)
                 .encoder(NetworkHandler.ToggleVisorPacket::encode)
