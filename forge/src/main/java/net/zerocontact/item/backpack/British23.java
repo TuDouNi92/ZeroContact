@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import static net.zerocontact.ZeroContact.MOD_ID;
 
 public class British23 extends BaseBackpack{
-    private static final ResourceLocation texture = new ResourceLocation(MOD_ID,"textures/item/backpack/backpack_british23_red.png");
+    private static final ResourceLocation texture = new ResourceLocation(MOD_ID,"textures/models/backpack/backpack_british23_red.png");
     private static final ResourceLocation model = new ResourceLocation(MOD_ID,"geo/backpack/backpack_british23_red.geo.json");
     private static final ResourceLocation animation = new ResourceLocation(MOD_ID,"");
     public British23(int containerSize) {

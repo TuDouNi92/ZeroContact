@@ -15,15 +15,15 @@ public class TagillaMask extends BaseGeoHelmet {
     public enum Color {
         MANHUNT(
                 new ColorResources(
-                        new ResourceLocation(MOD_ID,"textures/models/helmet/mask_svarka_tagilla_manhunt.png"),
-                        new ResourceLocation(MOD_ID,"geo/mask_svarka_tagilla_manhunt.geo.json"),
+                        new ResourceLocation(MOD_ID,"textures/models/mask/mask_svarka_tagilla_manhunt.png"),
+                        new ResourceLocation(MOD_ID,"geo/mask/mask_svarka_tagilla_manhunt.geo.json"),
                         null
                 )
         ),
         YBEY(
                 new ColorResources(
-                        new ResourceLocation(MOD_ID,"textures/models/helmet/mask_svarka_tagilla_ybei.png"),
-                        new ResourceLocation(MOD_ID,"geo/mask_svarka_tagilla_ybei.geo.json"),
+                        new ResourceLocation(MOD_ID,"textures/models/mask/mask_svarka_tagilla_ybei.png"),
+                        new ResourceLocation(MOD_ID,"geo/mask/mask_svarka_tagilla_ybei.geo.json"),
                         null
                 )
         );
