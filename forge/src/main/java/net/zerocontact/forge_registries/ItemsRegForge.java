@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
-public class OnRegisterItem {
+public class ItemsRegForge {
     private static final LinkedHashSet<RegistrySupplier<? extends ItemLike>> ITEMS_REG_TAB = new LinkedHashSet<>();
 
     @SubscribeEvent
