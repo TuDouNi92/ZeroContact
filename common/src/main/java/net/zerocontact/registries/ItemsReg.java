@@ -27,10 +27,10 @@ public class ItemsReg {
             SapiIV.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT),10,7,-0.04f));
     public static void register() {
         TABS.register();
-        ITEMS.register("jpc_armor", () ->
-                JpcArmor.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT)));
-        ITEMS.register("avs_armor", () ->
-                AvsArmor.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT)));
+//        ITEMS.register("jpc_armor", () ->
+//                JpcArmor.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT)));
+//        ITEMS.register("avs_armor", () ->
+//                AvsArmor.create(ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT)));
         ITEMS.register("si_plate",
                 () -> SapiIV.create(SLIME_STEEL, ArmorItem.Type.CHESTPLATE, new Item.Properties().arch$tab(ZERO_CONTACT),5,6,-0.01f));
         ITEMS.register("bc_plate",
