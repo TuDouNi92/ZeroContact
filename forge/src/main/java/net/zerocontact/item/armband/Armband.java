@@ -16,49 +16,49 @@ public class Armband extends AbstractGenerateGeoCurioItemImpl implements ArmorTy
     public enum Series {
         BLACK(
                 new ArmbandResources(
-                        new ResourceLocation(MOD_ID,"textures/item/armband/armband_black.png"),
+                        new ResourceLocation(MOD_ID,"textures/models/armband/armband_black.png"),
                         new ResourceLocation(MOD_ID,"geo/armband/armband_black.geo.json"),
                         new ResourceLocation(MOD_ID,"")
                         )
         ),
         BLUE(
                 new ArmbandResources(
-                        new ResourceLocation(MOD_ID,"textures/item/armband/armband_blue.png"),
+                        new ResourceLocation(MOD_ID,"textures/models/armband/armband_blue.png"),
                         new ResourceLocation(MOD_ID,"geo/armband/armband_blue.geo.json"),
                         new ResourceLocation(MOD_ID,"")
                 )
         ),
         GREEN(
                 new ArmbandResources(
-                        new ResourceLocation(MOD_ID,"textures/item/armband/armband_green.png"),
+                        new ResourceLocation(MOD_ID,"textures/models/armband/armband_green.png"),
                         new ResourceLocation(MOD_ID,"geo/armband/armband_green.geo.json"),
                         new ResourceLocation(MOD_ID,"")
                 )
         ),
         RED(
                 new ArmbandResources(
-                        new ResourceLocation(MOD_ID,"textures/item/armband/armband_red.png"),
+                        new ResourceLocation(MOD_ID,"textures/models/armband/armband_red.png"),
                         new ResourceLocation(MOD_ID,"geo/armband/armband_red.geo.json"),
                         new ResourceLocation(MOD_ID,"")
                 )
         ),
         FLORA(
                 new ArmbandResources(
-                        new ResourceLocation(MOD_ID,"textures/item/armband/armband_vsrf.png"),
+                        new ResourceLocation(MOD_ID,"textures/models/armband/armband_vsrf.png"),
                         new ResourceLocation(MOD_ID,"geo/armband/armband_flora.geo.json"),
                         new ResourceLocation(MOD_ID,"")
                 )
         ),
         WHITE(
                 new ArmbandResources(
-                        new ResourceLocation(MOD_ID,"textures/item/armband/armband_white.png"),
+                        new ResourceLocation(MOD_ID,"textures/models/armband/armband_white.png"),
                         new ResourceLocation(MOD_ID,"geo/armband/armband_white.geo.json"),
                         new ResourceLocation(MOD_ID,"")
                 )
         ),
         YELLOW(
                 new ArmbandResources(
-                        new ResourceLocation(MOD_ID,"textures/item/armband/armband_yellow.png"),
+                        new ResourceLocation(MOD_ID,"textures/models/armband/armband_yellow.png"),
                         new ResourceLocation(MOD_ID,"geo/armband/armband_yellow.geo.json"),
                         new ResourceLocation(MOD_ID,"")
                 )
