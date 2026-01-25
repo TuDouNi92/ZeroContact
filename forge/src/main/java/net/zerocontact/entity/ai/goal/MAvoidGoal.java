@@ -30,7 +30,6 @@ public class MAvoidGoal extends Goal {
     }
 
     private void runAway() {
-        if (!armedRaider.getNavigation().isDone()) return;
         if (armedRaider.getTarget() == null) {
             int targetX = (random.nextBoolean() ? 1 : -1) * random.nextInt(distance);
             int targetZ = (random.nextBoolean() ? 1 : -1) * random.nextInt(distance);
@@ -41,7 +40,7 @@ public class MAvoidGoal extends Goal {
             if (targetPos == null) return;
             armedRaider.getNavigation().moveTo(targetPos.x, targetPos.y, targetPos.z, 1.5D);
         }else{
-            armedRaider.lookAt(EntityAnchorArgument.Anchor.EYES,armedRaider.getTarget().position());
+            armedRaider.getLookControl().setLookAt(armedRaider.getTarget().position());
             armedRaider.stateController.getShareContext().signalPhases.add(GlobalStateController.SignalPhase.WANTS_ATTACK);
         }
 

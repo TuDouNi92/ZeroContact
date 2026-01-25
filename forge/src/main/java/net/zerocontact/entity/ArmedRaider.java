@@ -145,12 +145,11 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         stateController = new GlobalStateController(this);
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new HurtByTargetGoal(this, PathfinderMob.class));
-        this.goalSelector.addGoal(2, new AvoidEntityGoal<>(this, IronGolem.class, 10, 1.0F, 1.5F));
-        this.goalSelector.addGoal(2, new MAvoidGoal(this, 5));
-        this.goalSelector.addGoal(2, new OpenDoorGoal(this, false));
-        this.goalSelector.addGoal(4, new PerformGunAttackGoal(this));
-        this.goalSelector.addGoal(5, new RandomStrollGoal(this, 0.8F));
-        this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(3, new MAvoidGoal(this, 5));
+        this.goalSelector.addGoal(4, new OpenDoorGoal(this, false));
+        this.goalSelector.addGoal(5, new PerformGunAttackGoal(this));
+        this.goalSelector.addGoal(6, new RandomStrollGoal(this, 0.8F));
+        this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true, false));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Monster.class, true, false));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, IronGolem.class, true, false));
@@ -162,7 +161,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
                 .add(Attributes.MAX_HEALTH, 30.0F)
                 .add(Attributes.ATTACK_DAMAGE, 3.0F)
                 .add(Attributes.FOLLOW_RANGE, 35.0F)
-                .add(Attributes.KNOCKBACK_RESISTANCE, 0.6F);
+                .add(Attributes.ATTACK_KNOCKBACK, 0.3F);
     }
 
     @Override

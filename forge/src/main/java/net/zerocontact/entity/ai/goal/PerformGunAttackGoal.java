@@ -13,6 +13,7 @@ import net.minecraft.world.phys.Vec3;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.entity.ai.controller.GlobalStateController;
 
+import java.util.EnumSet;
 import java.util.Optional;
 
 public class PerformGunAttackGoal extends Goal {
@@ -26,6 +27,7 @@ public class PerformGunAttackGoal extends Goal {
         this.shooter = shooter;
         this.operator = IGunOperator.fromLivingEntity(shooter);
         this.random = shooter.getRandom();
+        this.setFlags(EnumSet.of(Flag.TARGET,Flag.LOOK));
     }
 
     @Override
@@ -49,8 +51,8 @@ public class PerformGunAttackGoal extends Goal {
         Vec3 lookVec = shooter.getLookAngle().normalize();
         Vec3 toTargetVec = target.position().subtract(shooter.position()).normalize();
         double dot = lookVec.dot(toTargetVec);
-        double fovCos = Math.cos(Math.toRadians(120));
-        return (dot >= fovCos || shooter.isSprinting()) && dot >= fovCos;
+        double fovCos = Math.cos(Math.toRadians(60));
+        return dot >= fovCos;
     }
 
     private float provideInaccuracy() {
