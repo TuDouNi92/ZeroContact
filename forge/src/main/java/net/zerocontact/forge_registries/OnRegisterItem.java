@@ -47,9 +47,9 @@ public class OnRegisterItem {
     public static void onReg(RegisterEvent event) {
         if (!event.getRegistryKey().equals(Registries.ITEM)) return;
         RegistrySupplier<BasePlate> CULT_LOCUST_PLATE = ItemsReg.ITEMS.register("plate_cult_locust",
-                ()-> BasePlate.createGeoPlate(0,8,-0.025f,"textures/item/plate/plate_cult_locust.png","geo/plate_cult_locust.geo.json",""));
+                ()-> BasePlate.createGeoPlate(0,8,-0.025f,"textures/models/plate/plate_cult_locust.png","geo/plate/plate_cult_locust.geo.json",""));
         RegistrySupplier<BasePlate> SLIME_PLATE = ItemsReg.ITEMS.register("plate_slime",
-                ()-> BasePlate.createGeoPlate(0,4,0f,"textures/item/plate/plate_slime.png","geo/plate_slime.geo.json",""));
+                ()-> BasePlate.createGeoPlate(0,4,0f,"textures/models/plate/plate_slime.png","geo/plate/plate_slime.geo.json",""));
         RegistrySupplier<ForgeSpawnEggItem> RAIDER_EGG = ItemsReg.ITEMS.register("raider_egg", () -> new ForgeSpawnEggItem(ModEntitiesReg.ARMED_RAIDER, 0x3d6145, 0xcfc08a, new Item.Properties()));
         RegistrySupplier<FastMt> FAST_MT = ItemsReg.ITEMS.register("fast_mt", () -> new FastMt(ArmorMaterials.IRON, ArmorItem.Type.HELMET, new Item.Properties(), 8));
         RegistrySupplier<Ratnik> RATNIK_HELMET_EMR = ItemsReg.ITEMS.register("helmet_6b47_ratnik_emr", () -> Ratnik.create(7,32, Ratnik.Color.EMR));
@@ -97,7 +97,9 @@ public class OnRegisterItem {
                         CULT_LOCUST_PLATE,SLIME_PLATE,
                         RAIDER_EGG,
                         RATNIK_HELMET_EMR,RATNIK_HELMET_ARC,BASTION_HELMET,BASTION_HELMET_MULTICAM,BASTION_HELMET_GREEN,BRITISH23_HELMET,
-                        ALTYN_VISOR_HELMET,AIRFRAME_HELMET,UNTAR_HELMET,TAGILLA_MASK_MANHUNT,TAGILLA_MASK_YBEY,COLD_FEAR_MASK,CYAN_CAP,BOSS_CAP,
+                        ALTYN_VISOR_HELMET,AIRFRAME_HELMET,UNTAR_HELMET,
+                        TAGILLA_MASK_MANHUNT,TAGILLA_MASK_YBEY,COLD_FEAR_MASK,
+                        CYAN_CAP,BOSS_CAP,
                         THOR_ARMOR,UNTAR_ARMOR,HEXGRID_ARMOR,R6B2,R6B23I,R6B23II,DEFENDER,
                         THUNDERBOLT_RIGS_GREY,
                         T20_BACKPACK_MULTICAM,T20_BACKPACK_UMBRA,BRITISH23_BACKPACK_RED,VKBO_BACKPACK_OLIVE,

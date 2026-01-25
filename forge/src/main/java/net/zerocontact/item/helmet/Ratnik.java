@@ -16,14 +16,14 @@ public class Ratnik extends BaseGeoHelmet {
         EMR(
                 new ColorResources(
                         new ResourceLocation(MOD_ID, "textures/models/helmet/helmet_6b47_cover_emr.png"),
-                        new ResourceLocation(MOD_ID, "geo/helmet_6b47_cover_emr.geo.json"),
+                        new ResourceLocation(MOD_ID, "geo/helmet/helmet_6b47_cover_emr.geo.json"),
                         null
                 )
         ),
         ARCTIC(
                 new ColorResources(
                         new ResourceLocation(MOD_ID, "textures/models/helmet/helmet_6b47_cover_arctic.png"),
-                        new ResourceLocation(MOD_ID, "geo/helmet_6b47_cover_arctic.geo.json"),
+                        new ResourceLocation(MOD_ID, "geo/helmet/helmet_6b47_cover_arctic.geo.json"),
                         null
                 )
         );

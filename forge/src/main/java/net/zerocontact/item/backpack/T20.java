@@ -14,14 +14,14 @@ public class T20 extends BaseBackpack {
     public enum Series{
         UMBRA(
                 new BackpackResource(
-                        new ResourceLocation(MOD_ID,"textures/item/backpack/backpack_t20_umbra.png"),
+                        new ResourceLocation(MOD_ID,"textures/models/backpack/backpack_t20_umbra.png"),
                         new ResourceLocation(MOD_ID,"geo/backpack/backpack_t20_umbra.geo.json"),
                         new ResourceLocation("")
                 )
         ),
         MULTICAM(
                 new BackpackResource(
-                        new ResourceLocation(MOD_ID,"textures/item/backpack/backpack_t20_multicam.png"),
+                        new ResourceLocation(MOD_ID,"textures/models/backpack/backpack_t20_multicam.png"),
                         new ResourceLocation(MOD_ID,"geo/backpack/backpack_t20_multicam.geo.json"),
                         new ResourceLocation("")
                 )

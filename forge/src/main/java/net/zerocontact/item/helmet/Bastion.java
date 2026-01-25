@@ -16,21 +16,21 @@ public class Bastion extends BaseGeoHelmet {
         BLACK(
                 new ColorResources(
                         new ResourceLocation(MOD_ID, "textures/models/helmet/helmet_bastion_black.png"),
-                        new ResourceLocation(MOD_ID, "geo/helmet_bastion_black.geo.json"),
+                        new ResourceLocation(MOD_ID, "geo/helmet/helmet_bastion_black.geo.json"),
                         null
                 )
         ),
         MULTICAM(
                 new ColorResources(
                         new ResourceLocation(MOD_ID, "textures/models/helmet/helmet_bastion_multicam.png"),
-                        new ResourceLocation(MOD_ID, "geo/helmet_bastion_multicam.geo.json"),
+                        new ResourceLocation(MOD_ID, "geo/helmet/helmet_bastion_multicam.geo.json"),
                         null
                 )
         ),
         GREEN(
                 new ColorResources(
                         new ResourceLocation(MOD_ID, "textures/models/helmet/helmet_bastion_green.png"),
-                        new ResourceLocation(MOD_ID, "geo/helmet_bastion_green.geo.json"),
+                        new ResourceLocation(MOD_ID, "geo/helmet/helmet_bastion_green.geo.json"),
                         null
                 )
         );
