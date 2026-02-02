@@ -6,8 +6,8 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.Toggleable;
+import net.zerocontact.animation_data.AnimateData;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -22,12 +22,13 @@ public class AltynVisor {
         private static final ResourceLocation texture = new ResourceLocation(MOD_ID, "textures/models/helmet/helmet_altyn_visor_olive.png");
         private static final ResourceLocation model = new ResourceLocation(MOD_ID, "geo/helmet/helmet_altyn_enabled_visor_olive.geo.json");
         private static final ResourceLocation animation = new ResourceLocation(MOD_ID, "animations/visor_altyn_switch.animation.json");
-        private static final ResourceLocation visor = new ResourceLocation(MOD_ID, "textures/gui/altyn_vision.tga");
-        private static final RawAnimation Enable = RawAnimation.begin().then("switch_disabled_to_enabled", Animation.LoopType.HOLD_ON_LAST_FRAME);
-        private static final RawAnimation DISABLE = RawAnimation.begin().then("switch_enabled_to_disabled", Animation.LoopType.HOLD_ON_LAST_FRAME);
+        private static final ResourceLocation visor = new ResourceLocation(MOD_ID, "textures/gui/altyn_vision_sky.png");
+        private static final RawAnimation ENABLE_VISOR = RawAnimation.begin().then("switch_disabled_to_enabled", Animation.LoopType.HOLD_ON_LAST_FRAME);
+        private static final RawAnimation DISABLE_VISOR = RawAnimation.begin().then("switch_enabled_to_disabled", Animation.LoopType.HOLD_ON_LAST_FRAME);
         private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
         private boolean isEnable = false;
         private boolean isToggling = false;
+        private AnimateData.VisorAnimateData animateData;
 
         public WithVisor(int absorb, int defaultDurability) {
             super(absorb, defaultDurability, texture, model, animation);
@@ -36,9 +37,17 @@ public class AltynVisor {
 
         @Override
         public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-            controllerRegistrar.add(new AnimationController<>(this, "controller", 10, state -> PlayState.STOP)
-                    .triggerableAnim("enable", Enable)
-                    .triggerableAnim("disable", DISABLE)
+            controllerRegistrar.add(new AnimationController<>(this, "controller", 0, state -> {
+                        String name = state.getController().getCurrentAnimation() != null ? state.getController().getCurrentAnimation().animation().name() : "";
+                        double tick = state.animationTick;
+                        double length = state.getController().getCurrentAnimation() != null ? state.getController().getCurrentAnimation().animation().length() : 0;
+                        boolean isPlaying = state.getController().isPlayingTriggeredAnimation();
+                        animateData = AnimateData.VisorAnimateData.create(name, tick, length, isPlaying);
+                        return PlayState.CONTINUE;
+                    })
+                            .receiveTriggeredAnimations()
+                            .triggerableAnim("enable", ENABLE_VISOR)
+                            .triggerableAnim("disable", DISABLE_VISOR)
             );
         }
 
@@ -46,7 +55,7 @@ public class AltynVisor {
         public void onInventoryTick(ItemStack stack, Level level, Player player, int slotIndex, int selectedIndex) {
             super.onInventoryTick(stack, level, player, slotIndex, selectedIndex);
             ItemStack helmet = player.getItemBySlot(EquipmentSlot.HEAD);
-            if(!isToggling)return;
+            if (!isToggling) return;
             if (level instanceof ServerLevel serverlevel) {
                 isEnable = switchVisorState(player);
                 if (isEnable) {
@@ -56,7 +65,6 @@ public class AltynVisor {
                 }
                 setToggling(false);
             }
-            ZeroContactLogger.LOG.info("isEnable:{}",isEnable);
         }
 
 
@@ -73,6 +81,11 @@ public class AltynVisor {
         @Override
         public void setToggling(boolean toggling) {
             this.isToggling = toggling;
+        }
+
+        @Override
+        public AnimateData.VisorAnimateData getAnimData() {
+            return animateData;
         }
 
         @Override

@@ -1,16 +1,14 @@
 package net.zerocontact.network;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
-import net.zerocontact.ZeroContactLogger;
+import net.zerocontact.animation_data.AnimateData;
 import net.zerocontact.api.Toggleable;
 import net.zerocontact.client.ClientData;
+import net.zerocontact.client.animation.VisorTracker;
 import net.zerocontact.command.CommandManager;
 import top.theillusivec4.curios.api.CuriosApi;
 
@@ -84,26 +82,50 @@ public class NetworkHandler {
                     if (stack.getItem() instanceof Toggleable toggleable) {
                         boolean isEnabled = toggleable.getEnabled();
                         toggleable.setToggling(true);
-                        ZeroContactLogger.LOG.info(isEnabled);
-                        ModMessages.sendToPlayer(new ToggleVisorResultPacket(isEnabled), player);
+                        ModMessages.sendToPlayer(new ToggleVisorResultPacket(isEnabled, toggleable.getAnimData()), player);
                     }
                 });
             });
         }
     }
 
-    public record ToggleVisorResultPacket(boolean lastSwitch) {
+    public record ToggleVisorResultPacket(boolean lastSwitch, AnimateData.VisorAnimateData visorAnimateData) {
         public void encode(FriendlyByteBuf buf) {
             buf.writeBoolean(lastSwitch);
+            String animName = "";
+            double tick = 0;
+            boolean isPlaying = false;
+            double animLength = 0;
+            if (visorAnimateData != null) {
+                animName = visorAnimateData.animationName;
+                tick = visorAnimateData.tick;
+                isPlaying = visorAnimateData.isPlaying;
+                animLength = visorAnimateData.animLength;
+            }
+            buf.writeUtf(animName);
+            buf.writeDouble(tick);
+            buf.writeDouble(animLength);
+            buf.writeBoolean(isPlaying);
         }
 
         public static ToggleVisorResultPacket decode(FriendlyByteBuf buf) {
-            return new ToggleVisorResultPacket(buf.readBoolean());
+            return new ToggleVisorResultPacket(
+                    buf.readBoolean(),
+                    new AnimateData.VisorAnimateData(
+                            buf.readUtf(),
+                            buf.readDouble(),
+                            buf.readDouble(),
+                            buf.readBoolean()
+                    )
+            );
         }
 
         public static void handle(ToggleVisorResultPacket msg, Supplier<NetworkEvent.Context> supplier) {
             NetworkEvent.Context context = supplier.get();
-            context.enqueueWork(() -> ClientData.setLastToggleVisorEnabled(msg.lastSwitch));
+            context.enqueueWork(() -> {
+                ClientData.setLastToggleVisorEnabled(msg.lastSwitch);
+                VisorTracker.update(msg.visorAnimateData);
+            });
         }
     }
 

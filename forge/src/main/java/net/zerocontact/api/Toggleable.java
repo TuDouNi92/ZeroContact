@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.zerocontact.animation_data.AnimateData;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -13,6 +14,8 @@ public interface Toggleable {
     boolean getEnabled();
 
     void setToggling(boolean toggling);
+
+    AnimateData.VisorAnimateData getAnimData();
 
     default void saveData(ItemStack stack, boolean switchOn) {
         stack.getOrCreateTag().putBoolean("VisorOn", switchOn);
