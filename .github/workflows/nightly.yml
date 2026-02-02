@@ -1,7 +1,5 @@
 name: NightlyBuild ZeroContact
 on:
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 jobs:
   build:
