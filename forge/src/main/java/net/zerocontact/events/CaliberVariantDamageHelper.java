@@ -7,7 +7,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
-import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.EntityHurtProvider;
 import net.zerocontact.command.CommandManager;
 import org.jetbrains.annotations.NotNull;
@@ -62,12 +61,31 @@ public enum CaliberVariantDamageHelper {
         this.caliber = caliber;
     }
 
+    /**
+     * Represents the caliber infos of a type of ammo
+     *
+     * <p>This class is meant to create a middleware that modifies ammo damage associated with gun data</p>
+     *
+     * @param id The ammo id from TAC:Z guns
+     * @param baseDamageFactor The balancing factor for each caliber generating new numbers
+     * @param penetrationClass The penetration level for damage interceptor, bypassed when the feature is off
+     * @param fleshDamage The flesh damage for damage interceptor, bypassed when the feature is off
+     */
     public record Caliber(String id, float baseDamageFactor, int penetrationClass, int fleshDamage) {
         public Caliber(String id, float baseDamageFactor) {
             this(id, baseDamageFactor, 10, 4);
         }
     }
 
+    /**
+     *
+     * <p>This method is meant to match calibers with input bullet damage source </p>
+     *
+     * @param source The Minecraft damage source
+     * @param set The enum set for calibers defined
+     * @return Return the caliber that matched with damage source
+     * @param <E> The enum set type
+     */
     private static <E> Optional<Caliber> getMatchedCaliber(DamageSource source, Set<E> set) {
         AtomicReference<Optional<Caliber>> result = new AtomicReference<>(Optional.empty());
         if (!source.is(ModDamageTypes.BULLETS_TAG)) return Optional.empty();
@@ -91,6 +109,16 @@ public enum CaliberVariantDamageHelper {
         return result.get();
     }
 
+    /**
+     *
+     * <p>This method is meant to generate damages under the effect of protections</p>
+     *
+     * @param original The original bullet damage
+     * @param source The Minecraft damage source
+     * @param hurtCanHold The damage that armor/plate can withstand
+     * @param provider Interface implementation that provides the situation of getting hit by bullets
+     * @return The generated damage amount
+     */
     public static float generateDamageAmount(float original, DamageSource source, int hurtCanHold, EntityHurtProvider provider) {
         AtomicDouble output = new AtomicDouble(original);
         Optional.ofNullable(source.getDirectEntity()).ifPresent(bullet -> {
@@ -122,6 +150,14 @@ public enum CaliberVariantDamageHelper {
         return (float) output.get();
     }
 
+    /**
+     *
+     * This method generates the damage once armor get penetrated
+     *
+     * @param caliber Caliber class
+     * @param hurtCanHold The damage that armor/plate can withstand
+     * @return Determine and returns the flesh damage
+     */
     private static double getPenetratedDamage(@NotNull Caliber caliber, int hurtCanHold) {
         RandomSource randomSource = RandomSource.create();
         if (hurtCanHold > caliber.penetrationClass) {
