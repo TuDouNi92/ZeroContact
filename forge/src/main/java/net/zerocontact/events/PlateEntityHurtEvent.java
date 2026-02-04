@@ -2,6 +2,7 @@ package net.zerocontact.events;
 
 import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
 import com.tacz.guns.api.event.common.GunDamageSourcePart;
+import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.init.ModDamageTypes;
 import dev.architectury.event.EventResult;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,8 +23,9 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PlateEntityHurtEvent {
-    public static boolean isHeadShot;
     public static boolean changeHurtAmountRicochet(LivingEntity lv, DamageSource source, float amount, ItemStack plateSlot) {
+        EntityKineticBullet.EntityResult result = EventUtil.getHitResult(source);
+        boolean isHeadShot = result != null && result.isHeadshot();
         if (lv instanceof ServerPlayer serverPlayer && serverPlayer.isCreative()) return false;
         DamageSource modifiedDamageSource = ModDamageTypes.Sources.bullet(lv.level().registryAccess(), null, null, false);
         AtomicBoolean interruptResult = new AtomicBoolean();
@@ -56,7 +58,7 @@ public class PlateEntityHurtEvent {
 
     private static float getHurtAmount(LivingEntity lv, DamageSource source, float amount, EntityHurtProvider provider, int hurtCanHold) {
         float hurtAmount;
-        float generateCaliberDamageAmount = CaliberVariantDamageHelper.generateDamageAmount(amount,source,hurtCanHold,provider);
+        float generateCaliberDamageAmount = CaliberVariantDamageHelper.generateDamageAmount(amount, source, hurtCanHold, provider);
         if (EventUtil.isIncidentAngleValid(lv, source)) {
             hurtAmount = provider.generateRicochet() * generateCaliberDamageAmount;
         } else {
@@ -67,7 +69,7 @@ public class PlateEntityHurtEvent {
 
     public static void entityHurtByGunHeadShot(EntityHurtByGunEvent event) {
         if (!(event instanceof EntityHurtByGunEvent.Pre eventPre)) return;
-        isHeadShot = event.isHeadShot();
+        boolean isHeadShot = event.isHeadShot();
         if (!isHeadShot) return;
         Optional<Entity> entity = Optional.ofNullable(event.getHurtEntity());
         DamageSource damageSource = event.getDamageSource(GunDamageSourcePart.ARMOR_PIERCING);

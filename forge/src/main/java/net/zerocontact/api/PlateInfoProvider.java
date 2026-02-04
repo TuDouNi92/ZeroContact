@@ -11,7 +11,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.entity.ArmedRaider;
-import net.zerocontact.events.PlateInteract;
+import net.zerocontact.events.PlateUnEquippedHelper;
 import net.zerocontact.registries.ModSoundEventsReg;
 import org.jetbrains.annotations.NotNull;
 import top.theillusivec4.curios.api.SlotContext;
@@ -39,7 +39,7 @@ public interface PlateInfoProvider extends ICurioItem, ProtectionInfoProvider {
     }
 
     default void curioTick(SlotContext slotContext, ItemStack stack) {
-        PlateInteract.onArmorUnequip(slotContext, stack);
+        PlateUnEquippedHelper.onArmorUnequipped(slotContext, stack);
     }
 
     @NotNull

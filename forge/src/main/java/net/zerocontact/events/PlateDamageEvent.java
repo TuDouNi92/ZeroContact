@@ -1,6 +1,7 @@
 package net.zerocontact.events;
 
 import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
+import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.init.ModDamageTypes;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -16,16 +17,13 @@ import top.theillusivec4.curios.api.CuriosApi;
 import java.util.Optional;
 
 public class PlateDamageEvent {
-    private static boolean isHeadshot;
-
     private static void DamagePlateModifier(
             LivingEntity livingEntity,
             DamageSource damageSource,
             float amount,
             ItemStack plateSlot
     ) {
-        if (isHeadshot) return;
-        if(plateSlot.isEmpty())return;
+        if (plateSlot.isEmpty()) return;
         damage(livingEntity, damageSource, amount, plateSlot);
     }
 
@@ -33,20 +31,24 @@ public class PlateDamageEvent {
         float durabilityLossFactor = 1;
         int hits = stackInSlot.getOrCreateTag().getInt("hits") + 1;
         int durabilityLossAmount = 1;
-        if (!stackInSlot.isEmpty() && (damageSource.is(ModDamageTypes.BULLET) || damageSource.is(ModDamageTypes.BULLET_IGNORE_ARMOR))) {
+        if (!stackInSlot.isEmpty() && (damageSource.is(ModDamageTypes.BULLETS_TAG))) {
             if (stackInSlot.getItem() instanceof DurabilityLossProvider provider) {
                 durabilityLossAmount = provider.generateLoss(amount, durabilityLossFactor, hits);
             }
             stackInSlot.getOrCreateTag().putInt("hits", hits);
+            EntityKineticBullet.EntityResult result = EventUtil.getHitResult(damageSource);
+            if (result != null && result.isHeadshot()) {
+                return;
+            }
             stackInSlot.hurtAndBreak(durabilityLossAmount, livingEntity, lv -> {
                 lv.playSound(ModSoundEventsReg.ARMOR_BROKEN_PLATE, 1.0f, 1.0f);
-                ZeroContactLogger.LOG.info(lv.getName() + "的插板碎掉了！");
+                ZeroContactLogger.LOG.debug("{}的插板碎掉了！", lv.getName());
             });
         }
     }
 
     public static void DamageHelmet(EntityHurtByGunEvent event) {
-        isHeadshot = event.isHeadShot();
+        boolean isHeadshot = event.isHeadShot();
         if (!isHeadshot) return;
         Optional<Entity> entity = Optional.ofNullable(event.getHurtEntity());
         float amount = event.getAmount();
@@ -59,9 +61,7 @@ public class PlateDamageEvent {
                 if (stack.getItem() instanceof DurabilityLossProvider durabilityLossProvider && stack.getItem() instanceof HelmetInfoProvider) {
                     durabilityLossAmount = durabilityLossProvider.generateLoss(amount, durabilityLossFactor, hits);
                     stack.getOrCreateTag().putInt("hits", hits);
-                    stack.hurtAndBreak(durabilityLossAmount, livingEntity, broken -> {
-                        livingEntity.playSound(ModSoundEventsReg.ARMOR_BROKEN_PLATE, 1.0f, 1.0f);
-                    });
+                    stack.hurtAndBreak(durabilityLossAmount, livingEntity, broken -> livingEntity.playSound(ModSoundEventsReg.ARMOR_BROKEN_PLATE, 1.0f, 1.0f));
                 }
             }
         });

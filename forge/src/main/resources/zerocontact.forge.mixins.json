@@ -5,7 +5,8 @@
   "minVersion": "0.8",
   "mixins": [
     "TaczModernKinetGunScriptAPIMixin",
-    "TaczAbstractGunItemMixin"
+    "TaczAbstractGunItemMixin",
+    "HeadshotHelmetMixin"
   ],
   "injectors": {
     "defaultRequire": 1

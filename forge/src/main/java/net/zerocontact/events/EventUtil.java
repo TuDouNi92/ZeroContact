@@ -1,10 +1,15 @@
 package net.zerocontact.events;
 
+import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.init.ModDamageTypes;
+import com.tacz.guns.util.EntityUtil;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -61,5 +66,15 @@ public class EventUtil {
             incidentAngle = Math.toDegrees(Math.atan2(sourceDz, sourceDx)) - lookAngle;
         }
         return incidentAngle;
+    }
+
+    public static @Nullable EntityKineticBullet.EntityResult getHitResult(DamageSource damageSource) {
+        Entity projectile = damageSource.getDirectEntity();
+        if (projectile instanceof EntityKineticBullet bullet) {
+            Vec3 startVec = bullet.position();
+            Vec3 endVec = startVec.add(bullet.getDeltaMovement());
+            return EntityUtil.findEntityOnPath(bullet, startVec, endVec);
+        }
+        return null;
     }
 }
