@@ -1,9 +1,7 @@
 package net.zerocontact.events;
 
 import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
-import com.tacz.guns.entity.EntityKineticBullet;
 import dev.architectury.event.events.common.TickEvent;
-import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -14,16 +12,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.zerocontact.api.Toggleable;
-import net.zerocontact.client.interaction.BulletPassBy;
 import net.zerocontact.client.menu.BackpackContainerMenu;
 import net.zerocontact.command.CommandManager;
 import net.zerocontact.item.backpack.BaseBackpack;
@@ -35,16 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.CuriosApi;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class ModForgeEventBus {
-    @SubscribeEvent
-    @OnlyIn(Dist.CLIENT)
-    public static void onClientEntity(EntityEvent event) {
-        Entity entity = event.getEntity();
-        if (entity instanceof EntityKineticBullet) {
-            BulletPassBy.playBulletPassBySound(entity, Minecraft.getInstance().player);
-        }
-    }
-
+public class ServerForgeEventBus {
     @SubscribeEvent
     public static void onPlayerInteractBackpack(PlayerInteractEvent.RightClickEmpty event) {
         Entity entity = event.getEntity();

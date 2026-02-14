@@ -8,9 +8,9 @@ import net.minecraft.world.item.ItemStack;
 import net.zerocontact.api.ArmorTypeTag;
 import top.theillusivec4.curios.api.SlotContext;
 
-public class PlateInteract {
+public class PlateUnEquippedHelper {
 
-    public static void onArmorUnequip(SlotContext context, ItemStack stack) {
+    public static void onArmorUnequipped(SlotContext context, ItemStack stack) {
         LivingEntity entity = context.entity();
         ItemStack ArmorItemStack = entity.getItemBySlot(EquipmentSlot.CHEST);
         if(entity instanceof ServerPlayer player){

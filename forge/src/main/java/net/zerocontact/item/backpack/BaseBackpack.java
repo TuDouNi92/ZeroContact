@@ -59,7 +59,7 @@ public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl impl
         return super.use(level, player, usedHand);
     }
 
-    private void callOpenScreen(ServerPlayer serverPlayer, BackpackContainerMenu.TriggerSource source) {
+    public void callOpenScreen(ServerPlayer serverPlayer, BackpackContainerMenu.TriggerSource source) {
         NetworkHooks.openScreen(serverPlayer, new SimpleMenuProvider((id, inv, __) -> new BackpackContainerMenu(id, inv, source), Component.translatable(this.getDescriptionId())), buf -> {
             buf.writeEnum(source);
         });
