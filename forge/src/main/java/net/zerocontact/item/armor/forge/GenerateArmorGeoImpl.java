@@ -14,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.IEquipmentTypeTag;
+import net.zerocontact.api.IItemLoader;
 import net.zerocontact.client.renderer.ArmorRender;
 import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
@@ -29,13 +30,14 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, IEquipmentTypeTag {
+public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, IEquipmentTypeTag, IItemLoader.GeneratableItem {
     protected final int defaultDurability;
-    public static Set<GenerationRecord> items = new HashSet<>();
+    public final Set<GenerationRecord<?>> items = new HashSet<>();
     private final float bluntFactor;
     private final float penetrateFactor;
     private final float ricochetFactor;
-    private GenerateArmorGeoImpl(Type type, String id, int defense, int defaultDurability, int absorb, float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, float bluntFactor, float penetrateFactor, float ricochetFactor) {
+
+    public GenerateArmorGeoImpl(Type type, String id, int defense, int defaultDurability, int absorb, float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, float bluntFactor, float penetrateFactor, float ricochetFactor) {
         super(type, id, defense, defaultDurability, absorb, mass, texture, model, animation);
         this.defaultDurability = defaultDurability;
         this.bluntFactor = bluntFactor;
@@ -88,7 +90,8 @@ public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, I
         return modifierMultimap;
     }
 
-    public static void deserializeItems() {
+
+    public void deserializeItems() {
         ArrayList<ItemGenData> itemGenDataList = ItemLoader.itemGenData;
         if (itemGenDataList.isEmpty()) return;
         for (ItemGenData data0 : itemGenDataList) {
@@ -105,7 +108,7 @@ public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, I
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerationRecord(id, new GenerateArmorGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, absorb, mass, texture, model, animation,bluntFactor,penetratedFactor,ricochetFactor)));
+            items.add(new GenerationRecord<>(id, new GenerateArmorGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, absorb, mass, texture, model, animation, bluntFactor, penetratedFactor, ricochetFactor)));
         }
     }
 

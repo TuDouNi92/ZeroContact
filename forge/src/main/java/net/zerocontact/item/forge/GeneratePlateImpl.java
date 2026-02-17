@@ -9,6 +9,7 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.api.ICombatArmorItem;
+import net.zerocontact.api.IItemLoader;
 import net.zerocontact.api.PlateInfoProvider;
 import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
- public class GeneratePlateImpl extends SapiIV implements ICombatArmorItem, PlateInfoProvider {
+public class GeneratePlateImpl extends SapiIV implements ICombatArmorItem, PlateInfoProvider, IItemLoader.GeneratableItem {
     private final int defense;
     private final int absorb;
     private final float movementFix;
@@ -31,8 +32,8 @@ import java.util.Set;
     private final float penetrateDamage;
     private final float ricochetDamage;
     private final int durabilityLossProvider;
-    public String id;
-    public static Set<GenerationRecord> items = new HashSet<>();
+    public final String id;
+    public final Set<GenerationRecord<?>> items = new HashSet<>();
 
     public GeneratePlateImpl(String id, float bluntDamage, float penetrateDamage, float ricochetDamage, int defense, int absorb, float movementFix, int durabilityLossProvider) {
         super(material, type, new Properties());
@@ -46,11 +47,12 @@ import java.util.Set;
         this.durabilityLossProvider = durabilityLossProvider;
     }
 
-    public static void deserializeItems() {
+    @Override
+    public void deserializeItems() {
         ArrayList<ItemGenData> itemGenDataList = ItemLoader.itemGenData;
         if (itemGenDataList.isEmpty()) return;
         for (ItemGenData data0 : itemGenDataList) {
-            if(!(data0 instanceof ItemGenData.Plate data))continue;
+            if (!(data0 instanceof ItemGenData.Plate data)) continue;
             String id = data.id;
             float bluntDamage = data.hurtModifier.bluntMultiplier;
             float penetrateDamage = data.hurtModifier.penetrateMultiplier;
@@ -59,7 +61,7 @@ import java.util.Set;
             int absorb = data.protectionClass;
             float movementFix = data.movementFix;
             int durabilityLossProvider = data.durabilityLossModifier;
-            items.add(new GenerationRecord(id,new GeneratePlateImpl(id,bluntDamage,penetrateDamage,ricochetDamage,defense,absorb,movementFix,durabilityLossProvider)));
+            items.add(new GenerationRecord<>(id, new GeneratePlateImpl(id, bluntDamage, penetrateDamage, ricochetDamage, defense, absorb, movementFix, durabilityLossProvider)));
         }
     }
 
@@ -108,13 +110,14 @@ import java.util.Set;
         return this.ricochetDamage;
     }
 
-     @Override
-     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
-         return super.getAttributeModifiers(slot, stack);
-     }
+    @Override
+    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
+        return super.getAttributeModifiers(slot, stack);
+    }
 
-     @Override
-     public boolean canEquip(ItemStack stack, EquipmentSlot armorType, Entity entity) {
-         return PlateInfoProvider.super.canEquip(stack, armorType, entity);
-     }
- }
+    @Override
+    public boolean canEquip(ItemStack stack, EquipmentSlot armorType, Entity entity) {
+        return PlateInfoProvider.super.canEquip(stack, armorType, entity);
+    }
+
+}

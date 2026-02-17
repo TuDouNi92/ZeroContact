@@ -71,8 +71,8 @@ public class ItemLoader{
                         Path itemPath = resoucePackPath.resolve("items");
                         Path ballisticDataPath = resoucePackPath.resolve("ammoDefinitions");
                         ZeroContactLogger.LOG.info("loading ItemPath");
-                        IItemLoader.loadItemJson(itemPath,GSON);
-                        IItemLoader.loadBallisticJson(ballisticDataPath,GSON);
+                        IItemLoader.IFiles.loadItemJson(itemPath,GSON);
+                        IItemLoader.IFiles.loadBallisticJson(ballisticDataPath,GSON);
                     });
         }
     }

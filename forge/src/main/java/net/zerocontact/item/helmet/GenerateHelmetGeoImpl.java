@@ -15,6 +15,7 @@ import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
+import net.zerocontact.api.IItemLoader;
 import net.zerocontact.client.renderer.HelmetRender;
 import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
@@ -27,17 +28,17 @@ import software.bernie.geckolib.animatable.GeoItem;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInfoProvider, GeoItem, ICombatArmorItem {
+public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInfoProvider, GeoItem, ICombatArmorItem, IItemLoader.GeneratableItem {
     private final int defaultDurability;
     private final int absorb;
-    public static Set<GenerationRecord> items = new HashSet<>();
+    public final Set<GenerationRecord<?>> items = new HashSet<>();
     private final float bluntDamage;
     private final float penetrateDamage;
     private final float ricochetDamage;
     private final int durabilityLossProvider;
 
-    private GenerateHelmetGeoImpl(String id, Type type, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, int defense, int absorb, float bluntDamage, float penetrateDamage, float ricochetDamage, int durabilityLossProvider, int defaultDurability) {
-        super(type, id, defense, defaultDurability,absorb,0, texture, model, animation);
+    public GenerateHelmetGeoImpl(String id, Type type, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, int defense, int absorb, float bluntDamage, float penetrateDamage, float ricochetDamage, int durabilityLossProvider, int defaultDurability) {
+        super(type, id, defense, defaultDurability, absorb, 0, texture, model, animation);
         this.absorb = absorb;
         this.bluntDamage = bluntDamage;
         this.penetrateDamage = penetrateDamage;
@@ -78,7 +79,7 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
 
     @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
-        if(slot !=EquipmentSlot.HEAD)return super.getAttributeModifiers(slot,stack);
+        if (slot != EquipmentSlot.HEAD) return super.getAttributeModifiers(slot, stack);
         Multimap<Attribute, AttributeModifier> modifierMultimap = HashMultimap.create();
         stack.getOrCreateTag().putInt("protection_class", getAbsorb());
         modifierMultimap.put(Attributes.ARMOR, new AttributeModifier(UUID.nameUUIDFromBytes(("Armor").getBytes()), "CuriosArmorDefense", this.getDefense(), AttributeModifier.Operation.ADDITION));
@@ -106,7 +107,8 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
         });
     }
 
-    public static void deserializeItems() {
+    @Override
+    public void deserializeItems() {
         ArrayList<ItemGenData> itemGenDataList = ItemLoader.itemGenData;
         if (itemGenDataList.isEmpty()) return;
         for (ItemGenData data0 : itemGenDataList) {
@@ -123,7 +125,7 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerationRecord(id,new GenerateHelmetGeoImpl(id, Type.HELMET, texture, model, animation, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, durabilityLossProvider,default_durability)));
+            items.add(new GenerationRecord<>(id, new GenerateHelmetGeoImpl(id, Type.HELMET, texture, model, animation, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, durabilityLossProvider, default_durability)));
         }
     }
 

@@ -3,6 +3,7 @@ package net.zerocontact.item.uniform;
 import net.minecraft.resources.ResourceLocation;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.IEquipmentTypeTag;
+import net.zerocontact.api.IItemLoader;
 import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
 import net.zerocontact.datagen.loader.ItemLoader;
@@ -13,13 +14,15 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class GenerateUniformTopGeoImpl extends AbstractGenerateGeoCurioItemImpl implements IEquipmentTypeTag {
-    public static Set<GenerationRecord> items = new HashSet<>();
+public class GenerateUniformTopGeoImpl extends AbstractGenerateGeoCurioItemImpl implements IEquipmentTypeTag, IItemLoader.GeneratableItem {
+    public final Set<GenerationRecord<?>> items = new HashSet<>();
     public static String serializeName = EquipmentType.UNIFORM_TOP.getTypeId();
+
     public GenerateUniformTopGeoImpl(String id, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
         super(id, defaultDurability, texture, model, animation);
     }
-    public static void deserializeItems() {
+
+    public void deserializeItems() {
         ArrayList<ItemGenData> itemGenDataList = ItemLoader.itemGenData;
         if (itemGenDataList.isEmpty()) return;
         for (ItemGenData data0 : itemGenDataList) {
@@ -30,7 +33,7 @@ public class GenerateUniformTopGeoImpl extends AbstractGenerateGeoCurioItemImpl 
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
             if (!(data.equipmentSlot).equals(serializeName)) continue;
-            items.add(new GenerationRecord(id,new GenerateUniformTopGeoImpl(id, defaultDurability, texture, model, animation)));
+            items.add(new GenerationRecord<>(id, new GenerateUniformTopGeoImpl(id, defaultDurability, texture, model, animation)));
         }
     }
 
