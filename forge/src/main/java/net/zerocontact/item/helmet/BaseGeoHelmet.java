@@ -13,8 +13,7 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.zerocontact.api.DurabilityLossProvider;
-import net.zerocontact.api.EntityHurtProvider;
+import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.client.renderer.HelmetRender;
 import net.zerocontact.item.PlateBaseMaterial;
@@ -27,7 +26,7 @@ import software.bernie.geckolib.core.animation.AnimatableManager;
 
 import java.util.function.Consumer;
 
-public class BaseGeoHelmet extends ArmorItem implements HelmetInfoProvider, GeoItem, EntityHurtProvider, DurabilityLossProvider {
+public class BaseGeoHelmet extends ArmorItem implements HelmetInfoProvider, GeoItem, ICombatArmorItem {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     private final int defense;
     private final int defaultDurability;

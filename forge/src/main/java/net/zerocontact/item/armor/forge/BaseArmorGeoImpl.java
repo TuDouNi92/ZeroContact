@@ -15,9 +15,7 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.api.IEquipmentTypeTag;
-import net.zerocontact.api.DurabilityLossProvider;
-import net.zerocontact.api.EntityHurtProvider;
-import net.zerocontact.api.ProtectionInfoProvider;
+import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.client.renderer.ArmorRender;
 import net.zerocontact.item.PlateBaseMaterial;
 import net.zerocontact.models.GenerateModel;
@@ -30,7 +28,7 @@ import software.bernie.geckolib.core.animation.AnimatableManager;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEquipmentTypeTag, ProtectionInfoProvider, DurabilityLossProvider, EntityHurtProvider {
+public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEquipmentTypeTag, ICombatArmorItem {
     protected final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     protected final Type type;
     protected final int defense;
@@ -107,7 +105,7 @@ public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEq
 
     @Override
     public int generateLoss(float damageAmount, float durabilityLossFactor, int hits) {
-        return DurabilityLossProvider.super.generateLoss(damageAmount, durabilityLossFactor, hits);
+        return ICombatArmorItem.super.generateLoss(damageAmount, durabilityLossFactor, hits);
     }
 
     @Override

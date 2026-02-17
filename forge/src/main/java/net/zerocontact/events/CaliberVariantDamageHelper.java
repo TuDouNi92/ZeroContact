@@ -7,7 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
-import net.zerocontact.api.EntityHurtProvider;
+import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.command.CommandManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -119,7 +119,7 @@ public enum CaliberVariantDamageHelper {
      * @param provider Interface implementation that provides the situation of getting hit by bullets
      * @return The generated damage amount
      */
-    public static float generateDamageAmount(float original, DamageSource source, int hurtCanHold, EntityHurtProvider provider) {
+    public static float generateDamageAmount(float original, DamageSource source, int hurtCanHold, ICombatArmorItem provider) {
         AtomicDouble output = new AtomicDouble(original);
         Optional.ofNullable(source.getDirectEntity()).ifPresent(bullet -> {
             if (bullet.level() instanceof ServerLevel serverLevel) {

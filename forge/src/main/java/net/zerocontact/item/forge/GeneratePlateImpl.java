@@ -8,8 +8,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
-import net.zerocontact.api.DurabilityLossProvider;
-import net.zerocontact.api.EntityHurtProvider;
+import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.PlateInfoProvider;
 import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
@@ -22,7 +21,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
- public class GeneratePlateImpl extends SapiIV implements DurabilityLossProvider, PlateInfoProvider, EntityHurtProvider {
+ public class GeneratePlateImpl extends SapiIV implements ICombatArmorItem, PlateInfoProvider {
     private final int defense;
     private final int absorb;
     private final float movementFix;

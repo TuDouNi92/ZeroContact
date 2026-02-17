@@ -14,7 +14,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.api.IEquipmentTypeTag;
-import net.zerocontact.api.EntityHurtProvider;
+import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.item.armor.forge.BaseArmorGeoImpl;
 import net.zerocontact.registries.ModSoundEventsReg;
@@ -46,7 +46,7 @@ public class PlateEntityHurtEvent {
         //This guard pattern is important to prevent recursively call from event
         if (!stack.isEmpty() && source.getEntity() != null) {
             lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
-            if (EventUtil.isDamageSourceValid(source) && stack.getItem() instanceof EntityHurtProvider provider) {
+            if (EventUtil.isDamageSourceValid(source) && stack.getItem() instanceof ICombatArmorItem provider) {
                 hurtAmount = getHurtAmount(lv, source, amount, provider, protectionClass);
                 lv.hurt(modifiedDamageSource, hurtAmount);
             }
@@ -56,7 +56,7 @@ public class PlateEntityHurtEvent {
         }
     }
 
-    private static float getHurtAmount(LivingEntity lv, DamageSource source, float amount, EntityHurtProvider provider, int hurtCanHold) {
+    private static float getHurtAmount(LivingEntity lv, DamageSource source, float amount, ICombatArmorItem provider, int hurtCanHold) {
         float hurtAmount;
         float generateCaliberDamageAmount = CaliberVariantDamageHelper.generateDamageAmount(amount, source, hurtCanHold, provider);
         if (EventUtil.isIncidentAngleValid(lv, source)) {
@@ -78,7 +78,7 @@ public class PlateEntityHurtEvent {
                 ItemStack helmet = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
                 float amount = event.getBaseAmount();
                 Optional.of(helmet).ifPresent(stack -> {
-                    if (!(stack.getItem() instanceof HelmetInfoProvider && stack.getItem() instanceof EntityHurtProvider entityHurtProvider))
+                    if (!(stack.getItem() instanceof HelmetInfoProvider && stack.getItem() instanceof ICombatArmorItem entityHurtProvider))
                         return;
                     int protectionClass = stack.getOrCreateTag().getInt("protection_class");
                     float hurtAmount = getHurtAmount(livingEntity, damageSource, amount, entityHurtProvider, protectionClass);

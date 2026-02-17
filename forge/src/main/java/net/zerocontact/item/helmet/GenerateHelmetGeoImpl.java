@@ -13,8 +13,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.ZeroContact;
-import net.zerocontact.api.DurabilityLossProvider;
-import net.zerocontact.api.EntityHurtProvider;
+import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.client.renderer.HelmetRender;
 import net.zerocontact.datagen.GenerationRecord;
@@ -28,7 +27,7 @@ import software.bernie.geckolib.animatable.GeoItem;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInfoProvider, GeoItem, EntityHurtProvider, DurabilityLossProvider {
+public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInfoProvider, GeoItem, ICombatArmorItem {
     private final int defaultDurability;
     private final int absorb;
     public static Set<GenerationRecord> items = new HashSet<>();

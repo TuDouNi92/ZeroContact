@@ -20,7 +20,7 @@ import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 import java.util.UUID;
 
-public interface PlateInfoProvider extends ICurioItem, ProtectionInfoProvider {
+public interface PlateInfoProvider extends ICurioItem, ICombatArmorItem {
     default ICurio.@NotNull SoundInfo getEquipSound(SlotContext slotContext, ItemStack stack) {
         return new ICurio.SoundInfo(ModSoundEventsReg.ARMOR_EQUIP_PLATE, 1.5f, 1.0f);
     }

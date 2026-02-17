@@ -1,5 +1,5 @@
 package net.zerocontact.api;
-
+@Deprecated
 public interface EntityHurtProvider {
     default float generateRicochet(){
         return 0.1f;

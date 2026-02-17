@@ -9,7 +9,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.ZeroContactLogger;
-import net.zerocontact.api.DurabilityLossProvider;
+import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.registries.ModSoundEventsReg;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -32,7 +32,7 @@ public class PlateDamageEvent {
         int hits = stackInSlot.getOrCreateTag().getInt("hits") + 1;
         int durabilityLossAmount = 1;
         if (!stackInSlot.isEmpty() && (damageSource.is(ModDamageTypes.BULLETS_TAG))) {
-            if (stackInSlot.getItem() instanceof DurabilityLossProvider provider) {
+            if (stackInSlot.getItem() instanceof ICombatArmorItem provider) {
                 durabilityLossAmount = provider.generateLoss(amount, durabilityLossFactor, hits);
             }
             stackInSlot.getOrCreateTag().putInt("hits", hits);
@@ -58,7 +58,7 @@ public class PlateDamageEvent {
                 float durabilityLossFactor = 1;
                 int hits = stack.getOrCreateTag().getInt("hits") + 1;
                 int durabilityLossAmount;
-                if (stack.getItem() instanceof DurabilityLossProvider durabilityLossProvider && stack.getItem() instanceof HelmetInfoProvider) {
+                if (stack.getItem() instanceof ICombatArmorItem durabilityLossProvider && stack.getItem() instanceof HelmetInfoProvider) {
                     durabilityLossAmount = durabilityLossProvider.generateLoss(amount, durabilityLossFactor, hits);
                     stack.getOrCreateTag().putInt("hits", hits);
                     stack.hurtAndBreak(durabilityLossAmount, livingEntity, broken -> livingEntity.playSound(ModSoundEventsReg.ARMOR_BROKEN_PLATE, 1.0f, 1.0f));
