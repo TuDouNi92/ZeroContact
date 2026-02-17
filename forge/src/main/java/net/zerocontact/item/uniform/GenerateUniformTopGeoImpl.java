@@ -2,7 +2,7 @@ package net.zerocontact.item.uniform;
 
 import net.minecraft.resources.ResourceLocation;
 import net.zerocontact.ZeroContact;
-import net.zerocontact.api.ArmorTypeTag;
+import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
 import net.zerocontact.datagen.loader.ItemLoader;
@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class GenerateUniformTopGeoImpl extends AbstractGenerateGeoCurioItemImpl implements ArmorTypeTag {
+public class GenerateUniformTopGeoImpl extends AbstractGenerateGeoCurioItemImpl implements IEquipmentTypeTag {
     public static Set<GenerationRecord> items = new HashSet<>();
-    public static String serializeName = ArmorType.UNIFORM_TOP.getTypeId();
+    public static String serializeName = EquipmentType.UNIFORM_TOP.getTypeId();
     public GenerateUniformTopGeoImpl(String id, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
         super(id, defaultDurability, texture, model, animation);
     }
@@ -35,7 +35,7 @@ public class GenerateUniformTopGeoImpl extends AbstractGenerateGeoCurioItemImpl 
     }
 
     @Override
-    public @NotNull ArmorType getArmorType() {
-        return ArmorType.UNIFORM_TOP;
+    public @NotNull IEquipmentTypeTag.EquipmentType getArmorType() {
+        return EquipmentType.UNIFORM_TOP;
     }
 }

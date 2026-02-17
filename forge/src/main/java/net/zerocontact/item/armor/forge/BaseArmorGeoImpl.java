@@ -14,7 +14,7 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.zerocontact.api.ArmorTypeTag;
+import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.api.DurabilityLossProvider;
 import net.zerocontact.api.EntityHurtProvider;
 import net.zerocontact.api.ProtectionInfoProvider;
@@ -30,7 +30,7 @@ import software.bernie.geckolib.core.animation.AnimatableManager;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, ArmorTypeTag, ProtectionInfoProvider, DurabilityLossProvider, EntityHurtProvider {
+public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEquipmentTypeTag, ProtectionInfoProvider, DurabilityLossProvider, EntityHurtProvider {
     protected final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     protected final Type type;
     protected final int defense;

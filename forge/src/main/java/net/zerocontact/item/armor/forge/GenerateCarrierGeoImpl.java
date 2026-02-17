@@ -13,7 +13,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.ZeroContact;
-import net.zerocontact.api.ArmorTypeTag;
+import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.client.renderer.ArmorRender;
 import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
@@ -26,10 +26,10 @@ import software.bernie.geckolib.animatable.GeoItem;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem, ArmorTypeTag {
+public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem, IEquipmentTypeTag {
     protected final int defaultDurability;
     public static Set<GenerationRecord> items = new HashSet<>();
-    private static final ArmorType armorType = ArmorType.PLATE_CARRIER;
+    private static final EquipmentType EQUIPMENT_TYPE = EquipmentType.PLATE_CARRIER;
 
     public GenerateCarrierGeoImpl(Type type, String id, int defense, int defaultDurability,int absorb,float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
         super(type, id, defense, defaultDurability,absorb,mass, texture, model, animation);
@@ -76,7 +76,7 @@ public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem,
             int defaultDurability = data.defaultDurability;
             int absorb = data.protectionClass;
             int mass =0;
-            if (!(Objects.equals(data.equipmentSlot, armorType.getTypeId()))) continue;
+            if (!(Objects.equals(data.equipmentSlot, EQUIPMENT_TYPE.getTypeId()))) continue;
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
@@ -85,7 +85,7 @@ public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem,
     }
 
     @Override
-    public @NotNull ArmorType getArmorType() {
-        return armorType;
+    public @NotNull IEquipmentTypeTag.EquipmentType getArmorType() {
+        return EQUIPMENT_TYPE;
     }
 }

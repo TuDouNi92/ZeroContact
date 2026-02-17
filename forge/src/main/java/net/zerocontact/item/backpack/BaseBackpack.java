@@ -19,7 +19,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.network.NetworkHooks;
-import net.zerocontact.api.ArmorTypeTag;
+import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.api.Toggleable;
 import net.zerocontact.client.menu.BackpackContainerMenu;
 import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
@@ -29,7 +29,7 @@ import top.theillusivec4.curios.api.SlotContext;
 
 import java.util.Optional;
 
-public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl implements ArmorTypeTag, Toggleable.Backpack {
+public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl implements IEquipmentTypeTag, Toggleable.Backpack {
     public final int containerSize;
     private boolean canOpen = false;
 
@@ -39,8 +39,8 @@ public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl impl
     }
 
     @Override
-    public @NotNull ArmorType getArmorType() {
-        return ArmorType.BACKPACK;
+    public @NotNull IEquipmentTypeTag.EquipmentType getArmorType() {
+        return EquipmentType.BACKPACK;
     }
 
     @Override

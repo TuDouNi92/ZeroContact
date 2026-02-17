@@ -1,6 +1,7 @@
 package net.zerocontact.item.armor.forge;
 
 import net.minecraft.resources.ResourceLocation;
+import net.zerocontact.api.IEquipmentTypeTag;
 import org.jetbrains.annotations.NotNull;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
@@ -14,8 +15,8 @@ public class Defender2ArmorImpl extends BaseArmorGeoImpl{
     }
 
     @Override
-    public @NotNull ArmorType getArmorType() {
-        return ArmorType.PLATE_CARRIER;
+    public @NotNull IEquipmentTypeTag.EquipmentType getArmorType() {
+        return EquipmentType.PLATE_CARRIER;
     }
 }
 

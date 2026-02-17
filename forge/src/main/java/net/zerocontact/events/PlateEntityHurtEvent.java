@@ -13,7 +13,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.zerocontact.api.ArmorTypeTag;
+import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.api.EntityHurtProvider;
 import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.item.armor.forge.BaseArmorGeoImpl;
@@ -31,7 +31,7 @@ public class PlateEntityHurtEvent {
         AtomicBoolean interruptResult = new AtomicBoolean();
         ItemStack stackInVanillaSlot = lv.getItemBySlot(EquipmentSlot.CHEST);
         if (isHeadShot) return false;
-        if (stackInVanillaSlot.getItem() instanceof BaseArmorGeoImpl baseArmorGeo && baseArmorGeo.getArmorType().equals(ArmorTypeTag.ArmorType.ARMOR)) {
+        if (stackInVanillaSlot.getItem() instanceof BaseArmorGeoImpl baseArmorGeo && baseArmorGeo.getArmorType().equals(IEquipmentTypeTag.EquipmentType.ARMOR)) {
             hurtIt(lv, source, amount, stackInVanillaSlot, modifiedDamageSource, interruptResult);
         } else {
             hurtIt(lv, source, amount, plateSlot, modifiedDamageSource, interruptResult);

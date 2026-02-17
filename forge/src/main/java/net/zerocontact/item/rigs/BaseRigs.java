@@ -1,6 +1,7 @@
 package net.zerocontact.item.rigs;
 
 import net.minecraft.resources.ResourceLocation;
+import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.item.backpack.BaseBackpack;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,7 +11,7 @@ public abstract class BaseRigs extends BaseBackpack {
     }
 
     @Override
-    public @NotNull ArmorType getArmorType() {
-        return ArmorType.RIGS;
+    public @NotNull IEquipmentTypeTag.EquipmentType getArmorType() {
+        return EquipmentType.RIGS;
     }
 }
