@@ -13,7 +13,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.ZeroContact;
-import net.zerocontact.api.ArmorTypeTag;
+import net.zerocontact.api.IEquipmentTypeTag;
+import net.zerocontact.api.IItemLoader;
 import net.zerocontact.client.renderer.ArmorRender;
 import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
@@ -26,13 +27,13 @@ import software.bernie.geckolib.animatable.GeoItem;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem, ArmorTypeTag {
+public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem, IEquipmentTypeTag, IItemLoader.GeneratableItem {
     protected final int defaultDurability;
-    public static Set<GenerationRecord> items = new HashSet<>();
-    private static final ArmorType armorType = ArmorType.PLATE_CARRIER;
+    public final Set<GenerationRecord<?>> items = new HashSet<>();
+    private static final EquipmentType EQUIPMENT_TYPE = EquipmentType.PLATE_CARRIER;
 
-    public GenerateCarrierGeoImpl(Type type, String id, int defense, int defaultDurability,int absorb,float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
-        super(type, id, defense, defaultDurability,absorb,mass, texture, model, animation);
+    public GenerateCarrierGeoImpl(Type type, String id, int defense, int defaultDurability, int absorb, float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+        super(type, id, defense, defaultDurability, absorb, mass, texture, model, animation);
         this.defaultDurability = defaultDurability;
     }
 
@@ -65,8 +66,8 @@ public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem,
         modifierMultimap.put(Attributes.ARMOR, new AttributeModifier(UUID.nameUUIDFromBytes(("Armor").getBytes()), "CuriosArmorDefense", this.getDefense(), AttributeModifier.Operation.ADDITION));
         return modifierMultimap;
     }
-
-    public static void deserializeItems() {
+    @Override
+    public void deserializeItems() {
         ArrayList<ItemGenData> itemGenDataList = ItemLoader.itemGenData;
         if (itemGenDataList.isEmpty()) return;
         for (ItemGenData data0 : itemGenDataList) {
@@ -75,17 +76,17 @@ public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem,
             int defense = data.defense;
             int defaultDurability = data.defaultDurability;
             int absorb = data.protectionClass;
-            int mass =0;
-            if (!(Objects.equals(data.equipmentSlot, armorType.getTypeId()))) continue;
+            int mass = 0;
+            if (!(Objects.equals(data.equipmentSlot, EQUIPMENT_TYPE.getTypeId()))) continue;
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerationRecord(id, new GenerateCarrierGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability,absorb,mass, texture, model, animation)));
+            items.add(new GenerationRecord<>(id, new GenerateCarrierGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, absorb, mass, texture, model, animation)));
         }
     }
 
     @Override
-    public @NotNull ArmorType getArmorType() {
-        return armorType;
+    public @NotNull IEquipmentTypeTag.EquipmentType getArmorType() {
+        return EQUIPMENT_TYPE;
     }
 }

@@ -1,13 +1,13 @@
 package net.zerocontact.item.armband;
 
 import net.minecraft.resources.ResourceLocation;
-import net.zerocontact.api.ArmorTypeTag;
+import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
 import org.jetbrains.annotations.NotNull;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
 
-public class Armband extends AbstractGenerateGeoCurioItemImpl implements ArmorTypeTag {
+public class Armband extends AbstractGenerateGeoCurioItemImpl implements IEquipmentTypeTag {
     public Armband(ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
         super("",0,texture, model, animation);
     }
@@ -73,7 +73,7 @@ public class Armband extends AbstractGenerateGeoCurioItemImpl implements ArmorTy
         return new Armband(series.resourceLocations.texture(),series.resourceLocations.model(),series.resourceLocations.animation());
     }
     @Override
-    public @NotNull ArmorType getArmorType() {
-        return ArmorType.ARMBAND;
+    public @NotNull IEquipmentTypeTag.EquipmentType getArmorType() {
+        return EquipmentType.ARMBAND;
     }
 }

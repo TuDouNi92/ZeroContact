@@ -19,7 +19,7 @@ public class ZeroContactForge {
         EventBuses.registerModEventBus(ZeroContact.MOD_ID, FMLJavaModLoadingContext.get().getModEventBus());
         ZeroContact.init();
         GeckoLib.initialize();
-        ModForgeEventBus.regEvents();
+        ServerForgeEventBus.regEvents();
         ModEntitiesReg.register();
         Predicate.predicateCurios();
         EntityDeathDogTagEvent.register();

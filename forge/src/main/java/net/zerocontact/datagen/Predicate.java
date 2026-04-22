@@ -3,7 +3,7 @@ package net.zerocontact.datagen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.zerocontact.api.PlateInfoProvider;
-import net.zerocontact.api.ArmorTypeTag;
+import net.zerocontact.api.IEquipmentTypeTag;
 import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.Objects;
@@ -21,9 +21,9 @@ public class Predicate {
             ) {
                 return true;
             }
-            if (slotResult.stack().getItem() instanceof ArmorTypeTag armorTypeTag) {
-                armorTypeTag.getArmorType();
-                return Objects.equals(slotResult.slotContext().identifier(), armorTypeTag.getArmorType().getTypeId().toLowerCase());
+            if (slotResult.stack().getItem() instanceof IEquipmentTypeTag IEquipmentTypeTag) {
+                IEquipmentTypeTag.getArmorType();
+                return Objects.equals(slotResult.slotContext().identifier(), IEquipmentTypeTag.getArmorType().getTypeId().toLowerCase());
             }
             return false;
         });

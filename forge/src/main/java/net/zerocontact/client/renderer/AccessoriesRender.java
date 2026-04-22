@@ -9,7 +9,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.zerocontact.api.ArmorTypeTag;
+import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
 import net.zerocontact.models.GenerateModel;
 import software.bernie.geckolib.animatable.GeoItem;
@@ -39,15 +39,15 @@ public class AccessoriesRender<T extends Item & GeoItem & GeoAnimatable, E exten
     @Override
     public void prepareModel(ItemStack stack, SlotContext slotContext, PoseStack poseStack, RenderLayerParent<LivingEntity, EntityModel<LivingEntity>> renderLayerParent, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         HumanoidRender.super.prepareModel(stack, slotContext, poseStack, renderLayerParent, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
-        if (stack.getItem() instanceof ArmorTypeTag armorTypeTag) {
-            if (armorTypeTag.getArmorType() == ArmorTypeTag.ArmorType.UNIFORM_TOP
-                    || armorTypeTag.getArmorType() == ArmorTypeTag.ArmorType.ARMBAND
-                    ||armorTypeTag.getArmorType() == ArmorTypeTag.ArmorType.BACKPACK
-                    || armorTypeTag.getArmorType() == ArmorTypeTag.ArmorType.RIGS
+        if (stack.getItem() instanceof IEquipmentTypeTag IEquipmentTypeTag) {
+            if (IEquipmentTypeTag.getArmorType() == net.zerocontact.api.IEquipmentTypeTag.EquipmentType.UNIFORM_TOP
+                    || IEquipmentTypeTag.getArmorType() == net.zerocontact.api.IEquipmentTypeTag.EquipmentType.ARMBAND
+                    || IEquipmentTypeTag.getArmorType() == net.zerocontact.api.IEquipmentTypeTag.EquipmentType.BACKPACK
+                    || IEquipmentTypeTag.getArmorType() == net.zerocontact.api.IEquipmentTypeTag.EquipmentType.RIGS
             ) {
                 render.prepForRender(slotContext.entity(), stack, EquipmentSlot.CHEST, (HumanoidModel<?>) renderLayerParent.getModel());
             }
-            if (armorTypeTag.getArmorType() == ArmorTypeTag.ArmorType.UNIFORM_PANTS) {
+            if (IEquipmentTypeTag.getArmorType() == net.zerocontact.api.IEquipmentTypeTag.EquipmentType.UNIFORM_PANTS) {
                 render.prepForRender(slotContext.entity(), stack, EquipmentSlot.LEGS, (HumanoidModel<?>) renderLayerParent.getModel());
             }
         }

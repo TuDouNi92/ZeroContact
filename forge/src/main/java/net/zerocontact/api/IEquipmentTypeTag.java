@@ -2,8 +2,8 @@ package net.zerocontact.api;
 
 import org.jetbrains.annotations.NotNull;
 
-public interface ArmorTypeTag {
-    enum ArmorType {
+public interface IEquipmentTypeTag {
+    enum EquipmentType {
         PLATE_CARRIER("PLATE_CARRIER"),
         ARMOR("ARMOR"),
         UNIFORM_TOP("UNIFORM_TOP"),
@@ -14,7 +14,7 @@ public interface ArmorTypeTag {
         RIGS("RIGS");
         private final String name;
 
-        ArmorType(String name) {
+        EquipmentType(String name) {
             this.name = name;
         }
 
@@ -23,7 +23,7 @@ public interface ArmorTypeTag {
         }
     }
 
-    default @NotNull ArmorType getArmorType(){
-        return ArmorType.ARMOR;
+    default @NotNull IEquipmentTypeTag.EquipmentType getArmorType(){
+        return EquipmentType.ARMOR;
     }
 }

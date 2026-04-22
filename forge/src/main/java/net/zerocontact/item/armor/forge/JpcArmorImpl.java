@@ -6,7 +6,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.zerocontact.api.ArmorTypeTag;
+import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.client.renderer.ArmorRender;
 import net.zerocontact.item.armor.JpcArmor;
 import net.zerocontact.models.JpcModel;
@@ -18,7 +18,7 @@ import software.bernie.geckolib.core.animation.AnimatableManager;
 
 import java.util.function.Consumer;
 
-public class JpcArmorImpl extends JpcArmor implements GeoItem, ArmorTypeTag {
+public class JpcArmorImpl extends JpcArmor implements GeoItem, IEquipmentTypeTag {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     public JpcArmorImpl(Type type, ArmorMaterial material, Properties properties) {
         super(type, material, properties);
@@ -53,7 +53,7 @@ public class JpcArmorImpl extends JpcArmor implements GeoItem, ArmorTypeTag {
     }
 
     @Override
-    public @NotNull ArmorType getArmorType() {
-        return ArmorType.PLATE_CARRIER;
+    public @NotNull IEquipmentTypeTag.EquipmentType getArmorType() {
+        return EquipmentType.PLATE_CARRIER;
     }
 }

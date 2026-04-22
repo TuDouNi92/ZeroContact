@@ -7,13 +7,12 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
-import net.zerocontact.api.DurabilityLossProvider;
-import net.zerocontact.api.EntityHurtProvider;
+import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.PlateInfoProvider;
 import net.zerocontact.item.Ceramic;
 import org.jetbrains.annotations.NotNull;
 
-public class CeramicImpl extends Ceramic implements EntityHurtProvider, DurabilityLossProvider, PlateInfoProvider {
+public class CeramicImpl extends Ceramic implements ICombatArmorItem, PlateInfoProvider {
     private final int defense;
     private final int absorb;
     private final float mass;

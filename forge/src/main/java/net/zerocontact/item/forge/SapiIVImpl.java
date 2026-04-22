@@ -7,13 +7,12 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
-import net.zerocontact.api.DurabilityLossProvider;
-import net.zerocontact.api.EntityHurtProvider;
+import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.PlateInfoProvider;
 import net.zerocontact.item.SapiIV;
 import org.jetbrains.annotations.NotNull;
 
-public class SapiIVImpl extends SapiIV implements DurabilityLossProvider, EntityHurtProvider, PlateInfoProvider {
+public class SapiIVImpl extends SapiIV implements ICombatArmorItem, PlateInfoProvider {
     private final Type type;
     private final ArmorMaterial material;
     private final int defense;
