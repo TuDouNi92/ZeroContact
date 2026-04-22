@@ -35,7 +35,7 @@ public interface Toggleable {
         return !state.get();
     }
     interface Backpack{
-        void setToggling(boolean open);
-        boolean getToggling();
+        void setToggling(ItemStack stack,boolean isOpen);
+        boolean getToggling(ItemStack stack);
     }
 }

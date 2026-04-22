@@ -1,14 +1,11 @@
 package net.zerocontact.forge;
 
 import dev.architectury.platform.forge.EventBuses;
-import net.minecraft.network.chat.Component;
-import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.zerocontact.ZeroContact;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.zerocontact.client.gui.ConfigScreen;
 import net.zerocontact.cofig.ModConfigs;
 import net.zerocontact.datagen.Predicate;
 import net.zerocontact.events.*;
@@ -28,16 +25,12 @@ public class ZeroContactForge {
         EntityDeathDogTagEvent.register();
         regConfig();
     }
-    private void regConfig(){
+
+    private static void regConfig() {
         ModLoadingContext.get().registerConfig(
                 ModConfig.Type.COMMON,
                 ModConfigs.CONFIG_SPEC
         );
-        ModLoadingContext.get().registerExtensionPoint(
-                ConfigScreenHandler.ConfigScreenFactory.class,
-                ()-> new ConfigScreenHandler.ConfigScreenFactory(
-                        (mc,parent)->new ConfigScreen(Component.literal("Config screen"),parent)
-                )
-        );
     }
+
 }

@@ -3,11 +3,16 @@ package net.zerocontact.events;
 import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.init.ModDamageTypes;
 import com.tacz.guns.util.EntityUtil;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -76,5 +81,31 @@ public class EventUtil {
             return EntityUtil.findEntityOnPath(bullet, startVec, endVec);
         }
         return null;
+    }
+
+    public static ServerPlayer getAllyPlayer(Player player) {
+        double range = 1.5D;
+        Vec3 eyePos = player.getEyePosition();
+        Vec3 lookVec = player.getLookAngle();
+        Vec3 reachVec = eyePos.add(lookVec.scale(range));
+        AABB box = player.getBoundingBox().expandTowards(lookVec.scale(range)).inflate(1.0D);
+        EntityHitResult result = ProjectileUtil.getEntityHitResult(
+                player.level(), player, eyePos, reachVec, box, e ->
+                        e instanceof ServerPlayer sp
+                                && !sp.isSpectator()
+                                && sp.isPickable()
+                                && sp.isAlliedTo(player)
+        );
+        return result != null ? (ServerPlayer) result.getEntity() : null;
+    }
+
+    public static boolean isLookAtTargetBack(ServerPlayer player, @Nullable LivingEntity target) {
+        if (target == null) return false;
+        Vec3 look = player.position().subtract(target.position()).normalize();
+        float yRot = target.getYRot();
+        Vec3 targetForward = Vec3.directionFromRotation(0, yRot).normalize();
+        Vec3 targetBack = targetForward.scale(-1);
+        double dot = look.dot(targetBack);
+        return dot > 0;
     }
 }

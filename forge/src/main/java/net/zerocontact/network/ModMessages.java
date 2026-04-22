@@ -50,10 +50,10 @@ public class ModMessages {
                 .encoder(NetworkHandler.ToggleBackpackPacket::encode)
                 .consumerMainThread(NetworkHandler.ToggleBackpackPacket::handle)
                 .add();
-        net.messageBuilder(NetworkHandler.ToggleBackpackResultPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(NetworkHandler.ToggleBackpackResultPacket::decode)
-                .encoder(NetworkHandler.ToggleBackpackResultPacket::encode)
-                .consumerMainThread(NetworkHandler.ToggleBackpackResultPacket::handle)
+        net.messageBuilder(NetworkHandler.RightClickingAllyBackpackPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(NetworkHandler.RightClickingAllyBackpackPacket::decode)
+                .encoder(NetworkHandler.RightClickingAllyBackpackPacket::encode)
+                .consumerMainThread(NetworkHandler.RightClickingAllyBackpackPacket::handle)
                 .add();
     }
 

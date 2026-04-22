@@ -23,41 +23,45 @@ import java.util.Optional;
 
 public class BackpackContainerMenu extends AbstractContainerMenu {
     private IndexSimpleContainer backpackContainer = new IndexSimpleContainer(0);
-    private IndexSimpleContainer rigsContainer =new IndexSimpleContainer(0);
+    private IndexSimpleContainer rigsContainer = new IndexSimpleContainer(0);
     private final TriggerSource triggerSource;
     public int minSlotX = Integer.MAX_VALUE;
     public int maxSlotX = Integer.MIN_VALUE;
     public int minSlotY = Integer.MAX_VALUE;
     public int maxSlotY = Integer.MIN_VALUE;
-    public int guiWidth,guiHeight;
+    public int guiWidth, guiHeight;
     public ItemStack backpackRenderStack;
     public ItemStack rigsRenderStack;
+    public ItemStack allyStack;
 
     public enum TriggerSource {
         USE,
-        KEY
+        KEY,
+        ALLY
     }
 
+    //client side
     public BackpackContainerMenu(int containerId, Inventory playerInv, FriendlyByteBuf buf) {
-        this(containerId, playerInv, buf.readEnum(TriggerSource.class));
+        this(containerId, playerInv, buf.readEnum(TriggerSource.class), buf.readItem());
     }
 
-    public BackpackContainerMenu(int containerId, Inventory playerInv, TriggerSource source) {
+    //server side
+    public BackpackContainerMenu(int containerId, Inventory playerInv, TriggerSource source, ItemStack allyStack) {
         super(ModMenus.BACKPACK_CONTAINER.get(), containerId);
         this.triggerSource = source;
-        if (triggerSource == BackpackContainerMenu.TriggerSource.USE) {
+        if (triggerSource == TriggerSource.USE) {
             backpackRenderStack = getHandStack(playerInv.player);
-            if(backpackRenderStack.getItem() instanceof BaseRigs baseRigs){
+            if (backpackRenderStack.getItem() instanceof BaseRigs baseRigs) {
                 rigsContainer = new IndexSimpleContainer(baseRigs.containerSize);
             } else if (backpackRenderStack.getItem() instanceof BaseBackpack backpack) {
                 backpackContainer = new IndexSimpleContainer(backpack.containerSize);
             }
             readInvfromTag(backpackRenderStack);
-        } else if (source == BackpackContainerMenu.TriggerSource.KEY) {
+        } else if (source == TriggerSource.KEY) {
             CuriosApi.getCuriosInventory(playerInv.player).ifPresent(inventoryHandler -> {
                 inventoryHandler.getStacksHandler("backpack").ifPresent(stacksHandler -> {
                     ItemStack backpackStack = stacksHandler.getStacks().getStackInSlot(0);
-                    if(backpackStack.getItem() instanceof BaseBackpack backpack) {
+                    if (backpackStack.getItem() instanceof BaseBackpack backpack) {
                         backpackContainer = new IndexSimpleContainer(backpack.containerSize);
                         backpackRenderStack = backpackStack;
                         readInvfromTag(backpackStack);
@@ -65,7 +69,7 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
                 });
                 inventoryHandler.getStacksHandler("rigs").ifPresent(stacksHandler -> {
                     ItemStack rigsStack = stacksHandler.getStacks().getStackInSlot(0);
-                    if(rigsStack.getItem() instanceof BaseRigs baseRigs) {
+                    if (rigsStack.getItem() instanceof BaseRigs baseRigs) {
                         rigsContainer = new IndexSimpleContainer(baseRigs.containerSize);
                         rigsRenderStack = rigsStack;
                         readInvfromTag(rigsStack);
@@ -73,7 +77,15 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
                 });
             });
 
+        } else if (source == TriggerSource.ALLY) {
+            if (allyStack.getItem() instanceof BaseBackpack backpack) {
+                this.allyStack = allyStack;
+                backpackContainer = new IndexSimpleContainer(backpack.containerSize);
+                backpackRenderStack = allyStack;
+                readInvfromTag(allyStack);
+            }
         }
+
         CustomInventory customInventory = new CustomInventory(this, backpackContainer.getContainerSize(), rigsContainer.getContainerSize());
         new PlayerInventory(playerInv, customInventory);
         int padding = 8;
@@ -133,14 +145,15 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
         protected int rigsCustomInvY;
         protected BackpackContainerMenu menu;
         private int startX;
-        CustomInventory(BackpackContainerMenu menu,  int backpackSize,  int rigsSize) {
+
+        CustomInventory(BackpackContainerMenu menu, int backpackSize, int rigsSize) {
             this.menu = menu;
             addCustomInventory(backpackSize, rigsSize);
         }
 
         private void addCustomInventory(int backpackSize, int rigsSize) {
             //Backpack part
-            int backpackRightScreenX=0;
+            int backpackRightScreenX = 0;
             if (backpackSize != 0) {
                 int cols = Mth.ceil(Mth.sqrt(backpackSize));
                 int rows = Mth.ceil((double) backpackSize / cols);
@@ -162,7 +175,7 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
             if (rigsSize != 0) {
                 int rCols = Mth.ceil(Mth.sqrt(rigsSize));
                 int rRows = Mth.ceil((double) rigsSize / rCols);
-                int rStartX = startX==0?(176 - rCols * 18) / 2: backpackRightScreenX+16;
+                int rStartX = startX == 0 ? (176 - rCols * 18) / 2 : backpackRightScreenX + 16;
                 for (int i = 0; i < rRows; ++i) {
                     for (int j = 0; j < rCols; ++j) {
                         rigsCustomInvY = 16 + i * 18;
@@ -188,7 +201,7 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
         private void addPlayerInventory(Inventory inventory, CustomInventory customInventory) {
             for (int i = 0; i < 3; ++i) {
                 for (int j = 0; j < 9; ++j) {
-                    playerInvY = customInventory.backpackCustomInvY ==0?customInventory.rigsCustomInvY+24+i*18:customInventory.backpackCustomInvY + 24 + i * 18;
+                    playerInvY = customInventory.backpackCustomInvY == 0 ? customInventory.rigsCustomInvY + 24 + i * 18 : customInventory.backpackCustomInvY + 24 + i * 18;
                     customInventory.menu.addSlot(new Slot(inventory, j + i * 9 + 9, 8 + j * 18, playerInvY)
                     );
                 }
@@ -214,6 +227,8 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
                 ItemStack rigsStack = stacksHandler.getStacks().getStackInSlot(0);
                 writeInvToTag(rigsStack);
             }));
+        } else if (triggerSource == TriggerSource.ALLY && !allyStack.isEmpty()) {
+            writeInvToTag(allyStack);
         }
         super.removed(player);
     }

@@ -25,13 +25,16 @@ import net.zerocontact.client.menu.BackpackContainerMenu;
 import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 
 import java.util.Optional;
 
+import static net.zerocontact.events.EventUtil.getAllyPlayer;
+import static net.zerocontact.events.EventUtil.isLookAtTargetBack;
+
 public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl implements ArmorTypeTag, Toggleable.Backpack {
     public final int containerSize;
-    private boolean canOpen = false;
 
     public BaseBackpack(ResourceLocation texture, ResourceLocation model, ResourceLocation animation, int containerSize) {
         super("", 0, texture, model, animation);
@@ -46,34 +49,35 @@ public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl impl
     @Override
     public void curioTick(SlotContext slotContext, ItemStack stack) {
         super.curioTick(slotContext, stack);
-        if (canOpen && !slotContext.entity().level().isClientSide() && slotContext.entity() instanceof ServerPlayer serverPlayer) {
-            callOpenScreen(serverPlayer, BackpackContainerMenu.TriggerSource.KEY);
+        if (getToggling(stack) && !slotContext.entity().level().isClientSide() && slotContext.entity() instanceof ServerPlayer serverPlayer) {
+            callOpenScreen(serverPlayer, BackpackContainerMenu.TriggerSource.KEY, ItemStack.EMPTY);
+            setToggling(stack,false);
         }
     }
 
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand usedHand) {
         if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
-            callOpenScreen(serverPlayer, BackpackContainerMenu.TriggerSource.USE);
+            callOpenScreen(serverPlayer, BackpackContainerMenu.TriggerSource.USE, ItemStack.EMPTY);
         }
         return super.use(level, player, usedHand);
     }
 
-    private void callOpenScreen(ServerPlayer serverPlayer, BackpackContainerMenu.TriggerSource source) {
-        NetworkHooks.openScreen(serverPlayer, new SimpleMenuProvider((id, inv, __) -> new BackpackContainerMenu(id, inv, source), Component.translatable(this.getDescriptionId())), buf -> {
+    public void callOpenScreen(ServerPlayer visitor, BackpackContainerMenu.TriggerSource source, ItemStack allieStack) {
+        NetworkHooks.openScreen(visitor, new SimpleMenuProvider((id, inv, __) -> new BackpackContainerMenu(id, inv, source, allieStack), Component.translatable(this.getDescriptionId())), buf -> {
             buf.writeEnum(source);
+            buf.writeItem(allieStack);
         });
-        canOpen = false;
     }
 
     @Override
-    public void setToggling(boolean open) {
-        this.canOpen = open;
+    public void setToggling(ItemStack stack, boolean isOpen) {
+        stack.getOrCreateTag().putBoolean("canOpen", isOpen);
     }
 
     @Override
-    public boolean getToggling() {
-        return this.canOpen;
+    public boolean getToggling(ItemStack stack) {
+        return stack.getOrCreateTag().getBoolean("canOpen");
     }
 
     @Override
@@ -104,5 +108,29 @@ public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl impl
                 return ForgeCapabilities.ITEM_HANDLER.orEmpty(capability, LazyOptional.of(() -> container));
             }
         };
+    }
+
+    @Override
+    public boolean canEquipFromUse(SlotContext slotContext, ItemStack stack) {
+        if (slotContext.entity().isCrouching()) {
+            return true;
+        }
+        return super.canEquipFromUse(slotContext, stack);
+    }
+
+    public static void whetherOpenAllyScreen(Player player) {
+        if (player instanceof ServerPlayer serverPlayer) {
+            ServerPlayer targetEntity = getAllyPlayer(player);
+            if (isLookAtTargetBack(serverPlayer, targetEntity) && player.isCrouching()) {
+                CuriosApi.getCuriosInventory(targetEntity)
+                        .ifPresent(itemHandler ->
+                                itemHandler.getStacksHandler("backpack").ifPresent(stacksHandler -> {
+                                    ItemStack backpackStack = stacksHandler.getStacks().getStackInSlot(0);
+                                    if (backpackStack.getItem() instanceof BaseBackpack backpack && player.isCrouching())
+                                        backpack.callOpenScreen(serverPlayer, BackpackContainerMenu.TriggerSource.ALLY, backpackStack);
+                                }));
+            }
+        }
+
     }
 }

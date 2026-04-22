@@ -10,6 +10,7 @@ import net.zerocontact.api.Toggleable;
 import net.zerocontact.client.ClientData;
 import net.zerocontact.client.animation.VisorTracker;
 import net.zerocontact.command.CommandManager;
+import net.zerocontact.item.backpack.BaseBackpack;
 import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.Optional;
@@ -145,10 +146,9 @@ public class NetworkHandler {
                 if (player == null) return;
                 CuriosApi.getCuriosInventory(player).ifPresent(handler -> {
                     handler.getStacksHandler("backpack").ifPresent(stacksHandler -> {
-                        if (stacksHandler.getStacks().getStackInSlot(0).getItem() instanceof Toggleable.Backpack backpack) {
-                            backpack.setToggling(msg.toggle);
-                            boolean switchToggleable = backpack.getToggling();
-                            ModMessages.sendToPlayer(new ToggleBackpackResultPacket(switchToggleable), player);
+                        ItemStack backpackStack = stacksHandler.getStacks().getStackInSlot(0);
+                        if (backpackStack.getItem() instanceof BaseBackpack backpack) {
+                            backpack.setToggling(backpackStack, msg.toggle);
                         }
                     });
                 });
@@ -156,18 +156,20 @@ public class NetworkHandler {
         }
     }
 
-    public record ToggleBackpackResultPacket(boolean toggle) {
-        public void encode(FriendlyByteBuf buf) {
-            buf.writeBoolean(toggle);
+    public record RightClickingAllyBackpackPacket() {
+        public void encode(FriendlyByteBuf ignoredBuf) {
         }
 
-        public static ToggleBackpackResultPacket decode(FriendlyByteBuf buf) {
-            return new ToggleBackpackResultPacket(buf.readBoolean());
+        public static RightClickingAllyBackpackPacket decode(FriendlyByteBuf buf) {
+            return new RightClickingAllyBackpackPacket();
         }
 
-        public static void handle(ToggleBackpackResultPacket msg, Supplier<NetworkEvent.Context> supplier) {
+        public static void handle(RightClickingAllyBackpackPacket msg, Supplier<NetworkEvent.Context> supplier) {
             NetworkEvent.Context context = supplier.get();
-            context.enqueueWork(() -> ClientData.setTriggerBackPackToggle(msg.toggle));
+            context.enqueueWork(() -> {
+                ServerPlayer serverPlayer = context.getSender();
+                BaseBackpack.whetherOpenAllyScreen(serverPlayer);
+            });
         }
     }
 }
