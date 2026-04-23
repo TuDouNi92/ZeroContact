@@ -1,19 +1,16 @@
 package net.zerocontact.events;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.zerocontact.cofig.ModConfigs;
 import net.zerocontact.command.CommandManager;
 import net.zerocontact.network.ModMessages;
 import net.zerocontact.network.NetworkHandler;
@@ -62,13 +59,6 @@ public class AttachStaminaEvent {
                             player);
                 });
             }
-        }
-    }
-    @SubscribeEvent
-    public static void onClientLogin(ClientPlayerNetworkEvent.LoggingIn event){
-        Minecraft mc = Minecraft.getInstance();
-        if(mc.isSingleplayer()){
-            ModMessages.sendToServer(new NetworkHandler.ToggleStaminaPacket(ModConfigs.COMMON.enableStamina.get()));
         }
     }
 }
