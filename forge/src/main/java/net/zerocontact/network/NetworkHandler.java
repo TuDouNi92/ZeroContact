@@ -81,9 +81,9 @@ public class NetworkHandler {
                 Optional<ItemStack> helmet = Optional.of(player.getItemBySlot(EquipmentSlot.HEAD));
                 helmet.ifPresent(stack -> {
                     if (stack.getItem() instanceof Toggleable toggleable) {
-                        boolean isEnabled = toggleable.getEnabled();
-                        toggleable.setToggling(true);
-                        ModMessages.sendToPlayer(new ToggleVisorResultPacket(isEnabled, toggleable.getAnimData()), player);
+                        boolean isEnabled = toggleable.getEnabled(stack);
+                        toggleable.setTriggered(true,stack);
+                        ModMessages.sendToPlayer(new ToggleVisorResultPacket(isEnabled, toggleable.readAnimData(stack)), player);
                     }
                 });
             });
@@ -94,17 +94,14 @@ public class NetworkHandler {
         public void encode(FriendlyByteBuf buf) {
             buf.writeBoolean(lastSwitch);
             String animName = "";
-            double tick = 0;
             boolean isPlaying = false;
             double animLength = 0;
             if (visorAnimateData != null) {
                 animName = visorAnimateData.animationName;
-                tick = visorAnimateData.tick;
                 isPlaying = visorAnimateData.isPlaying;
                 animLength = visorAnimateData.animLength;
             }
             buf.writeUtf(animName);
-            buf.writeDouble(tick);
             buf.writeDouble(animLength);
             buf.writeBoolean(isPlaying);
         }
@@ -114,7 +111,6 @@ public class NetworkHandler {
                     buf.readBoolean(),
                     new AnimateData.VisorAnimateData(
                             buf.readUtf(),
-                            buf.readDouble(),
                             buf.readDouble(),
                             buf.readBoolean()
                     )
