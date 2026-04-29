@@ -50,8 +50,8 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
         this.titleLabelX = (getXSize() - this.font.width(title)) / 2;
         this.guiWidthMax = getGuiLeft()+menu.guiWidth;
         this.guiHeightMax = getGuiTop()+menu.guiHeight;
-        this.leftPos = (this.width - this.guiWidthMax)/2;
-        this.topPos =(this.height - this.guiHeightMax)/2;
+        this.leftPos = (this.width - menu.guiWidth)/2;
+        this.topPos =(this.height - menu.guiHeight)/2;
     }
 
     @Override
@@ -67,7 +67,7 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
         drawSlotBg(menu, guiGraphics);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(getGuiLeft(), getGuiTop() + 64, 10);
-        guiGraphics.pose().scale(40.0f, -40.0f, 40.0f);
+        guiGraphics.pose().scale(24.0f, -24.0f, 24.0f);
         IClientItemExtensions extensions = IClientItemExtensions.of(menu.backpackRenderStack);
         extensions.getCustomRenderer().renderByItem(
                 menu.backpackRenderStack,

@@ -1,16 +1,20 @@
 package net.zerocontact.network;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
 import net.zerocontact.animation_data.AnimateData;
 import net.zerocontact.api.Toggleable;
 import net.zerocontact.client.ClientData;
 import net.zerocontact.client.animation.VisorTracker;
 import net.zerocontact.command.CommandManager;
+import net.zerocontact.datagen.GearRecipeData;
 import net.zerocontact.item.backpack.BaseBackpack;
+import net.zerocontact.item.block.WorkBenchEntity;
 import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.Optional;
@@ -82,7 +86,7 @@ public class NetworkHandler {
                 helmet.ifPresent(stack -> {
                     if (stack.getItem() instanceof Toggleable toggleable) {
                         boolean isEnabled = toggleable.getEnabled(stack);
-                        toggleable.setTriggered(true,stack);
+                        toggleable.setTriggered(true, stack);
                         ModMessages.sendToPlayer(new ToggleVisorResultPacket(isEnabled, toggleable.readAnimData(stack)), player);
                     }
                 });
@@ -165,6 +169,37 @@ public class NetworkHandler {
             context.enqueueWork(() -> {
                 ServerPlayer serverPlayer = context.getSender();
                 BaseBackpack.whetherOpenAllyScreen(serverPlayer);
+            });
+        }
+    }
+
+    public record BuyGearsPacket(BlockPos pos, int recipeIndex) {
+        public void encode(FriendlyByteBuf buf) {
+            buf.writeBlockPos(pos);
+            buf.writeInt(recipeIndex);
+        }
+
+        public static BuyGearsPacket decode(FriendlyByteBuf buf) {
+            return new BuyGearsPacket(buf.readBlockPos(), buf.readInt());
+        }
+
+        public static void handle(BuyGearsPacket msg, Supplier<NetworkEvent.Context> supplier) {
+            NetworkEvent.Context context = supplier.get();
+            context.enqueueWork(() -> {
+                ServerPlayer player = context.getSender();
+                if (player == null) return;
+                BlockEntity be = player.level().getBlockEntity(msg.pos);
+                if (!(be instanceof WorkBenchEntity workBenchEntity)) return;
+                if (msg.recipeIndex < 0 || msg.recipeIndex >= WorkBenchEntity.recipeData.size()) return;
+                GearRecipeData gearRecipeData = WorkBenchEntity.recipeData.get(msg.recipeIndex);
+                if (!player.isCreative()) {
+                    if (workBenchEntity.canCraft(gearRecipeData, player)) {
+                        workBenchEntity.consumeItems(gearRecipeData, player);
+                        workBenchEntity.giveItem(player, WorkBenchEntity.recipeData.get(msg.recipeIndex()).gearId);
+                    }
+                } else {
+                    workBenchEntity.giveItem(player, WorkBenchEntity.recipeData.get(msg.recipeIndex()).gearId);
+                }
             });
         }
     }

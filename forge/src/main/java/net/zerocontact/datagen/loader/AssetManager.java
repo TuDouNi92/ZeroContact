@@ -11,7 +11,7 @@ import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.zerocontact.ZeroContactLogger;
-import net.zerocontact.api.IItemLoader;
+import net.zerocontact.api.AssetHelper;
 import net.zerocontact.datagen.ItemGenData;
 import net.zerocontact.datagen.RuntimeTypeAdapterFactory;
 
@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
 
-public class ItemLoader{
+public class AssetManager {
     public static ArrayList<ItemGenData> itemGenData = new ArrayList<>();
     private static final RuntimeTypeAdapterFactory<ItemGenData> typeFactory =
             RuntimeTypeAdapterFactory
@@ -70,9 +70,12 @@ public class ItemLoader{
                         Path resoucePackPath = packPath.resolve("assets").resolve(MOD_ID);
                         Path itemPath = resoucePackPath.resolve("items");
                         Path ballisticDataPath = resoucePackPath.resolve("ammoDefinitions");
+                        Path recipe = resoucePackPath.resolve("gear_recipes");
                         ZeroContactLogger.LOG.info("loading ItemPath");
-                        IItemLoader.IFiles.loadItemJson(itemPath,GSON);
-                        IItemLoader.IFiles.loadBallisticJson(ballisticDataPath,GSON);
+                        AssetHelper.IFiles.loadItemJson(itemPath, GSON);
+                        AssetHelper.IFiles.loadBallisticJson(ballisticDataPath, GSON);
+                        AssetHelper.IFiles.copyRecipes(recipe);
+                        AssetHelper.IFiles.loadRecipes(recipe, GSON);
                     });
         }
     }

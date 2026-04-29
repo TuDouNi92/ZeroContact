@@ -17,5 +17,9 @@
   "curios.modifiers.front_plate": "Front plate",
   "curios.modifiers.back_plate": "Back Plate",
   "curios.identifier.front_plate": "Front plate Slot",
-  "curios.identifier.back_plate": "Back plate Slot"
+  "curios.identifier.back_plate": "Back plate Slot",
+  "block.zerocontact.thoughbook": "ThoughBook 67",
+  "gui.zerocontact.workbench.title": "ThoughBook 67 -Order Gears online",
+  "gui.zerocontact.workbench.submit": "Submit↵",
+  "gui.zerocontact.workbench.startOS": "[    0.000000] Linux version 6.5.0-21-generic (buildd@lcy02-amd64-123)\n[    0.000000] Command line: BOOT_IMAGE=/boot/vmlinuz root=UUID=xxxx ro quiet splash\n[    0.000000] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'\n[    0.000000] BIOS-provided physical RAM map:\n[    0.000000] e820: [mem 0x0000000000000000-0x000000000009ffff] usable\n[    0.000000] e820: [mem 0x0000000000100000-0x000000003fffffff] usable\n[    0.000000] NX (Execute Disable) protection: active\n[    0.000000] SMBIOS 3.2 present.\n[    0.000000] DMI: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform\n[    0.000000] Hypervisor detected: VMware"
 }

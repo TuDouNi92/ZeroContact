@@ -6,25 +6,28 @@ import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
+import net.zerocontact.ZeroContact;
 import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.datagen.ExperimentalBallisticData;
+import net.zerocontact.datagen.GearRecipeData;
 import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
 import net.zerocontact.events.CaliberVariantDamageHelper;
+import net.zerocontact.item.block.WorkBenchEntity;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static net.zerocontact.datagen.loader.ItemLoader.itemGenData;
+import static net.zerocontact.datagen.loader.AssetManager.itemGenData;
 
-public interface IItemLoader {
-    interface IFiles extends IItemLoader {
+public interface AssetHelper {
+    interface IFiles extends AssetHelper {
         static List<Path> getJsonList(Path path) throws IOException {
             try (Stream<Path> stream = Files.walk(path)) {
                 return stream.filter(name -> name.toString().endsWith(".json"))
@@ -83,9 +86,63 @@ public interface IItemLoader {
                 ZeroContactLogger.LOG.error(e);
             }
         }
+
+        static void copyRecipes(Path recipe) {
+            if (!Files.exists(recipe.resolve("default.json"))) {
+                ZeroContactLogger.LOG.info("No default recipe config found, copying new one to {}", recipe);
+                try (InputStream inputStream = ZeroContact.class.getResourceAsStream("/data/zerocontact/recipes/default.json")) {
+                    if (inputStream != null) {
+                        Files.copy(inputStream, recipe.resolve("default.json"));
+                    } else {
+                        ZeroContactLogger.LOG.error("Recipe config not found inside datapack!");
+                    }
+                } catch (Exception e) {
+                    ZeroContactLogger.LOG.error(e);
+                }
+            }
+        }
+
+        static void loadRecipes(Path recipe, Gson GSON) {
+            List<IOException> exceptions = new ArrayList<>();
+            if (!Files.exists(recipe)) return;
+            try {
+                Map<String, List<GearRecipeData.IngredientItems>> overrideMap = new HashMap<>();
+                getJsonList(recipe).forEach(json -> {
+                    try {
+                        GearRecipeData deserializedData = GSON.fromJson(Files.newBufferedReader(json), GearRecipeData.class);
+                        if (json.getFileName().toString().equals("default.json")) {
+                            WorkBenchEntity.recipeData.addAll(deserializedData.recipes);
+                        } else {
+                            for(GearRecipeData recipeData:deserializedData.recipes){
+                                overrideMap.put(recipeData.gearId, recipeData.ingredientItems);
+                            }
+                            for (GearRecipeData baseData : WorkBenchEntity.recipeData) {
+                                List<GearRecipeData.IngredientItems> override = overrideMap.get(baseData.gearId);
+                                if (override != null) {
+                                    baseData.ingredientItems = override;
+                                }
+                            }
+                            Set<String> existingId = WorkBenchEntity.recipeData.stream()
+                                    .map(r -> r.gearId)
+                                    .collect(Collectors.toSet());
+                            for (var e : overrideMap.entrySet()) {
+                                if (!existingId.contains(e.getKey())) {
+                                    WorkBenchEntity.recipeData.add(new GearRecipeData(e.getKey(), e.getValue()));
+                                }
+                            }
+                        }
+                    } catch (IOException e) {
+                        exceptions.add(e);
+                    }
+                });
+            } catch (IOException e) {
+                exceptions.add(e);
+                ZeroContactLogger.LOG.error(exceptions);
+            }
+        }
     }
 
-    interface GeneratableItem extends IItemLoader {
+    interface GeneratableItem extends AssetHelper {
         void deserializeItems();
     }
 

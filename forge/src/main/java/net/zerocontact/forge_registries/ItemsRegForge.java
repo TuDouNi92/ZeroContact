@@ -12,8 +12,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.RegisterEvent;
 import net.zerocontact.ZeroContactLogger;
-import net.zerocontact.api.IItemLoader;
-import net.zerocontact.datagen.loader.ItemLoader;
+import net.zerocontact.api.AssetHelper;
+import net.zerocontact.datagen.loader.AssetManager;
 import net.zerocontact.item.armband.Armband;
 import net.zerocontact.item.armband.GenerateUniformArmbandGeoImpl;
 import net.zerocontact.item.armor.forge.*;
@@ -115,18 +115,18 @@ public class ItemsRegForge {
                         BRITISH23_TOP, BRITISH23_BOTTOM, G99_TOP, G99_BOTTOM, SPN_TOP, SPN_BOTTOM
                 )
         );
-        ItemLoader.loadFromJson();
-        ZeroContactLogger.LOG.info("On Register ItemData:{}", new Gson().toJson(ItemLoader.itemGenData).formatted());
+        AssetManager.loadFromJson();
+        ZeroContactLogger.LOG.info("On Register ItemData:{}", new Gson().toJson(AssetManager.itemGenData).formatted());
 
 
-        IItemLoader.registerGeneratedItems(ITEMS_REG_TAB, ItemsReg.ITEMS,
-                new IItemLoader.WearableType(GENERATE_PLATE.get().items, "PLATE"),
-                new IItemLoader.WearableType(GENERATE_ARMOR.get().items, "ARMOR"),
-                new IItemLoader.WearableType(GENERATE_CARRIER.get().items, "PLATE_CARRIER"),
-                new IItemLoader.WearableType(GENERATE_HELMET.get().items, "HELMET"),
-                new IItemLoader.WearableType(GENERATE_TOP_UNIFORM.get().items, "UNIFORM_TOP"),
-                new IItemLoader.WearableType(GENERATE_PANTS.get().items, "UNIFORM_PANTS"),
-                new IItemLoader.WearableType(GENERATE_ARMBAND.get().items, "ARMBAND")
+        AssetHelper.registerGeneratedItems(ITEMS_REG_TAB, ItemsReg.ITEMS,
+                new AssetHelper.WearableType(GENERATE_PLATE.get().items, "PLATE"),
+                new AssetHelper.WearableType(GENERATE_ARMOR.get().items, "ARMOR"),
+                new AssetHelper.WearableType(GENERATE_CARRIER.get().items, "PLATE_CARRIER"),
+                new AssetHelper.WearableType(GENERATE_HELMET.get().items, "HELMET"),
+                new AssetHelper.WearableType(GENERATE_TOP_UNIFORM.get().items, "UNIFORM_TOP"),
+                new AssetHelper.WearableType(GENERATE_PANTS.get().items, "UNIFORM_PANTS"),
+                new AssetHelper.WearableType(GENERATE_ARMBAND.get().items, "ARMBAND")
         );
         ModMenus.MENUS.register();
     }

@@ -55,6 +55,11 @@ public class ModMessages {
                 .encoder(NetworkHandler.RightClickingAllyBackpackPacket::encode)
                 .consumerMainThread(NetworkHandler.RightClickingAllyBackpackPacket::handle)
                 .add();
+        net.messageBuilder(NetworkHandler.BuyGearsPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(NetworkHandler.BuyGearsPacket::decode)
+                .encoder(NetworkHandler.BuyGearsPacket::encode)
+                .consumerMainThread(NetworkHandler.BuyGearsPacket::handle)
+                .add();
     }
 
     public static <MSG> void sendToServer(MSG msg) {

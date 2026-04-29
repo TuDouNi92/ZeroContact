@@ -13,13 +13,13 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.ZeroContact;
+import net.zerocontact.api.AssetHelper;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
-import net.zerocontact.api.IItemLoader;
 import net.zerocontact.client.renderer.HelmetRender;
 import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
-import net.zerocontact.datagen.loader.ItemLoader;
+import net.zerocontact.datagen.loader.AssetManager;
 import net.zerocontact.item.armor.forge.BaseArmorGeoImpl;
 import net.zerocontact.models.GenerateModel;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +28,7 @@ import software.bernie.geckolib.animatable.GeoItem;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInfoProvider, GeoItem, ICombatArmorItem, IItemLoader.GeneratableItem {
+public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInfoProvider, GeoItem, ICombatArmorItem, AssetHelper.GeneratableItem {
     private final int defaultDurability;
     private final int absorb;
     public final Set<GenerationRecord<?>> items = new HashSet<>();
@@ -109,7 +109,7 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
 
     @Override
     public void deserializeItems() {
-        ArrayList<ItemGenData> itemGenDataList = ItemLoader.itemGenData;
+        ArrayList<ItemGenData> itemGenDataList = AssetManager.itemGenData;
         if (itemGenDataList.isEmpty()) return;
         for (ItemGenData data0 : itemGenDataList) {
             if (!(data0 instanceof ItemGenData.Armor data)) continue;

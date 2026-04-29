@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ConfigScreenHandler;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -14,15 +15,21 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.zerocontact.client.gui.BackpackScreen;
 import net.zerocontact.client.gui.ConfigScreen;
+import net.zerocontact.client.gui.WorkbenchScreen;
 import net.zerocontact.client.interaction.KeyBindingHandler;
 import net.zerocontact.forge_registries.ModMenus;
 import net.zerocontact.client.renderer.AccessoriesRender;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.forge_registries.ModEntitiesReg;
 import net.zerocontact.client.renderer.ArmedRaiderRender;
+import net.zerocontact.item.block.Workbench;
 import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
+import net.zerocontact.models.GenerateModel;
 import net.zerocontact.registries.ItemsReg;
+import software.bernie.geckolib.renderer.GeoBlockRenderer;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
+
+import static net.zerocontact.forge_registries.BlocksRegForge.WORKBENCH_ENTITY;
 
 
 public class ModRegEventBus {
@@ -39,12 +46,25 @@ public class ModRegEventBus {
         public static void onClientSetup(FMLClientSetupEvent event) {
             EntityRenderers.register(ModEntitiesReg.ARMED_RAIDER.get(), ArmedRaiderRender::new);
             MenuScreens.register(ModMenus.BACKPACK_CONTAINER.get(), BackpackScreen::new);
+            MenuScreens.register(ModMenus.WORKBENCH_MENU.get(), WorkbenchScreen::new);
             RegCurioGeoItemRender();
             regConfigScreen();
         }
         @SubscribeEvent
         public static void onRegisterMappings(RegisterKeyMappingsEvent event) {
             KeyBindingHandler.register(event);
+        }
+        @SubscribeEvent
+        public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event){
+            event.registerBlockEntityRenderer(
+                    WORKBENCH_ENTITY.get(), arg -> new GeoBlockRenderer<>(
+                            new GenerateModel<>(
+                                    Workbench.texture,
+                                    Workbench.model,
+                                    Workbench.animation
+                            )
+                    )
+            );
         }
     }
 

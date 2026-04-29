@@ -1,0 +1,88 @@
+{
+  "recipes": [
+    {
+      "gear_id": "zerocontact:helmet_altyn_visor",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:diamond",
+          "count": 1
+        },
+        {
+          "itemId": "minecraft:baked_potato",
+          "count": 1
+        },
+        {
+          "itemId": "minecraft:redstone",
+          "count": 1
+        },
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:helmet_airframe",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:diamond",
+          "count": 1
+        },
+        {
+          "itemId": "minecraft:baked_potato",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:redstone",
+          "count": 3
+        },
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:armor_untar_blue",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:diamond",
+          "count": 1
+        },
+        {
+          "itemId": "minecraft:baked_potato",
+          "count": 1
+        },
+        {
+          "itemId": "minecraft:redstone",
+          "count": 1
+        },
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:armor_hexgrid_black",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:diamond",
+          "count": 1
+        },
+        {
+          "itemId": "minecraft:baked_potato",
+          "count": 1
+        },
+        {
+          "itemId": "minecraft:redstone",
+          "count": 1
+        },
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

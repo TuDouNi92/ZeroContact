@@ -13,12 +13,12 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.ZeroContact;
+import net.zerocontact.api.AssetHelper;
 import net.zerocontact.api.IEquipmentTypeTag;
-import net.zerocontact.api.IItemLoader;
 import net.zerocontact.client.renderer.ArmorRender;
 import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
-import net.zerocontact.datagen.loader.ItemLoader;
+import net.zerocontact.datagen.loader.AssetManager;
 import net.zerocontact.models.GenerateModel;
 import net.zerocontact.registries.ModSoundEventsReg;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +27,7 @@ import software.bernie.geckolib.animatable.GeoItem;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem, IEquipmentTypeTag, IItemLoader.GeneratableItem {
+public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem, IEquipmentTypeTag, AssetHelper.GeneratableItem {
     protected final int defaultDurability;
     public final Set<GenerationRecord<?>> items = new HashSet<>();
     private static final EquipmentType EQUIPMENT_TYPE = EquipmentType.PLATE_CARRIER;
@@ -68,7 +68,7 @@ public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem,
     }
     @Override
     public void deserializeItems() {
-        ArrayList<ItemGenData> itemGenDataList = ItemLoader.itemGenData;
+        ArrayList<ItemGenData> itemGenDataList = AssetManager.itemGenData;
         if (itemGenDataList.isEmpty()) return;
         for (ItemGenData data0 : itemGenDataList) {
             if (!(data0 instanceof ItemGenData.Armor data)) continue;

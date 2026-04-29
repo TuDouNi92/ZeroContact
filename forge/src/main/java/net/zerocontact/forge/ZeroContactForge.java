@@ -9,6 +9,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.zerocontact.cofig.ModConfigs;
 import net.zerocontact.datagen.Predicate;
 import net.zerocontact.events.*;
+import net.zerocontact.forge_registries.BlocksRegForge;
 import net.zerocontact.forge_registries.ModEntitiesReg;
 import software.bernie.geckolib.GeckoLib;
 
@@ -21,6 +22,7 @@ public class ZeroContactForge {
         GeckoLib.initialize();
         ServerForgeEventBus.regEvents();
         ModEntitiesReg.register();
+        BlocksRegForge.register(FMLJavaModLoadingContext.get().getModEventBus());
         Predicate.predicateCurios();
         EntityDeathDogTagEvent.register();
         regConfig();

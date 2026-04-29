@@ -3,10 +3,10 @@ package net.zerocontact.item.armband;
 import net.minecraft.resources.ResourceLocation;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.IEquipmentTypeTag;
-import net.zerocontact.api.IItemLoader;
+import net.zerocontact.api.AssetHelper;
 import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
-import net.zerocontact.datagen.loader.ItemLoader;
+import net.zerocontact.datagen.loader.AssetManager;
 import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class GenerateUniformArmbandGeoImpl extends AbstractGenerateGeoCurioItemImpl implements IEquipmentTypeTag, IItemLoader.GeneratableItem {
+public class GenerateUniformArmbandGeoImpl extends AbstractGenerateGeoCurioItemImpl implements IEquipmentTypeTag, AssetHelper.GeneratableItem {
     public final Set<GenerationRecord<?>> items = new HashSet<>();
 
     public GenerateUniformArmbandGeoImpl(String id, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
@@ -23,7 +23,7 @@ public class GenerateUniformArmbandGeoImpl extends AbstractGenerateGeoCurioItemI
 
     @Override
     public void deserializeItems() {
-        ArrayList<ItemGenData> itemGenDataList = ItemLoader.itemGenData;
+        ArrayList<ItemGenData> itemGenDataList = AssetManager.itemGenData;
         if (itemGenDataList.isEmpty()) return;
         for (ItemGenData data0 : itemGenDataList) {
             if (!(data0 instanceof ItemGenData.Armor data)) continue;

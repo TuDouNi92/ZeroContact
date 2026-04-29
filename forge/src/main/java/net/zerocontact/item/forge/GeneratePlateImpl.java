@@ -8,12 +8,12 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
+import net.zerocontact.api.AssetHelper;
 import net.zerocontact.api.ICombatArmorItem;
-import net.zerocontact.api.IItemLoader;
 import net.zerocontact.api.PlateInfoProvider;
 import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
-import net.zerocontact.datagen.loader.ItemLoader;
+import net.zerocontact.datagen.loader.AssetManager;
 import net.zerocontact.item.PlateBaseMaterial;
 import net.zerocontact.item.SapiIV;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class GeneratePlateImpl extends SapiIV implements ICombatArmorItem, PlateInfoProvider, IItemLoader.GeneratableItem {
+public class GeneratePlateImpl extends SapiIV implements ICombatArmorItem, PlateInfoProvider, AssetHelper.GeneratableItem {
     private final int defense;
     private final int absorb;
     private final float movementFix;
@@ -49,7 +49,7 @@ public class GeneratePlateImpl extends SapiIV implements ICombatArmorItem, Plate
 
     @Override
     public void deserializeItems() {
-        ArrayList<ItemGenData> itemGenDataList = ItemLoader.itemGenData;
+        ArrayList<ItemGenData> itemGenDataList = AssetManager.itemGenData;
         if (itemGenDataList.isEmpty()) return;
         for (ItemGenData data0 : itemGenDataList) {
             if (!(data0 instanceof ItemGenData.Plate data)) continue;
