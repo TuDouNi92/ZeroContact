@@ -27,7 +27,7 @@ public class PlateEntityHurtEvent {
         EntityKineticBullet.EntityResult result = EventUtil.getHitResult(source);
         boolean isHeadShot = result != null && result.isHeadshot();
         if (lv instanceof ServerPlayer serverPlayer && serverPlayer.isCreative()) return false;
-        DamageSource modifiedDamageSource = ModDamageTypes.Sources.bullet(lv.level().registryAccess(), null, null, false);
+        DamageSource modifiedDamageSource = ZDamageTypes.create(lv.level());
         AtomicBoolean interruptResult = new AtomicBoolean();
         ItemStack stackInVanillaSlot = lv.getItemBySlot(EquipmentSlot.CHEST);
         if (isHeadShot) return false;
@@ -43,8 +43,7 @@ public class PlateEntityHurtEvent {
         float hurtAmount;
         int protectionClass = stack.getOrCreateTag().getInt("protection_class");
 
-        //This guard pattern is important to prevent recursively call from event
-        if (!stack.isEmpty() && source.getEntity() != null) {
+        if (!stack.isEmpty() && source.is(ModDamageTypes.BULLET)) {
             lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
             if (EventUtil.isDamageSourceValid(source) && stack.getItem() instanceof ICombatArmorItem provider) {
                 hurtAmount = getHurtAmount(lv, source, amount, provider, protectionClass);
