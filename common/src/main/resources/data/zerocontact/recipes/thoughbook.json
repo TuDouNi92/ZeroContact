@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "111",
+    "232",
+    "222"
+  ],
+  "key": {
+    "1": {
+      "item": "minecraft:glass_pane"
+    },
+    "2": {
+      "item": "minecraft:iron_ingot"
+    },
+    "3": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "item": "zerocontact:thoughbook",
+    "count": 1
+  }
+}
