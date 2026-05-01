@@ -18,6 +18,7 @@
   "curios.modifiers.back_plate": "Back Plate",
   "curios.identifier.front_plate": "Front plate Slot",
   "curios.identifier.back_plate": "Back plate Slot",
+  "tooltip.zerocontact.armor_category":"Protection Category",
   "block.zerocontact.thoughbook": "ThoughBook 67",
   "gui.zerocontact.workbench.title": "ThoughBook 67 -Order Gears online",
   "gui.zerocontact.workbench.submit": "Submit↵",

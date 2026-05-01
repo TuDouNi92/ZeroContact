@@ -1,10 +1,18 @@
 package net.zerocontact.api;
 
 import com.google.common.collect.Multimap;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public interface ICombatArmorItem {
 
@@ -44,4 +52,12 @@ public interface ICombatArmorItem {
     }
 
     Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack);
+
+    default void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
+        if (stack.getItem() instanceof IEquipmentTypeTag tag) {
+            Component armorCategoryLabel = Component.translatable("tooltip.zerocontact.armor_category").append(": ").withStyle(ChatFormatting.GOLD).append(Component.literal(tag.getArmorType().getTypeId()).withStyle(ChatFormatting.YELLOW));
+            tooltipComponents.add(armorCategoryLabel);
+        }
+    }
 }
+
