@@ -1,23 +1,99 @@
 {
   "recipes": [
     {
+      "gear_id": "zerocontact:plate_cult_locust",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:plate_slime",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 3
+        },
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:helmet_6b47_ratnik_emr",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:helmet_6b47_ratnik_arc",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:helmet_bastion_black",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:helmet_bastion_multicam",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:helmet_bastion_green",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:helmet_british23",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:black_wool",
+          "count": 1
+        },
+        {
+          "itemId": "minecraft:white_wool",
+          "count": 1
+        }
+      ]
+    },
+    {
       "gear_id": "zerocontact:helmet_altyn_visor",
       "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 24
+        },
         {
           "itemId": "minecraft:diamond",
           "count": 1
         },
         {
-          "itemId": "minecraft:baked_potato",
-          "count": 1
-        },
-        {
-          "itemId": "minecraft:redstone",
-          "count": 1
-        },
-        {
-          "itemId": "minecraft:iron_ingot",
-          "count": 1
+          "itemId": "minecraft:glass_pane",
+          "count": 2
         }
       ]
     },
@@ -25,16 +101,206 @@
       "gear_id": "zerocontact:helmet_airframe",
       "ingredient_items": [
         {
-          "itemId": "minecraft:diamond",
-          "count": 1
+          "itemId": "minecraft:copper_ingot",
+          "count": 4
         },
         {
-          "itemId": "minecraft:baked_potato",
+          "itemId": "minecraft:iron_ingot",
+          "count": 9
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:helmet_untar_blue",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 5
+        },
+        {
+          "itemId": "minecraft:blue_dye",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:mask_tagilla_manhunt",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 22
+        },
+        {
+          "itemId": "minecraft:yellow_dye",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:mask_tagilla_ybey",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 22
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:mask_cold_fear",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:black_carpet",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:cap_cyan",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:cyan_dye",
           "count": 2
         },
         {
-          "itemId": "minecraft:redstone",
+          "itemId": "minecraft:white_wool",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:cap_boss",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:red_dye",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:white_wool",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:armor_thor_black",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:black_wool",
           "count": 3
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:armor_untar_blue",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:blue_wool",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:armor_hexgrid_black",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:black_wool",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:armor_6b2",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:armor_6b23_1",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:armor_6b23_2",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:armor_defender_2",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:green_wool",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:rigs_thunderbolt_gray",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:gray_wool",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:backpack_t20_multicam",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:green_wool",
+          "count": 8
+        },
+        {
+          "itemId": "minecraft:iron_block",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:backpack_t20_umbra",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:yellow_wool",
+          "count": 8
+        },
+        {
+          "itemId": "minecraft:iron_block",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:backpack_british23_red",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:gray_wool",
+          "count": 6
+        },
+        {
+          "itemId": "minecraft:iron_block",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:backpack_vkbo_olive",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:green_wool",
+          "count": 4
         },
         {
           "itemId": "minecraft:iron_ingot",
@@ -43,44 +309,56 @@
       ]
     },
     {
-      "gear_id": "zerocontact:armor_untar_blue",
+      "gear_id": "zerocontact:uniform_british23_top",
       "ingredient_items": [
         {
-          "itemId": "minecraft:diamond",
-          "count": 1
-        },
-        {
-          "itemId": "minecraft:baked_potato",
-          "count": 1
-        },
-        {
-          "itemId": "minecraft:redstone",
-          "count": 1
-        },
-        {
-          "itemId": "minecraft:iron_ingot",
-          "count": 1
+          "itemId": "minecraft:red_wool",
+          "count": 8
         }
       ]
     },
     {
-      "gear_id": "zerocontact:armor_hexgrid_black",
+      "gear_id": "zerocontact:uniform_british23_bottom",
       "ingredient_items": [
         {
-          "itemId": "minecraft:diamond",
-          "count": 1
-        },
+          "itemId": "minecraft:black_wool",
+          "count": 7
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:uniform_g99_top",
+      "ingredient_items": [
         {
-          "itemId": "minecraft:baked_potato",
-          "count": 1
-        },
+          "itemId": "minecraft:brown_wool",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:uniform_g99_bottom",
+      "ingredient_items": [
         {
-          "itemId": "minecraft:redstone",
-          "count": 1
-        },
+          "itemId": "minecraft:brown_wool",
+          "count": 7
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:uniform_spn_top",
+      "ingredient_items": [
         {
-          "itemId": "minecraft:iron_ingot",
-          "count": 1
+          "itemId": "minecraft:green_wool",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:uniform_spn_bottom",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:green_wool",
+          "count": 7
         }
       ]
     }

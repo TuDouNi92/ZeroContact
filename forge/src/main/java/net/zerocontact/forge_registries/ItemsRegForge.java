@@ -77,7 +77,7 @@ public class ItemsRegForge {
         RegistrySupplier<T20> T20_BACKPACK_MULTICAM = ItemsReg.ITEMS.register("backpack_t20_multicam", () -> T20.create(T20.Series.MULTICAM, 25));
         RegistrySupplier<British23> BRITISH23_BACKPACK_RED = ItemsReg.ITEMS.register("backpack_british23_red", () -> new British23(23));
         RegistrySupplier<Vkbo> VKBO_BACKPACK_OLIVE = ItemsReg.ITEMS.register("backpack_vkbo_olive", () -> new Vkbo(8));
-        RegistrySupplier<Thunderbolt> THUNDERBOLT_RIGS_GREY = ItemsReg.ITEMS.register("rigs_thunderbolt_grey", () -> new Thunderbolt(16));
+        RegistrySupplier<Thunderbolt> THUNDERBOLT_RIGS_GREY = ItemsReg.ITEMS.register("rigs_thunderbolt_gray", () -> new Thunderbolt(16));
         RegistrySupplier<DogTag> DOG_TAG = ItemsReg.ITEMS.register("dog_tag", () -> new DogTag(new Item.Properties()));
         RegistrySupplier<Armband> ARMBAND_BLACK = ItemsReg.ITEMS.register("armband_black", () -> Armband.create(Armband.Series.BLACK));
         RegistrySupplier<Armband> ARMBAND_RED = ItemsReg.ITEMS.register("armband_red", () -> Armband.create(Armband.Series.RED));
