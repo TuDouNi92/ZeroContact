@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/avs_armor"
+    "layer0": "zerocontact:item/plate_ballistic_convoy"
   },
   "display": {
     "gui": {
@@ -12,7 +12,7 @@
       ],
       "translation": [
         0,
-        -13,
+        -4,
         0
       ],
       "scale": [
@@ -29,7 +29,7 @@
       ],
       "translation": [
         0,
-        -24,
+        0,
         0
       ],
       "scale": [
@@ -46,7 +46,7 @@
       ],
       "translation": [
         0,
-        -24,
+        0,
         0
       ],
       "scale": [
@@ -63,13 +63,13 @@
       ],
       "translation": [
         0,
-        -24,
+        0,
         0
       ],
       "scale": [
-        1.0,
-        1.0,
-        1.0
+        0.5,
+        0.5,
+        0.5
       ]
     },
     "thirdperson_righthand": {
@@ -80,13 +80,13 @@
       ],
       "translation": [
         0,
-        -24,
+        0,
         0
       ],
       "scale": [
-        1.0,
-        1.0,
-        1.0
+        0.5,
+        0.5,
+        0.5
       ]
     },
     "fixed": {
@@ -97,7 +97,7 @@
       ],
       "translation": [
         0,
-        -24,
+        0,
         0
       ]
     },
@@ -109,8 +109,13 @@
       ],
       "translation": [
         0,
-        -15,
+        0,
         0
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
       ]
     }
   }

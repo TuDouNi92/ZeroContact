@@ -48,6 +48,10 @@ public class ItemsRegForge {
         if (!event.getRegistryKey().equals(Registries.ITEM)) return;
         RegistrySupplier<BasePlate> CULT_LOCUST_PLATE = ItemsReg.ITEMS.register("plate_cult_locust",
                 () -> BasePlate.createGeoPlate(0, 8, -0.025f, "textures/models/plate/plate_cult_locust.png", "geo/plate/plate_cult_locust.geo.json", ""));
+        RegistrySupplier<BasePlate> BALLISTIC_CONVOY = ItemsReg.ITEMS.register("plate_ballistic_convoy",
+                () -> BasePlate.createGeoPlate(0, 11, -0.05f, "textures/models/plate/plate_cult_locust.png", "geo/plate/plate_cult_locust.geo.json", ""));
+        RegistrySupplier<BasePlate> STEEL_PLATE = ItemsReg.ITEMS.register("plate_steel",
+                () -> BasePlate.createGeoPlate(0, 6, -0.010f, "textures/models/plate/plate_cult_locust.png", "geo/plate/plate_cult_locust.geo.json", ""));
         RegistrySupplier<BasePlate> SLIME_PLATE = ItemsReg.ITEMS.register("plate_slime",
                 () -> BasePlate.createGeoPlate(0, 4, 0f, "textures/models/plate/plate_slime.png", "geo/plate/plate_slime.geo.json", ""));
         RegistrySupplier<ForgeSpawnEggItem> RAIDER_EGG = ItemsReg.ITEMS.register("raider_egg", () -> new ForgeSpawnEggItem(ModEntitiesReg.ARMED_RAIDER, 0x3d6145, 0xcfc08a, new Item.Properties()));
@@ -61,6 +65,10 @@ public class ItemsRegForge {
         RegistrySupplier<Untar> UNTAR_HELMET = ItemsReg.ITEMS.register("helmet_untar_blue", () -> new Untar(6, 24));
         RegistrySupplier<TagillaMask> TAGILLA_MASK_MANHUNT = ItemsReg.ITEMS.register("mask_tagilla_manhunt", () -> TagillaMask.create(12, 64, TagillaMask.Color.MANHUNT));
         RegistrySupplier<TagillaMask> TAGILLA_MASK_YBEY = ItemsReg.ITEMS.register("mask_tagilla_ybey", () -> TagillaMask.create(12, 64, TagillaMask.Color.YBEY));
+        RegistrySupplier<GasMask> PMK2 = ItemsReg.ITEMS.register("mask_pmk2", () -> GasMask.create(GasMask.Series.PMK2, 2, 12));
+        RegistrySupplier<GasMask> ZK = ItemsReg.ITEMS.register("mask_zk", () -> GasMask.create(GasMask.Series.ZK, 2, 12));
+        RegistrySupplier<GasMask> M50 = ItemsReg.ITEMS.register("mask_m50", () -> GasMask.create(GasMask.Series.M50, 2, 12));
+        RegistrySupplier<GasMask> MP5 = ItemsReg.ITEMS.register("mask_mp5", () -> GasMask.create(GasMask.Series.MP5, 2, 12));
         RegistrySupplier<ColdFearMask> COLD_FEAR_MASK = ItemsReg.ITEMS.register("mask_cold_fear", () -> new ColdFearMask(8, 24));
         RegistrySupplier<Cap> CYAN_CAP = ItemsReg.ITEMS.register("cap_cyan", () -> Cap.create(0, 24, Cap.Color.CYAN));
         RegistrySupplier<Cap> BOSS_CAP = ItemsReg.ITEMS.register("cap_boss", () -> Cap.create(0, 24, Cap.Color.BOSS));
@@ -69,10 +77,17 @@ public class ItemsRegForge {
         RegistrySupplier<AltynVisor.WithVisor> ALTYN_VISOR_HELMET = ItemsReg.ITEMS.register("helmet_altyn_visor", () -> new AltynVisor.WithVisor(10, 72));
         RegistrySupplier<AirFrame> AIRFRAME_HELMET = ItemsReg.ITEMS.register("helmet_airframe", () -> new AirFrame(8, 42));
         RegistrySupplier<net.zerocontact.item.helmet.British23> BRITISH23_HELMET = ItemsReg.ITEMS.register("helmet_british23", () -> new net.zerocontact.item.helmet.British23(0, 128));
+        RegistrySupplier<PhoneTalker> PHONETALKER_HELMET = ItemsReg.ITEMS.register("helmet_phonetalker_iiia", () -> new PhoneTalker(6, 32));
+        RegistrySupplier<TBH> TBH_HELMET = ItemsReg.ITEMS.register("helmet_tbh_iiia", () -> new TBH(7, 36));
         RegistrySupplier<R6b2ArmorImpl> R6B2 = ItemsReg.ITEMS.register("armor_6b2", () -> new R6b2ArmorImpl(5, 64, 4, -0.05F));
         RegistrySupplier<R6b23IArmorImpl> R6B23I = ItemsReg.ITEMS.register("armor_6b23_1", () -> new R6b23IArmorImpl(7, 128, 7, -0.025F));
         RegistrySupplier<R6b23IIArmorImpl> R6B23II = ItemsReg.ITEMS.register("armor_6b23_2", () -> new R6b23IIArmorImpl(7, 128, 7, -0.025F));
         RegistrySupplier<Defender2ArmorImpl> DEFENDER = ItemsReg.ITEMS.register("armor_defender_2", () -> new Defender2ArmorImpl(7, 128, 4, -0.015F));
+        RegistrySupplier<R6b43ArmorImpl> R6B43 = ItemsReg.ITEMS.register("armor_6b43", () -> R6b43ArmorImpl.create(R6b43ArmorImpl.Series.FLORA, 7, 128, 4, -0.1F));
+        RegistrySupplier<JpcArmorImpl> JPC_V1 = ItemsReg.ITEMS.register("armor_jpc_v1", () -> JpcArmorImpl.create(JpcArmorImpl.Series.V1, 7, 64, 0, 0.01F));
+        RegistrySupplier<JpcArmorImpl> JPC_V2 = ItemsReg.ITEMS.register("armor_jpc_v2", () -> JpcArmorImpl.create(JpcArmorImpl.Series.V2, 7, 64, 0, 0.01F));
+        RegistrySupplier<JpcArmorImpl> JPC_V2_SC = ItemsReg.ITEMS.register("armor_jpc_v2_swimmer_cut", () -> JpcArmorImpl.create(JpcArmorImpl.Series.V2SC, 7, 64, 0, 0.01F));
+        RegistrySupplier<AvsArmorImpl> AVS = ItemsReg.ITEMS.register("armor_avs", () -> new AvsArmorImpl(7, 86, 0, -0.03F));
         RegistrySupplier<T20> T20_BACKPACK_UMBRA = ItemsReg.ITEMS.register("backpack_t20_umbra", () -> T20.create(T20.Series.UMBRA, 25));
         RegistrySupplier<T20> T20_BACKPACK_MULTICAM = ItemsReg.ITEMS.register("backpack_t20_multicam", () -> T20.create(T20.Series.MULTICAM, 25));
         RegistrySupplier<British23> BRITISH23_BACKPACK_RED = ItemsReg.ITEMS.register("backpack_british23_red", () -> new British23(23));
@@ -102,13 +117,13 @@ public class ItemsRegForge {
 
         ITEMS_REG_TAB.addAll(
                 List.of(
-                        CULT_LOCUST_PLATE, SLIME_PLATE,
+                        CULT_LOCUST_PLATE, BALLISTIC_CONVOY, STEEL_PLATE, SLIME_PLATE,
                         RAIDER_EGG,
                         RATNIK_HELMET_EMR, RATNIK_HELMET_ARC, BASTION_HELMET, BASTION_HELMET_MULTICAM, BASTION_HELMET_GREEN, BRITISH23_HELMET,
-                        ALTYN_VISOR_HELMET, AIRFRAME_HELMET, UNTAR_HELMET,
-                        TAGILLA_MASK_MANHUNT, TAGILLA_MASK_YBEY, COLD_FEAR_MASK,
+                        ALTYN_VISOR_HELMET, AIRFRAME_HELMET, UNTAR_HELMET, PHONETALKER_HELMET, TBH_HELMET,
+                        TAGILLA_MASK_MANHUNT, TAGILLA_MASK_YBEY, COLD_FEAR_MASK, PMK2, ZK, M50, MP5,
                         CYAN_CAP, BOSS_CAP,
-                        THOR_ARMOR, UNTAR_ARMOR, HEXGRID_ARMOR, R6B2, R6B23I, R6B23II, DEFENDER,
+                        R6B2, R6B23I, R6B23II, R6B43, UNTAR_ARMOR, THOR_ARMOR, HEXGRID_ARMOR, DEFENDER, JPC_V1, JPC_V2, JPC_V2_SC, AVS,
                         THUNDERBOLT_RIGS_GREY,
                         T20_BACKPACK_MULTICAM, T20_BACKPACK_UMBRA, BRITISH23_BACKPACK_RED, VKBO_BACKPACK_OLIVE,
                         ARMBAND_BLACK, ARMBAND_RED, ARMBAND_BLUE, ARMBAND_WHITE, ARMBAND_GREEN, ARMBAND_YELLOW, ARMBAND_FLORA,
