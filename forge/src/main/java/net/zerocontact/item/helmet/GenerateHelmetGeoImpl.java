@@ -38,7 +38,7 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
     private final int durabilityLossProvider;
 
     public GenerateHelmetGeoImpl(String id, Type type, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, int defense, int absorb, float bluntDamage, float penetrateDamage, float ricochetDamage, int durabilityLossProvider, int defaultDurability) {
-        super(type, id, defense, defaultDurability, absorb, 0, texture, model, animation);
+        super(type, id, defense, defaultDurability, absorb, 1, 0, texture, model, animation);
         this.absorb = absorb;
         this.bluntDamage = bluntDamage;
         this.penetrateDamage = penetrateDamage;

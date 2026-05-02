@@ -7,6 +7,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.zerocontact.events.EventUtil;
+import net.zerocontact.events.ZDamageTypes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -26,9 +27,10 @@ public abstract class HeadshotHelmetMixin {
     @Shadow
     @Final
     private Inventory inventory;
+
     @Inject(method = "hurtArmor", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Inventory;hurtArmor(Lnet/minecraft/world/damagesource/DamageSource;F[I)V"), cancellable = true)
     public void zeroContact$hurtHelmet(DamageSource damageSource, float damageAmount, CallbackInfo ci) {
-        if (damageSource.is(ModDamageTypes.BULLETS_TAG)) {
+        if (damageSource.is(ZDamageTypes.ZC_DAMAGE)) {
             EntityKineticBullet.EntityResult result = EventUtil.getHitResult(damageSource);
             if (result != null && result.isHeadshot()) {
                 ci.cancel();
@@ -36,6 +38,12 @@ public abstract class HeadshotHelmetMixin {
             } else {
                 ci.cancel();
                 this.inventory.hurtArmor(damageSource, damageAmount, BODY_SLOTS);
+            }
+        } else if (damageSource.is(ModDamageTypes.BULLETS_TAG)) {
+            EntityKineticBullet.EntityResult result = EventUtil.getHitResult(damageSource);
+            if (result != null) {
+                ci.cancel();
+                this.inventory.hurtArmor(damageSource, damageAmount, Inventory.HELMET_SLOT_ONLY);
             }
         }
     }

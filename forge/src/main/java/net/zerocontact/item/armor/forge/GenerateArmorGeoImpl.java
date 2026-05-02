@@ -38,7 +38,7 @@ public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, I
     private final float ricochetFactor;
 
     public GenerateArmorGeoImpl(Type type, String id, int defense, int defaultDurability, int absorb, float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, float bluntFactor, float penetrateFactor, float ricochetFactor) {
-        super(type, id, defense, defaultDurability, absorb, mass, texture, model, animation);
+        super(type, id, defense, defaultDurability, absorb, penetrateFactor, mass, texture, model, animation);
         this.defaultDurability = defaultDurability;
         this.bluntFactor = bluntFactor;
         this.penetrateFactor = penetrateFactor;

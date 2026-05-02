@@ -18,6 +18,7 @@ import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.item.armor.forge.BaseArmorGeoImpl;
 import net.zerocontact.registries.ModSoundEventsReg;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -29,37 +30,57 @@ public class PlateEntityHurtEvent {
         if (lv instanceof ServerPlayer serverPlayer && serverPlayer.isCreative()) return false;
         DamageSource modifiedDamageSource = ZDamageTypes.create(lv.level());
         AtomicBoolean interruptResult = new AtomicBoolean();
-        ItemStack stackInVanillaSlot = lv.getItemBySlot(EquipmentSlot.CHEST);
+        ItemStack armorSlot = lv.getItemBySlot(EquipmentSlot.CHEST);
         if (isHeadShot) return false;
-        if (stackInVanillaSlot.getItem() instanceof BaseArmorGeoImpl baseArmorGeo && baseArmorGeo.getArmorType().equals(IEquipmentTypeTag.EquipmentType.ARMOR)) {
-            hurtIt(lv, source, amount, stackInVanillaSlot, modifiedDamageSource, interruptResult);
+        if (armorSlot.getItem() instanceof BaseArmorGeoImpl baseArmorGeo && baseArmorGeo.getArmorType().equals(IEquipmentTypeTag.EquipmentType.ARMOR)) {
+            hurtIt(lv, source, amount, null, armorSlot, modifiedDamageSource, interruptResult);
         } else {
-            hurtIt(lv, source, amount, plateSlot, modifiedDamageSource, interruptResult);
+            hurtIt(lv, source, amount, plateSlot, armorSlot, modifiedDamageSource, interruptResult);
         }
         return interruptResult.get();
     }
 
-    private static void hurtIt(LivingEntity lv, DamageSource source, float amount, ItemStack stack, DamageSource modifiedDamageSource, AtomicBoolean interruptResult) {
+    private static void hurtIt(LivingEntity lv, DamageSource source, float amount, @Nullable ItemStack plateStack, ItemStack armorStack, DamageSource modifiedDamageSource, AtomicBoolean interruptResult) {
         float hurtAmount;
-        int protectionClass = stack.getOrCreateTag().getInt("protection_class");
-
-        if (!stack.isEmpty() && source.is(ModDamageTypes.BULLET)) {
-            lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
-            if (EventUtil.isDamageSourceValid(source) && stack.getItem() instanceof ICombatArmorItem provider) {
-                hurtAmount = getHurtAmount(lv, source, amount, provider, protectionClass);
-                lv.hurt(modifiedDamageSource, hurtAmount);
+        if (plateStack != null && plateStack.getItem() instanceof ICombatArmorItem) {
+            int plateProtectionClass = plateStack.getOrCreateTag().getInt("protection_class");
+            if (source.is(ModDamageTypes.BULLET)) {
+                lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
+                if (EventUtil.isDamageSourceValid(source)) {
+                    hurtAmount = getHurtAmount(lv, source, amount, (ICombatArmorItem) plateStack.getItem(), (ICombatArmorItem) armorStack.getItem(), plateProtectionClass);
+                    lv.hurt(modifiedDamageSource, hurtAmount);
+                }
+                interruptResult.set(true);
             }
-            interruptResult.set(true);
+            else{
+                interruptResult.set(false);
+            }
         } else {
-            interruptResult.set(false);
+            int protectionClass = armorStack.getOrCreateTag().getInt("protection_class");
+            if (!armorStack.isEmpty() && source.is(ModDamageTypes.BULLET)) {
+                lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
+                if (EventUtil.isDamageSourceValid(source) && armorStack.getItem() instanceof ICombatArmorItem provider) {
+                    hurtAmount = getHurtAmount(lv, source, amount, null, provider, protectionClass);
+                    lv.hurt(modifiedDamageSource, hurtAmount);
+                }
+                interruptResult.set(true);
+            } else {
+                interruptResult.set(false);
+            }
         }
     }
 
-    private static float getHurtAmount(LivingEntity lv, DamageSource source, float amount, ICombatArmorItem provider, int hurtCanHold) {
+    private static float getHurtAmount(LivingEntity lv, DamageSource source, float amount, @Nullable ICombatArmorItem plateProvider, ICombatArmorItem armorProvider, int hurtCanHold) {
         float hurtAmount;
-        float generateCaliberDamageAmount = CaliberVariantDamageHelper.generateDamageAmount(amount, source, hurtCanHold, provider);
+        float generateCaliberDamageAmount;
+        if (plateProvider != null) {
+            generateCaliberDamageAmount = CaliberVariantDamageHelper.generateDamageAmount(amount, source, hurtCanHold, plateProvider);
+            generateCaliberDamageAmount *= armorProvider.generatePenetrated();
+        } else {
+            generateCaliberDamageAmount = CaliberVariantDamageHelper.generateDamageAmount(amount, source, hurtCanHold, armorProvider);
+        }
         if (EventUtil.isIncidentAngleValid(lv, source)) {
-            hurtAmount = provider.generateRicochet() * generateCaliberDamageAmount;
+            hurtAmount = armorProvider.generateRicochet() * generateCaliberDamageAmount;
         } else {
             hurtAmount = generateCaliberDamageAmount;
         }
@@ -80,7 +101,7 @@ public class PlateEntityHurtEvent {
                     if (!(stack.getItem() instanceof HelmetInfoProvider && stack.getItem() instanceof ICombatArmorItem entityHurtProvider))
                         return;
                     int protectionClass = stack.getOrCreateTag().getInt("protection_class");
-                    float hurtAmount = getHurtAmount(livingEntity, damageSource, amount, entityHurtProvider, protectionClass);
+                    float hurtAmount = getHurtAmount(livingEntity, damageSource, amount, null, entityHurtProvider, protectionClass);
                     eventPre.setBaseAmount(hurtAmount);
                     eventPre.setHeadshotMultiplier(1f);
                     playHeadshotSound(livingEntity);

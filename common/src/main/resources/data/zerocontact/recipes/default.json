@@ -1,6 +1,24 @@
 {
   "recipes": [
     {
+      "gear_id": "zerocontact:plate_steel",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:plate_ballistic_convoy",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 12
+        }
+      ]
+    },
+    {
       "gear_id": "zerocontact:plate_cult_locust",
       "ingredient_items": [
         {
@@ -19,6 +37,24 @@
         {
           "itemId": "minecraft:copper_ingot",
           "count": 3
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:helmet_phonetalker_iiia",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:helmet_tbh_iiia",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 7
         }
       ]
     },
@@ -155,6 +191,42 @@
       ]
     },
     {
+      "gear_id": "zerocontact:mask_m50",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:mask_pmk2",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:mask_zk",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:mask_mp5",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 2
+        }
+      ]
+    },
+    {
       "gear_id": "zerocontact:cap_cyan",
       "ingredient_items": [
         {
@@ -177,6 +249,42 @@
         {
           "itemId": "minecraft:white_wool",
           "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:armor_avs",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:green_wool",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:armor_jpc_v1",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:green_wool",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:armor_jpc_v2",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:green_wool",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:armor_jpc_v2_swimmer_cut",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:green_wool",
+          "count": 3
         }
       ]
     },
@@ -231,6 +339,15 @@
         {
           "itemId": "minecraft:iron_ingot",
           "count": 8
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:armor_6b43",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 16
         }
       ]
     },

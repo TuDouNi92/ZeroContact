@@ -19,37 +19,37 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public enum CaliberVariantDamageHelper {
     CALIBER_762x39(
-            new Caliber("tacz:762x39", 3)
+            new Caliber("tacz:762x39", 3, 6)
     ),
     CALIBER_556x45(
-            new Caliber("tacz:556x45", 2)
+            new Caliber("tacz:556x45", 2, 5)
     ),
     CALIBER_308(
-            new Caliber("tacz:308", 4)
+            new Caliber("tacz:308", 4, 10)
     ),
     CALIBER_50AE(
-            new Caliber("tacz:50ae", 2)
+            new Caliber("tacz:50ae", 2, 9)
     ),
     CALIBER_9mm(
-            new Caliber("tacz:9mm", 1.5f)
+            new Caliber("tacz:9mm", 1.5f, 4)
     ),
     CALIBER_45ACP(
-            new Caliber("tacz:45acp", 1.25f)
+            new Caliber("tacz:45acp", 1.25f, 5)
     ),
     CALIBER_762x25(
-            new Caliber("tacz:762x25", 1.5f)
+            new Caliber("tacz:762x25", 1.5f, 3)
     ),
     CALIBER_762x54(
-            new Caliber("tacz:762x54", 4)
+            new Caliber("tacz:762x54", 4, 12)
     ),
     CALIBER_338(
-            new Caliber("tacz:338", 3)
+            new Caliber("tacz:338", 3, 14)
     ),
     CALIBER_68x51(
-            new Caliber("tacz:6.8x51", 2.5f)
+            new Caliber("tacz:6.8x51", 2.5f, 7)
     ),
     CALIBER_50BMG(
-            new Caliber("tacz:50bmg", 4)
+            new Caliber("tacz:50bmg", 4, 18)
     );
     private final Caliber caliber;
     private static final EnumSet<CaliberVariantDamageHelper> caliberVariantDamageHelperEnumSet = EnumSet.of(
@@ -66,25 +66,28 @@ public enum CaliberVariantDamageHelper {
      *
      * <p>This class is meant to create a middleware that modifies ammo damage associated with gun data</p>
      *
-     * @param id The ammo id from TAC:Z guns
+     * @param id               The ammo id from TAC:Z guns
      * @param baseDamageFactor The balancing factor for each caliber generating new numbers
      * @param penetrationClass The penetration level for damage interceptor, bypassed when the feature is off
-     * @param fleshDamage The flesh damage for damage interceptor, bypassed when the feature is off
+     * @param fleshDamage      The flesh damage for damage interceptor, bypassed when the feature is off
      */
     public record Caliber(String id, float baseDamageFactor, int penetrationClass, int fleshDamage) {
+        public Caliber(String id, float baseDamageFactor, int penetrationClass) {
+            this(id, baseDamageFactor, penetrationClass, 8);
+        }
+
         public Caliber(String id, float baseDamageFactor) {
             this(id, baseDamageFactor, 10, 4);
         }
     }
 
     /**
-     *
      * <p>This method is meant to match calibers with input bullet damage source </p>
      *
      * @param source The Minecraft damage source
-     * @param set The enum set for calibers defined
+     * @param set    The enum set for calibers defined
+     * @param <E>    The enum set type
      * @return Return the caliber that matched with damage source
-     * @param <E> The enum set type
      */
     private static <E> Optional<Caliber> getMatchedCaliber(DamageSource source, Set<E> set) {
         AtomicReference<Optional<Caliber>> result = new AtomicReference<>(Optional.empty());
@@ -110,13 +113,12 @@ public enum CaliberVariantDamageHelper {
     }
 
     /**
-     *
      * <p>This method is meant to generate damages under the effect of protections</p>
      *
-     * @param original The original bullet damage
-     * @param source The Minecraft damage source
+     * @param original    The original bullet damage
+     * @param source      The Minecraft damage source
      * @param hurtCanHold The damage that armor/plate can withstand
-     * @param provider Interface implementation that provides the situation of getting hit by bullets
+     * @param provider    Interface implementation that provides the situation of getting hit by bullets
      * @return The generated damage amount
      */
     public static float generateDamageAmount(float original, DamageSource source, int hurtCanHold, ICombatArmorItem provider) {
@@ -129,18 +131,18 @@ public enum CaliberVariantDamageHelper {
                         double fleshDamage = getPenetratedDamage(caliber, hurtCanHold);
                         if (fleshDamage != 0) {
                             output.set(fleshDamage * provider.generatePenetrated());
-                        }
-                        else{
+                        } else {
                             output.set(balanceDamage * provider.generateBlunt());
                         }
                     });
                 } else {
                     getMatchedCaliber(source, caliberVariantDamageHelperEnumSet).ifPresent(caliber -> {
                         double balanceDamage = caliber.baseDamageFactor * Mth.sqrt(original) * 0.75f;
-                        if (hurtCanHold > balanceDamage) {
-                            output.set(balanceDamage * provider.generateBlunt());
+                        double fleshDamage = getPenetratedDamage(caliber, hurtCanHold);
+                        if (fleshDamage != 0) {
+                            output.set(fleshDamage * provider.generatePenetrated());
                         } else {
-                            output.set(balanceDamage * provider.generatePenetrated());
+                            output.set(balanceDamage * provider.generateBlunt());
                         }
                     });
                 }
@@ -151,18 +153,17 @@ public enum CaliberVariantDamageHelper {
     }
 
     /**
-     *
      * This method generates the damage once armor get penetrated
      *
-     * @param caliber Caliber class
+     * @param caliber     Caliber class
      * @param hurtCanHold The damage that armor/plate can withstand
      * @return Determine and returns the flesh damage
      */
     private static double getPenetratedDamage(@NotNull Caliber caliber, int hurtCanHold) {
         RandomSource randomSource = RandomSource.create();
         if (hurtCanHold > caliber.penetrationClass) {
-            double penetrateProbability = Math.pow((double) caliber.penetrationClass / hurtCanHold, 2);
-            if (randomSource.nextFloat() >= penetrateProbability) {
+            double penetrateProbability = Math.min(0.15, (double) caliber.penetrationClass / hurtCanHold);
+            if (randomSource.nextFloat() < penetrateProbability) {
                 return caliber.fleshDamage;
             }
             return 0.0;

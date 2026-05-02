@@ -41,8 +41,9 @@ public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEq
     protected final ResourceLocation texture, model, animation;
     private final int absorb;
     private final float mass;
+    private final float penetrateReduction;
 
-    public BaseArmorGeoImpl(Type type, String id, int defense, int defaultDurability, int absorb, float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+    public BaseArmorGeoImpl(Type type, String id, int defense, int defaultDurability, int absorb, float penetrateReduction, float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
         super(PlateBaseMaterial.ARMOR_STEEL, type, new Properties().defaultDurability(defaultDurability));
         this.type = type;
         this.id = id;
@@ -52,6 +53,7 @@ public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEq
         this.animation = animation;
         this.absorb = absorb;
         this.mass = mass;
+        this.penetrateReduction = penetrateReduction;
     }
 
     @Override
@@ -131,6 +133,11 @@ public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEq
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
         ICombatArmorItem.super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
+    }
+
+    @Override
+    public float generatePenetrated() {
+        return penetrateReduction;
     }
 }
 

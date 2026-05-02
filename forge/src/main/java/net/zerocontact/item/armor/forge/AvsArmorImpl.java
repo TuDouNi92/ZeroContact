@@ -11,8 +11,8 @@ public class AvsArmorImpl extends BaseArmorGeoImpl {
     private static final ResourceLocation model = new ResourceLocation(MOD_ID, "geo/vest/vest_avs_tagilla_desert.geo.json");
     private static final ResourceLocation animation = null;
 
-    public AvsArmorImpl(int defense, int defaultDurability, int absorb, float mass) {
-        super(Type.CHESTPLATE, "", defense, defaultDurability, absorb, mass, texture, model, animation);
+    public AvsArmorImpl(int defense, int defaultDurability, int absorb, float generateReduction, float mass) {
+        super(Type.CHESTPLATE, "", defense, defaultDurability, absorb, generateReduction, mass, texture, model, animation);
     }
 
     @Override

@@ -20,12 +20,16 @@ import static net.zerocontact.ZeroContact.MOD_ID;
 public class BasePlate extends SapiIVImpl implements GeoItem {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private final ResourceLocation texture, model, animation;
+    private final float bluntReduction;
+    private final float penetrateReduction;
 
-    private BasePlate(int defense, int absorb, float movementFix, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+    private BasePlate(int defense, int absorb, float bluntReduction, float penetrateReduction, float movementFix, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
         super(PlateBaseMaterial.ARMOR_STEEL, Type.CHESTPLATE, new Properties(), defense, absorb, movementFix);
         this.texture = texture;
         this.model = model;
         this.animation = animation;
+        this.penetrateReduction = penetrateReduction;
+        this.bluntReduction = bluntReduction;
     }
 
     @Override
@@ -53,7 +57,17 @@ public class BasePlate extends SapiIVImpl implements GeoItem {
         return geoCache;
     }
 
-    public static BasePlate createGeoPlate(int defense, int absorb, float movementFix, String texture, String model, @NotNull String animation) {
-        return new BasePlate(defense, absorb, movementFix, new ResourceLocation(MOD_ID, texture), new ResourceLocation(MOD_ID, model), new ResourceLocation(MOD_ID, animation));
+    public static BasePlate createGeoPlate(int defense, int absorb, float bluntReduction, float penetrateReduction, float movementFix, String texture, String model, @NotNull String animation) {
+        return new BasePlate(defense, absorb, bluntReduction, penetrateReduction, movementFix, new ResourceLocation(MOD_ID, texture), new ResourceLocation(MOD_ID, model), new ResourceLocation(MOD_ID, animation));
+    }
+
+    @Override
+    public float generatePenetrated() {
+        return penetrateReduction;
+    }
+
+    @Override
+    public float generateBlunt() {
+        return bluntReduction;
     }
 }

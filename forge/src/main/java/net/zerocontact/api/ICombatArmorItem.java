@@ -55,8 +55,32 @@ public interface ICombatArmorItem {
 
     default void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
         if (stack.getItem() instanceof IEquipmentTypeTag tag) {
-            Component armorCategoryLabel = Component.translatable("tooltip.zerocontact.armor_category").append(": ").withStyle(ChatFormatting.GOLD).append(Component.literal(tag.getArmorType().getTypeId()).withStyle(ChatFormatting.YELLOW));
+            Component armorCategoryLabel = Component.translatable("tooltip.zerocontact.armor_category")
+                    .append(": ")
+                    .withStyle(ChatFormatting.GOLD)
+                    .append(
+                            Component.literal(tag.getArmorType().getTypeId())
+                                    .withStyle(ChatFormatting.YELLOW)
+                    );
             tooltipComponents.add(armorCategoryLabel);
+        }
+        if (stack.getItem() instanceof ICombatArmorItem combatArmorItem) {
+            Component armorBluntReduction = Component.translatable("tooltip.zerocontact.armor_blunt_reduction")
+                    .append(": ")
+                    .withStyle(ChatFormatting.GOLD)
+                    .append(
+                            Component.literal(String.valueOf(combatArmorItem.generateBlunt()))
+                                    .withStyle(ChatFormatting.YELLOW)
+                    );
+            Component armorPenetrateReduction = Component.translatable("tooltip.zerocontact.armor_penetrate_reduction")
+                    .append(": ")
+                    .withStyle(ChatFormatting.GOLD)
+                    .append(
+                            Component.literal(String.valueOf(combatArmorItem.generatePenetrated()))
+                                    .withStyle(ChatFormatting.YELLOW)
+                    );
+            tooltipComponents.add(armorBluntReduction);
+            tooltipComponents.add(armorPenetrateReduction);
         }
     }
 }

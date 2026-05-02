@@ -75,6 +75,8 @@
   "curios.identifier.uniform_top": "Uniform slot",
   "curios.identifier.uniform_pants": "Uniform pants slot",
   "tooltip.zerocontact.armor_category":"Protection Category",
+  "tooltip.zerocontact.armor_penetrate_reduction": "Penetrate reduction",
+  "tooltip.zerocontact.armor_blunt_reduction": "Blunt reduction",
   "block.zerocontact.thoughbook": "ThoughBook 67",
   "gui.zerocontact.workbench.title": "ThoughBook 67 -Order Gears online",
   "gui.zerocontact.workbench.submit": "Submit↵",
