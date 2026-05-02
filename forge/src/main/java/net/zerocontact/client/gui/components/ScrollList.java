@@ -17,10 +17,8 @@ import net.zerocontact.client.gui.WorkbenchScreen;
 import net.zerocontact.datagen.GearRecipeData;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ScrollList extends AbstractSelectionList<ScrollList.GearEntry> {
     private final WorkbenchScreen screen;
@@ -97,7 +95,7 @@ public class ScrollList extends AbstractSelectionList<ScrollList.GearEntry> {
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             GearEntry entry = parent.getEntryAtPosition(mouseX, mouseY);
             if (entry != null) {
-                parent.setSelected(entry);
+                parent.setFocused(entry);
                 return true;
             }
             return super.mouseClicked(mouseX, mouseY, button);
@@ -107,7 +105,7 @@ public class ScrollList extends AbstractSelectionList<ScrollList.GearEntry> {
     //Fking bugjump, a scrollbar blocked me for the entire day
     @Override
     protected int getScrollbarPosition() {
-        return this.x1-2;
+        return this.x1+2;
     }
 
     @Override
