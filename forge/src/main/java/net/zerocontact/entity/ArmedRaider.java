@@ -222,11 +222,11 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     }
 
     private void finalizeArmors() {
-        Item armor = ForgeRegistries.ITEMS.getValue(new ResourceLocation("zerocontact", "jpc_armor"));
+        Item armor = ForgeRegistries.ITEMS.getValue(new ResourceLocation("zerocontact", "armor_jpc_v1"));
         if (armor != null) {
             this.setItemSlot(EquipmentSlot.CHEST, new ItemStack(armor));
             CuriosApi.getCuriosInventory(this).ifPresent(handler -> {
-                Item plate = ForgeRegistries.ITEMS.getValue(new ResourceLocation("zerocontact", "steel_plate"));
+                Item plate = ForgeRegistries.ITEMS.getValue(new ResourceLocation("zerocontact", "plate_steel"));
                 if (plate != null) {
                     ItemStack plateStack = new ItemStack(plate);
                     handler.setEquippedCurio("front_plate", 0, plateStack);

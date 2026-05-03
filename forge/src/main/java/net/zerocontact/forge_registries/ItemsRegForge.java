@@ -47,13 +47,13 @@ public class ItemsRegForge {
     public static void onReg(RegisterEvent event) {
         if (!event.getRegistryKey().equals(Registries.ITEM)) return;
         RegistrySupplier<BasePlate> CULT_LOCUST_PLATE = ItemsReg.ITEMS.register("plate_cult_locust",
-                () -> BasePlate.createGeoPlate(0, 8, 0.2f, 0.75f, -0.025f, "textures/models/plate/plate_cult_locust.png", "geo/plate/plate_cult_locust.geo.json", ""));
+                () -> BasePlate.createGeoPlate(0, 8, 0.1f, 0.75f, -0.025f, "textures/models/plate/plate_cult_locust.png", "geo/plate/plate_cult_locust.geo.json", ""));
         RegistrySupplier<BasePlate> BALLISTIC_CONVOY = ItemsReg.ITEMS.register("plate_ballistic_convoy",
-                () -> BasePlate.createGeoPlate(0, 11, 0.35f, 0.87f, -0.05f, "textures/models/plate/plate_cult_locust.png", "geo/plate/plate_cult_locust.geo.json", ""));
+                () -> BasePlate.createGeoPlate(0, 11, 0.05f, 0.87f, -0.05f, "textures/models/plate/plate_cult_locust.png", "geo/plate/plate_cult_locust.geo.json", ""));
         RegistrySupplier<BasePlate> STEEL_PLATE = ItemsReg.ITEMS.register("plate_steel",
-                () -> BasePlate.createGeoPlate(0, 6, 0.55f, 0.9f, -0.010f, "textures/models/plate/plate_cult_locust.png", "geo/plate/plate_cult_locust.geo.json", ""));
+                () -> BasePlate.createGeoPlate(0, 6, 0.25f, 0.9f, -0.010f, "textures/models/plate/plate_cult_locust.png", "geo/plate/plate_cult_locust.geo.json", ""));
         RegistrySupplier<BasePlate> SLIME_PLATE = ItemsReg.ITEMS.register("plate_slime",
-                () -> BasePlate.createGeoPlate(0, 4, 0.1f, 1f, 0f, "textures/models/plate/plate_slime.png", "geo/plate/plate_slime.geo.json", ""));
+                () -> BasePlate.createGeoPlate(0, 4, 0.2f, 1f, 0f, "textures/models/plate/plate_slime.png", "geo/plate/plate_slime.geo.json", ""));
         RegistrySupplier<ForgeSpawnEggItem> RAIDER_EGG = ItemsReg.ITEMS.register("raider_egg", () -> new ForgeSpawnEggItem(ModEntitiesReg.ARMED_RAIDER, 0x3d6145, 0xcfc08a, new Item.Properties()));
 
         RegistrySupplier<FastMt> FAST_MT = ItemsReg.ITEMS.register("fast_mt", () -> new FastMt(ArmorMaterials.IRON, ArmorItem.Type.HELMET, new Item.Properties(), 8));
@@ -78,18 +78,18 @@ public class ItemsRegForge {
         RegistrySupplier<Cap> CYAN_CAP = ItemsReg.ITEMS.register("cap_cyan", () -> Cap.create(0, 24, Cap.Color.CYAN));
         RegistrySupplier<Cap> BOSS_CAP = ItemsReg.ITEMS.register("cap_boss", () -> Cap.create(0, 24, Cap.Color.BOSS));
 
-        RegistrySupplier<ThorArmorImpl> THOR_ARMOR = ItemsReg.ITEMS.register("armor_thor_black", () -> new ThorArmorImpl(4, 128, 0, 0.95f, -0.01F));
-        RegistrySupplier<UntarArmorImpl> UNTAR_ARMOR = ItemsReg.ITEMS.register("armor_untar_blue", () -> new UntarArmorImpl(9, 72, 6, 0.98f, -0.03F));
-        RegistrySupplier<HexgridArmorImpl> HEXGRID_ARMOR = ItemsReg.ITEMS.register("armor_hexgrid_black", () -> new HexgridArmorImpl(9, 128, 2, 1, 0.01F));
-        RegistrySupplier<R6b2ArmorImpl> R6B2 = ItemsReg.ITEMS.register("armor_6b2", () -> new R6b2ArmorImpl(5, 64, 4, 1.05f, -0.05F));
-        RegistrySupplier<R6b23IArmorImpl> R6B23I = ItemsReg.ITEMS.register("armor_6b23_1", () -> new R6b23IArmorImpl(7, 128, 7, 0.9f, -0.025F));
-        RegistrySupplier<R6b23IIArmorImpl> R6B23II = ItemsReg.ITEMS.register("armor_6b23_2", () -> new R6b23IIArmorImpl(7, 128, 7, 0.9f, -0.025F));
-        RegistrySupplier<Defender2ArmorImpl> DEFENDER = ItemsReg.ITEMS.register("armor_defender_2", () -> new Defender2ArmorImpl(7, 128, 4, 0.85f, -0.015F));
-        RegistrySupplier<R6b43ArmorImpl> R6B43 = ItemsReg.ITEMS.register("armor_6b43", () -> R6b43ArmorImpl.create(R6b43ArmorImpl.Series.FLORA, 7, 128, 4, .7f, -0.1F));
-        RegistrySupplier<JpcArmorImpl> JPC_V1 = ItemsReg.ITEMS.register("armor_jpc_v1", () -> JpcArmorImpl.create(JpcArmorImpl.Series.V1, 7, 64, 0, 0.95f, 0.01F));
-        RegistrySupplier<JpcArmorImpl> JPC_V2 = ItemsReg.ITEMS.register("armor_jpc_v2", () -> JpcArmorImpl.create(JpcArmorImpl.Series.V2, 7, 64, 0, 0.95f, 0.01F));
-        RegistrySupplier<JpcArmorImpl> JPC_V2_SC = ItemsReg.ITEMS.register("armor_jpc_v2_swimmer_cut", () -> JpcArmorImpl.create(JpcArmorImpl.Series.V2SC, 7, 64, 0, 0.95f, 0.01F));
-        RegistrySupplier<AvsArmorImpl> AVS = ItemsReg.ITEMS.register("armor_avs", () -> new AvsArmorImpl(7, 86, 0, 0.85f, -0.03F));
+        RegistrySupplier<ThorArmorImpl> THOR_ARMOR = ItemsReg.ITEMS.register("armor_thor_black", () -> new ThorArmorImpl(0, 35, 0, 0.35f, 0.95f, -0.01F));
+        RegistrySupplier<UntarArmorImpl> UNTAR_ARMOR = ItemsReg.ITEMS.register("armor_untar_blue", () -> new UntarArmorImpl(6, 24, 6, 0.20f, 0.98f, -0.03F));
+        RegistrySupplier<HexgridArmorImpl> HEXGRID_ARMOR = ItemsReg.ITEMS.register("armor_hexgrid_black", () -> new HexgridArmorImpl(2, 31, 2, 0.5f, 1, 0.01F));
+        RegistrySupplier<R6b2ArmorImpl> R6B2 = ItemsReg.ITEMS.register("armor_6b2", () -> new R6b2ArmorImpl(4, 12, 4, 0.4f, 1.05f, -0.05F));
+        RegistrySupplier<R6b23IArmorImpl> R6B23I = ItemsReg.ITEMS.register("armor_6b23_1", () -> new R6b23IArmorImpl(7, 48, 7, 0.2f, 0.8f, -0.025F));
+        RegistrySupplier<R6b23IIArmorImpl> R6B23II = ItemsReg.ITEMS.register("armor_6b23_2", () -> new R6b23IIArmorImpl(7, 48, 7, 0.2f, 0.8f, -0.025F));
+        RegistrySupplier<Defender2ArmorImpl> DEFENDER = ItemsReg.ITEMS.register("armor_defender_2", () -> new Defender2ArmorImpl(4, 64, 4, 0.08f, 0.85f, -0.015F));
+        RegistrySupplier<R6b43ArmorImpl> R6B43 = ItemsReg.ITEMS.register("armor_6b43", () -> R6b43ArmorImpl.create(R6b43ArmorImpl.Series.FLORA, 12, 64, 12, 0.05f, .7f, -0.1F));
+        RegistrySupplier<JpcArmorImpl> JPC_V1 = ItemsReg.ITEMS.register("armor_jpc_v1", () -> JpcArmorImpl.create(JpcArmorImpl.Series.V1, 0, 32, 0, 0.25f, 0.95f, 0.01F));
+        RegistrySupplier<JpcArmorImpl> JPC_V2 = ItemsReg.ITEMS.register("armor_jpc_v2", () -> JpcArmorImpl.create(JpcArmorImpl.Series.V2, 0, 32, 0, 0.25f, 0.95f, 0.01F));
+        RegistrySupplier<JpcArmorImpl> JPC_V2_SC = ItemsReg.ITEMS.register("armor_jpc_v2_swimmer_cut", () -> JpcArmorImpl.create(JpcArmorImpl.Series.V2SC, 0, 16, 0, 0.25f, 0.95f, 0.01F));
+        RegistrySupplier<AvsArmorImpl> AVS = ItemsReg.ITEMS.register("armor_avs", () -> new AvsArmorImpl(0, 48, 0, 0.20f, 0.85f, -0.03F));
 
         RegistrySupplier<T20> T20_BACKPACK_UMBRA = ItemsReg.ITEMS.register("backpack_t20_umbra", () -> T20.create(T20.Series.UMBRA, 25));
         RegistrySupplier<T20> T20_BACKPACK_MULTICAM = ItemsReg.ITEMS.register("backpack_t20_multicam", () -> T20.create(T20.Series.MULTICAM, 25));
@@ -116,7 +116,7 @@ public class ItemsRegForge {
 
         RegistrySupplier<GeneratePlateImpl> GENERATE_PLATE = ItemsReg.ITEMS.register("generate_plate", () -> new GeneratePlateImpl("", 0, 0, 0, 0, 0, 0, 0));
         RegistrySupplier<GenerateArmorGeoImpl> GENERATE_ARMOR = ItemsReg.ITEMS.register("generate_armor", () -> new GenerateArmorGeoImpl(ArmorItem.Type.CHESTPLATE, "", 0, 0, 0, 0, new ResourceLocation(""), new ResourceLocation(""), new ResourceLocation(""), 0, 0, 0));
-        RegistrySupplier<GenerateCarrierGeoImpl> GENERATE_CARRIER = ItemsReg.ITEMS.register("generate_carrier", () -> new GenerateCarrierGeoImpl(ArmorItem.Type.CHESTPLATE, "", 0, 0, 0, 0, 0, new ResourceLocation(""), new ResourceLocation(""), new ResourceLocation("")));
+        RegistrySupplier<GenerateCarrierGeoImpl> GENERATE_CARRIER = ItemsReg.ITEMS.register("generate_carrier", () -> new GenerateCarrierGeoImpl(ArmorItem.Type.CHESTPLATE, "", 0, 0, 0, 0, 0, 0, new ResourceLocation(""), new ResourceLocation(""), new ResourceLocation("")));
         RegistrySupplier<GenerateHelmetGeoImpl> GENERATE_HELMET = ItemsReg.ITEMS.register("generate_helmet", () -> new GenerateHelmetGeoImpl("", ArmorItem.Type.HELMET, new ResourceLocation(""), new ResourceLocation(""), new ResourceLocation(""), 0, 0, 0, 0, 0, 0, 0));
         RegistrySupplier<GenerateUniformTopGeoImpl> GENERATE_TOP_UNIFORM = ItemsReg.ITEMS.register("generate_top_uniform", () -> new GenerateUniformTopGeoImpl("", 0, new ResourceLocation(""), new ResourceLocation(""), new ResourceLocation("")));
         RegistrySupplier<GenerateUniformPantsGeoImpl> GENERATE_PANTS = ItemsReg.ITEMS.register("generate_pants", () -> new GenerateUniformPantsGeoImpl("", 0, new ResourceLocation(""), new ResourceLocation(""), new ResourceLocation("")));

@@ -34,12 +34,12 @@ public class JpcArmorImpl extends BaseArmorGeoImpl {
         }
     }
 
-    JpcArmorImpl(int defense, int defaultDurability, int absorb, float generateReduction, float mass, Series series) {
-        super(Type.CHESTPLATE, "", defense, defaultDurability, absorb, generateReduction, mass, series.texture, series.model, series.animation);
+    JpcArmorImpl(int defense, int defaultDurability, int absorb, float bluntReduction, float penetrateReduction, float mass, Series series) {
+        super(Type.CHESTPLATE, "", defense, defaultDurability, absorb, bluntReduction, penetrateReduction, mass, series.texture, series.model, series.animation);
     }
 
-    public static JpcArmorImpl create(Series series, int defense, int defaultDurability, int absorb, float generateReduction, float mass) {
-        return new JpcArmorImpl(defense, defaultDurability, absorb, generateReduction, mass, series);
+    public static JpcArmorImpl create(Series series, int defense, int defaultDurability, int absorb, float bluntReduction, float penetrateReduction, float mass) {
+        return new JpcArmorImpl(defense, defaultDurability, absorb, bluntReduction, penetrateReduction, mass, series);
     }
 
     @Override

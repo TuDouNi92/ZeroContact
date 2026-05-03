@@ -162,7 +162,7 @@ public enum CaliberVariantDamageHelper {
     private static double getPenetratedDamage(@NotNull Caliber caliber, int hurtCanHold) {
         RandomSource randomSource = RandomSource.create();
         if (hurtCanHold > caliber.penetrationClass) {
-            double penetrateProbability = Math.min(0.15, (double) caliber.penetrationClass / hurtCanHold);
+            double penetrateProbability = Math.min(0.05f, (double) caliber.penetrationClass / hurtCanHold);
             if (randomSource.nextFloat() < penetrateProbability) {
                 return caliber.fleshDamage;
             }

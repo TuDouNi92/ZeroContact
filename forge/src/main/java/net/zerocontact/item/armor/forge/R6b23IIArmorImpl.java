@@ -9,7 +9,7 @@ public class R6b23IIArmorImpl extends BaseArmorGeoImpl {
     private static final ResourceLocation model = new ResourceLocation(MOD_ID, "geo/vest/vest_6b23_2_flora.geo.json");
     private static final ResourceLocation animation = null;
 
-    public R6b23IIArmorImpl(int defense, int defaultDurability, int absorb, float penetrateReduction, float mass) {
-        super(Type.CHESTPLATE, "", defense, defaultDurability, absorb, penetrateReduction, mass, texture, model, animation);
+    public R6b23IIArmorImpl(int defense, int defaultDurability, int absorb, float bluntReduction, float penetrateReduction, float mass) {
+        super(Type.CHESTPLATE, "", defense, defaultDurability, absorb, bluntReduction, penetrateReduction, mass, texture, model, animation);
     }
 }

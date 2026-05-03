@@ -22,11 +22,11 @@ public class R6b43ArmorImpl extends BaseArmorGeoImpl {
         }
     }
 
-    R6b43ArmorImpl(Series series, int defense, int defaultDurability, int absorb, float generateReduction, float mass) {
-        super(Type.CHESTPLATE, "", defense, defaultDurability, absorb, generateReduction, mass, series.texture, series.model, series.animation);
+    R6b43ArmorImpl(Series series, int defense, int defaultDurability, int absorb, float bluntReduction, float penetrateReduction, float mass) {
+        super(Type.CHESTPLATE, "", defense, defaultDurability, absorb, bluntReduction, penetrateReduction, mass, series.texture, series.model, series.animation);
     }
 
-    public static R6b43ArmorImpl create(Series series, int defense, int defaultDurability, int absorb, float generateReduction, float mass) {
-        return new R6b43ArmorImpl(series, defense, defaultDurability, absorb, generateReduction, mass);
+    public static R6b43ArmorImpl create(Series series, int defense, int defaultDurability, int absorb, float bluntReduction, float penetrateReduction, float mass) {
+        return new R6b43ArmorImpl(series, defense, defaultDurability, absorb, bluntReduction, penetrateReduction, mass);
     }
 }

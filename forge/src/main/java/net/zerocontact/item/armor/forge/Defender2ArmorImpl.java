@@ -11,8 +11,8 @@ public class Defender2ArmorImpl extends BaseArmorGeoImpl {
     private static final ResourceLocation model = new ResourceLocation(MOD_ID, "geo/vest/vest_defender_2_olive.geo.json");
     private static final ResourceLocation animation = null;
 
-    public Defender2ArmorImpl(int defense, int defaultDurability, int absorb, float generateReduction, float mass) {
-        super(Type.CHESTPLATE, "", defense, defaultDurability, absorb, generateReduction, mass, texture, model, animation);
+    public Defender2ArmorImpl(int defense, int defaultDurability, int absorb, float bluntReduction, float penetrateReduction, float mass) {
+        super(Type.CHESTPLATE, "", defense, defaultDurability, absorb, bluntReduction, penetrateReduction, mass, texture, model, animation);
     }
 
     @Override

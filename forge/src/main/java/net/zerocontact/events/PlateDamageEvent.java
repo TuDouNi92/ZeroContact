@@ -31,7 +31,7 @@ public class PlateDamageEvent {
         float durabilityLossFactor = 1;
         int hits = stackInSlot.getOrCreateTag().getInt("hits") + 1;
         int durabilityLossAmount = 1;
-        if (!stackInSlot.isEmpty() && (damageSource.is(ModDamageTypes.BULLETS_TAG))) {
+        if (!stackInSlot.isEmpty() && (damageSource.is(ModDamageTypes.BULLETS_TAG) || damageSource.is(ZDamageTypes.ZC_DAMAGE))) {
             if (stackInSlot.getItem() instanceof ICombatArmorItem provider) {
                 durabilityLossAmount = provider.generateLoss(amount, durabilityLossFactor, hits);
             }

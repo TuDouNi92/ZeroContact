@@ -11,6 +11,9 @@
   "item.zerocontact.dogtag.time_stamp":"Time: %s",
   "item.zerocontact.dogtag.killedBy": "Killed by: %s",
   "item.zerocontact.dogtag.weaponName": "Weapon: %s",
+
+  "death.attack.zc_damage.player": "%1$s was shot by %2$s",
+
   "item.zerocontact.raider_egg": "Raider",
   "item.zerocontact.helmet_6b47_ratnik_emr": "6b47 (Emr)",
   "item.zerocontact.helmet_6b47_ratnik_arc": "6b47 (Arctic)",

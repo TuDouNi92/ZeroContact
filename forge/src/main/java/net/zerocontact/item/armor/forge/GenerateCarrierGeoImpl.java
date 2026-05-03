@@ -32,8 +32,8 @@ public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem,
     public final Set<GenerationRecord<?>> items = new HashSet<>();
     private static final EquipmentType EQUIPMENT_TYPE = EquipmentType.PLATE_CARRIER;
 
-    public GenerateCarrierGeoImpl(Type type, String id, int defense, int defaultDurability, int absorb, float penetrateReduction, float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
-        super(type, id, defense, defaultDurability, absorb, penetrateReduction, mass, texture, model, animation);
+    public GenerateCarrierGeoImpl(Type type, String id, int defense, int defaultDurability, int absorb, float bluntReduction, float penetrateReduction, float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+        super(type, id, defense, defaultDurability, absorb, bluntReduction, penetrateReduction, mass, texture, model, animation);
         this.defaultDurability = defaultDurability;
     }
 
@@ -79,11 +79,12 @@ public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem,
             int absorb = data.protectionClass;
             int mass = 0;
             float penetrateReduction = data.hurtModifier.penetrateMultiplier;
+            float bluntReduction = data.hurtModifier.bluntMultiplier;
             if (!(Objects.equals(data.equipmentSlot, EQUIPMENT_TYPE.getTypeId()))) continue;
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerationRecord<>(id, new GenerateCarrierGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, absorb, penetrateReduction, mass, texture, model, animation)));
+            items.add(new GenerationRecord<>(id, new GenerateCarrierGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, absorb, bluntReduction, penetrateReduction, mass, texture, model, animation)));
         }
     }
 

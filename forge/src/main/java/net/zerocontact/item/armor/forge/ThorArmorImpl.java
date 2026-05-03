@@ -11,8 +11,8 @@ public class ThorArmorImpl extends BaseArmorGeoImpl {
     private static final ResourceLocation model = new ResourceLocation(MOD_ID, "geo/vest/vest_thor_black.geo.json");
     private static final ResourceLocation animation = null;
 
-    public ThorArmorImpl(int defense, int defaultDurability, int absorb, float penetrateReduction, float mass) {
-        super(Type.CHESTPLATE, "", defense, defaultDurability, absorb, penetrateReduction, mass, texture, model, animation);
+    public ThorArmorImpl(int defense, int defaultDurability, int absorb, float bluntReduction, float penetrateReduction, float mass) {
+        super(Type.CHESTPLATE, "", defense, defaultDurability, absorb, bluntReduction, penetrateReduction, mass, texture, model, animation);
     }
 
     @Override
