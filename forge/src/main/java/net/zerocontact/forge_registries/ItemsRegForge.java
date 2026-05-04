@@ -81,7 +81,7 @@ public class ItemsRegForge {
         RegistrySupplier<ThorArmorImpl> THOR_ARMOR = ItemsReg.ITEMS.register("armor_thor_black", () -> new ThorArmorImpl(0, 35, 0, 0.35f, 0.95f, -0.01F));
         RegistrySupplier<UntarArmorImpl> UNTAR_ARMOR = ItemsReg.ITEMS.register("armor_untar_blue", () -> new UntarArmorImpl(6, 24, 6, 0.20f, 0.98f, -0.03F));
         RegistrySupplier<HexgridArmorImpl> HEXGRID_ARMOR = ItemsReg.ITEMS.register("armor_hexgrid_black", () -> new HexgridArmorImpl(2, 31, 2, 0.5f, 1, 0.01F));
-        RegistrySupplier<R6b2ArmorImpl> R6B2 = ItemsReg.ITEMS.register("armor_6b2", () -> new R6b2ArmorImpl(4, 12, 4, 0.4f, 1.05f, -0.05F));
+        RegistrySupplier<R6b2ArmorImpl> R6B2 = ItemsReg.ITEMS.register("armor_6b2", () -> new R6b2ArmorImpl(4, 12, 5, 0.4f, 1.05f, -0.05F));
         RegistrySupplier<R6b23IArmorImpl> R6B23I = ItemsReg.ITEMS.register("armor_6b23_1", () -> new R6b23IArmorImpl(7, 48, 7, 0.2f, 0.8f, -0.025F));
         RegistrySupplier<R6b23IIArmorImpl> R6B23II = ItemsReg.ITEMS.register("armor_6b23_2", () -> new R6b23IIArmorImpl(7, 48, 7, 0.2f, 0.8f, -0.025F));
         RegistrySupplier<Defender2ArmorImpl> DEFENDER = ItemsReg.ITEMS.register("armor_defender_2", () -> new Defender2ArmorImpl(4, 64, 4, 0.08f, 0.85f, -0.015F));

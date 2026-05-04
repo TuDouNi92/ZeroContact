@@ -7,6 +7,7 @@ import com.tacz.guns.init.ModDamageTypes;
 import dev.architectury.event.EventResult;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -24,7 +25,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PlateEntityHurtEvent {
-    public static boolean changeHurtAmountRicochet(LivingEntity lv, DamageSource source, float amount, ItemStack plateSlot) {
+    public static boolean modifyDamage(LivingEntity lv, DamageSource source, float amount, ItemStack plateSlot) {
         EntityKineticBullet.EntityResult result = EventUtil.getHitResult(source);
         boolean isHeadShot = result != null && result.isHeadshot();
         if (lv instanceof ServerPlayer serverPlayer && serverPlayer.isCreative()) return false;
@@ -32,10 +33,15 @@ public class PlateEntityHurtEvent {
         AtomicBoolean interruptResult = new AtomicBoolean();
         ItemStack armorSlot = lv.getItemBySlot(EquipmentSlot.CHEST);
         if (isHeadShot) return false;
-        if (armorSlot.getItem() instanceof BaseArmorGeoImpl baseArmorGeo && baseArmorGeo.getArmorType().equals(IEquipmentTypeTag.EquipmentType.ARMOR)) {
-            hurtIt(lv, source, amount, null, armorSlot, modifiedDamageSource, interruptResult);
-        } else {
-            hurtIt(lv, source, amount, plateSlot, armorSlot, modifiedDamageSource, interruptResult);
+        if (armorSlot.getItem() instanceof BaseArmorGeoImpl baseArmorGeo) {
+            //Ignores the bypass damage
+            if (source.typeHolder().containsTag(DamageTypeTags.BYPASSES_ARMOR)) return true;
+
+            if (baseArmorGeo.getArmorType().equals(IEquipmentTypeTag.EquipmentType.ARMOR)) {
+                hurtIt(lv, source, amount, null, armorSlot, modifiedDamageSource, interruptResult);
+            } else if (baseArmorGeo.getArmorType().equals(IEquipmentTypeTag.EquipmentType.PLATE_CARRIER)) {
+                hurtIt(lv, source, amount, plateSlot, armorSlot, modifiedDamageSource, interruptResult);
+            }
         }
         return interruptResult.get();
     }
@@ -51,13 +57,12 @@ public class PlateEntityHurtEvent {
                     lv.hurt(modifiedDamageSource, hurtAmount);
                 }
                 interruptResult.set(true);
-            }
-            else{
+            } else {
                 interruptResult.set(false);
             }
         } else {
             int protectionClass = armorStack.getOrCreateTag().getInt("protection_class");
-            if (!armorStack.isEmpty() && source.is(ModDamageTypes.BULLET)) {
+            if (source.is(ModDamageTypes.BULLET)) {
                 lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
                 if (EventUtil.isDamageSourceValid(source) && armorStack.getItem() instanceof ICombatArmorItem provider) {
                     hurtAmount = getHurtAmount(lv, source, amount, null, provider, protectionClass);
@@ -118,7 +123,7 @@ public class PlateEntityHurtEvent {
     }
 
     public static EventResult entityHurtRegister(LivingEntity lv, DamageSource source, float amount) {
-        if (PlateEntityHurtEvent.changeHurtAmountRicochet(lv, source, amount, EventUtil.idHitFromBack(lv, source))) {
+        if (PlateEntityHurtEvent.modifyDamage(lv, source, amount, EventUtil.idHitFromBack(lv, source))) {
             return EventResult.interruptFalse();
         }
         return EventResult.pass();
