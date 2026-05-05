@@ -134,3 +134,33 @@ Tutorials about customize your own datapack can be found in GitHub wiki.
 
 - AI improves for `raider`
 - Fix crashes in specific situations
+
+## indev.1.1.0
+
+### New Items
+
+- A workbench named *thoughbook* for crafting gears in survival.
+- Uniform G99, SPN, British23rd regiment
+- Backpack British23rd regiment
+- *Thunderbolt* Rigs
+- *Jumpable Plate Carrier* 1.0, 2.0, swimmer cut
+- 6B43 body armor
+- Phonetalker helmet
+- TBH helmet
+- 6B47 helmet [Arctic, EMR]
+- Gas masks [PMK2,ZK,M50,MP5]
+- Cap *Boss*
+
+### New Mechanism
+
+- Override workebench recipes by datapacks.
+- Backpacks can be interacted with allies by crouch right click behind.
+
+### Fix & Optimize
+
+- Ammo can be extracted from Rigs into TacZ guns.
+- Fix the Altyn visor malfunction.
+- Improvement for calculating armor & helmet durability separated from overall equipments.
+- Improvement for calculating damage for armors & plate-carriers.
+- Add tooltips for damage reduction.
+- Basic localization
