@@ -6,6 +6,9 @@ public class ItemGenData {
     public static class Plate extends ItemGenData{
         //Item identifier under namespace of zerocontact
         public String id;
+        //The durability
+        @SerializedName("durability")
+        public int durability;
         //Vanilla armor defense
         public int defense;
         //Protection level,ranges unlimited.

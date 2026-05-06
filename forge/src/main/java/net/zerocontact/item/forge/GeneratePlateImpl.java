@@ -35,8 +35,8 @@ public class GeneratePlateImpl extends SapiIV implements ICombatArmorItem, Plate
     public final String id;
     public final Set<GenerationRecord<?>> items = new HashSet<>();
 
-    public GeneratePlateImpl(String id, float bluntDamage, float penetrateDamage, float ricochetDamage, int defense, int absorb, float movementFix, int durabilityLossProvider) {
-        super(material, type, new Properties());
+    public GeneratePlateImpl(String id, int durability, float bluntDamage, float penetrateDamage, float ricochetDamage, int defense, int absorb, float movementFix, int durabilityLossProvider) {
+        super(material, type, new Properties().defaultDurability(durability));
         this.id = id;
         this.defense = defense;
         this.absorb = absorb;
@@ -61,7 +61,8 @@ public class GeneratePlateImpl extends SapiIV implements ICombatArmorItem, Plate
             int absorb = data.protectionClass;
             float movementFix = data.movementFix;
             int durabilityLossProvider = data.durabilityLossModifier;
-            items.add(new GenerationRecord<>(id, new GeneratePlateImpl(id, bluntDamage, penetrateDamage, ricochetDamage, defense, absorb, movementFix, durabilityLossProvider)));
+            int durability = data.durability;
+            items.add(new GenerationRecord<>(id, new GeneratePlateImpl(id, durability, bluntDamage, penetrateDamage, ricochetDamage, defense, absorb, movementFix, durabilityLossProvider)));
         }
     }
 

@@ -114,7 +114,7 @@ public class ItemsRegForge {
         RegistrySupplier<SpnTop> SPN_TOP = ItemsReg.ITEMS.register("uniform_spn_top", SpnTop::new);
         RegistrySupplier<SpnBottom> SPN_BOTTOM = ItemsReg.ITEMS.register("uniform_spn_bottom", SpnBottom::new);
 
-        RegistrySupplier<GeneratePlateImpl> GENERATE_PLATE = ItemsReg.ITEMS.register("generate_plate", () -> new GeneratePlateImpl("", 0, 0, 0, 0, 0, 0, 0));
+        RegistrySupplier<GeneratePlateImpl> GENERATE_PLATE = ItemsReg.ITEMS.register("generate_plate", () -> new GeneratePlateImpl("",0, 0, 0, 0, 0, 0, 0, 0));
         RegistrySupplier<GenerateArmorGeoImpl> GENERATE_ARMOR = ItemsReg.ITEMS.register("generate_armor", () -> new GenerateArmorGeoImpl(ArmorItem.Type.CHESTPLATE, "", 0, 0, 0, 0, new ResourceLocation(""), new ResourceLocation(""), new ResourceLocation(""), 0, 0, 0));
         RegistrySupplier<GenerateCarrierGeoImpl> GENERATE_CARRIER = ItemsReg.ITEMS.register("generate_carrier", () -> new GenerateCarrierGeoImpl(ArmorItem.Type.CHESTPLATE, "", 0, 0, 0, 0, 0, 0, new ResourceLocation(""), new ResourceLocation(""), new ResourceLocation("")));
         RegistrySupplier<GenerateHelmetGeoImpl> GENERATE_HELMET = ItemsReg.ITEMS.register("generate_helmet", () -> new GenerateHelmetGeoImpl("", ArmorItem.Type.HELMET, new ResourceLocation(""), new ResourceLocation(""), new ResourceLocation(""), 0, 0, 0, 0, 0, 0, 0));
