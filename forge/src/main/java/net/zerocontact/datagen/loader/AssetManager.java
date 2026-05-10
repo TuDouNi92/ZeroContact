@@ -10,19 +10,24 @@ import net.minecraft.server.packs.repository.PackSource;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.zerocontact.ZeroContact;
 import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.AssetHelper;
 import net.zerocontact.datagen.ItemGenData;
 import net.zerocontact.datagen.RuntimeTypeAdapterFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
 
@@ -38,7 +43,7 @@ public class AssetManager {
     private static final Set<Path> RPACK_PATHS = new HashSet<>();
     private static final Set<Pack> PACKS = new HashSet<>();
 
-    public static void loadFromJson() {
+    public static void load() {
         if (Files.notExists(LOAD_PATH)) {
             try {
                 Files.createDirectories(LOAD_PATH);
@@ -48,10 +53,32 @@ public class AssetManager {
             }
         }
         try {
+            createDefaultPack();
             loadPack();
             loadResourceAndDataPack();
         } catch (IOException e) {
             ZeroContactLogger.LOG.error(e);
+        }
+    }
+
+    private static void createDefaultPack() throws IOException {
+        try (InputStream inputStream = ZeroContact.class.getResourceAsStream("/data/zerocontact/default_pack.zip")) {
+            if (inputStream != null) {
+                try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
+                    ZipEntry entry;
+                    while ((entry = zipInputStream.getNextEntry()) != null) {
+                        Path target = LOAD_PATH.resolve("default_pack").resolve(entry.getName());
+                        if (entry.isDirectory()) {
+                            Files.createDirectories(target);
+                        } else {
+                            Files.createDirectories(target.getParent());
+                            Files.copy(zipInputStream, target, StandardCopyOption.REPLACE_EXISTING);
+                        }
+                    }
+                }
+            } else {
+                ZeroContactLogger.LOG.error("Default pack not found.");
+            }
         }
     }
 
@@ -74,7 +101,6 @@ public class AssetManager {
                         ZeroContactLogger.LOG.info("loading ItemPath");
                         AssetHelper.IFiles.loadItemJson(itemPath, GSON);
                         AssetHelper.IFiles.loadBallisticJson(ballisticDataPath, GSON);
-                        AssetHelper.IFiles.copyRecipes(recipe);
                         AssetHelper.IFiles.loadRecipes(recipe, GSON);
                     });
         }

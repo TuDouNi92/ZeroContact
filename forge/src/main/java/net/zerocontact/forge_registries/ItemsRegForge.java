@@ -137,7 +137,7 @@ public class ItemsRegForge {
                         BRITISH23_TOP, BRITISH23_BOTTOM, G99_TOP, G99_BOTTOM, SPN_TOP, SPN_BOTTOM
                 )
         );
-        AssetManager.loadFromJson();
+        AssetManager.load();
         ZeroContactLogger.LOG.info("On Register ItemData:{}", new Gson().toJson(AssetManager.itemGenData).formatted());
 
 

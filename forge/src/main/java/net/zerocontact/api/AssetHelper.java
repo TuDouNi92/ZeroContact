@@ -87,21 +87,6 @@ public interface AssetHelper {
             }
         }
 
-        static void copyRecipes(Path recipe) {
-            if (!Files.exists(recipe.resolve("default.json"))) {
-                ZeroContactLogger.LOG.info("No default recipe config found, copying new one to {}", recipe);
-                try (InputStream inputStream = ZeroContact.class.getResourceAsStream("/data/zerocontact/recipes/default.json")) {
-                    if (inputStream != null) {
-                        Files.copy(inputStream, recipe.resolve("default.json"));
-                    } else {
-                        ZeroContactLogger.LOG.error("Recipe config not found inside datapack!");
-                    }
-                } catch (Exception e) {
-                    ZeroContactLogger.LOG.error(e);
-                }
-            }
-        }
-
         static void loadRecipes(Path recipe, Gson GSON) {
             List<IOException> exceptions = new ArrayList<>();
             if (!Files.exists(recipe)) return;
