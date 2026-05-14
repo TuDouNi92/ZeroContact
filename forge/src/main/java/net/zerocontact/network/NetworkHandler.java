@@ -151,6 +151,12 @@ public class NetworkHandler {
                             backpack.setToggling(backpackStack, msg.toggle);
                         }
                     });
+                    handler.getStacksHandler("rigs").ifPresent(stacksHandler -> {
+                        ItemStack rigsStack = stacksHandler.getStacks().getStackInSlot(0);
+                        if (rigsStack.getItem() instanceof BaseBackpack rigs) {
+                            rigs.setToggling(rigsStack, msg.toggle);
+                        }
+                    });
                 });
             });
         }

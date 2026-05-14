@@ -17,6 +17,7 @@ import net.zerocontact.forge_registries.ModMenus;
 import net.zerocontact.item.backpack.BaseBackpack;
 import net.zerocontact.item.rigs.BaseRigs;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.Optional;
@@ -30,7 +31,7 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
     public int minSlotY = Integer.MAX_VALUE;
     public int maxSlotY = Integer.MIN_VALUE;
     public int guiWidth, guiHeight;
-    public ItemStack backpackRenderStack;
+    public @Nullable ItemStack backpackRenderStack;
     public ItemStack rigsRenderStack;
     public ItemStack allyStack;
 
