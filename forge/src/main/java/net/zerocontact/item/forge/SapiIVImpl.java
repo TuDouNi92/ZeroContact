@@ -11,8 +11,8 @@ import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.PlateInfoProvider;
 import net.zerocontact.item.SapiIV;
 import org.jetbrains.annotations.NotNull;
-
-public class SapiIVImpl extends SapiIV implements ICombatArmorItem, PlateInfoProvider {
+@Deprecated
+public class SapiIVImpl extends SapiIV implements PlateInfoProvider {
     private final Type type;
     private final ArmorMaterial material;
     private final int defense;

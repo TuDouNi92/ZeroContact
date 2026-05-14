@@ -2,6 +2,7 @@ package net.zerocontact.api;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -10,14 +11,18 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.events.PlateUnEquippedHelper;
 import net.zerocontact.registries.ModSoundEventsReg;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface PlateInfoProvider extends ICurioItem, ICombatArmorItem {
@@ -56,5 +61,10 @@ public interface PlateInfoProvider extends ICurioItem, ICombatArmorItem {
 
     default boolean canEquip(ItemStack stack, EquipmentSlot armorType, Entity entity) {
         return false;
+    }
+
+    @Override
+    default void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
+        ICombatArmorItem.super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
     }
 }
