@@ -6,7 +6,8 @@
   "mixins": [
     "TaczModernKinetGunScriptAPIMixin",
     "TaczAbstractGunItemMixin",
-    "HeadshotHelmetMixin"
+    "HeadshotHelmetMixin",
+    "GunHudOverlayMixin"
   ],
   "injectors": {
     "defaultRequire": 1

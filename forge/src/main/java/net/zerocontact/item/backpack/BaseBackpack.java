@@ -50,15 +50,15 @@ public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl impl
     public void curioTick(SlotContext slotContext, ItemStack stack) {
         super.curioTick(slotContext, stack);
         if (getToggling(stack) && !slotContext.entity().level().isClientSide() && slotContext.entity() instanceof ServerPlayer serverPlayer) {
-            callOpenScreen(serverPlayer, BackpackContainerMenu.TriggerSource.KEY,ItemStack.EMPTY);
-            setToggling(stack,false);
+            callOpenScreen(serverPlayer, BackpackContainerMenu.TriggerSource.KEY, ItemStack.EMPTY);
+            setToggling(stack, false);
         }
     }
 
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand usedHand) {
         if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
-            callOpenScreen(serverPlayer, BackpackContainerMenu.TriggerSource.USE,ItemStack.EMPTY);
+            callOpenScreen(serverPlayer, BackpackContainerMenu.TriggerSource.USE, ItemStack.EMPTY);
         }
         return super.use(level, player, usedHand);
     }
@@ -103,7 +103,7 @@ public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl impl
                 ListTag listTag = readInvTags(stack);
                 CompoundTag compoundTag = new CompoundTag();
                 compoundTag.put("Items", listTag);
-                ItemStackHandler container = new ItemStackHandler(listTag.size());
+                ItemStackHandler container = new ItemStackHandler(containerSize);
                 container.deserializeNBT(compoundTag);
                 return ForgeCapabilities.ITEM_HANDLER.orEmpty(capability, LazyOptional.of(() -> container));
             }
