@@ -72,7 +72,7 @@ public class ServerForgeEventBus {
         ModMessages.register();
         TickEvent.PLAYER_PRE.register(PlayerStamina::staminaTick);
         dev.architectury.event.events.common.EntityEvent.LIVING_HURT.register((lv, source, amount) -> {
-                    PlateDamageEvent.DamagePlateRegister(lv, source, amount);
+                    PlateDamageEvent.register(lv, source, amount);
                     return PlateEntityHurtEvent.entityHurtRegister(lv, source, amount);
                 }
         );
@@ -81,6 +81,6 @@ public class ServerForgeEventBus {
     @SubscribeEvent
     public static void entityHurtByGunEvent(EntityHurtByGunEvent event) {
         PlateEntityHurtEvent.entityHurtByGunHeadShot(event);
-        PlateDamageEvent.DamageHelmet(event);
+        PlateDamageEvent.modifyHelmet(event);
     }
 }

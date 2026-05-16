@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PlateEntityHurtEvent {
-    public static boolean modifyDamage(LivingEntity lv, DamageSource source, float amount, ItemStack plateSlot) {
+    public static boolean modifyDamage(LivingEntity lv, DamageSource source, float amount) {
         EntityKineticBullet.EntityResult result = EventUtil.getHitResult(source);
         boolean isHeadShot = result != null && result.isHeadshot();
         if (lv instanceof ServerPlayer serverPlayer && serverPlayer.isCreative()) return false;
@@ -40,7 +40,12 @@ public class PlateEntityHurtEvent {
             if (baseArmorGeo.getArmorType().equals(IEquipmentTypeTag.EquipmentType.ARMOR)) {
                 hurtIt(lv, source, amount, null, armorSlot, modifiedDamageSource, interruptResult);
             } else if (baseArmorGeo.getArmorType().equals(IEquipmentTypeTag.EquipmentType.PLATE_CARRIER)) {
-                hurtIt(lv, source, amount, plateSlot, armorSlot, modifiedDamageSource, interruptResult);
+                boolean hitFromBack = EventUtil.isHitFromBack(lv, source);
+                if (!hitFromBack) {
+                    hurtIt(lv, source, amount, BaseArmorGeoImpl.getPlateStack(BaseArmorGeoImpl.FRONT_PLATE_SLOT, armorSlot), armorSlot, modifiedDamageSource, interruptResult);
+                } else {
+                    hurtIt(lv, source, amount, BaseArmorGeoImpl.getPlateStack(BaseArmorGeoImpl.BACK_PLATE_SLOT, armorSlot), armorSlot, modifiedDamageSource, interruptResult);
+                }
             }
         }
         return interruptResult.get();
@@ -123,7 +128,7 @@ public class PlateEntityHurtEvent {
     }
 
     public static EventResult entityHurtRegister(LivingEntity lv, DamageSource source, float amount) {
-        if (PlateEntityHurtEvent.modifyDamage(lv, source, amount, EventUtil.idHitFromBack(lv, source))) {
+        if (PlateEntityHurtEvent.modifyDamage(lv, source, amount)) {
             return EventResult.interruptFalse();
         }
         return EventResult.pass();

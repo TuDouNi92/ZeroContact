@@ -44,20 +44,12 @@ public class EventUtil {
         return false;
     }
 
-    public static ItemStack idHitFromBack(LivingEntity lv, DamageSource source) {
+    public static boolean isHitFromBack(LivingEntity lv, DamageSource source) {
         double incidentAngleAbs = Math.abs(getAngle(lv, source));
-        AtomicReference<ItemStack> plate_stack = new AtomicReference<>(ItemStack.EMPTY);
-        CuriosApi.getCuriosInventory(lv).ifPresent(iCuriosItemHandler -> {
-            if (incidentAngleAbs != 361) {
-                if (incidentAngleAbs > 90) {
-                    iCuriosItemHandler.getStacksHandler("front_plate").ifPresent(stacksHandler -> plate_stack.set(stacksHandler.getStacks().getStackInSlot(0)));
-
-                } else {
-                    iCuriosItemHandler.getStacksHandler("back_plate").ifPresent(stacksHandler -> plate_stack.set(stacksHandler.getStacks().getStackInSlot(0)));
-                }
-            }
-        });
-        return plate_stack.get();
+        if (incidentAngleAbs != 361) {
+            return incidentAngleAbs < 90;
+        }
+        return true;
     }
 
     private static double getAngle(LivingEntity lv, DamageSource source) {

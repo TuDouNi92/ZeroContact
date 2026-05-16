@@ -60,6 +60,21 @@ public class ModMessages {
                 .encoder(NetworkHandler.BuyGearsPacket::encode)
                 .consumerMainThread(NetworkHandler.BuyGearsPacket::handle)
                 .add();
+        net.messageBuilder(PlatePackets.PlateExtractor.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(PlatePackets.PlateExtractor::decode)
+                .encoder(PlatePackets.PlateExtractor::encode)
+                .consumerMainThread(PlatePackets.PlateExtractor::handle)
+                .add();
+        net.messageBuilder(PlatePackets.PlateInserter.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(PlatePackets.PlateInserter::decode)
+                .encoder(PlatePackets.PlateInserter::encode)
+                .consumerMainThread(PlatePackets.PlateInserter::handle)
+                .add();
+        net.messageBuilder(PlatePackets.IndexUpdater.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(PlatePackets.IndexUpdater::decode)
+                .encoder(PlatePackets.IndexUpdater::encode)
+                .consumerMainThread(PlatePackets.IndexUpdater::handle)
+                .add();
     }
 
     public static <MSG> void sendToServer(MSG msg) {

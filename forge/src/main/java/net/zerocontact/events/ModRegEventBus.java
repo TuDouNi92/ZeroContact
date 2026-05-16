@@ -7,12 +7,15 @@ import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.zerocontact.client.bundle.ClientPlateBundle;
+import net.zerocontact.client.bundle.PlateBundle;
 import net.zerocontact.client.gui.BackpackScreen;
 import net.zerocontact.client.gui.ConfigScreen;
 import net.zerocontact.client.gui.WorkbenchScreen;
@@ -40,6 +43,7 @@ public class ModRegEventBus {
             event.put(ModEntitiesReg.ARMED_RAIDER.get(), ArmedRaider.createAttributes().build());
         }
     }
+
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     static class ClientDistribution {
         @SubscribeEvent
@@ -50,12 +54,19 @@ public class ModRegEventBus {
             RegCurioGeoItemRender();
             regConfigScreen();
         }
+
+        @SubscribeEvent
+        public static void onRegisterTooltipComponent(RegisterClientTooltipComponentFactoriesEvent event) {
+            event.register(PlateBundle.class, ClientPlateBundle::new);
+        }
+
         @SubscribeEvent
         public static void onRegisterMappings(RegisterKeyMappingsEvent event) {
             KeyBindingHandler.register(event);
         }
+
         @SubscribeEvent
-        public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event){
+        public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
             event.registerBlockEntityRenderer(
                     WORKBENCH_ENTITY.get(), arg -> new GeoBlockRenderer<>(
                             new GenerateModel<>(

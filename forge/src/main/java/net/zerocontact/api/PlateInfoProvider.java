@@ -30,6 +30,7 @@ public interface PlateInfoProvider extends ICurioItem, ICombatArmorItem {
         return new ICurio.SoundInfo(ModSoundEventsReg.ARMOR_EQUIP_PLATE, 1.5f, 1.0f);
     }
 
+    @Deprecated
     default Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext, UUID uuid, ItemStack stack) {
         Multimap<Attribute, AttributeModifier> modifiers = HashMultimap.create();
         stack.getOrCreateTag().putInt("protection_class", getAbsorb());
@@ -39,19 +40,31 @@ public interface PlateInfoProvider extends ICurioItem, ICombatArmorItem {
         return modifiers;
     }
 
+    @Override
+    default Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
+        Multimap<Attribute, AttributeModifier> modifiers = HashMultimap.create();
+        stack.getOrCreateTag().putInt("protection_class", getAbsorb());
+        modifiers.put(Attributes.ARMOR, new AttributeModifier(UUID.nameUUIDFromBytes(("Armor").getBytes()), "CuriosArmorDefense", this.getDefense(), AttributeModifier.Operation.ADDITION));
+        modifiers.put(Attributes.MOVEMENT_SPEED, new AttributeModifier(UUID.nameUUIDFromBytes(("MoveSpeed").getBytes()), "MoveSpeed", getMass(), AttributeModifier.Operation.MULTIPLY_TOTAL));
+        modifiers.put(Attributes.KNOCKBACK_RESISTANCE, new AttributeModifier(UUID.nameUUIDFromBytes(("KnockBack").getBytes()), "KnockBack", .4f, AttributeModifier.Operation.MULTIPLY_TOTAL));
+        return modifiers;
+    }
+
+    @Deprecated
     default boolean canEquipFromUse(SlotContext slotContext, ItemStack stack) {
         return true;
     }
 
+    @Deprecated
     default void curioTick(SlotContext slotContext, ItemStack stack) {
         PlateUnEquippedHelper.onArmorUnequipped(slotContext, stack);
     }
-
+    @Deprecated
     @NotNull
     default ICurio.DropRule getDropRule(SlotContext slotContext, DamageSource source, int lootingLevel, boolean recentlyHit, ItemStack stack) {
-        if(slotContext.entity() instanceof ArmedRaider){
-            RandomSource randomSource =RandomSource.create();
-            if(randomSource.nextFloat()<=0.8F){
+        if (slotContext.entity() instanceof ArmedRaider) {
+            RandomSource randomSource = RandomSource.create();
+            if (randomSource.nextFloat() <= 0.8F) {
                 return ICurio.DropRule.DESTROY;
             }
             return ICurioItem.super.getDropRule(slotContext, source, lootingLevel, recentlyHit, stack);

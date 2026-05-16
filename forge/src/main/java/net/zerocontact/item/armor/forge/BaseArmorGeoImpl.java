@@ -4,6 +4,9 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -17,6 +20,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.ItemStackHandler;
 import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.client.renderer.ArmorRender;
@@ -32,6 +40,7 @@ import software.bernie.geckolib.core.animation.AnimatableManager;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEquipmentTypeTag, ICombatArmorItem {
     protected final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
@@ -43,6 +52,9 @@ public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEq
     private final float mass;
     private final float penetrateReduction;
     private final float bluntReduction;
+    public static final int FRONT_PLATE_SLOT = 0;
+    public static final int BACK_PLATE_SLOT = 1;
+
     public BaseArmorGeoImpl(Type type, String id, int defense, int defaultDurability, int absorb, float bluntReduction, float penetrateReduction, float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
         super(PlateBaseMaterial.ARMOR_STEEL, type, new Properties().defaultDurability(defaultDurability));
         this.type = type;
@@ -144,6 +156,73 @@ public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEq
     @Override
     public float generateBlunt() {
         return bluntReduction;
+    }
+
+
+    @Override
+    public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
+        final ItemStackHandler itemStackHandler = new ItemStackHandler(2);
+        if (stack.getItem() instanceof BaseArmorGeoImpl baseArmorGeo && baseArmorGeo.getArmorType().equals(EquipmentType.PLATE_CARRIER)) {
+            CompoundTag tag = stack.getOrCreateTag();
+            if (tag.contains("PlateBundle")) {
+                deserialize(stack, itemStackHandler);
+            } else {
+                serialize(stack, itemStackHandler);
+                stack.getOrCreateTag().putInt("PointingSlot", 0);
+            }
+        }
+        return new ICapabilityProvider() {
+            @Override
+            public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction arg) {
+
+                return ForgeCapabilities.ITEM_HANDLER.orEmpty(capability, LazyOptional.of(() -> itemStackHandler));
+            }
+        };
+    }
+
+    public void serialize(ItemStack stack, ItemStackHandler itemStackHandler) {
+        CompoundTag bundleTag = new CompoundTag();
+        bundleTag.put("Items", itemStackHandler.serializeNBT().getList("Items", Tag.TAG_COMPOUND));
+        stack.getOrCreateTag().put("PlateBundle", bundleTag);
+    }
+
+    public void deserialize(ItemStack stack, ItemStackHandler itemStackHandler) {
+        CompoundTag bundleTag = stack.getOrCreateTag().getCompound("PlateBundle");
+        CompoundTag handlerTag = new CompoundTag();
+        handlerTag.put("Items", bundleTag.getList("Items", Tag.TAG_COMPOUND));
+        itemStackHandler.deserializeNBT(handlerTag);
+    }
+
+    public static int getSelectedPlate(ItemStack armorStack) {
+        if (armorStack.getItem() instanceof BaseArmorGeoImpl) {
+            return armorStack.getOrCreateTag().getInt("PointingSlot");
+        }
+        return 0;
+    }
+
+    public static ItemStack getPlateStack(int index, ItemStack armorStack) {
+        final ItemStack[] finalStack = {ItemStack.EMPTY};
+        if (armorStack.getItem() instanceof BaseArmorGeoImpl baseArmorGeo) {
+            if (!(baseArmorGeo.getArmorType().equals(EquipmentType.PLATE_CARRIER))) return finalStack[0];
+            armorStack.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(handler -> {
+                ItemStack stack = handler.extractItem(index, 1, true);
+                finalStack[0] = stack;
+            });
+        }
+        return finalStack[0];
+    }
+
+    public static void modifyPlateStack(int index, ItemStack armorStack, Function<ItemStack, ItemStack> modifier) {
+        if (!(armorStack.getItem() instanceof BaseArmorGeoImpl baseArmorGeo)) return;
+        if (!(baseArmorGeo.getArmorType().equals(EquipmentType.PLATE_CARRIER))) return;
+        armorStack.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(handler -> {
+            if (!(handler instanceof ItemStackHandler itemStackHandler)) return;
+            ItemStack plateStack = getPlateStack(index, armorStack);
+            if (plateStack.isEmpty()) return;
+            ItemStack modifiedStack = modifier.apply(plateStack.copy());
+            itemStackHandler.setStackInSlot(index, modifiedStack);
+            baseArmorGeo.serialize(armorStack, itemStackHandler);
+        });
     }
 }
 
