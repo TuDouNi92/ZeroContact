@@ -12,8 +12,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.RegisterEvent;
 import net.zerocontact.ZeroContactLogger;
-import net.zerocontact.api.AssetHelper;
-import net.zerocontact.datagen.loader.AssetManager;
+import net.zerocontact.api.IAssetManager;
+import net.zerocontact.datagen.loader.ZPackManager;
 import net.zerocontact.item.armband.Armband;
 import net.zerocontact.item.armband.GenerateUniformArmbandGeoImpl;
 import net.zerocontact.item.armor.forge.*;
@@ -114,7 +114,7 @@ public class ItemsRegForge {
         RegistrySupplier<SpnTop> SPN_TOP = ItemsReg.ITEMS.register("uniform_spn_top", SpnTop::new);
         RegistrySupplier<SpnBottom> SPN_BOTTOM = ItemsReg.ITEMS.register("uniform_spn_bottom", SpnBottom::new);
 
-        RegistrySupplier<GeneratePlateImpl> GENERATE_PLATE = ItemsReg.ITEMS.register("generate_plate", () -> new GeneratePlateImpl("",0, 0, 0, 0, 0, 0, 0, 0));
+        RegistrySupplier<GeneratePlateImpl> GENERATE_PLATE = ItemsReg.ITEMS.register("generate_plate", () -> new GeneratePlateImpl("", 0, 0, 0, 0, 0, 0, 0, 0));
         RegistrySupplier<GenerateArmorGeoImpl> GENERATE_ARMOR = ItemsReg.ITEMS.register("generate_armor", () -> new GenerateArmorGeoImpl(ArmorItem.Type.CHESTPLATE, "", 0, 0, 0, 0, new ResourceLocation(""), new ResourceLocation(""), new ResourceLocation(""), 0, 0, 0));
         RegistrySupplier<GenerateCarrierGeoImpl> GENERATE_CARRIER = ItemsReg.ITEMS.register("generate_carrier", () -> new GenerateCarrierGeoImpl(ArmorItem.Type.CHESTPLATE, "", 0, 0, 0, 0, 0, 0, new ResourceLocation(""), new ResourceLocation(""), new ResourceLocation("")));
         RegistrySupplier<GenerateHelmetGeoImpl> GENERATE_HELMET = ItemsReg.ITEMS.register("generate_helmet", () -> new GenerateHelmetGeoImpl("", ArmorItem.Type.HELMET, new ResourceLocation(""), new ResourceLocation(""), new ResourceLocation(""), 0, 0, 0, 0, 0, 0, 0));
@@ -137,18 +137,18 @@ public class ItemsRegForge {
                         BRITISH23_TOP, BRITISH23_BOTTOM, G99_TOP, G99_BOTTOM, SPN_TOP, SPN_BOTTOM
                 )
         );
-        AssetManager.load();
-        ZeroContactLogger.LOG.info("On Register ItemData:{}", new Gson().toJson(AssetManager.itemGenData).formatted());
-
-
-        AssetHelper.registerGeneratedItems(ITEMS_REG_TAB, ItemsReg.ITEMS,
-                new AssetHelper.WearableType(GENERATE_PLATE.get().items, "PLATE"),
-                new AssetHelper.WearableType(GENERATE_ARMOR.get().items, "ARMOR"),
-                new AssetHelper.WearableType(GENERATE_CARRIER.get().items, "PLATE_CARRIER"),
-                new AssetHelper.WearableType(GENERATE_HELMET.get().items, "HELMET"),
-                new AssetHelper.WearableType(GENERATE_TOP_UNIFORM.get().items, "UNIFORM_TOP"),
-                new AssetHelper.WearableType(GENERATE_PANTS.get().items, "UNIFORM_PANTS"),
-                new AssetHelper.WearableType(GENERATE_ARMBAND.get().items, "ARMBAND")
+        ZPackManager packManager = new ZPackManager();
+        packManager.init();
+        ZeroContactLogger.LOG.info("On Register ItemData:{}", new Gson().toJson(ZPackManager.itemGenData).formatted());
+        IAssetManager assetManager = packManager.getAssetManager();
+        assetManager.registerItems(ITEMS_REG_TAB, ItemsReg.ITEMS,
+                new IAssetManager.WearableType(GENERATE_PLATE.get().items, "PLATE"),
+                new IAssetManager.WearableType(GENERATE_ARMOR.get().items, "ARMOR"),
+                new IAssetManager.WearableType(GENERATE_CARRIER.get().items, "PLATE_CARRIER"),
+                new IAssetManager.WearableType(GENERATE_HELMET.get().items, "HELMET"),
+                new IAssetManager.WearableType(GENERATE_TOP_UNIFORM.get().items, "UNIFORM_TOP"),
+                new IAssetManager.WearableType(GENERATE_PANTS.get().items, "UNIFORM_PANTS"),
+                new IAssetManager.WearableType(GENERATE_ARMBAND.get().items, "ARMBAND")
         );
         ModMenus.MENUS.register();
     }
