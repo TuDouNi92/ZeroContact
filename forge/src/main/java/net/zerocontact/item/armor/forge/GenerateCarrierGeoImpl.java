@@ -18,7 +18,7 @@ import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.client.renderer.ArmorRender;
 import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
-import net.zerocontact.datagen.loader.ZPackManager;
+import net.zerocontact.datagen.loader.ZContentLoader;
 import net.zerocontact.models.GenerateModel;
 import net.zerocontact.registries.ModSoundEventsReg;
 import org.jetbrains.annotations.NotNull;
@@ -69,7 +69,7 @@ public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem,
 
     @Override
     public void deserializeItems() {
-        LinkedHashMap<? extends ItemGenData, String> itemGenDataList = ZPackManager.itemGenData;
+        LinkedHashMap<? extends ItemGenData, String> itemGenDataList = ZContentLoader.itemGenData;
         itemGenDataList.entrySet().stream()
                 .filter(entry -> entry instanceof ItemGenData.Armor data && data.equipmentSlot.equals(EQUIPMENT_TYPE.getTypeId()))
                 .forEach(item -> {

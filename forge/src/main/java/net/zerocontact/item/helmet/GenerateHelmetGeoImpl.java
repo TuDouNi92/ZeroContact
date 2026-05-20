@@ -19,7 +19,7 @@ import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.client.renderer.HelmetRender;
 import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
-import net.zerocontact.datagen.loader.ZPackManager;
+import net.zerocontact.datagen.loader.ZContentLoader;
 import net.zerocontact.item.armor.forge.BaseArmorGeoImpl;
 import net.zerocontact.models.GenerateModel;
 import org.jetbrains.annotations.NotNull;
@@ -109,7 +109,7 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
 
     @Override
     public void deserializeItems() {
-        LinkedHashMap<? extends ItemGenData, String> itemGenDataList = ZPackManager.itemGenData;
+        LinkedHashMap<? extends ItemGenData, String> itemGenDataList = ZContentLoader.itemGenData;
         itemGenDataList.entrySet().stream()
                 .filter(entry -> entry.getKey() instanceof ItemGenData.Armor data && data.equipmentSlot.equals(EquipmentType.HELMET.getTypeId()))
                 .forEach(item -> {

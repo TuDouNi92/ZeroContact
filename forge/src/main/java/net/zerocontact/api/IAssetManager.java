@@ -7,12 +7,12 @@ import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.zerocontact.datagen.GenerationRecord;
+import net.zerocontact.datagen.loader.ZContentLoader;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -20,6 +20,9 @@ import java.util.function.Consumer;
 
 @ApiStatus.Internal
 public interface IAssetManager {
+
+    Gson getGson();
+
     //Collect JSON paths from Path
     List<Path> getJsonListPathsFromPath(Path path) throws IOException;
 
@@ -44,6 +47,6 @@ public interface IAssetManager {
     }
 
     interface GeneratableItem {
-        void deserializeItems();
+         void deserializeItems();
     }
 }

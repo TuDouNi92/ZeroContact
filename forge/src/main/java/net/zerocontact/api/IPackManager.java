@@ -1,36 +1,18 @@
 package net.zerocontact.api;
 
-import com.google.gson.Gson;
-import net.zerocontact.datagen.Zpack;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.io.IOException;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
-import java.util.Set;
 
 @ApiStatus.Internal
 public interface IPackManager {
 
-    /**
-     * Get GSON object that may include type factories
-     * */
-    Gson getGson();
-
-    /**
-     * Get the path of the custom pack from where it should be
-     * */
-    Path getPacksPath() throws InvalidPathException;
-
-    /**
-     * Get packs which should be generated into resource packs and datapacks
-     * */
-    Set<Zpack> getOuterPacks();
+    void findOuterPacks() throws IOException;
 
     IAssetManager getAssetManager();
 
     /**
-     * Generate and register packs from {@link #getOuterPacks()}
+     * Generate and register packs from {@link #findOuterPacks()} ()}
      * */
     void registerVanillaDataPackBundle() throws IllegalArgumentException;
 
@@ -46,5 +28,5 @@ public interface IPackManager {
     /**
      * Loads JSON from packs, should use a JSON {@code assetManager} which implemeted {@link IAssetManager} from the argument
      * */
-    <T extends IAssetManager> void loadOuterPack(T assetManager) throws IOException;
+    void loadOuterPack() throws IOException;
 }

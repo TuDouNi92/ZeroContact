@@ -1,6 +1,7 @@
 package net.zerocontact.datagen.loader;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
@@ -8,18 +9,31 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.IAssetManager;
+import net.zerocontact.datagen.ItemGenData;
+import net.zerocontact.datagen.RuntimeTypeAdapterFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class ZAssetManager implements IAssetManager {
+    private final RuntimeTypeAdapterFactory<ItemGenData> typeAdapterFactory =
+            RuntimeTypeAdapterFactory
+                    .of(ItemGenData.class, "type")
+                    .registerSubtype(ItemGenData.Plate.class, "plate")
+                    .registerSubtype(ItemGenData.Armor.class, "armor");
+    private final Gson gson = new GsonBuilder().registerTypeAdapterFactory(typeAdapterFactory).create();
+
+    @Override
+    public Gson getGson() {
+        return gson;
+    }
+
     @Override
     public List<Path> getJsonListPathsFromPath(Path path) throws IOException {
         try (Stream<Path> stream = Files.walk(path)) {
@@ -49,7 +63,7 @@ public class ZAssetManager implements IAssetManager {
     }
 
     @Override
-    public void registerItems(LinkedHashMap<RegistrySupplier<? extends ItemLike>,String> regTabSet, DeferredRegister<Item> itemsDeferredRegister, WearableType... wearableTypes) {
+    public void registerItems(LinkedHashMap<RegistrySupplier<? extends ItemLike>, String> regTabSet, DeferredRegister<Item> itemsDeferredRegister, WearableType... wearableTypes) {
         itemsDeferredRegister.forEach(itemRegistrySupplier -> {
             if (itemRegistrySupplier.get() instanceof GeneratableItem generatableItem) {
                 generatableItem.deserializeItems();

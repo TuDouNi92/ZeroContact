@@ -6,7 +6,7 @@ import net.zerocontact.api.IAssetManager;
 import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
-import net.zerocontact.datagen.loader.ZPackManager;
+import net.zerocontact.datagen.loader.ZContentLoader;
 import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,7 +22,7 @@ public class GenerateUniformTopGeoImpl extends AbstractGenerateGeoCurioItemImpl 
     }
 
     public void deserializeItems() {
-        LinkedHashMap<? extends ItemGenData, String> itemGenDataList = ZPackManager.itemGenData;
+        LinkedHashMap<? extends ItemGenData, String> itemGenDataList = ZContentLoader.itemGenData;
         itemGenDataList.entrySet().stream()
                 .filter(entry -> entry.getKey() instanceof ItemGenData.Armor data && data.equipmentSlot.equals(EquipmentType.UNIFORM_TOP.getTypeId()))
                 .forEach(item -> {

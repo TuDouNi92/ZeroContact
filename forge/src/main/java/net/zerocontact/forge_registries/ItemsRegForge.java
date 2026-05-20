@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.RegisterEvent;
 import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.IAssetManager;
+import net.zerocontact.datagen.loader.ZContentLoader;
 import net.zerocontact.datagen.loader.ZPackManager;
 import net.zerocontact.item.armband.Armband;
 import net.zerocontact.item.armband.GenerateUniformArmbandGeoImpl;
@@ -147,7 +148,7 @@ public class ItemsRegForge {
         );
         ZPackManager packManager = new ZPackManager();
         packManager.init();
-        ZeroContactLogger.LOG.info("On Register ItemData:{}", new Gson().toJson(ZPackManager.itemGenData).formatted());
+        ZeroContactLogger.LOG.info("On Register ItemData:{}", new Gson().toJson(ZContentLoader.itemGenData).formatted());
         IAssetManager assetManager = packManager.getAssetManager();
         assetManager.registerItems(ITEMS_REG_TAB, ItemsReg.ITEMS,
                 new IAssetManager.WearableType(GENERATE_PLATE.get().items, "PLATE"),

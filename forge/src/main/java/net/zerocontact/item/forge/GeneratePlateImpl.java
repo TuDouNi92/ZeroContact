@@ -13,7 +13,7 @@ import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.PlateInfoProvider;
 import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
-import net.zerocontact.datagen.loader.ZPackManager;
+import net.zerocontact.datagen.loader.ZContentLoader;
 import net.zerocontact.item.PlateBaseMaterial;
 import net.zerocontact.item.SapiIV;
 import org.jetbrains.annotations.NotNull;
@@ -49,7 +49,7 @@ public class GeneratePlateImpl extends SapiIV implements ICombatArmorItem, Plate
 
     @Override
     public void deserializeItems() {
-        LinkedHashMap<? extends ItemGenData, String> itemGenDataList = ZPackManager.itemGenData;
+        LinkedHashMap<? extends ItemGenData, String> itemGenDataList = ZContentLoader.itemGenData;
         itemGenDataList.entrySet().stream()
                 .filter(entry -> entry.getKey() instanceof ItemGenData.Plate)
                 .forEach(item -> {

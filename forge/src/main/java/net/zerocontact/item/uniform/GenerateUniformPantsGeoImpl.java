@@ -6,11 +6,10 @@ import net.zerocontact.api.IAssetManager;
 import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
-import net.zerocontact.datagen.loader.ZPackManager;
+import net.zerocontact.datagen.loader.ZContentLoader;
 import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Set;
@@ -24,7 +23,7 @@ public class GenerateUniformPantsGeoImpl extends AbstractGenerateGeoCurioItemImp
 
     @Override
     public void deserializeItems() {
-        LinkedHashMap<? extends ItemGenData, String> itemGenDataList = ZPackManager.itemGenData;
+        LinkedHashMap<? extends ItemGenData, String> itemGenDataList = ZContentLoader.itemGenData;
         itemGenDataList.entrySet().stream()
                 .filter(entry -> entry.getKey() instanceof ItemGenData.Armor data && data.equipmentSlot.equals(EquipmentType.UNIFORM_PANTS.getTypeId()))
                 .forEach(item -> {
