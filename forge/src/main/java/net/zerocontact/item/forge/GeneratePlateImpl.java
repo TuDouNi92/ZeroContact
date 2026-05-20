@@ -18,8 +18,8 @@ import net.zerocontact.item.PlateBaseMaterial;
 import net.zerocontact.item.SapiIV;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Set;
 
 public class GeneratePlateImpl extends SapiIV implements ICombatArmorItem, PlateInfoProvider, IAssetManager.GeneratableItem {
@@ -49,21 +49,22 @@ public class GeneratePlateImpl extends SapiIV implements ICombatArmorItem, Plate
 
     @Override
     public void deserializeItems() {
-        ArrayList<ItemGenData> itemGenDataList = ZPackManager.itemGenData;
-        if (itemGenDataList.isEmpty()) return;
-        for (ItemGenData data0 : itemGenDataList) {
-            if (!(data0 instanceof ItemGenData.Plate data)) continue;
-            String id = data.id;
-            float bluntDamage = data.hurtModifier.bluntMultiplier;
-            float penetrateDamage = data.hurtModifier.penetrateMultiplier;
-            float ricochetDamage = data.hurtModifier.ricochetMultiplier;
-            int defense = data.defense;
-            int absorb = data.protectionClass;
-            float movementFix = data.movementFix;
-            int durabilityLossProvider = data.durabilityLossModifier;
-            int durability = data.durability;
-            items.add(new GenerationRecord<>(id, new GeneratePlateImpl(id, durability, bluntDamage, penetrateDamage, ricochetDamage, defense, absorb, movementFix, durabilityLossProvider)));
-        }
+        LinkedHashMap<? extends ItemGenData, String> itemGenDataList = ZPackManager.itemGenData;
+        itemGenDataList.entrySet().stream()
+                .filter(entry -> entry.getKey() instanceof ItemGenData.Plate)
+                .forEach(item -> {
+                    ItemGenData.Plate data = (ItemGenData.Plate) item.getKey();
+                    String id = data.id;
+                    float bluntDamage = data.hurtModifier.bluntMultiplier;
+                    float penetrateDamage = data.hurtModifier.penetrateMultiplier;
+                    float ricochetDamage = data.hurtModifier.ricochetMultiplier;
+                    int defense = data.defense;
+                    int absorb = data.protectionClass;
+                    float movementFix = data.movementFix;
+                    int durabilityLossProvider = data.durabilityLossModifier;
+                    int durability = data.durability;
+                    items.add(new GenerationRecord<>(id, new GeneratePlateImpl(id, durability, bluntDamage, penetrateDamage, ricochetDamage, defense, absorb, movementFix, durabilityLossProvider), item.getValue()));
+                });
     }
 
     @Override

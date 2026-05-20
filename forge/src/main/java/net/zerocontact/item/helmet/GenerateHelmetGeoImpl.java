@@ -109,24 +109,24 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
 
     @Override
     public void deserializeItems() {
-        ArrayList<ItemGenData> itemGenDataList = ZPackManager.itemGenData;
-        if (itemGenDataList.isEmpty()) return;
-        for (ItemGenData data0 : itemGenDataList) {
-            if (!(data0 instanceof ItemGenData.Armor data)) continue;
-            String id = data.id;
-            float bluntDamage = data.hurtModifier.bluntMultiplier;
-            float penetrateDamage = data.hurtModifier.penetrateMultiplier;
-            float ricochetDamage = data.hurtModifier.ricochetMultiplier;
-            int defense = data.defense;
-            int absorb = data.protectionClass;
-            int durabilityLossProvider = data.durabilityLossModifier;
-            int default_durability = data.defaultDurability;
-            if (!data.equipmentSlot.equals("HELMET")) continue;
-            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
-            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
-            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerationRecord<>(id, new GenerateHelmetGeoImpl(id, Type.HELMET, texture, model, animation, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, durabilityLossProvider, default_durability)));
-        }
+        LinkedHashMap<? extends ItemGenData, String> itemGenDataList = ZPackManager.itemGenData;
+        itemGenDataList.entrySet().stream()
+                .filter(entry -> entry.getKey() instanceof ItemGenData.Armor data && data.equipmentSlot.equals(EquipmentType.HELMET.getTypeId()))
+                .forEach(item -> {
+                    ItemGenData.Armor data = (ItemGenData.Armor) item.getKey();
+                    String id = data.id;
+                    float bluntDamage = data.hurtModifier.bluntMultiplier;
+                    float penetrateDamage = data.hurtModifier.penetrateMultiplier;
+                    float ricochetDamage = data.hurtModifier.ricochetMultiplier;
+                    int defense = data.defense;
+                    int absorb = data.protectionClass;
+                    int durabilityLossProvider = data.durabilityLossModifier;
+                    int default_durability = data.defaultDurability;
+                    ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
+                    ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
+                    ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
+                    items.add(new GenerationRecord<>(id, new GenerateHelmetGeoImpl(id, Type.HELMET, texture, model, animation, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, durabilityLossProvider, default_durability), item.getValue()));
+                });
     }
 
 }

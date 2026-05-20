@@ -6,6 +6,7 @@ public interface IEquipmentTypeTag {
     enum EquipmentType {
         PLATE_CARRIER("PLATE_CARRIER"),
         ARMOR("ARMOR"),
+        HELMET("HELMET"),
         UNIFORM_TOP("UNIFORM_TOP"),
         UNIFORM_PANTS("UNIFORM_PANTS"),
         ARMBAND("ARMBAND"),

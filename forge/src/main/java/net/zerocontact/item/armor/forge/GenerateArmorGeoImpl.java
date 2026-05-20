@@ -24,10 +24,7 @@ import net.zerocontact.registries.ModSoundEventsReg;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, IEquipmentTypeTag, IAssetManager.GeneratableItem {
@@ -92,24 +89,25 @@ public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, I
 
 
     public void deserializeItems() {
-        ArrayList<ItemGenData> itemGenDataList = ZPackManager.itemGenData;
-        if (itemGenDataList.isEmpty()) return;
-        for (ItemGenData data0 : itemGenDataList) {
-            if (!(data0 instanceof ItemGenData.Armor data)) continue;
-            String id = data.id;
-            int defense = data.defense;
-            int defaultDurability = data.defaultDurability;
-            int absorb = data.protectionClass;
-            int mass = 0;
-            float bluntFactor = data.hurtModifier.bluntMultiplier;
-            float penetratedFactor = data.hurtModifier.penetrateMultiplier;
-            float ricochetFactor = data.hurtModifier.ricochetMultiplier;
-            if (!data.equipmentSlot.equals("ARMOR")) continue;
-            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
-            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
-            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerationRecord<>(id, new GenerateArmorGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, absorb, mass, texture, model, animation, bluntFactor, penetratedFactor, ricochetFactor)));
-        }
+        LinkedHashMap<? extends ItemGenData, String> itemGenDataList = ZPackManager.itemGenData;
+        itemGenDataList.entrySet().stream()
+                .filter(entry
+                        -> entry.getKey() instanceof ItemGenData.Armor data
+                        && data.equipmentSlot.equals(EquipmentType.ARMOR.getTypeId()))
+                .forEach(item -> {
+                    ItemGenData.Armor data = (ItemGenData.Armor) item.getKey();
+                    String id = data.id;
+                    int defense = data.defense;
+                    int defaultDurability = data.defaultDurability;
+                    int absorb = data.protectionClass;
+                    int mass = 0;
+                    float bluntFactor = data.hurtModifier.bluntMultiplier;
+                    float penetratedFactor = data.hurtModifier.penetrateMultiplier;
+                    float ricochetFactor = data.hurtModifier.ricochetMultiplier;
+                    ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
+                    ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
+                    ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
+                    items.add(new GenerationRecord<>(id, new GenerateArmorGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, absorb, mass, texture, model, animation, bluntFactor, penetratedFactor, ricochetFactor), item.getValue()));
+                });
     }
-
 }

@@ -1,6 +1,7 @@
 package net.zerocontact.datagen.loader;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.world.item.Item;
@@ -11,9 +12,11 @@ import net.zerocontact.api.IAssetManager;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class ZAssetManager implements IAssetManager {
@@ -39,7 +42,14 @@ public class ZAssetManager implements IAssetManager {
     }
 
     @Override
-    public void registerItems(LinkedHashSet<RegistrySupplier<? extends ItemLike>> regTabSet, DeferredRegister<Item> itemsDeferredRegister, WearableType... wearableTypes) {
+    public <T> void deserializeFromManifest(Path json, Gson gson, Class<T> targetBeanClazz, Consumer<T> data) throws IOException, JsonSyntaxException {
+        if (Files.notExists(json)) return;
+        T rawData = gson.fromJson(Files.newBufferedReader(json), targetBeanClazz);
+        data.accept(rawData);
+    }
+
+    @Override
+    public void registerItems(LinkedHashMap<RegistrySupplier<? extends ItemLike>,String> regTabSet, DeferredRegister<Item> itemsDeferredRegister, WearableType... wearableTypes) {
         itemsDeferredRegister.forEach(itemRegistrySupplier -> {
             if (itemRegistrySupplier.get() instanceof GeneratableItem generatableItem) {
                 generatableItem.deserializeItems();
@@ -48,7 +58,7 @@ public class ZAssetManager implements IAssetManager {
         for (WearableType type : wearableTypes) {
             type.records().forEach(generationRecord -> {
                 RegistrySupplier<? extends ItemLike> reg = itemsDeferredRegister.register(generationRecord.id(), generationRecord::item);
-                regTabSet.add(reg);
+                regTabSet.put(reg, generationRecord.tabName());
                 ZeroContactLogger.LOG.info("Reg {} for:{}", type.logDisplayName(), reg);
             });
         }

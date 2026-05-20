@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Set;
 
 public class GenerateUniformPantsGeoImpl extends AbstractGenerateGeoCurioItemImpl implements IEquipmentTypeTag, IAssetManager.GeneratableItem {
@@ -23,18 +24,18 @@ public class GenerateUniformPantsGeoImpl extends AbstractGenerateGeoCurioItemImp
 
     @Override
     public void deserializeItems() {
-        ArrayList<ItemGenData> itemGenDataList = ZPackManager.itemGenData;
-        if (itemGenDataList.isEmpty()) return;
-        for (ItemGenData data0 : itemGenDataList) {
-            if (!(data0 instanceof ItemGenData.Armor data)) continue;
-            String id = data.id;
-            int defaultDurability = data.defaultDurability;
-            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
-            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
-            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            if (!(data.equipmentSlot).equals(EquipmentType.UNIFORM_PANTS.getTypeId())) continue;
-            items.add(new GenerationRecord<>(id, new GenerateUniformPantsGeoImpl(id, defaultDurability, texture, model, animation)));
-        }
+        LinkedHashMap<? extends ItemGenData, String> itemGenDataList = ZPackManager.itemGenData;
+        itemGenDataList.entrySet().stream()
+                .filter(entry -> entry.getKey() instanceof ItemGenData.Armor data && data.equipmentSlot.equals(EquipmentType.UNIFORM_PANTS.getTypeId()))
+                .forEach(item -> {
+                    ItemGenData.Armor data = (ItemGenData.Armor) item.getKey();
+                    String id = data.id;
+                    int defaultDurability = data.defaultDurability;
+                    ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
+                    ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
+                    ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
+                    items.add(new GenerationRecord<>(id, new GenerateUniformPantsGeoImpl(id, defaultDurability, texture, model, animation), item.getValue()));
+                });
     }
 
     @Override

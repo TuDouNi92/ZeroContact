@@ -1,7 +1,7 @@
 package net.zerocontact.api;
 
 import com.google.gson.Gson;
-import net.minecraft.server.packs.repository.Pack;
+import net.zerocontact.datagen.Zpack;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ public interface IPackManager {
     /**
      * Get packs which should be generated into resource packs and datapacks
      * */
-    Set<Path> getOuterPacks();
+    Set<Zpack> getOuterPacks();
 
     IAssetManager getAssetManager();
 

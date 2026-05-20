@@ -69,23 +69,24 @@ public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem,
 
     @Override
     public void deserializeItems() {
-        ArrayList<ItemGenData> itemGenDataList = ZPackManager.itemGenData;
-        if (itemGenDataList.isEmpty()) return;
-        for (ItemGenData data0 : itemGenDataList) {
-            if (!(data0 instanceof ItemGenData.Armor data)) continue;
-            String id = data.id;
-            int defense = data.defense;
-            int defaultDurability = data.defaultDurability;
-            int absorb = data.protectionClass;
-            int mass = 0;
-            float penetrateReduction = data.hurtModifier.penetrateMultiplier;
-            float bluntReduction = data.hurtModifier.bluntMultiplier;
-            if (!(Objects.equals(data.equipmentSlot, EQUIPMENT_TYPE.getTypeId()))) continue;
-            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
-            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
-            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerationRecord<>(id, new GenerateCarrierGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, absorb, bluntReduction, penetrateReduction, mass, texture, model, animation)));
-        }
+        LinkedHashMap<? extends ItemGenData, String> itemGenDataList = ZPackManager.itemGenData;
+        itemGenDataList.entrySet().stream()
+                .filter(entry -> entry instanceof ItemGenData.Armor data && data.equipmentSlot.equals(EQUIPMENT_TYPE.getTypeId()))
+                .forEach(item -> {
+                    ItemGenData.Armor data = (ItemGenData.Armor) item.getKey();
+                    String id = data.id;
+                    int defense = data.defense;
+                    int defaultDurability = data.defaultDurability;
+                    int absorb = data.protectionClass;
+                    int mass = 0;
+                    float penetrateReduction = data.hurtModifier.penetrateMultiplier;
+                    float bluntReduction = data.hurtModifier.bluntMultiplier;
+                    ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
+                    ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
+                    ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
+                    items.add(new GenerationRecord<>(id, new GenerateCarrierGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, absorb, bluntReduction, penetrateReduction, mass, texture, model, animation), item.getValue()));
+
+                });
     }
 
     @Override

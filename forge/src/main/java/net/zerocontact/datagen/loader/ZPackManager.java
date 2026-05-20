@@ -14,10 +14,7 @@ import net.zerocontact.ZeroContact;
 import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.IAssetManager;
 import net.zerocontact.api.IPackManager;
-import net.zerocontact.datagen.ExperimentalBallisticData;
-import net.zerocontact.datagen.GearRecipeData;
-import net.zerocontact.datagen.ItemGenData;
-import net.zerocontact.datagen.RuntimeTypeAdapterFactory;
+import net.zerocontact.datagen.*;
 import net.zerocontact.events.CaliberVariantDamageHelper;
 import net.zerocontact.item.block.WorkBenchEntity;
 
@@ -43,11 +40,17 @@ public class ZPackManager implements IPackManager {
                     .registerSubtype(ItemGenData.Armor.class, "armor");
     private final Gson gson = new GsonBuilder().registerTypeAdapterFactory(typeAdapterFactory).create();
     private static final Path defaultPath = Paths.get("config/zerocontact/packs");
-    private final Set<Path> outerPacks = new HashSet<>();
+    private final Set<Zpack> outerPacks = new HashSet<>();
     private static final Set<Pack> vanillaPacks = new HashSet<>();
-    public static final ArrayList<ItemGenData> itemGenData = new ArrayList<>();
+    public static final LinkedHashMap<ItemGenData, String> itemGenData = new LinkedHashMap<>();
     private static final String DEFAULT_RECIPE_NAME = "default.json";
     private final ZAssetManager assetManager = new ZAssetManager();
+    private static final String DEFAULT_PACK_LOCATION = "/data/zerocontact/default_pack.zip";
+    private static final String DEFAULT_PACK_NAME = "default_pack";
+    private static final String ITEM_PATH = "data/" + MOD_ID + "/items";
+    private static final String AMMO_DEF_PATH = "data/" + MOD_ID + "/ammoDefinitions";
+    private static final String RECIPES_PATH = "data/" + MOD_ID + "/gear_recipes";
+    private static final String MANIFEST_PATH = "data/manifest.json";
 
     @Override
     public Gson getGson() {
@@ -60,23 +63,23 @@ public class ZPackManager implements IPackManager {
     }
 
     @Override
-    public Set<Path> getOuterPacks() {
+    public Set<Zpack> getOuterPacks() {
         return outerPacks;
     }
 
     @Override
-    public IAssetManager getAssetManager() {
+    public ZAssetManager getAssetManager() {
         return assetManager;
     }
 
     @Override
     public void createDefaultPack() throws IOException {
-        try (InputStream inputStream = ZeroContact.class.getResourceAsStream("/data/zerocontact/default_pack.zip")) {
+        try (InputStream inputStream = ZeroContact.class.getResourceAsStream(DEFAULT_PACK_LOCATION)) {
             if (inputStream != null) {
                 try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
                     ZipEntry entry;
                     while ((entry = zipInputStream.getNextEntry()) != null) {
-                        Path target = defaultPath.resolve("default_pack").resolve(entry.getName());
+                        Path target = defaultPath.resolve(DEFAULT_PACK_NAME).resolve(entry.getName());
                         if (entry.isDirectory()) {
                             Files.createDirectories(target);
                         } else {
@@ -98,8 +101,16 @@ public class ZPackManager implements IPackManager {
                     .filter(path -> !path.equals(defaultPath))
                     .forEach(packPath -> {
                         try {
-                            outerPacks.add(packPath);
-                        } catch (IllegalArgumentException e) {
+                            assetManager.deserializeFromManifest(
+                                    packPath.resolve(MANIFEST_PATH), gson,
+                                    ManifestData.class,
+                                    data -> outerPacks.add(
+                                            new Zpack(
+                                                    data.tabName(),
+                                                    packPath
+                                            )
+                                    ));
+                        } catch (IllegalArgumentException | IOException e) {
                             ZeroContactLogger.LOG.error(e);
                         }
                     });
@@ -108,27 +119,27 @@ public class ZPackManager implements IPackManager {
 
     @Override
     public <T extends IAssetManager> void loadOuterPack(T assetManager) {
-        loadItems(assetManager);
-        loadBallistics(assetManager);
-        loadRecipes(assetManager);
+        loadItems();
+        loadBallistics();
+        loadRecipes();
     }
 
     @Override
     public void registerVanillaDataPackBundle() throws IllegalArgumentException {
         if (outerPacks.isEmpty()) return;
         outerPacks.forEach(path -> {
-            String packId = path.getFileName().toString();
+            String packId = path.outerPack().getFileName().toString();
             Pack resourcePack = Pack.readMetaAndCreate(
                     packId,
                     Component.literal("ZeroContact ResPack"),
                     true,
-                    (id) -> new PathPackResources(id, path, true),
+                    (id) -> new PathPackResources(id, path.outerPack(), true),
                     PackType.CLIENT_RESOURCES, Pack.Position.TOP, PackSource.BUILT_IN);
             Pack dataPack = Pack.readMetaAndCreate(
                     packId,
                     Component.literal("ZeroContact DataPack"),
                     true,
-                    (id) -> new PathPackResources(id, path, true),
+                    (id) -> new PathPackResources(id, path.outerPack(), true),
                     PackType.SERVER_DATA, Pack.Position.TOP, PackSource.BUILT_IN);
             vanillaPacks.add(resourcePack);
             vanillaPacks.add(dataPack);
@@ -151,21 +162,21 @@ public class ZPackManager implements IPackManager {
     }
 
 
-    private <T extends IAssetManager> void loadItems(T assetManager) throws RuntimeException {
+    private void loadItems() throws RuntimeException {
         outerPacks.forEach(pack -> {
-            Path itemPath = pack.resolve("assets/" + MOD_ID + "/items");
+            Path itemPath = pack.outerPack().resolve(ITEM_PATH);
             try {
                 List<Path> itemList = assetManager.getJsonListPathsFromPath(itemPath);
-                assetManager.deserializeFromJsonList(itemList, gson, ItemGenData.class, (data, __) -> itemGenData.add(data));
+                assetManager.deserializeFromJsonList(itemList, gson, ItemGenData.class, (data, __) -> itemGenData.put(data, pack.tab()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
     }
 
-    private <T extends IAssetManager> void loadBallistics(T assetManager) {
+    private void loadBallistics() {
         outerPacks.forEach(pack -> {
-            Path ballisticPath = pack.resolve("assets/" + MOD_ID + "/ammoDefinitions");
+            Path ballisticPath = pack.outerPack().resolve(AMMO_DEF_PATH);
             try {
                 List<Path> ammoList = assetManager.getJsonListPathsFromPath(ballisticPath);
                 assetManager.deserializeFromJsonList(
@@ -189,9 +200,9 @@ public class ZPackManager implements IPackManager {
         });
     }
 
-    private <T extends IAssetManager> void loadRecipes(T assetManager) {
+    private void loadRecipes() {
         outerPacks.forEach(pack -> {
-            Path recipesPath = pack.resolve("assets/" + MOD_ID + "/gear_recipes");
+            Path recipesPath = pack.outerPack().resolve(RECIPES_PATH);
             try {
                 List<Path> recipePath = assetManager.getJsonListPathsFromPath(recipesPath);
                 Map<String, List<GearRecipeData.IngredientItems>> overrideMap = new HashMap<>();

@@ -1,8 +1,10 @@
 package net.zerocontact.forge_registries;
 
 import com.google.gson.Gson;
+import dev.architectury.registry.CreativeTabRegistry;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.ItemLike;
@@ -28,18 +30,23 @@ import net.zerocontact.item.uniform.*;
 import net.zerocontact.item.helmet.*;
 import net.zerocontact.registries.ItemsReg;
 
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
+
+import static net.zerocontact.ZeroContact.MOD_ID;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ItemsRegForge {
-    private static final LinkedHashSet<RegistrySupplier<? extends ItemLike>> ITEMS_REG_TAB = new LinkedHashSet<>();
+    private static final LinkedHashMap<RegistrySupplier<? extends ItemLike>, String> ITEMS_REG_TAB = new LinkedHashMap<>();
+    private static final LinkedHashMap<RegistrySupplier<CreativeModeTab>, String> TABS = new LinkedHashMap<>();
 
     @SubscribeEvent
     public static void attachToTabs(BuildCreativeModeTabContentsEvent event) {
-        if (event.getTab().equals(ItemsReg.ZERO_CONTACT.get())) {
-            ITEMS_REG_TAB.forEach(event::accept);
-        }
+        TABS.forEach((tab, name) -> {
+            if (!event.getTab().equals(tab.get())) return;
+            ITEMS_REG_TAB.entrySet().stream()
+                    .filter(entry -> entry.getValue().equals(name))
+                    .forEach(entry -> event.accept(entry.getKey()));
+        });
     }
 
 
@@ -122,20 +129,21 @@ public class ItemsRegForge {
         RegistrySupplier<GenerateUniformPantsGeoImpl> GENERATE_PANTS = ItemsReg.ITEMS.register("generate_pants", () -> new GenerateUniformPantsGeoImpl("", 0, new ResourceLocation(""), new ResourceLocation(""), new ResourceLocation("")));
         RegistrySupplier<GenerateUniformArmbandGeoImpl> GENERATE_ARMBAND = ItemsReg.ITEMS.register("generate_armband", () -> new GenerateUniformArmbandGeoImpl("", 0, new ResourceLocation(""), new ResourceLocation(""), new ResourceLocation("")));
 
-        ITEMS_REG_TAB.addAll(
-                List.of(
-                        CULT_LOCUST_PLATE, BALLISTIC_CONVOY, STEEL_PLATE, SLIME_PLATE,
-                        RAIDER_EGG,
-                        RATNIK_HELMET_EMR, RATNIK_HELMET_ARC, BASTION_HELMET, BASTION_HELMET_MULTICAM, BASTION_HELMET_GREEN, BRITISH23_HELMET,
-                        ALTYN_VISOR_HELMET, AIRFRAME_HELMET, UNTAR_HELMET, PHONETALKER_HELMET, TBH_HELMET,
-                        TAGILLA_MASK_MANHUNT, TAGILLA_MASK_YBEY, COLD_FEAR_MASK, PMK2, ZK, M50, MP5,
-                        CYAN_CAP, BOSS_CAP,
-                        R6B2, R6B23I, R6B23II, R6B43, UNTAR_ARMOR, THOR_ARMOR, HEXGRID_ARMOR, DEFENDER, JPC_V1, JPC_V2, JPC_V2_SC, AVS,
-                        THUNDERBOLT_RIGS_GREY,
-                        T20_BACKPACK_MULTICAM, T20_BACKPACK_UMBRA, BRITISH23_BACKPACK_RED, VKBO_BACKPACK_OLIVE,
-                        ARMBAND_BLACK, ARMBAND_RED, ARMBAND_BLUE, ARMBAND_WHITE, ARMBAND_GREEN, ARMBAND_YELLOW, ARMBAND_FLORA,
-                        BRITISH23_TOP, BRITISH23_BOTTOM, G99_TOP, G99_BOTTOM, SPN_TOP, SPN_BOTTOM
-                )
+        List<RegistrySupplier<? extends ItemLike>> items = List.of(
+                CULT_LOCUST_PLATE, BALLISTIC_CONVOY, STEEL_PLATE, SLIME_PLATE,
+                RAIDER_EGG,
+                RATNIK_HELMET_EMR, RATNIK_HELMET_ARC, BASTION_HELMET, BASTION_HELMET_MULTICAM, BASTION_HELMET_GREEN, BRITISH23_HELMET,
+                ALTYN_VISOR_HELMET, AIRFRAME_HELMET, UNTAR_HELMET, PHONETALKER_HELMET, TBH_HELMET,
+                TAGILLA_MASK_MANHUNT, TAGILLA_MASK_YBEY, COLD_FEAR_MASK, PMK2, ZK, M50, MP5,
+                CYAN_CAP, BOSS_CAP,
+                R6B2, R6B23I, R6B23II, R6B43, UNTAR_ARMOR, THOR_ARMOR, HEXGRID_ARMOR, DEFENDER, JPC_V1, JPC_V2, JPC_V2_SC, AVS,
+                THUNDERBOLT_RIGS_GREY,
+                T20_BACKPACK_MULTICAM, T20_BACKPACK_UMBRA, BRITISH23_BACKPACK_RED, VKBO_BACKPACK_OLIVE,
+                ARMBAND_BLACK, ARMBAND_RED, ARMBAND_BLUE, ARMBAND_WHITE, ARMBAND_GREEN, ARMBAND_YELLOW, ARMBAND_FLORA,
+                BRITISH23_TOP, BRITISH23_BOTTOM, G99_TOP, G99_BOTTOM, SPN_TOP, SPN_BOTTOM
+        );
+        items.forEach(
+                item -> ITEMS_REG_TAB.put(item, "zero_contact")
         );
         ZPackManager packManager = new ZPackManager();
         packManager.init();
@@ -150,6 +158,17 @@ public class ItemsRegForge {
                 new IAssetManager.WearableType(GENERATE_PANTS.get().items, "UNIFORM_PANTS"),
                 new IAssetManager.WearableType(GENERATE_ARMBAND.get().items, "ARMBAND")
         );
+
+        LinkedHashSet<String> tabNameSet = new LinkedHashSet<>(ITEMS_REG_TAB.values());
+        tabNameSet.forEach(tabName -> {
+            ItemStack[] iconStack = {ItemStack.EMPTY};
+            ITEMS_REG_TAB.entrySet().stream()
+                    .filter(entry -> Objects.equals(entry.getValue(), tabName))
+                    .findFirst()
+                    .ifPresent(entry -> iconStack[0] = new ItemStack(entry.getKey().get()));
+            TABS.put(ItemsReg.TABS.register(tabName, () -> CreativeTabRegistry.create(Component.translatable("itemGroup." + MOD_ID + "." + tabName), () -> iconStack[0])), tabName);
+        });
+
         ModMenus.MENUS.register();
     }
 

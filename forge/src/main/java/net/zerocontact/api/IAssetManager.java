@@ -11,6 +11,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,10 +33,12 @@ public interface IAssetManager {
      */
     <T> void deserializeFromJsonList(List<Path> list, Gson gson, Class<T> targetBeanClazz, BiConsumer<T, Path> data) throws IOException, JsonSyntaxException;
 
+    <T> void deserializeFromManifest(Path json,Gson gson, Class<T> targetBeanClazz, Consumer<T> data) throws IOException, JsonSyntaxException;
+
     /**
      * This should Register Items that should implemented {@link GeneratableItem}
      */
-    void registerItems(LinkedHashSet<RegistrySupplier<? extends ItemLike>> regTabSet, DeferredRegister<Item> itemsDeferredRegister, WearableType... wearableTypes);
+    void registerItems(LinkedHashMap<RegistrySupplier<? extends ItemLike>,String> regTabSet, DeferredRegister<Item> itemsDeferredRegister, WearableType... wearableTypes);
 
     record WearableType(Set<GenerationRecord<?>> records, String logDisplayName) {
     }
