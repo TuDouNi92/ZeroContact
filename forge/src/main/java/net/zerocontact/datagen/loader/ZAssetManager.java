@@ -9,17 +9,23 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.IAssetManager;
+import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.datagen.ItemGenData;
+import net.zerocontact.datagen.ItemAdapter;
 import net.zerocontact.datagen.RuntimeTypeAdapterFactory;
+import net.zerocontact.registries.ItemsReg;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+
+import static net.zerocontact.forge_registries.ItemsRegForge.ITEMS_REG_TAB;
 
 public class ZAssetManager implements IAssetManager {
     private final RuntimeTypeAdapterFactory<ItemGenData> typeAdapterFactory =
@@ -64,11 +70,6 @@ public class ZAssetManager implements IAssetManager {
 
     @Override
     public void registerItems(LinkedHashMap<RegistrySupplier<? extends ItemLike>, String> regTabSet, DeferredRegister<Item> itemsDeferredRegister, WearableType... wearableTypes) {
-        itemsDeferredRegister.forEach(itemRegistrySupplier -> {
-            if (itemRegistrySupplier.get() instanceof GeneratableItem generatableItem) {
-                generatableItem.deserializeItems();
-            }
-        });
         for (WearableType type : wearableTypes) {
             type.records().forEach(generationRecord -> {
                 RegistrySupplier<? extends ItemLike> reg = itemsDeferredRegister.register(generationRecord.id(), generationRecord::item);
@@ -76,5 +77,20 @@ public class ZAssetManager implements IAssetManager {
                 ZeroContactLogger.LOG.info("Reg {} for:{}", type.logDisplayName(), reg);
             });
         }
+    }
+
+    @Override
+    public void register() {
+        ZContentLoader.itemGenData.forEach((data, tab) -> ItemAdapter.ADAPTERS.forEach(adapter -> {
+            if (data instanceof ItemGenData.Armor armor) {
+                LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(armor, tab);
+                if (records.isEmpty()) return;
+                this.registerItems(ITEMS_REG_TAB, ItemsReg.ITEMS, new IAssetManager.WearableType(records, "ARMOR_LIKE"));
+            } else if (data instanceof ItemGenData.Plate plate) {
+                LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(plate, tab);
+                if (records.isEmpty()) return;
+                this.registerItems(ITEMS_REG_TAB, ItemsReg.ITEMS, new IAssetManager.WearableType(records, "PLATE_LIKE"));
+            }
+        }));
     }
 }

@@ -12,13 +12,9 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.zerocontact.ZeroContact;
-import net.zerocontact.api.IAssetManager;
 import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.client.renderer.ArmorRender;
 import net.zerocontact.datagen.GenerationRecord;
-import net.zerocontact.datagen.ItemGenData;
-import net.zerocontact.datagen.loader.ZContentLoader;
 import net.zerocontact.models.GenerateModel;
 import net.zerocontact.registries.ModSoundEventsReg;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +23,7 @@ import software.bernie.geckolib.animatable.GeoItem;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, IEquipmentTypeTag, IAssetManager.GeneratableItem {
+public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, IEquipmentTypeTag {
     protected final int defaultDurability;
     public final Set<GenerationRecord<?>> items = new HashSet<>();
     private final float bluntFactor;
@@ -87,27 +83,4 @@ public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, I
         return modifierMultimap;
     }
 
-
-    public void deserializeItems() {
-        LinkedHashMap<? extends ItemGenData, String> itemGenDataList = ZContentLoader.itemGenData;
-        itemGenDataList.entrySet().stream()
-                .filter(entry
-                        -> entry.getKey() instanceof ItemGenData.Armor data
-                        && data.equipmentSlot.equals(EquipmentType.ARMOR.getTypeId()))
-                .forEach(item -> {
-                    ItemGenData.Armor data = (ItemGenData.Armor) item.getKey();
-                    String id = data.id;
-                    int defense = data.defense;
-                    int defaultDurability = data.defaultDurability;
-                    int absorb = data.protectionClass;
-                    int mass = 0;
-                    float bluntFactor = data.hurtModifier.bluntMultiplier;
-                    float penetratedFactor = data.hurtModifier.penetrateMultiplier;
-                    float ricochetFactor = data.hurtModifier.ricochetMultiplier;
-                    ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
-                    ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
-                    ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-                    items.add(new GenerationRecord<>(id, new GenerateArmorGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, absorb, mass, texture, model, animation, bluntFactor, penetratedFactor, ricochetFactor), item.getValue()));
-                });
-    }
 }

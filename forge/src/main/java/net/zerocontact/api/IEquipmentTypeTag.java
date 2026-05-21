@@ -12,7 +12,8 @@ public interface IEquipmentTypeTag {
         ARMBAND("ARMBAND"),
         HEADSET("HEADSET"),
         BACKPACK("BACKPACK"),
-        RIGS("RIGS");
+        RIGS("RIGS"),
+        PLATE("PLATE");
         private final String name;
 
         EquipmentType(String name) {

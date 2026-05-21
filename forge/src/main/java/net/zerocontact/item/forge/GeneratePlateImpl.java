@@ -8,21 +8,18 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
-import net.zerocontact.api.IAssetManager;
 import net.zerocontact.api.ICombatArmorItem;
+import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.api.PlateInfoProvider;
 import net.zerocontact.datagen.GenerationRecord;
-import net.zerocontact.datagen.ItemGenData;
-import net.zerocontact.datagen.loader.ZContentLoader;
 import net.zerocontact.item.PlateBaseMaterial;
 import net.zerocontact.item.SapiIV;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.Set;
 
-public class GeneratePlateImpl extends SapiIV implements ICombatArmorItem, PlateInfoProvider, IAssetManager.GeneratableItem {
+public class GeneratePlateImpl extends SapiIV implements ICombatArmorItem, PlateInfoProvider, IEquipmentTypeTag {
     private final int defense;
     private final int absorb;
     private final float movementFix;
@@ -47,25 +44,6 @@ public class GeneratePlateImpl extends SapiIV implements ICombatArmorItem, Plate
         this.durabilityLossProvider = durabilityLossProvider;
     }
 
-    @Override
-    public void deserializeItems() {
-        LinkedHashMap<? extends ItemGenData, String> itemGenDataList = ZContentLoader.itemGenData;
-        itemGenDataList.entrySet().stream()
-                .filter(entry -> entry.getKey() instanceof ItemGenData.Plate)
-                .forEach(item -> {
-                    ItemGenData.Plate data = (ItemGenData.Plate) item.getKey();
-                    String id = data.id;
-                    float bluntDamage = data.hurtModifier.bluntMultiplier;
-                    float penetrateDamage = data.hurtModifier.penetrateMultiplier;
-                    float ricochetDamage = data.hurtModifier.ricochetMultiplier;
-                    int defense = data.defense;
-                    int absorb = data.protectionClass;
-                    float movementFix = data.movementFix;
-                    int durabilityLossProvider = data.durabilityLossModifier;
-                    int durability = data.durability;
-                    items.add(new GenerationRecord<>(id, new GeneratePlateImpl(id, durability, bluntDamage, penetrateDamage, ricochetDamage, defense, absorb, movementFix, durabilityLossProvider), item.getValue()));
-                });
-    }
 
     @Override
     public @NotNull Type getType() {
@@ -122,4 +100,8 @@ public class GeneratePlateImpl extends SapiIV implements ICombatArmorItem, Plate
         return PlateInfoProvider.super.canEquip(stack, armorType, entity);
     }
 
+    @Override
+    public @NotNull IEquipmentTypeTag.EquipmentType getArmorType() {
+        return EquipmentType.PLATE;
+    }
 }

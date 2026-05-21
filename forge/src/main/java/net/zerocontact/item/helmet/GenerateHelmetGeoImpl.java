@@ -12,14 +12,11 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.zerocontact.ZeroContact;
 import net.zerocontact.api.IAssetManager;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.client.renderer.HelmetRender;
 import net.zerocontact.datagen.GenerationRecord;
-import net.zerocontact.datagen.ItemGenData;
-import net.zerocontact.datagen.loader.ZContentLoader;
 import net.zerocontact.item.armor.forge.BaseArmorGeoImpl;
 import net.zerocontact.models.GenerateModel;
 import org.jetbrains.annotations.NotNull;
@@ -105,28 +102,6 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
                 return new HelmetRender.HelmetItemRender<>(new GenerateModel<>(texture, model, animation));
             }
         });
-    }
-
-    @Override
-    public void deserializeItems() {
-        LinkedHashMap<? extends ItemGenData, String> itemGenDataList = ZContentLoader.itemGenData;
-        itemGenDataList.entrySet().stream()
-                .filter(entry -> entry.getKey() instanceof ItemGenData.Armor data && data.equipmentSlot.equals(EquipmentType.HELMET.getTypeId()))
-                .forEach(item -> {
-                    ItemGenData.Armor data = (ItemGenData.Armor) item.getKey();
-                    String id = data.id;
-                    float bluntDamage = data.hurtModifier.bluntMultiplier;
-                    float penetrateDamage = data.hurtModifier.penetrateMultiplier;
-                    float ricochetDamage = data.hurtModifier.ricochetMultiplier;
-                    int defense = data.defense;
-                    int absorb = data.protectionClass;
-                    int durabilityLossProvider = data.durabilityLossModifier;
-                    int default_durability = data.defaultDurability;
-                    ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
-                    ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
-                    ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-                    items.add(new GenerationRecord<>(id, new GenerateHelmetGeoImpl(id, Type.HELMET, texture, model, animation, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, durabilityLossProvider, default_durability), item.getValue()));
-                });
     }
 
 }

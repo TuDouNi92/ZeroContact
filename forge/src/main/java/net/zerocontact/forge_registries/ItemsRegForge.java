@@ -1,6 +1,5 @@
 package net.zerocontact.forge_registries;
 
-import com.google.gson.Gson;
 import dev.architectury.registry.CreativeTabRegistry;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
@@ -148,17 +147,9 @@ public class ItemsRegForge {
         );
         ZPackManager packManager = new ZPackManager();
         packManager.init();
-        ZeroContactLogger.LOG.info("On Register ItemData:{}", new Gson().toJson(ZContentLoader.itemGenData).formatted());
         IAssetManager assetManager = packManager.getAssetManager();
-        assetManager.registerItems(ITEMS_REG_TAB, ItemsReg.ITEMS,
-                new IAssetManager.WearableType(GENERATE_PLATE.get().items, "PLATE"),
-                new IAssetManager.WearableType(GENERATE_ARMOR.get().items, "ARMOR"),
-                new IAssetManager.WearableType(GENERATE_CARRIER.get().items, "PLATE_CARRIER"),
-                new IAssetManager.WearableType(GENERATE_HELMET.get().items, "HELMET"),
-                new IAssetManager.WearableType(GENERATE_TOP_UNIFORM.get().items, "UNIFORM_TOP"),
-                new IAssetManager.WearableType(GENERATE_PANTS.get().items, "UNIFORM_PANTS"),
-                new IAssetManager.WearableType(GENERATE_ARMBAND.get().items, "ARMBAND")
-        );
+        ZeroContactLogger.LOG.info("On Register ItemData:{}", assetManager.getGson().toJson(ZContentLoader.itemGenData).formatted());
+        assetManager.register();
 
         LinkedHashSet<String> tabNameSet = new LinkedHashSet<>(ITEMS_REG_TAB.values());
         tabNameSet.forEach(tabName -> {

@@ -12,13 +12,10 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.zerocontact.ZeroContact;
 import net.zerocontact.api.IAssetManager;
 import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.client.renderer.ArmorRender;
 import net.zerocontact.datagen.GenerationRecord;
-import net.zerocontact.datagen.ItemGenData;
-import net.zerocontact.datagen.loader.ZContentLoader;
 import net.zerocontact.models.GenerateModel;
 import net.zerocontact.registries.ModSoundEventsReg;
 import org.jetbrains.annotations.NotNull;
@@ -65,28 +62,6 @@ public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem,
         Multimap<Attribute, AttributeModifier> modifierMultimap = HashMultimap.create();
         modifierMultimap.put(Attributes.ARMOR, new AttributeModifier(UUID.nameUUIDFromBytes(("Armor").getBytes()), "CuriosArmorDefense", this.getDefense(), AttributeModifier.Operation.ADDITION));
         return modifierMultimap;
-    }
-
-    @Override
-    public void deserializeItems() {
-        LinkedHashMap<? extends ItemGenData, String> itemGenDataList = ZContentLoader.itemGenData;
-        itemGenDataList.entrySet().stream()
-                .filter(entry -> entry instanceof ItemGenData.Armor data && data.equipmentSlot.equals(EQUIPMENT_TYPE.getTypeId()))
-                .forEach(item -> {
-                    ItemGenData.Armor data = (ItemGenData.Armor) item.getKey();
-                    String id = data.id;
-                    int defense = data.defense;
-                    int defaultDurability = data.defaultDurability;
-                    int absorb = data.protectionClass;
-                    int mass = 0;
-                    float penetrateReduction = data.hurtModifier.penetrateMultiplier;
-                    float bluntReduction = data.hurtModifier.bluntMultiplier;
-                    ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
-                    ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
-                    ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-                    items.add(new GenerationRecord<>(id, new GenerateCarrierGeoImpl(Type.CHESTPLATE, id, defense, defaultDurability, absorb, bluntReduction, penetrateReduction, mass, texture, model, animation), item.getValue()));
-
-                });
     }
 
     @Override
