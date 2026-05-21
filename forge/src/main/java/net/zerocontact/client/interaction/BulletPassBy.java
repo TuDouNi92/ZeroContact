@@ -5,11 +5,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import net.zerocontact.registries.ModSoundEventsReg;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
 public class BulletPassBy {
-    public static void playBulletPassBySound(Entity bullet, LivingEntity entity) {
+    public static void playBulletPassBySound(Entity bullet, @Nullable LivingEntity entity) {
+        if(entity==null)return;
         if (bullet instanceof EntityKineticBullet) {
             Optional<Entity> bulletEntity = Optional.of(bullet);
             bulletEntity.ifPresent(bl -> {
