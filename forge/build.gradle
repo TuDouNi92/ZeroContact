@@ -39,6 +39,10 @@ dependencies {
     forgeRuntimeLibrary("com.eliotlash.mclib:mclib:20")
     modImplementation files("libs/simplebedrockmodel-2.1.0-forge+mc1.20.1.jar")
     forgeRuntimeLibrary("com.maydaymemory:mae:1.1.0")
+
+    modLocalRuntime files('libs/embeddium-0.3.31+mc1.20.1 (1).jar')
+    modLocalRuntime files('libs/oculus-mc1.20.1-1.8.0 (1).jar')
+    forgeRuntimeLibrary('org.anarres:jcpp:1.4.14')
 }
 
 processResources {
