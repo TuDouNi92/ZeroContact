@@ -6,6 +6,7 @@ import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.gun.FireMode;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.util.LandRandomPos;
@@ -35,22 +36,21 @@ public class PerformGunAttackGoal extends Goal {
 
     @Override
     public void tick() {
-        if(!shooter.stateController.getShareContext().isHurt){
+        if (!shooter.stateController.getShareContext().isHurt) {
             burstFire();
-        }
-        else{
+        } else {
             burstFireWithFallBack();
         }
     }
 
     public static <T extends ArmedRaider> boolean isInVisionToShoot(T shooter) {
         LivingEntity target = shooter.getTarget();
-        if(target ==null)return false;
+        if (target == null) return false;
         Vec3 lookVec = shooter.getLookAngle().normalize();
         Vec3 toTargetVec = target.position().subtract(shooter.position()).normalize();
         double dot = lookVec.dot(toTargetVec);
         double fovCos = Math.cos(Math.toRadians(120));
-        return (dot >= fovCos || shooter.isSprinting()) && dot >= fovCos;
+        return dot >= fovCos && shooter.hasLineOfSight(target);
     }
 
     private float provideInaccuracy() {
@@ -64,7 +64,7 @@ public class PerformGunAttackGoal extends Goal {
     private void shoot(LivingEntity target) {
         double x, y, z;
         x = target.getX() - shooter.getX();
-        double targetY = target.getY()+target.getBbHeight()*0.5;
+        double targetY = target.getY() + target.getBbHeight() * 0.5;
         y = targetY - shooter.getEyeY();
         z = target.getZ() - shooter.getZ();
         float spread = provideInaccuracy();
@@ -81,24 +81,28 @@ public class PerformGunAttackGoal extends Goal {
 
     }
 
+    private static double getWantedY(Entity entity) {
+        return entity instanceof LivingEntity ? entity.getEyeY() : (entity.getBoundingBox().minY + entity.getBoundingBox().maxY) / (double) 2.0F;
+    }
+
     private void burstFire() {
-        if (!IGun.mainhandHoldGun(shooter) || operator == null) return;
+        if (!IGun.mainHandHoldGun(shooter) || operator == null) return;
         LivingEntity target = shooter.getTarget();
         if (target != null) {
-            shooter.getLookControl().setLookAt(target);
+            shooter.getLookControl().setLookAt(target.getX(), getWantedY(target), target.getZ(), 32f, 16f);
         } else {
             return;
         }
         if (shootCoolDown > 0) {
             shootCoolDown--;
-            FireMode fireMode = IGun.getMainhandFireMode(shooter);
+            FireMode fireMode = IGun.getMainHandFireMode(shooter);
             if (fireMode == FireMode.SEMI || fireMode == FireMode.BURST) {
                 burstInterval = random.nextInt(10);
             } else {
                 burstInterval = random.nextInt(15);
             }
         } else {
-            if (burstInterval > 0 && isInVisionToShoot(shooter)) {
+            if (burstInterval > 0 && isInVisionToShoot(shooter) && shooter.getLookControl().isLookingAtTarget()) {
                 shoot(target);
                 burstInterval--;
             } else {
@@ -110,9 +114,9 @@ public class PerformGunAttackGoal extends Goal {
 
     private void burstFireWithFallBack() {
         burstFire();
-        if(shooter.getTarget()!=null){
-            Vec3 targetPos =LandRandomPos.getPosAway(shooter,12,6, shooter.getTarget().position());
-            Optional.ofNullable(targetPos).ifPresent(__-> shooter.getNavigation().moveTo(targetPos.x,targetPos.y,targetPos.z,1.25D));
+        if (shooter.getTarget() != null) {
+            Vec3 targetPos = LandRandomPos.getPosAway(shooter, 12, 6, shooter.getTarget().position());
+            Optional.ofNullable(targetPos).ifPresent(__ -> shooter.getNavigation().moveTo(targetPos.x, targetPos.y, targetPos.z, 1.25D));
         }
     }
 }

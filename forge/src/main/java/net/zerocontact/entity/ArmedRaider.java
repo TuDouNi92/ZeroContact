@@ -69,8 +69,9 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     private final LazyOptional<IItemHandler> itemHandlerLazyOptional = LazyOptional.of(() -> new InvWrapper(inventory));
     private final IGunOperator operator;
     private String factionId;
-    public GlobalStateController stateController;
+    public final GlobalStateController stateController;
     private int voiceTicks;
+    private boolean attackPredicate;
 
     public String getFactionId() {
         return this.factionId;
@@ -84,9 +85,21 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     protected enum Weapon {
         AK(),
         SKS("tacz:sks_tactical", "tacz:762x39"),
+        FN_FAL("tacz:fn_fal","tacz:308"),
         M4("tacz:m4a1", "tacz:556x45"),
         SCAR_L("tacz:scar_l", "tacz:556x45"),
-        M320("tacz:m320", "tacz:40mm");
+        M320("tacz:m320", "tacz:40mm"),
+        AUG("tacz:aug","tacz:556x45"),
+        HK416D("tacz:hk416d","tacz:556x45"),
+        M16A4("tacz:m16a4","tacz:556x45"),
+        QBZ191("tacz:qbz_191","tacz:58x42"),
+        CZ75("tacz:cz75","tacz:9mm"),
+        GLOCK17("tacz:glock_17","tacz:9mm"),
+        P320("tacz:p320","tacz:45acp"),
+        P90("tacz:p90","tacz:57x28"),
+        VECTOR("tacz:vector45","tacz:45acp"),
+        UZI("tacz:uzi","tacz:9mm")
+        ;
         private String gunName;
         private String ammoName;
 
@@ -136,13 +149,13 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         MTeam.registerEntity(this);
         geoCache = GeckoLibUtil.createInstanceCache(this);
         NameList.setName(this, this.random);
-//        this.setCustomNameVisible(true);
+        this.setCustomNameVisible(true);
+        stateController = new GlobalStateController(this);
     }
 
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        stateController = new GlobalStateController(this);
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new HurtByTargetGoal(this, PathfinderMob.class));
         this.goalSelector.addGoal(2, new AvoidEntityGoal<>(this, IronGolem.class, 10, 1.0F, 1.5F));
@@ -150,7 +163,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         this.goalSelector.addGoal(2, new OpenDoorGoal(this, false));
         this.goalSelector.addGoal(4, new PerformGunAttackGoal(this));
         this.goalSelector.addGoal(5, new RandomStrollGoal(this, 0.8F));
-        this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true, false));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Monster.class, true, false));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, IronGolem.class, true, false));
@@ -167,32 +180,18 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-        controllerRegistrar.add(new AnimationController<>(this, "controller", 10, this::predicate));
-        controllerRegistrar.add(new AnimationController<>(this, "triggerable", 10, this::triggerable)
+        controllerRegistrar.add(new AnimationController<>(this, "controller", 10, this::defaultPredicate));
+        controllerRegistrar.add(new AnimationController<GeoAnimatable>(this, "fire", 10, (state) -> PlayState.CONTINUE)
                 .triggerableAnim("shoot", SHOOT_ANIM));
     }
 
-    private PlayState triggerable(AnimationState<ArmedRaider> armedRaiderAnimationState) {
-        return PlayState.CONTINUE;
-    }
-
-    private void triggerablePredicate() {
-        Optional.ofNullable(stateController).ifPresent(state -> {
-            if (state.getPhase() == GlobalStateController.Phase.ATTACK) {
-                this.triggerAnim("triggerable", "shoot");
-            } else {
-                this.stopTriggeredAnimation("triggerable", "shoot");
-            }
-
-        });
-    }
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return geoCache;
     }
 
-    private <E extends GeoAnimatable> PlayState predicate(AnimationState<E> state) {
+    private <E extends GeoAnimatable> PlayState defaultPredicate(AnimationState<E> state) {
         if (state.isMoving()) {
             state.getController().setAnimation(WALK);
         } else {
@@ -285,10 +284,11 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     private void listenSoundState() {
         if (voiceTicks == 0) {
             playVoice();
-            voiceTicks++;
-        } else if (voiceTicks >= 100) {
+        } else if (voiceTicks >= 200) {
             voiceTicks = 0;
+            return;
         }
+        voiceTicks++;
     }
 
     private void playVoice() {
@@ -306,8 +306,19 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     public void tick() {
         super.tick();
         listenSoundState();
-        Optional.ofNullable(stateController).ifPresent(GlobalStateController::tick);
-        triggerablePredicate();
+        attackPredicate();
+        stateController.tick();
+    }
+
+    private void attackPredicate() {
+        if(this.level().isClientSide)return;
+        if (stateController.getPhase() == GlobalStateController.Phase.ATTACK && !this.walkAnimation.isMoving()) {
+            this.triggerAnim("fire", "shoot");
+            attackPredicate = true;
+        } else {
+            attackPredicate = false;
+            this.stopTriggeredAnimation("fire", "shoot");
+        }
     }
 
     @Override

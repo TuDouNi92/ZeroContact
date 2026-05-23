@@ -28,13 +28,15 @@ public class IdlePhaseContext implements IPhaseContext {
     @Override
     public boolean shouldTransition() {
         return PerformGunAttackGoal.isInVisionToShoot(armedRaider)
-                || armedRaider.stateController.getShareContext().isHurt;
+                || armedRaider.stateController.getShareContext().isHurt
+                || armedRaider.getTarget()!=null;
     }
 
     @Override
     public GlobalStateController.Phase getNextPhase() {
         if (PerformGunAttackGoal.isInVisionToShoot(armedRaider)) return GlobalStateController.Phase.ATTACK;
         if (armedRaider.stateController.getShareContext().isHurt) return GlobalStateController.Phase.ESCAPE;
+        if(armedRaider.getTarget()!=null) return GlobalStateController.Phase.CHASE;
         return GlobalStateController.Phase.IDLE;
     }
 

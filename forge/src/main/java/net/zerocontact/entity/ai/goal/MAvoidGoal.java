@@ -2,6 +2,7 @@ package net.zerocontact.entity.ai.goal;
 
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.util.LandRandomPos;
 import net.minecraft.world.phys.Vec3;
@@ -35,14 +36,16 @@ public class MAvoidGoal extends Goal {
             int targetX = (random.nextBoolean() ? 1 : -1) * random.nextInt(distance);
             int targetZ = (random.nextBoolean() ? 1 : -1) * random.nextInt(distance);
             Vec3 targetPos = armedRaider.position().add(targetX, 0, targetZ);
-            armedRaider.getNavigation().moveTo(targetPos.x, targetPos.y, targetPos.z, 1.5D);
-        } else if(!armedRaider.hasLineOfSight(armedRaider.getTarget())) {
+            armedRaider.getNavigation().moveTo(targetPos.x, targetPos.y, targetPos.z, 1.2D);
+        } else if (!armedRaider.hasLineOfSight(armedRaider.getTarget())) {
             Vec3 targetPos = LandRandomPos.getPosAway(armedRaider, 12, 6, armedRaider.getTarget().position());
             if (targetPos == null) return;
-            armedRaider.getNavigation().moveTo(targetPos.x, targetPos.y, targetPos.z, 1.5D);
-        }else{
-            armedRaider.lookAt(EntityAnchorArgument.Anchor.EYES,armedRaider.getTarget().position());
-            armedRaider.stateController.getShareContext().signalPhases.add(GlobalStateController.SignalPhase.WANTS_ATTACK);
+            armedRaider.getNavigation().moveTo(targetPos.x, targetPos.y, targetPos.z, 1.2D);
+        } else {
+            armedRaider.lookAt(EntityAnchorArgument.Anchor.EYES, armedRaider.getTarget().position());
+            if (armedRaider.getTarget() instanceof PathfinderMob mob)
+                armedRaider.stateController.getShareContext().cacheTarget = mob;
+            armedRaider.stateController.getShareContext().signalPhases.add(GlobalStateController.SignalPhase.WANTS_CHASE);
         }
 
     }

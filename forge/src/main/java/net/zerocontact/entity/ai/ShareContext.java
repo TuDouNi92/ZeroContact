@@ -1,7 +1,8 @@
 package net.zerocontact.entity.ai;
 
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.PathfinderMob;
 import net.zerocontact.entity.ai.controller.GlobalStateController;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -9,6 +10,7 @@ import java.util.Set;
 public class ShareContext {
     public final Set<GlobalStateController.SignalPhase> signalPhases;
     public boolean isHurt;
+    public @Nullable PathfinderMob cacheTarget;
     public ShareContext(){
         this.signalPhases = new HashSet<>();
     }

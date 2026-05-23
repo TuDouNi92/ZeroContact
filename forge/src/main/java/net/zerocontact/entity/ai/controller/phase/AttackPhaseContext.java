@@ -1,21 +1,31 @@
 package net.zerocontact.entity.ai.controller.phase;
 
+import net.minecraft.world.entity.PathfinderMob;
 import net.zerocontact.api.IPhaseContext;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.entity.ai.controller.GlobalStateController;
 import net.zerocontact.entity.ai.goal.PerformGunAttackGoal;
 
-import java.util.Optional;
-
 public class AttackPhaseContext implements IPhaseContext {
     private final ArmedRaider armedRaider;
-    private int ticks =0;
-    public AttackPhaseContext(ArmedRaider armedRaider){
+    private int ticks = 0;
+
+    public AttackPhaseContext(ArmedRaider armedRaider) {
         this.armedRaider = armedRaider;
     }
+
     @Override
     public void tick() {
         ticks++;
+        cacheTargetIfNoVision();
+    }
+
+    private void cacheTargetIfNoVision() {
+
+        if(!PerformGunAttackGoal.isInVisionToShoot(armedRaider)){
+            armedRaider.stateController.getShareContext().cacheTarget = (PathfinderMob) armedRaider.getTarget();
+            armedRaider.stateController.getShareContext().signalPhases.add(GlobalStateController.SignalPhase.WANTS_CHASE);
+        }
     }
 
     @Override
@@ -35,15 +45,11 @@ public class AttackPhaseContext implements IPhaseContext {
 
     @Override
     public boolean isTimedOut() {
-        return ticks>=GlobalStateController.Phase.ATTACK.timeOut;
+        return ticks >= GlobalStateController.Phase.ATTACK.timeOut;
     }
 
     @Override
     public void onExit() {
-        Optional.ofNullable(armedRaider.getTarget()).ifPresent(target->{
-            if(!target.isAlive()){
-                armedRaider.setTarget(null);
-            }
-        });
+        if(armedRaider.getTarget()!=null && !armedRaider.getTarget().isAlive()) armedRaider.setTarget(null);
     }
 }

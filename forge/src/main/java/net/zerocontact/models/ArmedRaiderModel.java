@@ -46,8 +46,8 @@ public class ArmedRaiderModel extends GeoModel<ArmedRaider> {
         leftArm.setRotX(entityModelData.headPitch()*Mth.DEG_TO_RAD + leftArm.getRotX());
         rightArm.setRotX(entityModelData.headPitch()*Mth.DEG_TO_RAD + rightArm.getRotX());
         if(leftArm.getRotY()!=0){
-            leftArm.setRotY(entityModelData.netHeadYaw()*Mth.DEG_TO_RAD + leftArm.getRotY());
-            rightArm.setRotY(entityModelData.netHeadYaw()*Mth.DEG_TO_RAD + rightArm.getRotY());
+            leftArm.setRotY(Math.min(1.4f,entityModelData.netHeadYaw()*Mth.DEG_TO_RAD + leftArm.getRotY()));
+            rightArm.setRotY(Math.min(1.4f,entityModelData.netHeadYaw()*Mth.DEG_TO_RAD + rightArm.getRotY()));
         }
     }
 }
