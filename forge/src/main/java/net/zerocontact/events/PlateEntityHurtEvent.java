@@ -35,8 +35,8 @@ public class PlateEntityHurtEvent {
         if (isHeadShot) return false;
         if (armorSlot.getItem() instanceof BaseArmorGeoImpl baseArmorGeo) {
             //Ignores the bypass damage
-            if (source.typeHolder().containsTag(DamageTypeTags.BYPASSES_ARMOR)) return true;
-
+            if (source.is(ModDamageTypes.BULLET) && source.typeHolder().containsTag(DamageTypeTags.BYPASSES_ARMOR))
+                return true;
             if (baseArmorGeo.getArmorType().equals(IEquipmentTypeTag.EquipmentType.ARMOR)) {
                 hurtIt(lv, source, amount, null, armorSlot, modifiedDamageSource, interruptResult);
             } else if (baseArmorGeo.getArmorType().equals(IEquipmentTypeTag.EquipmentType.PLATE_CARRIER)) {
@@ -52,25 +52,19 @@ public class PlateEntityHurtEvent {
             int plateProtectionClass = plateStack.getOrCreateTag().getInt("protection_class");
             if (source.is(ModDamageTypes.BULLET)) {
                 lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
-                if (EventUtil.isDamageSourceValid(source)) {
-                    hurtAmount = getHurtAmount(lv, source, amount, (ICombatArmorItem) plateStack.getItem(), (ICombatArmorItem) armorStack.getItem(), plateProtectionClass);
-                    lv.hurt(modifiedDamageSource, hurtAmount);
-                }
+                hurtAmount = getHurtAmount(lv, source, amount, (ICombatArmorItem) plateStack.getItem(), (ICombatArmorItem) armorStack.getItem(), plateProtectionClass);
+                lv.hurt(modifiedDamageSource, hurtAmount);
                 interruptResult.set(true);
-            } else {
-                interruptResult.set(false);
             }
         } else {
             int protectionClass = armorStack.getOrCreateTag().getInt("protection_class");
             if (source.is(ModDamageTypes.BULLET)) {
                 lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
-                if (EventUtil.isDamageSourceValid(source) && armorStack.getItem() instanceof ICombatArmorItem provider) {
+                if (armorStack.getItem() instanceof ICombatArmorItem provider) {
                     hurtAmount = getHurtAmount(lv, source, amount, null, provider, protectionClass);
                     lv.hurt(modifiedDamageSource, hurtAmount);
                 }
                 interruptResult.set(true);
-            } else {
-                interruptResult.set(false);
             }
         }
     }

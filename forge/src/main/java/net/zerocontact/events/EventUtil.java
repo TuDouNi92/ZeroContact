@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class EventUtil {
 
+    @Deprecated
     //判断伤害源是否合法
     public static boolean isDamageSourceValid(DamageSource damageSource) {
         return damageSource.is(DamageTypes.ARROW)

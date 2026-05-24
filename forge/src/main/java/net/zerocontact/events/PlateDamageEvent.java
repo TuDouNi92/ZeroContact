@@ -68,8 +68,6 @@ public class PlateDamageEvent {
     }
 
     public static void DamagePlateRegister(LivingEntity entity, DamageSource damageSource, float amount) {
-        if (EventUtil.isDamageSourceValid(damageSource)) {
-            CuriosApi.getCuriosInventory(entity).ifPresent(inv -> DamagePlateModifier(entity, damageSource, amount, EventUtil.idHitFromBack(entity, damageSource)));
-        }
+        CuriosApi.getCuriosInventory(entity).ifPresent(inv -> DamagePlateModifier(entity, damageSource, amount, EventUtil.idHitFromBack(entity, damageSource)));
     }
 }
