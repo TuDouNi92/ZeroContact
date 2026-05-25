@@ -2,10 +2,12 @@ package net.zerocontact.entity;
 
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.entity.IGunOperator;
+import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.item.AmmoItem;
 import com.tacz.guns.resource.index.CommonAmmoIndex;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
+import com.tacz.guns.sound.SoundManager;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -39,11 +41,11 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.zerocontact.entity.ai.MTeam;
 import net.zerocontact.entity.ai.NameList;
 import net.zerocontact.entity.ai.controller.GlobalStateController;
-import net.zerocontact.entity.ai.goal.MAvoidGoal;
+import net.zerocontact.entity.ai.goal.AvoidGoal;
 import net.zerocontact.entity.ai.goal.PerformGunAttackGoal;
+import net.zerocontact.entity.ai.goal.RestrictedGoalWrapper;
 import net.zerocontact.registries.ModSoundEventsReg;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -68,38 +70,25 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     private final SimpleContainer inventory = new SimpleContainer(5);
     private final LazyOptional<IItemHandler> itemHandlerLazyOptional = LazyOptional.of(() -> new InvWrapper(inventory));
     private final IGunOperator operator;
-    private String factionId;
     public final GlobalStateController stateController;
-    private int voiceTicks;
-    private boolean attackPredicate;
-
-    public String getFactionId() {
-        return this.factionId;
-    }
-
-    public void setFactionId(String factionId) {
-        this.factionId = factionId;
-    }
-
 
     protected enum Weapon {
         AK(),
         SKS("tacz:sks_tactical", "tacz:762x39"),
-        FN_FAL("tacz:fn_fal","tacz:308"),
+        FN_FAL("tacz:fn_fal", "tacz:308"),
         M4("tacz:m4a1", "tacz:556x45"),
         SCAR_L("tacz:scar_l", "tacz:556x45"),
         M320("tacz:m320", "tacz:40mm"),
-        AUG("tacz:aug","tacz:556x45"),
-        HK416D("tacz:hk416d","tacz:556x45"),
-        M16A4("tacz:m16a4","tacz:556x45"),
-        QBZ191("tacz:qbz_191","tacz:58x42"),
-        CZ75("tacz:cz75","tacz:9mm"),
-        GLOCK17("tacz:glock_17","tacz:9mm"),
-        P320("tacz:p320","tacz:45acp"),
-        P90("tacz:p90","tacz:57x28"),
-        VECTOR("tacz:vector45","tacz:45acp"),
-        UZI("tacz:uzi","tacz:9mm")
-        ;
+        AUG("tacz:aug", "tacz:556x45"),
+        HK416D("tacz:hk416d", "tacz:556x45"),
+        M16A4("tacz:m16a4", "tacz:556x45"),
+        QBZ191("tacz:qbz_191", "tacz:58x42"),
+        CZ75("tacz:cz75", "tacz:9mm"),
+        GLOCK17("tacz:glock_17", "tacz:9mm"),
+        P320("tacz:p320", "tacz:45acp"),
+        P90("tacz:p90", "tacz:57x28"),
+        VECTOR("tacz:vector45", "tacz:45acp"),
+        UZI("tacz:uzi", "tacz:9mm");
         private String gunName;
         private String ammoName;
 
@@ -138,7 +127,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
 
     }
 
-    private Weapon randomEnum() {
+    private Weapon randomWeapon() {
         Weapon[] values = Weapon.values();
         return values[random.nextInt(values.length)];
     }
@@ -146,10 +135,8 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     public ArmedRaider(EntityType<? extends PatrollingMonster> entityType, Level level) {
         super(entityType, level);
         operator = IGunOperator.fromLivingEntity(this);
-        MTeam.registerEntity(this);
         geoCache = GeckoLibUtil.createInstanceCache(this);
         NameList.setName(this, this.random);
-        this.setCustomNameVisible(true);
         stateController = new GlobalStateController(this);
     }
 
@@ -157,13 +144,12 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     protected void registerGoals() {
         super.registerGoals();
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(1, new HurtByTargetGoal(this, PathfinderMob.class));
-        this.goalSelector.addGoal(2, new AvoidEntityGoal<>(this, IronGolem.class, 10, 1.0F, 1.5F));
-        this.goalSelector.addGoal(2, new MAvoidGoal(this, 5));
-        this.goalSelector.addGoal(2, new OpenDoorGoal(this, false));
+        this.goalSelector.addGoal(1, new HurtByTargetGoal(this));
+        this.goalSelector.addGoal(2, new AvoidGoal(this, 5));
+        this.goalSelector.addGoal(2, RestrictedGoalWrapper.create(this, new OpenDoorGoal(this, false)));
         this.goalSelector.addGoal(4, new PerformGunAttackGoal(this));
-        this.goalSelector.addGoal(5, new RandomStrollGoal(this, 0.8F));
-        this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(5, RestrictedGoalWrapper.create(this, new RandomStrollGoal(this, 0.8F)));
+        this.goalSelector.addGoal(8, RestrictedGoalWrapper.create(this, new RandomLookAroundGoal(this)));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true, false));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Monster.class, true, false));
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, IronGolem.class, true, false));
@@ -202,7 +188,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
 
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor level, @NotNull DifficultyInstance difficulty, @NotNull MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
-        Weapon weapon = randomEnum();
+        Weapon weapon = randomWeapon();
         ItemStack gun = weapon.getWeapon();
         if (gun == null) return null;
         this.setItemInHand(InteractionHand.MAIN_HAND, gun);
@@ -281,59 +267,49 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         itemHandlerLazyOptional.invalidate();
     }
 
-    private void listenSoundState() {
-        if (voiceTicks == 0) {
-            playVoice();
-        } else if (voiceTicks >= 200) {
-            voiceTicks = 0;
-            return;
-        }
-        voiceTicks++;
-    }
-
-    private void playVoice() {
-        Optional.ofNullable(stateController).ifPresent(sc -> {
-            if (sc.getPhase() == GlobalStateController.Phase.ATTACK) {
+    private void listenPlayVoice() {
+        GlobalStateController.VoiceManager manager = stateController.voiceManager;
+        if (manager.tryUse(GlobalStateController.Voice.CONTACT, 200)) {
+            if (stateController.getPhase() == GlobalStateController.Phase.ATTACK) {
                 this.playSound(ModSoundEventsReg.RAIDER_CONTACT, 1, 1);
             }
-        });
-        if (operator.getSynReloadState().getStateType().isReloading()) {
-            this.playSound(ModSoundEventsReg.RAIDER_RELOAD, 1, 1);
+        }
+        if(manager.tryUse(GlobalStateController.Voice.RELOAD,40)){
+            if (operator.getSynReloadState().getStateType().isReloading()) {
+                this.playSound(ModSoundEventsReg.RAIDER_RELOAD, 1, 1);
+                IGun gun = IGun.getIGunOrNull(this.getMainHandItem());
+                Optional.ofNullable(gun).ifPresent(iGun -> SoundManager.sendSoundToNearby(
+                        this,
+                        6,
+                        iGun.getGunId(this.getMainHandItem()), iGun.getGunDisplayId(this.getMainHandItem()),
+                        SoundManager.RELOAD_EMPTY_SOUND, 1, 1));
+            }
         }
     }
 
     @Override
     public void tick() {
         super.tick();
-        listenSoundState();
+        listenPlayVoice();
         attackPredicate();
         stateController.tick();
     }
 
     private void attackPredicate() {
-        if(this.level().isClientSide)return;
+        if (this.level().isClientSide) return;
         if (stateController.getPhase() == GlobalStateController.Phase.ATTACK && !this.walkAnimation.isMoving()) {
             this.triggerAnim("fire", "shoot");
-            attackPredicate = true;
         } else {
-            attackPredicate = false;
             this.stopTriggeredAnimation("fire", "shoot");
         }
     }
 
     @Override
     public boolean hurt(@NotNull DamageSource source, float amount) {
-        Optional.ofNullable(stateController).ifPresent(GlobalStateController::onHurt);
+        stateController.onHurt();
         return super.hurt(source, amount);
     }
 
-    @Override
-    public boolean isAlliedTo(@NotNull Entity other) {
-        if (other instanceof ArmedRaider) {
-            return this.factionId != null && Objects.equals(this.getFactionId(), ((ArmedRaider) other).getFactionId());
-        }
-        return false;
-    }
 
     @Override
     public @NotNull SimpleContainer getInventory() {

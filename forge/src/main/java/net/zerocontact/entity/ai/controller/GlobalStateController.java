@@ -1,6 +1,7 @@
 package net.zerocontact.entity.ai.controller;
 
 import net.minecraft.network.chat.Component;
+import net.zerocontact.EnvHelper;
 import net.zerocontact.api.IPhaseContext;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.entity.ai.ShareContext;
@@ -9,7 +10,12 @@ import net.zerocontact.entity.ai.controller.phase.ChasePhaseContext;
 import net.zerocontact.entity.ai.controller.phase.EscapePhaseContext;
 import net.zerocontact.entity.ai.controller.phase.IdlePhaseContext;
 
+import java.util.EnumMap;
+import java.util.Map;
+
 public class GlobalStateController {
+    public final VoiceManager voiceManager;
+
     public enum Phase {
         IDLE(9999), ATTACK(200), ESCAPE(40), CHASE(100);
         public final int timeOut;
@@ -18,6 +24,40 @@ public class GlobalStateController {
         Phase(int timeOut) {
             this.timeOut = timeOut;
         }
+    }
+
+    public static class VoiceManager {
+        private final Map<Voice, Integer> voicesIntegerMap = new EnumMap<>(Voice.class);
+
+        public void tick() {
+            voicesIntegerMap.replaceAll(((__, cooldown) -> Math.max(0, cooldown - 1)));
+        }
+
+        public boolean canPlay(Voice voice) {
+            return voicesIntegerMap.getOrDefault(voice, 0) == 0;
+        }
+
+        public boolean tryUse(Voice voice, int cooldown) {
+            if (!canPlay(voice)) {
+                return false;
+            }
+            voicesIntegerMap.put(voice, cooldown);
+            return true;
+        }
+
+        public void reset(Voice voice) {
+            voicesIntegerMap.remove(voice);
+        }
+
+        public void resetAll() {
+            voicesIntegerMap.clear();
+        }
+    }
+
+    public enum Voice {
+        CONTACT,
+        RELOAD,
+        HURT
     }
 
     public enum SignalPhase {
@@ -31,6 +71,7 @@ public class GlobalStateController {
     private IPhaseContext currentContext;
 
     public <T extends ArmedRaider> GlobalStateController(T entity) {
+        this.voiceManager = new VoiceManager();
         this.armedRaider = entity;
         this.currentContext = new IdlePhaseContext(entity);
     }
@@ -38,6 +79,7 @@ public class GlobalStateController {
     public void tick() {
         if (armedRaider.level().isClientSide) return;
         currentContext.tick();
+        voiceManager.tick();
         if (!checkSignal()) {
             updatePhase();
         }
@@ -82,14 +124,17 @@ public class GlobalStateController {
             case ESCAPE -> new EscapePhaseContext(armedRaider);
         };
         this.currentContext.onEnter();
-//        armedRaider.setCustomName(
-//                Component.literal(
-//                        phase.name()
-//                                + "-"
-//                                + "IfHurt:"
-//                                + armedRaider.stateController.shareContext.isHurt
-//                                + "Target:"
-//                                + (armedRaider.getTarget() == null ? "null" : armedRaider.getTarget().position())));
+        if(EnvHelper.DEBUG){
+            armedRaider.setCustomName(
+                    Component.literal(
+                            phase.name()
+                                    + "-"
+                                    + "IfHurt:"
+                                    + armedRaider.stateController.shareContext.isHurt
+                                    + "Target:"
+                                    + (armedRaider.getTarget() == null ? "null" : armedRaider.getTarget().position())));
+            armedRaider.setCustomNameVisible(true);
+        }
     }
 
     public Phase getPhase() {

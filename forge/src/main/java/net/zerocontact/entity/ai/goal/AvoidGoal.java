@@ -9,12 +9,12 @@ import net.minecraft.world.phys.Vec3;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.entity.ai.controller.GlobalStateController;
 
-public class MAvoidGoal extends Goal {
+public class AvoidGoal extends Goal {
     private final ArmedRaider armedRaider;
     private final int distance;
     private final RandomSource random;
 
-    public MAvoidGoal(ArmedRaider mob, int distance) {
+    public AvoidGoal(ArmedRaider mob, int distance) {
         this.armedRaider = mob;
         this.distance = distance;
         this.random = mob.getRandom();
