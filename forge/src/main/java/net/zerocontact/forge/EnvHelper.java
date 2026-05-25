@@ -1,4 +1,4 @@
-package net.zerocontact;
+package net.zerocontact.forge;
 
 import java.lang.management.ManagementFactory;
 

@@ -1,7 +1,7 @@
 package net.zerocontact.entity.ai.controller;
 
 import net.minecraft.network.chat.Component;
-import net.zerocontact.EnvHelper;
+import net.zerocontact.forge.EnvHelper;
 import net.zerocontact.api.IPhaseContext;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.entity.ai.ShareContext;
