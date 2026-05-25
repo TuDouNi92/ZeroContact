@@ -35,7 +35,7 @@ public class PlateEntityHurtEvent {
         if (isHeadShot) return false;
         if (armorSlot.getItem() instanceof BaseArmorGeoImpl baseArmorGeo) {
             //Ignores the bypass damage
-            if (source.is(ModDamageTypes.BULLET) && source.typeHolder().containsTag(DamageTypeTags.BYPASSES_ARMOR))
+            if (source.is(ModDamageTypes.BULLET_IGNORE_ARMOR) && source.typeHolder().containsTag(DamageTypeTags.BYPASSES_ARMOR))
                 return true;
             if (baseArmorGeo.getArmorType().equals(IEquipmentTypeTag.EquipmentType.ARMOR)) {
                 hurtIt(lv, source, amount, null, armorSlot, modifiedDamageSource, interruptResult);

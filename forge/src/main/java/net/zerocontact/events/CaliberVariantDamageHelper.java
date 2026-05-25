@@ -11,50 +11,74 @@ import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.command.CommandManager;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 public enum CaliberVariantDamageHelper {
     CALIBER_762x39(
-            new Caliber("tacz:762x39", 3, 6)
+            new Caliber("tacz:762x39", 3, 6, 5.5f)
     ),
     CALIBER_556x45(
-            new Caliber("tacz:556x45", 2, 5)
+            new Caliber("tacz:556x45", 2, 5, 4)
+    ),
+    CALIBER_580x42(
+            new Caliber("tacz:58x42", 3, 6, 6f)
     ),
     CALIBER_308(
-            new Caliber("tacz:308", 4, 10)
+            new Caliber("tacz:308", 4, 10, 8)
     ),
     CALIBER_50AE(
-            new Caliber("tacz:50ae", 2, 9)
+            new Caliber("tacz:50ae", 2, 9, 6.2f)
     ),
     CALIBER_9mm(
-            new Caliber("tacz:9mm", 1.5f, 4)
+            new Caliber("tacz:9mm", 1.5f, 4, 3.75f)
     ),
     CALIBER_45ACP(
-            new Caliber("tacz:45acp", 1.25f, 5)
+            new Caliber("tacz:45acp", 1.25f, 5, 4)
     ),
     CALIBER_762x25(
-            new Caliber("tacz:762x25", 1.5f, 3)
+            new Caliber("tacz:762x25", 1.5f, 3, 3f)
     ),
     CALIBER_762x54(
-            new Caliber("tacz:762x54", 4, 12)
+            new Caliber("tacz:762x54", 4, 12, 8)
     ),
     CALIBER_338(
-            new Caliber("tacz:338", 3, 14)
+            new Caliber("tacz:338", 3, 14, 15)
     ),
     CALIBER_68x51(
-            new Caliber("tacz:6.8x51", 2.5f, 7)
+            new Caliber("tacz:68x51fury", 2.5f, 7, 6)
     ),
     CALIBER_50BMG(
-            new Caliber("tacz:50bmg", 4, 18)
+            new Caliber("tacz:50bmg", 4, 18, 18.5f)
+    ),
+    CALIBER_12G(
+            new Caliber("tacz:12g", 0.2f, 3, 10)
+    ),
+    CALIBER_22WMR(
+            new Caliber("tacz:22wmr", 1.5f, 5, 6)
+    ),
+    CALIBER_30_06(
+            new Caliber("tacz:30_06", 4, 8, 12)
+    ),
+    CALIBER_46x30(
+            new Caliber("tacz:46x30", 2f, 4, 5)
+    ),
+    CALIBER_57x28(
+            new Caliber("tacz:57x28", 1.5f, 5, 6)
+    ),
+    CALIBER_45_70(
+            new Caliber("tacz:45_70", 5f, 8, 10)
+    ),
+    CALIBER_357MAG(
+            new Caliber("tacz:357mag", 2, 6, 7)
+    ),
+    CALIBER_500MAG(
+            new Caliber("tacz:500mag", 3, 7, 6)
     );
+
     private final Caliber caliber;
-    private static final EnumSet<CaliberVariantDamageHelper> caliberVariantDamageHelperEnumSet = EnumSet.of(
-            CALIBER_556x45, CALIBER_762x39, CALIBER_68x51, CALIBER_308, CALIBER_338, CALIBER_762x54, CALIBER_45ACP, CALIBER_762x25, CALIBER_9mm, CALIBER_50AE, CALIBER_50BMG
-    );
+    private static final EnumSet<CaliberVariantDamageHelper> caliberVariantDamageHelperEnumSet = EnumSet.allOf(CaliberVariantDamageHelper.class);
     public static final Set<Caliber> experimentalBallisticSet = new HashSet<>();
 
     CaliberVariantDamageHelper(Caliber caliber) {
@@ -71,13 +95,18 @@ public enum CaliberVariantDamageHelper {
      * @param penetrationClass The penetration level for damage interceptor, bypassed when the feature is off
      * @param fleshDamage      The flesh damage for damage interceptor, bypassed when the feature is off
      */
-    public record Caliber(String id, float baseDamageFactor, int penetrationClass, int fleshDamage) {
+    public record Caliber(String id, float baseDamageFactor, int penetrationClass, float fleshDamage) {
         public Caliber(String id, float baseDamageFactor, int penetrationClass) {
             this(id, baseDamageFactor, penetrationClass, 8);
         }
 
         public Caliber(String id, float baseDamageFactor) {
             this(id, baseDamageFactor, 10, 4);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof Caliber caliber && Objects.equals(id, caliber.id);
         }
     }
 
@@ -126,7 +155,10 @@ public enum CaliberVariantDamageHelper {
         Optional.ofNullable(source.getDirectEntity()).ifPresent(bullet -> {
             if (bullet.level() instanceof ServerLevel serverLevel) {
                 if (CommandManager.CommandSavedData.get(serverLevel).experimentalBallistic) {
-                    getMatchedCaliber(source, experimentalBallisticSet).ifPresent(caliber -> {
+                    Set<Caliber> mergedCaliberSet = caliberVariantDamageHelperEnumSet.stream().map(a -> a.caliber).collect(Collectors.toSet());
+                    mergedCaliberSet.removeAll(experimentalBallisticSet);
+                    mergedCaliberSet.addAll(experimentalBallisticSet);
+                    getMatchedCaliber(source, mergedCaliberSet).ifPresent(caliber -> {
                         double balanceDamage = caliber.baseDamageFactor * Mth.sqrt(original) * 0.75f;
                         double fleshDamage = getPenetratedDamage(caliber, hurtCanHold);
                         if (fleshDamage != 0) {
