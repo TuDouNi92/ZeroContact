@@ -164,3 +164,20 @@ Tutorials about customize your own datapack can be found in GitHub wiki.
 - Improvement for calculating damage for armors & plate-carriers.
 - Add tooltips for damage reduction.
 - Basic localization
+
+
+## indev.1.1.1
+
+### Fix & Optimize
+- Fix the missing argument of custom datapack
+- Fix Gui malfunction when have both backpack and rigs equipped
+- Custom datapacks now have their own creative menu tabs
+- Format change of datapacks
+- Fix crash in the specific condition of playing bullet fly-by sound
+- Fix wrong ammo extracting on rigs
+- Fix a crash caused by the entity when have Oculus and shader packs enabled
+- Fix abnormal damage calculation
+- Fix invulnerability on falling or getting hit by mobs with armor
+- Rebalancing calibers
+- Ai and animation optimization for the entity
+- Chinese localization
