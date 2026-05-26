@@ -5,6 +5,7 @@ import net.minecraft.world.item.ArmorItem;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.IAssetManager;
 import net.zerocontact.api.IEquipmentTypeTag;
+import net.zerocontact.item.ammo.GenerateAmmo;
 import net.zerocontact.item.armband.GenerateUniformArmbandGeoImpl;
 import net.zerocontact.item.armor.forge.GenerateArmorGeoImpl;
 import net.zerocontact.item.armor.forge.GenerateCarrierGeoImpl;
@@ -17,10 +18,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ItemAdapter {
-    public record Mapper<T extends ItemGenData>(T data, IEquipmentTypeTag.EquipmentType type) {
+    public record Mapper<T>(T data, IEquipmentTypeTag.EquipmentType type) {
     }
 
-    public static <T extends ItemGenData> Mapper<?> getMapper(T data) {
+    public static <T> Mapper<?> getMapper(T data) {
         if (data instanceof ItemGenData.Armor armor) {
             Map<String, IEquipmentTypeTag.EquipmentType> convertMap = Arrays
                     .stream(IEquipmentTypeTag.EquipmentType.values())
@@ -29,18 +30,21 @@ public class ItemAdapter {
 
         } else if (data instanceof ItemGenData.Plate plate) {
             return new Mapper<>(plate, IEquipmentTypeTag.EquipmentType.PLATE);
+        } else if (data instanceof ExperimentalBallisticData ammo) {
+            return new Mapper<>(ammo, IEquipmentTypeTag.EquipmentType.AMMO);
         }
-        return new Mapper<>(null,null);
+        return new Mapper<>(null, null);
     }
 
-    public static final List< ? extends IAssetManager.GeneratableItem> ADAPTERS = List.of(
+    public static final List<? extends IAssetManager.GeneratableItem> ADAPTERS = List.of(
             new ArmorAdapter(),
             new PlateAdapter(),
             new CarrierAdapter(),
             new HelmetAdapter(),
             new ArmbandAdapter(),
             new UniformTopAdapter(),
-            new UniformPantsAdapter()
+            new UniformPantsAdapter(),
+            new AmmoAdapter()
     );
 
     public static class ArmorAdapter implements IAssetManager.GeneratableItem {
@@ -174,4 +178,19 @@ public class ItemAdapter {
         }
     }
 
+    public static class AmmoAdapter implements IAssetManager.GeneratableItem {
+        public static final LinkedHashSet<GenerationRecord<?>> items = new LinkedHashSet<>();
+        @Override
+        public <T> LinkedHashSet<GenerationRecord<?>> deserializeItems(T data, String tab) {
+            if (!(data instanceof ExperimentalBallisticData ammoData)) return items;
+            String id = ammoData.ammoId;
+            String variant = ammoData.variant;
+            float baseDamageFactor = ammoData.baseDamageFactor;
+            int penetrationClass = ammoData.penetrationClass;
+            float fleshDamage = ammoData.fleshDamage;
+            int stackSize = ammoData.stackSize;
+            items.add(new GenerationRecord<>(variant, new GenerateAmmo(id, variant, baseDamageFactor, penetrationClass, fleshDamage, stackSize), tab));
+            return items;
+        }
+    }
 }

@@ -80,6 +80,7 @@ public enum CaliberVariantDamageHelper {
     private final Caliber caliber;
     private static final EnumSet<CaliberVariantDamageHelper> caliberVariantDamageHelperEnumSet = EnumSet.allOf(CaliberVariantDamageHelper.class);
     public static final Set<Caliber> experimentalBallisticSet = new HashSet<>();
+    private static final String DEFAULT = "default";
 
     CaliberVariantDamageHelper(Caliber caliber) {
         this.caliber = caliber;
@@ -95,18 +96,19 @@ public enum CaliberVariantDamageHelper {
      * @param penetrationClass The penetration level for damage interceptor, bypassed when the feature is off
      * @param fleshDamage      The flesh damage for damage interceptor, bypassed when the feature is off
      */
-    public record Caliber(String id, float baseDamageFactor, int penetrationClass, float fleshDamage) {
-        public Caliber(String id, float baseDamageFactor, int penetrationClass) {
-            this(id, baseDamageFactor, penetrationClass, 8);
-        }
-
-        public Caliber(String id, float baseDamageFactor) {
-            this(id, baseDamageFactor, 10, 4);
+    public record Caliber(String id, String variant, float baseDamageFactor, int penetrationClass, float fleshDamage, int stackSize) {
+        public Caliber(String id, float baseDamageFactor, int penetrationClass, float fleshDamage) {
+            this(id, DEFAULT, baseDamageFactor, penetrationClass, fleshDamage,30);
         }
 
         @Override
         public boolean equals(Object obj) {
             return obj instanceof Caliber caliber && Objects.equals(id, caliber.id);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(id);
         }
     }
 

@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import static net.zerocontact.ZeroContact.MOD_ID;
 
 public class ZContentLoader implements IContentLoader {
-    public static final LinkedHashMap<ItemGenData, String> itemGenData = new LinkedHashMap<>();
+    public static final LinkedHashMap<Object, String> itemGenData = new LinkedHashMap<>();
     private final IAssetManager assetManager;
     private static final String DEFAULT_RECIPE_NAME = "default.json";
     private static final String ITEM_PATH = "data/" + MOD_ID + "/items";
@@ -28,13 +28,14 @@ public class ZContentLoader implements IContentLoader {
         this.assetManager = assetManager;
     }
 
+
     @Override
     public void loadItems(Set<Zpack> packs) {
         packs.forEach(pack -> {
             Path itemPath = pack.outerPack().resolve(ITEM_PATH);
             try {
                 List<Path> itemList = assetManager.getJsonListPathsFromPath(itemPath);
-                assetManager.deserializeFromJsonList(itemList, assetManager.getGson(), ItemGenData.class, (data, __) -> itemGenData.put(data, pack.tab()));
+                assetManager.deserializeFromJsonList(itemList, assetManager.getGson(), ItemGenData.class, (data, __) -> itemGenData.put(data,pack.tab()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -51,16 +52,20 @@ public class ZContentLoader implements IContentLoader {
                         ammoList,
                         assetManager.getGson(),
                         ExperimentalBallisticData.class,
-                        (data, __) ->
-                                CaliberVariantDamageHelper.experimentalBallisticSet.
-                                        add(
-                                                new CaliberVariantDamageHelper.Caliber(
-                                                        data.ammoId,
-                                                        data.baseDamageFactor,
-                                                        data.penetrationClass,
-                                                        data.fleshDamage
-                                                )
-                                        )
+                        (data, __) -> {
+                            itemGenData.put(data,pack.tab());
+                            CaliberVariantDamageHelper.experimentalBallisticSet.
+                                    add(
+                                            new CaliberVariantDamageHelper.Caliber(
+                                                    data.ammoId,
+                                                    data.variant,
+                                                    data.baseDamageFactor,
+                                                    data.penetrationClass,
+                                                    data.fleshDamage,
+                                                    data.stackSize
+                                            )
+                                    );
+                        }
                 );
             } catch (IOException e) {
                 throw new RuntimeException(e);
