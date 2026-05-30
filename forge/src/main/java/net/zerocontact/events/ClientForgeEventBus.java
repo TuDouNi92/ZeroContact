@@ -23,6 +23,7 @@ public class ClientForgeEventBus {
         if (event.phase != TickEvent.Phase.END || Minecraft.getInstance().player == null) return;
         listenVisorKey();
         listenBackpackKey();
+        listenAmmoSelectorKey();
     }
     @SubscribeEvent
     public static void clientEntityTick(EntityEvent event){
@@ -34,7 +35,13 @@ public class ClientForgeEventBus {
             BulletPassBy.playBulletPassBySound(entity, Minecraft.getInstance().player);
         }
     }
-
+    private static void listenAmmoSelectorKey(){
+        while (KeyBindingHandler.TOGGLE_AMMO_SELECTOR.consumeClick()){
+            if(Minecraft.getInstance().screen == null){
+                ModMessages.sendToServer(new NetworkHandler.OpenAmmoSelectorPacket());
+            }
+        }
+    }
     private static void listenBackpackKey() {
         while (KeyBindingHandler.TOGGLE_BACKPACK_KEY.consumeClick()) {
             if (Minecraft.getInstance().screen == null && !ClientData.justCloseBackpack) {

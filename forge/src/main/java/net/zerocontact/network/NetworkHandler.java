@@ -1,22 +1,31 @@
 package net.zerocontact.network;
 
+import com.tacz.guns.api.client.gameplay.IClientPlayerGunOperator;
+import com.tacz.guns.api.item.IGun;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.NetworkHooks;
 import net.zerocontact.animation_data.AnimateData;
 import net.zerocontact.api.Toggleable;
 import net.zerocontact.client.ClientData;
 import net.zerocontact.client.animation.VisorTracker;
+import net.zerocontact.client.menu.AmmoSelectorMenu;
 import net.zerocontact.command.CommandManager;
 import net.zerocontact.datagen.GearRecipeData;
 import net.zerocontact.item.backpack.BaseBackpack;
 import net.zerocontact.item.block.WorkBenchEntity;
 import top.theillusivec4.curios.api.CuriosApi;
 
+import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -205,6 +214,57 @@ public class NetworkHandler {
                     }
                 } else {
                     workBenchEntity.giveItem(player, WorkBenchEntity.recipeData.get(msg.recipeIndex()).gearId);
+                }
+            });
+        }
+    }
+
+    public record OpenAmmoSelectorPacket() {
+        public void encode(FriendlyByteBuf buf) {
+        }
+
+        public static OpenAmmoSelectorPacket decode(FriendlyByteBuf buf) {
+            return new OpenAmmoSelectorPacket();
+        }
+        public static void handle(OpenAmmoSelectorPacket msg, Supplier<NetworkEvent.Context> supplier) {
+            NetworkEvent.Context context = supplier.get();
+            ServerPlayer player = context.getSender();
+            if (player == null) return;
+            context.enqueueWork(() -> {
+                if (!IGun.mainHandHoldGun(player)) return;
+                LinkedHashMap<ItemStack, Integer> ammoMap = AmmoSelectorMenu.getAmmoCount(player);
+                NetworkHooks.openScreen(
+                        player,
+                        new SimpleMenuProvider((id, inv, __) -> new AmmoSelectorMenu(id, ammoMap, inv), Component.translatable("")),
+                        buf -> buf.writeMap(ammoMap, FriendlyByteBuf::writeItem, FriendlyByteBuf::writeInt)
+                );
+            });
+        }
+    }
+
+    public record SelectAmmoPacket(ItemStack ammoItem) {
+        public void encode(FriendlyByteBuf buf) {
+            buf.writeItem(ammoItem);
+        }
+        public static SelectAmmoPacket decode(FriendlyByteBuf buf) {
+            return new SelectAmmoPacket(buf.readItem());
+        }
+        public static void handle(SelectAmmoPacket msg, Supplier<NetworkEvent.Context> supplier) {
+            ServerAmmoSelector.handle(msg,supplier);
+        }
+    }
+
+    public record ClientAmmoReloadPacket(){
+        public void encode(FriendlyByteBuf buf){};
+        public static ClientAmmoReloadPacket decode(FriendlyByteBuf buf){return new ClientAmmoReloadPacket();};
+        public static void handle(ClientAmmoReloadPacket __, Supplier<NetworkEvent.Context> supplier){
+            NetworkEvent.Context context = supplier.get();
+            context.enqueueWork(() -> {
+                Minecraft  mc= Minecraft.getInstance();
+                LocalPlayer player = mc.player;
+                IClientPlayerGunOperator operator = IClientPlayerGunOperator.fromLocalPlayer(player);
+                if (operator != null) {
+                    operator.reload();
                 }
             });
         }

@@ -9,12 +9,14 @@ import org.lwjgl.glfw.GLFW;
 public class KeyBindingHandler {
     public static KeyMapping TOGGLE_BACKPACK_KEY;
     public static KeyMapping TOGGLE_VISOR_KEY;
-
+    public static KeyMapping TOGGLE_AMMO_SELECTOR;
     public static void register(RegisterKeyMappingsEvent event) {
         TOGGLE_VISOR_KEY = new KeyMapping("key.swap_visor", KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_X, "key.categories.zerocontact");
         TOGGLE_BACKPACK_KEY = new KeyMapping("key.open_backpack", KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B, "key.categories.zerocontact");
+        TOGGLE_AMMO_SELECTOR = new KeyMapping("key.open_selector",KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM,GLFW.GLFW_KEY_LEFT_ALT,"key.categories.zerocontact");
         event.register(TOGGLE_VISOR_KEY);
         event.register(TOGGLE_BACKPACK_KEY);
+        event.register(TOGGLE_AMMO_SELECTOR);
     }
 
 }

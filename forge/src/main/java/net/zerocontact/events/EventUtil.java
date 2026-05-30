@@ -109,4 +109,15 @@ public class EventUtil {
         double dot = look.dot(targetBack);
         return dot > 0;
     }
+
+    public static ItemStack getCuriosStackFirst(LivingEntity player, String id) {
+        ItemStack[] stacks = {null};
+        CuriosApi.getCuriosInventory(player).ifPresent(handler -> {
+            handler.getStacksHandler(id).ifPresent(iCurioStacksHandler -> {
+                ItemStack stack = iCurioStacksHandler.getStacks().getStackInSlot(0);
+                stacks[0] = stack;
+            });
+        });
+        return stacks[0];
+    }
 }

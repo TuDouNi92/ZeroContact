@@ -30,7 +30,20 @@ public class AmmoInjector {
         stack.getOrCreateTag().put("ai_ammo", tag);
     }
 
-    //Read and bind in the spawn event
+    public static void write(AmmoContext context, CompoundTag tag) {
+        CompoundTag subTag = new CompoundTag();
+        CaliberVariantDamageHelper.Caliber caliber = context.caliber;
+        subTag.putString("ai_ammoId", caliber.id());
+        subTag.putString("variant", caliber.variant());
+        subTag.putFloat("ai_damageFactor", caliber.baseDamageFactor());
+        subTag.putInt("ai_penetrate_level", caliber.penetrationClass());
+        subTag.putFloat("ai_flesh_damage", caliber.fleshDamage());
+        subTag.putInt("stack_size", caliber.stackSize());
+        tag.put("ai_ammo", subTag);
+    }
+
+
+    //Read and bind Bullet and Gun in the spawn event
     public static @Nullable AmmoContext read(ItemStack stack) {
         if (stack.getTag() == null) return null;
         CompoundTag tag = stack.getTag().getCompound("ai_ammo");
@@ -43,7 +56,6 @@ public class AmmoInjector {
         return new AmmoContext(new CaliberVariantDamageHelper.Caliber(id, variant, damageFactor, level, flesh, stackSize));
     }
 
-    //Copy ammo tags into gun tags in mixin reload
     public static void copyTags(ItemStack ammoStack, ItemStack gunStack) {
         if (ammoStack.getTag() == null) return;
         CompoundTag ammoTag = ammoStack.getTag().getCompound("ai_ammo");

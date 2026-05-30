@@ -1,6 +1,7 @@
 package net.zerocontact.item.ammo;
 
 import com.tacz.guns.api.item.nbt.AmmoItemDataAccessor;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -31,8 +32,12 @@ public class GenerateAmmo extends Item implements AmmoItemDataAccessor, IEquipme
         this.fleshDamage = fleshDamage;
         this.stackSize = stackSize;
     }
-@Override
+
+    @Override
     public @NotNull ResourceLocation getAmmoId(ItemStack ammo) {
+        AmmoInjector.write(new AmmoInjector.AmmoContext(
+                new CaliberVariantDamageHelper.Caliber(ammoId, ammoVariant, baseDamageFactor, penetrateClass, fleshDamage, stackSize)
+        ), ammo);
         return new ResourceLocation(ammoId);
     }
 

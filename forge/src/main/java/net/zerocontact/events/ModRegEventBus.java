@@ -13,6 +13,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.zerocontact.client.gui.AmmoSelectorScreen;
 import net.zerocontact.client.gui.BackpackScreen;
 import net.zerocontact.client.gui.ConfigScreen;
 import net.zerocontact.client.gui.WorkbenchScreen;
@@ -47,6 +48,7 @@ public class ModRegEventBus {
             EntityRenderers.register(ModEntitiesReg.ARMED_RAIDER.get(), ArmedRaiderRender::new);
             MenuScreens.register(ModMenus.BACKPACK_CONTAINER.get(), BackpackScreen::new);
             MenuScreens.register(ModMenus.WORKBENCH_MENU.get(), WorkbenchScreen::new);
+            MenuScreens.register(ModMenus.AMMO_SELECTOR.get(), AmmoSelectorScreen::new);
             RegCurioGeoItemRender();
             regConfigScreen();
         }

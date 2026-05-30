@@ -60,6 +60,22 @@ public class ModMessages {
                 .encoder(NetworkHandler.BuyGearsPacket::encode)
                 .consumerMainThread(NetworkHandler.BuyGearsPacket::handle)
                 .add();
+
+        net.messageBuilder(NetworkHandler.OpenAmmoSelectorPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(NetworkHandler.OpenAmmoSelectorPacket::decode)
+                .encoder(NetworkHandler.OpenAmmoSelectorPacket::encode)
+                .consumerMainThread(NetworkHandler.OpenAmmoSelectorPacket::handle)
+                .add();
+        net.messageBuilder(NetworkHandler.SelectAmmoPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(NetworkHandler.SelectAmmoPacket::decode)
+                .encoder(NetworkHandler.SelectAmmoPacket::encode)
+                .consumerMainThread(NetworkHandler.SelectAmmoPacket::handle)
+                .add();
+        net.messageBuilder(NetworkHandler.ClientAmmoReloadPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(NetworkHandler.ClientAmmoReloadPacket::decode)
+                .encoder(NetworkHandler.ClientAmmoReloadPacket::encode)
+                .consumerMainThread(NetworkHandler.ClientAmmoReloadPacket::handle)
+                .add();
     }
 
     public static <MSG> void sendToServer(MSG msg) {
