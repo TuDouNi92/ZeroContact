@@ -2,7 +2,6 @@ package net.zerocontact.entity.ai.goal;
 
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.util.LandRandomPos;
 import net.minecraft.world.phys.Vec3;
@@ -43,8 +42,7 @@ public class AvoidGoal extends Goal {
             armedRaider.getNavigation().moveTo(targetPos.x, targetPos.y, targetPos.z, 1.2D);
         } else {
             armedRaider.lookAt(EntityAnchorArgument.Anchor.EYES, armedRaider.getTarget().position());
-            if (armedRaider.getTarget() instanceof PathfinderMob mob)
-                armedRaider.stateController.getShareContext().cacheTarget = mob;
+            armedRaider.stateController.getShareContext().cacheTarget = armedRaider.getTarget();
             armedRaider.stateController.getShareContext().signalPhases.add(GlobalStateController.SignalPhase.WANTS_CHASE);
         }
 

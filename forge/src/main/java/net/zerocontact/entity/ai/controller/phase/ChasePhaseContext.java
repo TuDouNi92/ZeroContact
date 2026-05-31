@@ -1,6 +1,6 @@
 package net.zerocontact.entity.ai.controller.phase;
 
-import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.util.LandRandomPos;
 import net.minecraft.world.phys.Vec3;
 import net.zerocontact.api.IPhaseContext;
@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 public class ChasePhaseContext implements IPhaseContext {
     private final ArmedRaider raider;
     private int ticks = 0;
-    private @Nullable PathfinderMob cacheTarget;
+    private @Nullable LivingEntity cacheTarget;
 
     public ChasePhaseContext(ArmedRaider raider) {
         this.raider = raider;
@@ -37,8 +37,8 @@ public class ChasePhaseContext implements IPhaseContext {
             if (!raider.getNavigation().isDone()) return;
             raider.getNavigation().moveTo(searchPos.x, searchPos.y, searchPos.z, 1D);
             raider.setTarget(cacheTarget);
-        } else if (raider.getTarget() != null && raider.getTarget() instanceof PathfinderMob mob) {
-            Vec3 searchPos = LandRandomPos.getPosTowards(this.raider, 12, 6, mob.position());
+        } else if (raider.getTarget() != null) {
+            Vec3 searchPos = LandRandomPos.getPosTowards(this.raider, 12, 6, raider.getTarget().position());
             if (searchPos == null) return;
             if (!raider.getNavigation().isDone()) return;
             raider.getNavigation().moveTo(searchPos.x, searchPos.y, searchPos.z, 1D);
