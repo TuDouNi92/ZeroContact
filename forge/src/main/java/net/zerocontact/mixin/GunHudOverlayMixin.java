@@ -15,6 +15,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.zerocontact.events.AmmoInjector;
 import net.zerocontact.item.rigs.BaseRigs;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -50,16 +51,13 @@ public class GunHudOverlayMixin {
             });
         });
     }
-    @Inject(method = "render",remap = false,at= @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;III)I",ordinal = 0,shift = At.Shift.AFTER),locals = LocalCapture.CAPTURE_FAILHARD)
-    private void zeroContact$renderHud(ForgeGui gui, GuiGraphics graphics, float partialTick, int width, int height, CallbackInfo ci, Minecraft mc, LocalPlayer player, ItemStack stack, IGun iGun, ResourceLocation gunId, GunData gunData, GunDisplayInstance display, boolean useInventoryAmmo, boolean useDummyAmmo, boolean overheatLocked, int ammoCount, int ammoCountColor, int inventoryAmmoCountColor, String currentAmmoCountText, String inventoryAmmoCountText, PoseStack poseStack, Font font, String minecraftVersion, String modVersion, String debugInfo){
+    @Inject(method = "render",remap = false,at= @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;FFIZ)I",ordinal = 0,shift = At.Shift.AFTER),locals = LocalCapture.CAPTURE_FAILHARD)
+    private void zeroContact$renderHud(ForgeGui gui, GuiGraphics graphics, float partialTick, int width, int height, CallbackInfo ci, Minecraft mc, LocalPlayer player, ItemStack stack, IGun iGun, ResourceLocation gunId, GunData gunData, GunDisplayInstance display, boolean useInventoryAmmo, boolean useDummyAmmo, boolean overheatLocked, int ammoCount, int ammoCountColor, int inventoryAmmoCountColor, String currentAmmoCountText, String inventoryAmmoCountText, PoseStack poseStack, Font font){
         if(player==null)return;
         ItemStack gunStack = IGun.mainHandHoldGun(player)?player.getMainHandItem():null;
         if(gunStack==null)return;
-        String currentAmmo = gunStack.getOrCreateTagElement("ai_ammo").getString("existed_variant");
-        poseStack.pushPose();
-        poseStack.translate(16,16,0);
-        poseStack.scale(1.5f,1.5f,1);
-        graphics.drawString(mc.font,currentAmmo,(float)(width - 70) / 1.5F, (float)(height - 43) / 1.5F,ammoCountColor,false);
-        poseStack.popPose();
+        String[] currentAmmo = AmmoInjector.getAmmoVariantInGun(gunStack).split(":");
+        if(currentAmmo.length<2)return;
+        graphics.drawString(mc.font,currentAmmo[1],(float)(width - 75) / 1.5F, (float)(height - 72) / 1.5F,ammoCountColor,false);
     }
 }

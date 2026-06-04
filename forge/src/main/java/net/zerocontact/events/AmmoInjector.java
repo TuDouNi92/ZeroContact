@@ -3,7 +3,6 @@ package net.zerocontact.events;
 import com.tacz.guns.entity.EntityKineticBullet;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,11 +43,11 @@ public class AmmoInjector {
 
 
     //Read and bind Bullet and Gun in the spawn event
-    public static @Nullable AmmoContext read(ItemStack stack) {
+    public static AmmoContext read(ItemStack stack) {
         if (stack.getTag() == null) return null;
         CompoundTag tag = stack.getTag().getCompound("ai_ammo");
         String id = tag.getString("ai_ammoId");
-        String variant = tag.getString("variant");
+        String variant = tag.getString("existed_variant");
         float damageFactor = tag.getFloat("ai_damageFactor");
         int level = tag.getInt("ai_penetrate_level");
         float flesh = tag.getFloat("ai_flesh_damage");
@@ -56,10 +55,11 @@ public class AmmoInjector {
         return new AmmoContext(new CaliberVariantDamageHelper.Caliber(id, variant, damageFactor, level, flesh, stackSize));
     }
 
-    public static void copyTags(ItemStack ammoStack, ItemStack gunStack) {
-        if (ammoStack.getTag() == null) return;
-        CompoundTag ammoTag = ammoStack.getTag().getCompound("ai_ammo");
-        gunStack.getOrCreateTag().put("ai_ammo", ammoTag.copy());
+
+    public static void copyTags(ItemStack left, ItemStack right) {
+        if (left.getTag() == null) return;
+        CompoundTag ammoTag = left.getTag().getCompound("ai_ammo");
+        right.getOrCreateTag().put("ai_ammo", ammoTag.copy());
     }
 
     //Bind in spawn
@@ -75,5 +75,21 @@ public class AmmoInjector {
     //Consume in hurt event
     public static void consume(EntityKineticBullet bullet) {
         mapping.remove(bullet.getUUID());
+    }
+
+    public static String getAmmoVariantInGun(ItemStack gunStack) {
+        return gunStack.getOrCreateTagElement("ai_ammo").getString("existed_variant");
+    }
+
+    public static void setAmmoVariantInGun(ItemStack gunStack, String selectedVariant) {
+        gunStack.getOrCreateTag().getCompound("ai_ammo").putString("existed_variant", selectedVariant);
+    }
+
+    public static String getClientSelectedAmmoVariant(ItemStack gunStack) {
+        return gunStack.getOrCreateTag().getCompound("ai_ammo").getString("selected_variant");
+    }
+
+    public static void setClientSelectedAmmoVariant(ItemStack gunStack, String selectedAmmoKey) {
+        gunStack.getOrCreateTagElement("ai_ammo").putString("selected_variant", selectedAmmoKey);
     }
 }

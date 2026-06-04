@@ -5,7 +5,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.client.interaction.KeyBindingHandler;
 import net.zerocontact.client.menu.AmmoSelectorMenu;
@@ -18,7 +17,7 @@ public class AmmoSelectorScreen extends AbstractContainerScreen<AmmoSelectorMenu
     private final AmmoSelectorRenderUtil.Ring ring = new AmmoSelectorRenderUtil.Ring(
             (float) mc.getWindow().getGuiScaledWidth() / 2,
             (float) mc.getWindow().getGuiScaledHeight() / 2,
-            64,
+            24,
             96,
             menu.ammo.size(),
             4f
@@ -50,7 +49,7 @@ public class AmmoSelectorScreen extends AbstractContainerScreen<AmmoSelectorMenu
         AmmoSelectorRenderUtil.drawSegmentedRing(
                 guiGraphics,
                 ring,
-                16,
+                32,
                 0x55000000
         );
         renderAmmoLabel(ring, guiGraphics);
@@ -60,7 +59,7 @@ public class AmmoSelectorScreen extends AbstractContainerScreen<AmmoSelectorMenu
     private static void renderHighLight(GuiGraphics guiGraphics, int mouseX, int mouseY, AmmoSelectorRenderUtil.Ring ring) {
         int index = AmmoSelectorRenderUtil.getHoveredSegment(mouseX, mouseY, ring);
         if (AmmoSelectorRenderUtil.getHoveredSegment(mouseX, mouseY, ring) != -1) {
-            AmmoSelectorRenderUtil.drawSegmentedRingPart(guiGraphics, ring, index, 16, 0x33FFFFFF);
+            AmmoSelectorRenderUtil.drawSegmentedRingPart(guiGraphics, ring, index, 32, 0x33FFFFFF);
         }
     }
 

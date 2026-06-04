@@ -8,16 +8,21 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.zerocontact.events.AmmoInjector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ServerAmmoSelector {
@@ -31,9 +36,7 @@ public class ServerAmmoSelector {
             ItemStack selectedAmmoStack = msg.ammoItem();
             ResourceLocation selectedAmmoKey = ForgeRegistries.ITEMS.getKey(selectedAmmoStack.getItem());
             if (selectedAmmoKey == null) return;
-            gunStack
-                    .getOrCreateTagElement("ai_ammo")
-                    .putString("selected_variant", selectedAmmoKey.toString());
+            AmmoInjector.setClientSelectedAmmoVariant(gunStack,selectedAmmoKey.toString());
             ModMessages.sendToPlayer(new NetworkHandler.ClientAmmoReloadPacket(), player);
         });
     }
@@ -86,30 +89,36 @@ public class ServerAmmoSelector {
         };
     }
 
-    public static int dropAmmoFromGun(LivingEntity entity, ItemStack gunStack, ItemStack newAmmoStack, int neededAmount) {
+    public static int dropAmmoFromGun(LivingEntity entity, ItemStack gunStack, ItemStack newAmmoStack, int neededAmount, @Nullable ItemStack rigs) {
         if (!(entity instanceof ServerPlayer player)) return neededAmount;
+        Consumer<ItemStack> paybackFunc = stack -> player.getInventory().placeItemBackInInventory(stack);
+        if (rigs != null && rigs.getCapability(ForgeCapabilities.ITEM_HANDLER, null).isPresent()) {
+            IItemHandler rigsHandler = (IItemHandler) rigs.getCapability(ForgeCapabilities.ITEM_HANDLER, null).cast();
+            paybackFunc = stack -> addToRigs(stack, rigsHandler, player.getInventory());
+        }
         CompoundTag gunTag = gunStack.getTag();
         IGun gun = IGun.getIGunOrNull(gunStack);
         if (gun == null) return neededAmount;
         if (gunTag == null) return neededAmount;
-        String existedAmmoKey = gunTag.getCompound("ai_ammo").getString("existed_variant");
+        String existedAmmoKey = AmmoInjector.getAmmoVariantInGun(gunStack);
         Item existedAmmo = ForgeRegistries.ITEMS.getValue(new ResourceLocation(existedAmmoKey));
         if (existedAmmo == null) return neededAmount;
         if (!newAmmoStack.is(existedAmmo)) {
             int currentAmmoCount = gun.getCurrentAmmoCount(gunStack);
             if (existedAmmo instanceof AmmoItem || existedAmmo.equals(Items.AIR)) {
+                Consumer<ItemStack> finalPaybackFunc = paybackFunc;
                 TimelessAPI.getCommonGunIndex(gun.getGunId(gunStack)).ifPresent(index -> {
                     ResourceLocation vanillaAmmoIdResource = index.getGunData().getAmmoId();
                     ItemStack vanillaAmmoStack = AmmoItemBuilder.create().setId(vanillaAmmoIdResource).setCount(currentAmmoCount).build();
                     if (currentAmmoCount == 0 && vanillaAmmoStack.getCount() != currentAmmoCount) {
                         vanillaAmmoStack.setCount(currentAmmoCount);
                     }
-                    player.getInventory().add(vanillaAmmoStack);
+                    finalPaybackFunc.accept(vanillaAmmoStack);
                 });
             } else {
                 ItemStack defaultInstanceStack = existedAmmo.getDefaultInstance();
                 defaultInstanceStack.setCount(currentAmmoCount);
-                player.getInventory().add(defaultInstanceStack);
+                paybackFunc.accept(defaultInstanceStack);
             }
             neededAmount += currentAmmoCount;
             gun.setCurrentAmmoCount(gunStack, 0);
@@ -117,8 +126,18 @@ public class ServerAmmoSelector {
         return neededAmount;
     }
 
+    private static void addToRigs(ItemStack stack, IItemHandler rigsHandler, Inventory playerInv) {
+        ItemStack remain = stack;
+        for (int i = 0; i < rigsHandler.getSlots() && !remain.isEmpty(); i++) {
+            remain = rigsHandler.insertItem(i, remain, false);
+        }
+        if (!remain.isEmpty()) {
+            playerInv.placeItemBackInInventory(remain);
+        }
+    }
+
     public static boolean isNeededAmmo(ItemStack checkAmmoStack, ItemStack gunStack) {
-        String ammoId = gunStack.getOrCreateTag().getCompound("ai_ammo").getString("existed_variant");
+        String ammoId = AmmoInjector.getAmmoVariantInGun(gunStack);
         Item ammoItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(ammoId));
         if (ammoItem == null) return false;
         return checkAmmoStack.is(ammoItem);

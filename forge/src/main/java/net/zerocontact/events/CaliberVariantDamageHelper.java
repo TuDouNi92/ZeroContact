@@ -10,6 +10,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.command.CommandManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -96,19 +97,20 @@ public enum CaliberVariantDamageHelper {
      * @param penetrationClass The penetration level for damage interceptor, bypassed when the feature is off
      * @param fleshDamage      The flesh damage for damage interceptor, bypassed when the feature is off
      */
-    public record Caliber(String id, String variant, float baseDamageFactor, int penetrationClass, float fleshDamage, int stackSize) {
+    public record Caliber(String id, String variant, float baseDamageFactor, int penetrationClass, float fleshDamage,
+                          int stackSize) {
         public Caliber(String id, float baseDamageFactor, int penetrationClass, float fleshDamage) {
-            this(id, DEFAULT, baseDamageFactor, penetrationClass, fleshDamage,30);
+            this(id, DEFAULT, baseDamageFactor, penetrationClass, fleshDamage, 30);
         }
 
         @Override
         public boolean equals(Object obj) {
-            return obj instanceof Caliber caliber && Objects.equals(id, caliber.id);
+            return obj instanceof Caliber caliber && Objects.equals(id, caliber.id) && Objects.equals(variant, caliber.variant.split(":")[1]);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(id);
+            return Objects.hash(id, variant);
         }
     }
 
@@ -122,24 +124,28 @@ public enum CaliberVariantDamageHelper {
      */
     private static <E> Optional<Caliber> getMatchedCaliber(DamageSource source, Set<E> set) {
         AtomicReference<Optional<Caliber>> result = new AtomicReference<>(Optional.empty());
-        if (!source.is(ModDamageTypes.BULLETS_TAG)) return Optional.empty();
-        Optional.ofNullable(source.getDirectEntity()).ifPresent(entity -> {
-            if (entity instanceof EntityKineticBullet bullet) {
-                for (E caliberData : set) {
-                    if (caliberData instanceof CaliberVariantDamageHelper caliberEnum) {
-                        if (caliberEnum.caliber.id.equals(bullet.getAmmoId().toString())) {
-                            result.set(Optional.of(caliberEnum.caliber));
-                        }
+        if (!(source.getDirectEntity() instanceof EntityKineticBullet bullet)) return result.get();
+        @Nullable AmmoInjector.AmmoContext ammoContext = AmmoInjector.get(bullet);
+        if (!source.is(ModDamageTypes.BULLETS_TAG) || ammoContext == null) return result.get();
 
-                    } else if (caliberData instanceof Caliber caliber) {
-                        if (caliber.id.equals(bullet.getAmmoId().toString())) {
-                            result.set(Optional.of(caliber));
-                        }
-                    }
+        for (E caliberData : set) {
+            if (caliberData instanceof CaliberVariantDamageHelper caliberEnum) {
+                if (caliberEnum.caliber.id.equals(bullet.getAmmoId().toString())) {
+                    result.set(Optional.of(caliberEnum.caliber));
+                    break;
+                }
+
+            } else if (caliberData instanceof Caliber caliber) {
+                if (caliber.equals(ammoContext.caliber())) {
+                    result.set(Optional.of(caliber));
+                    break;
+                }
+                else if(caliber.id.equals(ammoContext.caliber().id) &&caliber.variant.equals(DEFAULT)){
+                    result.set(Optional.of(caliber));
+                    break;
                 }
             }
-
-        });
+        }
         return result.get();
     }
 
