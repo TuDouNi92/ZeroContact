@@ -3,8 +3,10 @@ package net.zerocontact.mixin;
 import com.tacz.guns.api.item.IAmmo;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.item.ModernKineticGunScriptAPI;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -23,8 +25,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
+
 @Mixin(ModernKineticGunScriptAPI.class)
-public class TaczModernKinetGunScriptAPIMixin {
+public abstract class TaczModernKinetGunScriptAPIMixin {
     @Shadow(remap = false)
     private LivingEntity shooter;
     @Shadow(remap = false)
@@ -35,21 +40,44 @@ public class TaczModernKinetGunScriptAPIMixin {
     @Inject(method = "consumeAmmoFromPlayer", at = @At("HEAD"), remap = false, cancellable = true)
     public void zeroContact$consumeAmmoFromPlayerRigs(int neededAmount, CallbackInfoReturnable<Integer> cir) {
         ItemStack rigs = EventUtil.getCuriosStackFirst(shooter, "rigs");
-        if (rigs.isEmpty()) {
-            shooter.getCapability(ForgeCapabilities.ITEM_HANDLER, null).ifPresent(itemHandler -> zeroContact$extractSyncTag(neededAmount, cir, itemHandler, null));
-        } else {
-            rigs.getCapability(ForgeCapabilities.ITEM_HANDLER, null).map(itemHandler -> zeroContact$extractSyncTag(neededAmount, cir, itemHandler, rigs));
+        if (shooter instanceof ServerPlayer player) {
+            if (!player.isCreative()) {
+                if (rigs.isEmpty()) {
+                    shooter.getCapability(ForgeCapabilities.ITEM_HANDLER, null).ifPresent(itemHandler -> zeroContact$extractSyncTag(neededAmount, cir, itemHandler, null));
+                } else {
+                    rigs.getCapability(ForgeCapabilities.ITEM_HANDLER, null).map(itemHandler -> zeroContact$extractSyncTag(neededAmount, cir, itemHandler, rigs));
+                }
+            } else {
+                zeroContact$extractSyncTag(neededAmount, cir, zeroContact$getCreativeHandler(), null);
+            }
         }
         cir.cancel();
+    }
+
+    @Inject(method = "isReloadingNeedConsumeAmmo", at = @At("RETURN"), remap = false, cancellable = true)
+    private void zeroContact$creativeConsumeFakeAmmo(CallbackInfoReturnable<Boolean> cir) {
+        cir.setReturnValue(true);
+    }
+
+
+    @Unique
+    private IItemHandler zeroContact$getCreativeHandler() {
+        IItemHandler itemHandler = new ItemStackHandler(0);
+        if (!(shooter instanceof ServerPlayer player)) return itemHandler;
+        LinkedHashMap<ItemStack, Integer> ammoWrap = ServerAmmoSelector.getCreativeAmmoForHeldGun(player);
+        NonNullList<ItemStack> stackNonNullList = ammoWrap.keySet().stream().peek(stack -> stack.setCount(stack.getMaxStackSize())).collect(Collectors.toCollection(NonNullList::create));
+        if (stackNonNullList.isEmpty()) return itemHandler;
+        itemHandler = new ItemStackHandler(stackNonNullList);
+        return itemHandler;
     }
 
     @Unique
     private int zeroContact$extractSyncTag(int neededAmount, CallbackInfoReturnable<Integer> cir, IItemHandler itemHandler, @Nullable ItemStack rigs) {
         int ammoCount = 0;
-            IItemHandler modifiedHandler = ServerAmmoSelector.filteredAmmoHandler(itemHandler, AmmoInjector.getClientSelectedAmmoVariant(itemStack));
-            ammoCount = zeroContact$getAmmoCount(modifiedHandler, ammoCount, rigs);
-            int actualNeededAmount = zeroContact$checkDropAmmo(neededAmount, rigs);
-            zeroContact$extractAmmo(itemStack, AmmoInjector.getClientSelectedAmmoVariant(itemStack), actualNeededAmount, cir, itemHandler, modifiedHandler, ammoCount, rigs);
+        IItemHandler modifiedHandler = ServerAmmoSelector.filteredAmmoHandler(itemHandler, AmmoInjector.getClientSelectedAmmoVariant(itemStack));
+        ammoCount = zeroContact$getAmmoCount(modifiedHandler, ammoCount, rigs);
+        int actualNeededAmount = zeroContact$checkDropAmmo(neededAmount, rigs);
+        zeroContact$extractAmmo(itemStack, AmmoInjector.getClientSelectedAmmoVariant(itemStack), actualNeededAmount, cir, itemHandler, modifiedHandler, ammoCount, rigs);
         return ammoCount;
     }
 
@@ -59,7 +87,7 @@ public class TaczModernKinetGunScriptAPIMixin {
         if (itemHandler instanceof ItemStackHandler itemStackHandler && rigs != null) {
             rigs.getOrCreateTag().put("inventory", itemStackHandler.serializeNBT().getList("Items", Tag.TAG_COMPOUND));
         }
-        AmmoInjector.setAmmoVariantInGun(gunStack,selectedVariant);
+        AmmoInjector.setAmmoVariantInGun(gunStack, selectedVariant);
         cir.setReturnValue(result);
     }
 

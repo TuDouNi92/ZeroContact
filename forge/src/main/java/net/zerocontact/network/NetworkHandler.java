@@ -232,7 +232,7 @@ public class NetworkHandler {
             if (player == null) return;
             context.enqueueWork(() -> {
                 if (!IGun.mainHandHoldGun(player)) return;
-                LinkedHashMap<ItemStack, Integer> ammoMap = AmmoSelectorMenu.getAmmoCount(player);
+                LinkedHashMap<ItemStack, Integer> ammoMap = ServerAmmoSelector.getCreativeAmmoForHeldGun(player);
                 NetworkHooks.openScreen(
                         player,
                         new SimpleMenuProvider((id, inv, __) -> new AmmoSelectorMenu(id, ammoMap, inv), Component.translatable("")),

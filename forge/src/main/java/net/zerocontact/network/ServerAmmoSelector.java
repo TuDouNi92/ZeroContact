@@ -1,6 +1,7 @@
 package net.zerocontact.network;
 
 import com.tacz.guns.api.TimelessAPI;
+import com.tacz.guns.api.item.IAmmo;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.builder.AmmoItemBuilder;
 import com.tacz.guns.item.AmmoItem;
@@ -16,14 +17,21 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.zerocontact.datagen.GenerationRecord;
+import net.zerocontact.datagen.ItemAdapter;
 import net.zerocontact.events.AmmoInjector;
+import net.zerocontact.events.EventUtil;
+import net.zerocontact.item.ammo.GenerateAmmo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class ServerAmmoSelector {
     public static void handle(NetworkHandler.SelectAmmoPacket msg, Supplier<NetworkEvent.Context> supplier) {
@@ -90,7 +98,7 @@ public class ServerAmmoSelector {
     }
 
     public static int dropAmmoFromGun(LivingEntity entity, ItemStack gunStack, ItemStack newAmmoStack, int neededAmount, @Nullable ItemStack rigs) {
-        if (!(entity instanceof ServerPlayer player)) return neededAmount;
+        if (!(entity instanceof ServerPlayer player) || player.isCreative()) return neededAmount;
         Consumer<ItemStack> paybackFunc = stack -> player.getInventory().placeItemBackInInventory(stack);
         if (rigs != null && rigs.getCapability(ForgeCapabilities.ITEM_HANDLER, null).isPresent()) {
             IItemHandler rigsHandler = (IItemHandler) rigs.getCapability(ForgeCapabilities.ITEM_HANDLER, null).cast();
@@ -141,5 +149,76 @@ public class ServerAmmoSelector {
         Item ammoItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(ammoId));
         if (ammoItem == null) return false;
         return checkAmmoStack.is(ammoItem);
+    }
+
+    public static LinkedHashMap<ItemStack, Integer> getCreativeAmmoForHeldGun(ServerPlayer player) {
+        Inventory vanillaInv = player.getInventory();
+        ItemStack gunItem = player.getMainHandItem();
+        LinkedHashMap<ItemWrapper, Integer> items = new LinkedHashMap<>();
+        if (player.isCreative()) {
+            ItemAdapter.AmmoAdapter.items
+                    .stream()
+                    .map(GenerationRecord::item)
+                    .filter(item -> item instanceof GenerateAmmo ammo && ammo.isAmmoOfGun(gunItem, ammo.getDefaultInstance()))
+                    .forEach(item -> items.merge(
+                            new ItemWrapper(item, ((GenerateAmmo) item).getAmmoId(item.getDefaultInstance()).toString()),
+                            9999,
+                            (l,r)->r
+                    ));
+        } else {
+            for (ItemStack ammoStack : vanillaInv.items) {
+                if (ammoStack.getItem() instanceof IAmmo ammo
+                        && ammo.isAmmoOfGun(gunItem, ammoStack)) {
+                    items.merge(
+                            new ItemWrapper(ammoStack.getItem(), ammo.getAmmoId(ammoStack).toString()),
+                            ammoStack.getCount(),
+                            Integer::sum
+                    );
+                }
+            }
+            ItemStack rigs = EventUtil.getCuriosStackFirst(player, "rigs");
+            rigs.getCapability(
+                    ForgeCapabilities.ITEM_HANDLER,
+                    null
+            ).ifPresent(cap -> {
+                for (int i = 0; i < cap.getSlots(); i++) {
+                    ItemStack ammoStack = cap.getStackInSlot(i);
+                    if (ammoStack.getItem() instanceof IAmmo ammo
+                            && ammo.isAmmoOfGun(gunItem, ammoStack)) {
+                        items.merge(
+                                new ItemWrapper(ammoStack.getItem(), ammo.getAmmoId(ammoStack).toString()),
+                                ammoStack.getCount(),
+                                Integer::sum
+                        );
+                    }
+                }
+            });
+        }
+        return items.entrySet()
+                .stream()
+                .collect(
+                        Collectors.toMap(
+                                entry -> {
+                                    ItemStack stack = new ItemStack(entry.getKey().item, 1);
+                                    stack.getOrCreateTag().putString("AmmoId", entry.getKey().ammoId());
+                                    return stack;
+                                },
+                                Map.Entry::getValue,
+                                Integer::sum,
+                                LinkedHashMap::new
+                        )
+                );
+    }
+
+    public record ItemWrapper(Item item, String ammoId) {
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof ItemWrapper wrapper && wrapper.item.equals(item);
+        }
+
+        @Override
+        public int hashCode() {
+            return item.hashCode();
+        }
     }
 }
