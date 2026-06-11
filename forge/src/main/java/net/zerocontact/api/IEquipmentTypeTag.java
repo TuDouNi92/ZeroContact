@@ -15,13 +15,18 @@ public interface IEquipmentTypeTag {
         RIGS("RIGS"),
         PLATE("PLATE");
         private final String name;
-
+        private final String translationValue;
         EquipmentType(String name) {
             this.name = name;
+            this.translationValue = "tooltip.zerocontact.armor_category"+"."+name.toLowerCase();
         }
 
         public String getTypeId() {
             return name;
+        }
+
+        public String getTranslationValue() {
+            return translationValue;
         }
     }
 

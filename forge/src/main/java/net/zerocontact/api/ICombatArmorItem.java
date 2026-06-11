@@ -58,12 +58,19 @@ public interface ICombatArmorItem {
                     .append(": ")
                     .withStyle(ChatFormatting.GOLD)
                     .append(
-                            Component.literal(tag.getArmorType().getTypeId())
+                            Component.translatable(tag.getArmorType().getTranslationValue())
                                     .withStyle(ChatFormatting.YELLOW)
                     );
             tooltipComponents.add(armorCategoryLabel);
         }
         if (stack.getItem() instanceof ICombatArmorItem combatArmorItem) {
+            Component protectionLevel = Component.translatable("tooltip.zerocontact.armor_protection")
+                    .append(":")
+                    .withStyle(ChatFormatting.GOLD)
+                    .append(
+                            Component.literal(String.valueOf(combatArmorItem.getAbsorb()))
+                                    .withStyle(ChatFormatting.YELLOW)
+                    );
             Component armorBluntReduction = Component.translatable("tooltip.zerocontact.armor_blunt_reduction")
                     .append(": ")
                     .withStyle(ChatFormatting.GOLD)
@@ -78,6 +85,7 @@ public interface ICombatArmorItem {
                             Component.literal(String.valueOf(combatArmorItem.generatePenetrated()))
                                     .withStyle(ChatFormatting.YELLOW)
                     );
+            tooltipComponents.add(protectionLevel);
             tooltipComponents.add(armorBluntReduction);
             tooltipComponents.add(armorPenetrateReduction);
         }
