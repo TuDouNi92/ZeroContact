@@ -31,7 +31,11 @@ public class ZeroContactForge {
     private static void regConfig() {
         ModLoadingContext.get().registerConfig(
                 ModConfig.Type.COMMON,
-                ModConfigs.CONFIG_SPEC
+                ModConfigs.COMMON_CONFIG_SPEC
+        );
+        ModLoadingContext.get().registerConfig(
+                ModConfig.Type.CLIENT,
+                ModConfigs.CLIENT_CONFIG_SPEC
         );
     }
 
