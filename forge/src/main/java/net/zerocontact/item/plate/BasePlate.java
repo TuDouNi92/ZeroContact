@@ -38,8 +38,8 @@ public class BasePlate extends ArmorItem implements PlateInfoProvider, GeoItem {
     private final int absorb;
     private final float movementFix;
 
-    private BasePlate(int defense, int absorb, float bluntReduction, float penetrateReduction, float movementFix, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
-        super(PlateBaseMaterial.ARMOR_STEEL, Type.CHESTPLATE, new Properties());
+    private BasePlate(int durability, int defense, int absorb, float bluntReduction, float penetrateReduction, float movementFix, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+        super(PlateBaseMaterial.ARMOR_STEEL, Type.CHESTPLATE, new Properties().defaultDurability(durability));
         this.texture = texture;
         this.model = model;
         this.animation = animation;
@@ -75,8 +75,8 @@ public class BasePlate extends ArmorItem implements PlateInfoProvider, GeoItem {
         return geoCache;
     }
 
-    public static BasePlate createGeoPlate(int defense, int absorb, float bluntReduction, float penetrateReduction, float movementFix, String texture, String model, @NotNull String animation) {
-        return new BasePlate(defense, absorb, bluntReduction, penetrateReduction, movementFix, new ResourceLocation(MOD_ID, texture), new ResourceLocation(MOD_ID, model), new ResourceLocation(MOD_ID, animation));
+    public static BasePlate createGeoPlate(int durability, int defense, int absorb, float bluntReduction, float penetrateReduction, float movementFix, String texture, String model, @NotNull String animation) {
+        return new BasePlate(durability, defense, absorb, bluntReduction, penetrateReduction, movementFix, new ResourceLocation(MOD_ID, texture), new ResourceLocation(MOD_ID, model), new ResourceLocation(MOD_ID, animation));
     }
 
     @Override
