@@ -15,6 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.datagen.GenerationRecord;
@@ -100,9 +101,11 @@ public class ServerAmmoSelector {
     public static int dropAmmoFromGun(LivingEntity entity, ItemStack gunStack, ItemStack newAmmoStack, int neededAmount, @Nullable ItemStack rigs) {
         if (!(entity instanceof ServerPlayer player) || player.isCreative()) return neededAmount;
         Consumer<ItemStack> paybackFunc = stack -> player.getInventory().placeItemBackInInventory(stack);
-        if (rigs != null && rigs.getCapability(ForgeCapabilities.ITEM_HANDLER, null).isPresent()) {
-            IItemHandler rigsHandler = (IItemHandler) rigs.getCapability(ForgeCapabilities.ITEM_HANDLER, null).cast();
-            paybackFunc = stack -> addToRigs(stack, rigsHandler, player.getInventory());
+        if (rigs != null) {
+            IItemHandler handler = rigs.getCapability(ForgeCapabilities.ITEM_HANDLER, null).orElse(new ItemStackHandler());
+            if (handler.getSlots() > 0) {
+                paybackFunc = stack -> addToRigs(stack, handler, player.getInventory());
+            }
         }
         CompoundTag gunTag = gunStack.getTag();
         IGun gun = IGun.getIGunOrNull(gunStack);
