@@ -44,7 +44,7 @@ public class ServerAmmoSelector {
             ItemStack selectedAmmoStack = msg.ammoItem();
             ResourceLocation selectedAmmoKey = ForgeRegistries.ITEMS.getKey(selectedAmmoStack.getItem());
             if (selectedAmmoKey == null) return;
-            AmmoInjector.setClientSelectedAmmoVariant(gunStack,selectedAmmoKey.toString());
+            AmmoInjector.setClientSelectedAmmoVariant(gunStack, selectedAmmoKey.toString());
             ModMessages.sendToPlayer(new NetworkHandler.ClientAmmoReloadPacket(), player);
         });
     }
@@ -155,7 +155,17 @@ public class ServerAmmoSelector {
         Inventory vanillaInv = player.getInventory();
         ItemStack gunItem = player.getMainHandItem();
         LinkedHashMap<ItemWrapper, Integer> items = new LinkedHashMap<>();
+        LinkedHashMap<ItemStack, Integer> finalItems = new LinkedHashMap<>();
         if (player.isCreative()) {
+            IGun iGun = IGun.getIGunOrNull(gunItem);
+            if (iGun != null) {
+                TimelessAPI.getCommonGunIndex(iGun.getGunId(gunItem)).ifPresent((index) -> {
+                    ResourceLocation defaultAmmoId = index.getGunData().getAmmoId();
+                    ItemStack defaultAmmoStack = AmmoItemBuilder.create().setId(defaultAmmoId).setCount(1).build();
+                    finalItems.put(defaultAmmoStack, 9999);
+                });
+            }
+
             ItemAdapter.AmmoAdapter.items
                     .stream()
                     .map(GenerationRecord::item)
@@ -163,7 +173,7 @@ public class ServerAmmoSelector {
                     .forEach(item -> items.merge(
                             new ItemWrapper(item, ((GenerateAmmo) item).getAmmoId(item.getDefaultInstance()).toString()),
                             9999,
-                            (l,r)->r
+                            (l, r) -> r
                     ));
         } else {
             for (ItemStack ammoStack : vanillaInv.items) {
@@ -194,7 +204,7 @@ public class ServerAmmoSelector {
                 }
             });
         }
-        return items.entrySet()
+        finalItems.putAll((Map<? extends ItemStack, ? extends Integer>) items.entrySet()
                 .stream()
                 .collect(
                         Collectors.toMap(
@@ -207,7 +217,8 @@ public class ServerAmmoSelector {
                                 Integer::sum,
                                 LinkedHashMap::new
                         )
-                );
+                ));
+        return finalItems;
     }
 
     public record ItemWrapper(Item item, String ammoId) {

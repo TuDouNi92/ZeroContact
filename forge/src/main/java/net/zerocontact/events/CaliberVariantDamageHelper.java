@@ -140,10 +140,6 @@ public enum CaliberVariantDamageHelper {
                     result.set(Optional.of(caliber));
                     break;
                 }
-                else if(caliber.id.equals(ammoContext.caliber().id) &&caliber.variant.equals(DEFAULT)){
-                    result.set(Optional.of(caliber));
-                    break;
-                }
             }
         }
         return result.get();
@@ -167,20 +163,19 @@ public enum CaliberVariantDamageHelper {
                     mergedCaliberSet.removeAll(experimentalBallisticSet);
                     mergedCaliberSet.addAll(experimentalBallisticSet);
                     getMatchedCaliber(source, mergedCaliberSet).ifPresent(caliber -> {
-                        double balanceDamage = caliber.baseDamageFactor * Mth.sqrt(original) * 0.75f;
-                        double fleshDamage = getPenetratedDamage(caliber, hurtCanHold);
-                        if (fleshDamage != 0) {
-                            output.set(fleshDamage * provider.generatePenetrated());
+                        double penetratedDamage = getPenetratedDamage(caliber, hurtCanHold);
+                        if (penetratedDamage != 0) {
+                            output.set(penetratedDamage * provider.generatePenetrated());
                         } else {
-                            output.set(balanceDamage * provider.generateBlunt());
+                            output.set(caliber.fleshDamage * provider.generateBlunt());
                         }
                     });
                 } else {
                     getMatchedCaliber(source, caliberVariantDamageHelperEnumSet).ifPresent(caliber -> {
                         double balanceDamage = caliber.baseDamageFactor * Mth.sqrt(original) * 0.75f;
-                        double fleshDamage = getPenetratedDamage(caliber, hurtCanHold);
-                        if (fleshDamage != 0) {
-                            output.set(fleshDamage * provider.generatePenetrated());
+                        double penetratedDamage = getPenetratedDamage(caliber, hurtCanHold);
+                        if (penetratedDamage != 0) {
+                            output.set(penetratedDamage * provider.generatePenetrated());
                         } else {
                             output.set(balanceDamage * provider.generateBlunt());
                         }
