@@ -1,6 +1,5 @@
 package net.zerocontact.entity.ai.controller.phase;
 
-import net.minecraft.world.entity.PathfinderMob;
 import net.zerocontact.api.IPhaseContext;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.entity.ai.controller.GlobalStateController;
@@ -23,7 +22,7 @@ public class AttackPhaseContext implements IPhaseContext {
     private void cacheTargetIfNoVision() {
 
         if(!PerformGunAttackGoal.isInVisionToShoot(armedRaider)){
-            armedRaider.stateController.getShareContext().cacheTarget = (PathfinderMob) armedRaider.getTarget();
+            armedRaider.stateController.getShareContext().cacheTarget = armedRaider.getTarget();
             armedRaider.stateController.getShareContext().signalPhases.add(GlobalStateController.SignalPhase.WANTS_CHASE);
         }
     }
