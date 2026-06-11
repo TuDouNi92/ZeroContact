@@ -54,13 +54,13 @@ public class ItemsRegForge {
     public static void onReg(RegisterEvent event) {
         if (!event.getRegistryKey().equals(Registries.ITEM)) return;
         RegistrySupplier<BasePlate> CULT_LOCUST_PLATE = ItemsReg.ITEMS.register("plate_cult_locust",
-                () -> BasePlate.createGeoPlate(0, 8, 0.1f, 0.75f, -0.025f, "textures/models/plate/plate_cult_locust.png", "geo/plate/plate_cult_locust.geo.json", ""));
+                () -> BasePlate.createGeoPlate(128,0, 8, 0.1f, 0.75f, -0.025f, "textures/models/plate/plate_cult_locust.png", "geo/plate/plate_cult_locust.geo.json", ""));
         RegistrySupplier<BasePlate> BALLISTIC_CONVOY = ItemsReg.ITEMS.register("plate_ballistic_convoy",
-                () -> BasePlate.createGeoPlate(0, 11, 0.05f, 0.87f, -0.05f, "textures/models/plate/plate_cult_locust.png", "geo/plate/plate_cult_locust.geo.json", ""));
+                () -> BasePlate.createGeoPlate(168,0, 11, 0.05f, 0.87f, -0.05f, "textures/models/plate/plate_cult_locust.png", "geo/plate/plate_cult_locust.geo.json", ""));
         RegistrySupplier<BasePlate> STEEL_PLATE = ItemsReg.ITEMS.register("plate_steel",
-                () -> BasePlate.createGeoPlate(0, 6, 0.25f, 0.9f, -0.010f, "textures/models/plate/plate_cult_locust.png", "geo/plate/plate_cult_locust.geo.json", ""));
+                () -> BasePlate.createGeoPlate(72,0, 6, 0.25f, 0.9f, -0.010f, "textures/models/plate/plate_cult_locust.png", "geo/plate/plate_cult_locust.geo.json", ""));
         RegistrySupplier<BasePlate> SLIME_PLATE = ItemsReg.ITEMS.register("plate_slime",
-                () -> BasePlate.createGeoPlate(0, 4, 0.2f, 1f, 0f, "textures/models/plate/plate_slime.png", "geo/plate/plate_slime.geo.json", ""));
+                () -> BasePlate.createGeoPlate(32,0, 4, 0.2f, 1f, 0f, "textures/models/plate/plate_slime.png", "geo/plate/plate_slime.geo.json", ""));
         RegistrySupplier<ForgeSpawnEggItem> RAIDER_EGG = ItemsReg.ITEMS.register("raider_egg", () -> new ForgeSpawnEggItem(ModEntitiesReg.ARMED_RAIDER, 0x3d6145, 0xcfc08a, new Item.Properties()));
 
         RegistrySupplier<FastMt> FAST_MT = ItemsReg.ITEMS.register("fast_mt", () -> new FastMt(ArmorMaterials.IRON, ArmorItem.Type.HELMET, new Item.Properties(), 8));

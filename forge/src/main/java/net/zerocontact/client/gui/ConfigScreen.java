@@ -24,6 +24,20 @@ public class ConfigScreen extends Screen {
     @Override
     protected void init() {
         int y = this.height / 4;
+
+        addRenderableWidget(
+                Button.builder(
+                                Component.literal("Play bullet whizz wfx: " + ModConfigs.CLIENT.playBulletSound.get()),
+                                btn -> {
+                                    boolean flip = !ModConfigs.CLIENT.playBulletSound.get();
+                                    ModConfigs.CLIENT.playBulletSound.set(flip);
+                                    btn.setMessage(Component.literal("Play bullet whizz wfx: " + flip));
+                                }
+                        )
+                        .bounds(this.width / 2 - 100, y-30, 200, 20)
+                        .build()
+        );
+
         addRenderableWidget(
                 Button.builder(
                                 Component.literal("Enable stamina: " + ModConfigs.COMMON.enableStamina.get()),
@@ -48,6 +62,10 @@ public class ConfigScreen extends Screen {
                 ).bounds(this.width / 2 - 100, y + 30, 200, 20).build()
         );
     }
+
+
+
+
 
     @Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
