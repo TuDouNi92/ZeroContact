@@ -2,12 +2,10 @@ package net.zerocontact.entity;
 
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.entity.IGunOperator;
-import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.item.AmmoItem;
 import com.tacz.guns.resource.index.CommonAmmoIndex;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
-import com.tacz.guns.sound.SoundManager;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -46,7 +44,6 @@ import net.zerocontact.entity.ai.controller.GlobalStateController;
 import net.zerocontact.entity.ai.goal.AvoidGoal;
 import net.zerocontact.entity.ai.goal.PerformGunAttackGoal;
 import net.zerocontact.entity.ai.goal.RestrictedGoalWrapper;
-import net.zerocontact.registries.ModSoundEventsReg;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -59,7 +56,6 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.Objects;
-import java.util.Optional;
 
 public class ArmedRaider extends PatrollingMonster implements GeoEntity, InventoryCarrier {
     private final AnimatableInstanceCache geoCache;
@@ -269,22 +265,9 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
 
     private void listenPlayVoice() {
         GlobalStateController.VoiceManager manager = stateController.voiceManager;
-        if (manager.tryUse(GlobalStateController.Voice.CONTACT, 200)) {
-            if (stateController.getPhase() == GlobalStateController.Phase.ATTACK) {
-                this.playSound(ModSoundEventsReg.RAIDER_CONTACT, 1, 1);
-            }
-        }
-        if(manager.tryUse(GlobalStateController.Voice.RELOAD,40)){
-            if (operator.getSynReloadState().getStateType().isReloading()) {
-                this.playSound(ModSoundEventsReg.RAIDER_RELOAD, 1, 1);
-                IGun gun = IGun.getIGunOrNull(this.getMainHandItem());
-                Optional.ofNullable(gun).ifPresent(iGun -> SoundManager.sendSoundToNearby(
-                        this,
-                        6,
-                        iGun.getGunId(this.getMainHandItem()), iGun.getGunDisplayId(this.getMainHandItem()),
-                        SoundManager.RELOAD_EMPTY_SOUND, 1, 1));
-            }
-        }
+        manager.playSound(GlobalStateController.Voice.CONTACT,this,()->stateController.getPhase() == GlobalStateController.Phase.ATTACK);
+        manager.playSound(GlobalStateController.Voice.RELOAD,this,()->operator.getSynReloadState().getStateType().isReloading());
+        manager.playSound(GlobalStateController.Voice.HURT,this,()->stateController.getShareContext().isHurt);
     }
 
     @Override

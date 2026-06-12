@@ -23,22 +23,64 @@
       }
     ]
   },
-  "usec1_enemy_contact_01_n_01": {
+  "raider/usec1_enemy_contact_01_n_01": {
     "sounds": [
       {
-        "name": "zerocontact:usec1_enemy_contact_01_n_01",
+        "name": "zerocontact:raider/usec1_enemy_contact_01_n_01",
         "type": "file"
       }
     ]
   },
-  "usec1_weap_reload_01_n_01": {
+  "raider/usec1_enemy_contact_04_l_01": {
     "sounds": [
       {
-        "name": "zerocontact:usec1_weap_reload_01_n_01",
+        "name": "zerocontact:raider/usec1_enemy_contact_04_l_01",
         "type": "file"
       }
     ]
   },
+  "raider/usec1_hit_01_01": {
+    "sounds": [
+      {
+        "name": "zerocontact:raider/usec1_hit_01_01",
+        "type": "file"
+      }
+    ]
+  },
+  "raider/usec1_hit_04_01": {
+    "sounds": [
+      {
+        "name": "zerocontact:raider/usec1_hit_04_01",
+        "type": "file"
+      }
+    ]
+  },
+  "raider/usec1_hit_05_01": {
+    "sounds": [
+      {
+        "name": "zerocontact:raider/usec1_hit_05_01",
+        "type": "file"
+      }
+    ]
+  },
+
+  "raider/usec1_weap_reload_01_n_01": {
+    "sounds": [
+      {
+        "name": "zerocontact:raider/usec1_weap_reload_01_n_01",
+        "type": "file"
+      }
+    ]
+  },
+  "raider/usec1_weap_reload_02_l_01": {
+    "sounds": [
+      {
+        "name": "zerocontact:raider/usec1_weap_reload_02_l_01",
+        "type": "file"
+      }
+    ]
+  },
+
   "bullet_1": {
     "sounds": [
       {
