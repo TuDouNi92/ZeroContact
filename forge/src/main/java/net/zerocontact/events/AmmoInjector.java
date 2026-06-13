@@ -2,7 +2,12 @@ package net.zerocontact.events;
 
 import com.tacz.guns.entity.EntityKineticBullet;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.zerocontact.item.ammo.GenerateAmmo;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,8 +20,7 @@ public class AmmoInjector {
 
     private static final Map<UUID, AmmoContext> mapping = new HashMap<>();
 
-
-    //Write for data-driven needs
+    //Write for data-driven registration
     public static void write(AmmoContext context, ItemStack stack) {
         CompoundTag tag = new CompoundTag();
         CaliberVariantDamageHelper.Caliber caliber = context.caliber;
@@ -25,20 +29,9 @@ public class AmmoInjector {
         tag.putFloat("ai_damageFactor", caliber.baseDamageFactor());
         tag.putInt("ai_penetrate_level", caliber.penetrationClass());
         tag.putFloat("ai_flesh_damage", caliber.fleshDamage());
+        tag.putFloat("ai_armor_damage", caliber.armorDamage());
         tag.putInt("stack_size", caliber.stackSize());
         stack.getOrCreateTag().put("ai_ammo", tag);
-    }
-
-    public static void write(AmmoContext context, CompoundTag tag) {
-        CompoundTag subTag = new CompoundTag();
-        CaliberVariantDamageHelper.Caliber caliber = context.caliber;
-        subTag.putString("ai_ammoId", caliber.id());
-        subTag.putString("variant", caliber.variant());
-        subTag.putFloat("ai_damageFactor", caliber.baseDamageFactor());
-        subTag.putInt("ai_penetrate_level", caliber.penetrationClass());
-        subTag.putFloat("ai_flesh_damage", caliber.fleshDamage());
-        subTag.putInt("stack_size", caliber.stackSize());
-        tag.put("ai_ammo", subTag);
     }
 
 
@@ -51,15 +44,28 @@ public class AmmoInjector {
         float damageFactor = tag.getFloat("ai_damageFactor");
         int level = tag.getInt("ai_penetrate_level");
         float flesh = tag.getFloat("ai_flesh_damage");
+        float armorDamage = tag.getFloat("ai_armor_damage");
         int stackSize = tag.getInt("stack_size");
-        return new AmmoContext(new CaliberVariantDamageHelper.Caliber(id, variant, damageFactor, level, flesh, stackSize));
+        return new AmmoContext(new CaliberVariantDamageHelper.Caliber(id, variant, damageFactor, level, flesh, armorDamage, stackSize));
     }
 
 
-    public static void copyTags(ItemStack left, ItemStack right) {
-        if (left.getTag() == null) return;
-        CompoundTag ammoTag = left.getTag().getCompound("ai_ammo");
-        right.getOrCreateTag().put("ai_ammo", ammoTag.copy());
+    private static void copyTags(CaliberVariantDamageHelper.Caliber defaultCaliber, ItemStack gun) {
+        String id = defaultCaliber.id();
+        float damageFactor = defaultCaliber.baseDamageFactor();
+        String variant = defaultCaliber.variant();
+        int level = defaultCaliber.penetrationClass();
+        float flesh = defaultCaliber.fleshDamage();
+        float armorDamage = defaultCaliber.armorDamage();
+        int stackSize = defaultCaliber.stackSize();
+        CompoundTag gunTag = gun.getOrCreateTagElement("ai_ammo");
+        gunTag.putString("ai_ammoId", id);
+        gunTag.putString("variant", variant);
+        gunTag.putFloat("ai_damageFactor", damageFactor);
+        gunTag.putInt("ai_penetrate_level", level);
+        gunTag.putFloat("ai_flesh_damage", flesh);
+        gunTag.putFloat("ai_armor_damage", armorDamage);
+        gunTag.putInt("stack_size", stackSize);
     }
 
     //Bind in spawn
@@ -68,7 +74,7 @@ public class AmmoInjector {
     }
 
     //Consume in hurt event
-    public static AmmoContext get(EntityKineticBullet bullet) {
+    public static @Nullable AmmoContext get(EntityKineticBullet bullet) {
         return mapping.get(bullet.getUUID());
     }
 
@@ -83,6 +89,10 @@ public class AmmoInjector {
 
     public static void setAmmoVariantInGun(ItemStack gunStack, String selectedVariant) {
         gunStack.getOrCreateTag().getCompound("ai_ammo").putString("existed_variant", selectedVariant);
+        Item ammoItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(selectedVariant));
+        if (!(ammoItem instanceof GenerateAmmo ammo)) return;
+        CaliberVariantDamageHelper.Caliber caliber = ammo.getDefualtCaliber();
+        copyTags(caliber, gunStack);
     }
 
     public static String getClientSelectedAmmoVariant(ItemStack gunStack) {

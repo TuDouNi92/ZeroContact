@@ -1,12 +1,11 @@
 package net.zerocontact.events;
 
 import com.tacz.guns.entity.EntityKineticBullet;
-import com.tacz.guns.init.ModDamageTypes;
 import com.tacz.guns.util.EntityUtil;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
@@ -14,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.zerocontact.api.IEquipmentTypeTag;
 import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.CuriosApi;
 
@@ -21,44 +21,33 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class EventUtil {
 
-    @Deprecated
-    //判断伤害源是否合法
-    public static boolean isDamageSourceValid(DamageSource damageSource) {
-        return damageSource.is(DamageTypes.ARROW)
-                || damageSource.is(DamageTypes.PLAYER_ATTACK)
-                || damageSource.is(DamageTypes.MOB_PROJECTILE)
-                || damageSource.is(ModDamageTypes.BULLET)
-                || damageSource.is(ModDamageTypes.BULLET_IGNORE_ARMOR)
-                || damageSource.is(DamageTypes.EXPLOSION)
-                || damageSource.is(DamageTypes.PLAYER_EXPLOSION);
-    }
-
     //判断入射角是否合法，服务于判断跳弹功能
     public static boolean isIncidentAngleValid(LivingEntity lv, DamageSource source) {
         double incidentAngle = getAngle(lv, source);
         double incidentAngleAbs = Math.abs(incidentAngle);
         if (incidentAngle != -361) {
-            if ((Math.abs(incidentAngleAbs - 90) <= 30) && (Math.abs(incidentAngleAbs - 90) >= 10)) {
-                return true;
-            }
+            return (Math.abs(incidentAngleAbs - 90) <= 30) && (Math.abs(incidentAngleAbs - 90) >= 10);
         }
         return false;
     }
 
-    public static ItemStack idHitFromBack(LivingEntity lv, DamageSource source) {
+    public static ItemStack getHitBodyPartStack(LivingEntity lv, DamageSource source) {
         double incidentAngleAbs = Math.abs(getAngle(lv, source));
-        AtomicReference<ItemStack> plate_stack = new AtomicReference<>(ItemStack.EMPTY);
+        AtomicReference<ItemStack> defenseStack = new AtomicReference<>(ItemStack.EMPTY);
+        if (lv.getItemBySlot(EquipmentSlot.CHEST).getItem() instanceof IEquipmentTypeTag tag && tag.getArmorType().equals(IEquipmentTypeTag.EquipmentType.ARMOR)) {
+            defenseStack.set(lv.getItemBySlot(EquipmentSlot.CHEST));
+            return defenseStack.get();
+        }
         CuriosApi.getCuriosInventory(lv).ifPresent(iCuriosItemHandler -> {
             if (incidentAngleAbs != 361) {
                 if (incidentAngleAbs > 90) {
-                    iCuriosItemHandler.getStacksHandler("front_plate").ifPresent(stacksHandler -> plate_stack.set(stacksHandler.getStacks().getStackInSlot(0)));
-
+                    iCuriosItemHandler.getStacksHandler("front_plate").ifPresent(stacksHandler -> defenseStack.set(stacksHandler.getStacks().getStackInSlot(0)));
                 } else {
-                    iCuriosItemHandler.getStacksHandler("back_plate").ifPresent(stacksHandler -> plate_stack.set(stacksHandler.getStacks().getStackInSlot(0)));
+                    iCuriosItemHandler.getStacksHandler("back_plate").ifPresent(stacksHandler -> defenseStack.set(stacksHandler.getStacks().getStackInSlot(0)));
                 }
             }
         });
-        return plate_stack.get();
+        return defenseStack.get();
     }
 
     private static double getAngle(LivingEntity lv, DamageSource source) {
@@ -90,13 +79,7 @@ public class EventUtil {
         Vec3 lookVec = player.getLookAngle();
         Vec3 reachVec = eyePos.add(lookVec.scale(range));
         AABB box = player.getBoundingBox().expandTowards(lookVec.scale(range)).inflate(1.0D);
-        EntityHitResult result = ProjectileUtil.getEntityHitResult(
-                player.level(), player, eyePos, reachVec, box, e ->
-                        e instanceof ServerPlayer sp
-                                && !sp.isSpectator()
-                                && sp.isPickable()
-                                && sp.isAlliedTo(player)
-        );
+        EntityHitResult result = ProjectileUtil.getEntityHitResult(player.level(), player, eyePos, reachVec, box, e -> e instanceof ServerPlayer sp && !sp.isSpectator() && sp.isPickable() && sp.isAlliedTo(player));
         return result != null ? (ServerPlayer) result.getEntity() : null;
     }
 

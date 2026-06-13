@@ -35,7 +35,7 @@ public class ZContentLoader implements IContentLoader {
             Path itemPath = pack.outerPack().resolve(ITEM_PATH);
             try {
                 List<Path> itemList = assetManager.getJsonListPathsFromPath(itemPath);
-                assetManager.deserializeFromJsonList(itemList, assetManager.getGson(), ItemGenData.class, (data, __) -> itemGenData.put(data,pack.tab()));
+                assetManager.deserializeFromJsonList(itemList, assetManager.getGson(), ItemGenData.class, (data, __) -> itemGenData.put(data, pack.tab()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -53,7 +53,7 @@ public class ZContentLoader implements IContentLoader {
                         assetManager.getGson(),
                         ExperimentalBallisticData.class,
                         (data, __) -> {
-                            itemGenData.put(data,pack.tab());
+                            itemGenData.put(data, pack.tab());
                             CaliberVariantDamageHelper.experimentalBallisticSet.
                                     add(
                                             new CaliberVariantDamageHelper.Caliber(
@@ -62,6 +62,7 @@ public class ZContentLoader implements IContentLoader {
                                                     data.baseDamageFactor,
                                                     data.penetrationClass,
                                                     data.fleshDamage,
+                                                    data.armorDamage,
                                                     data.stackSize
                                             )
                                     );

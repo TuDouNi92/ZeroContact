@@ -117,7 +117,7 @@ public class PlateEntityHurtEvent {
     }
 
     public static EventResult entityHurtRegister(LivingEntity lv, DamageSource source, float amount) {
-        if (PlateEntityHurtEvent.modifyDamage(lv, source, amount, EventUtil.idHitFromBack(lv, source))) {
+        if (PlateEntityHurtEvent.modifyDamage(lv, source, amount, EventUtil.getHitBodyPartStack(lv, source))) {
             return EventResult.interruptFalse();
         }
         return EventResult.pass();

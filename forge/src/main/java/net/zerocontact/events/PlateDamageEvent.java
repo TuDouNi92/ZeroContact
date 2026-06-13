@@ -12,12 +12,11 @@ import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.registries.ModSoundEventsReg;
-import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.Optional;
 
 public class PlateDamageEvent {
-    private static void DamagePlateModifier(
+    private static void modify(
             LivingEntity livingEntity,
             DamageSource damageSource,
             float amount,
@@ -28,12 +27,25 @@ public class PlateDamageEvent {
     }
 
     private static void damage(LivingEntity livingEntity, DamageSource damageSource, float amount, ItemStack stackInSlot) {
-        float durabilityLossFactor = 1;
+        float durabilityLossFactor = 0.1f;
+        float defaultArmorDamage = Math.min(amount * 0.1f, 10);
         int hits = stackInSlot.getOrCreateTag().getInt("hits") + 1;
         int durabilityLossAmount = 1;
         if (!stackInSlot.isEmpty() && (damageSource.is(ModDamageTypes.BULLETS_TAG) || damageSource.is(ZDamageTypes.ZC_DAMAGE))) {
-            if (stackInSlot.getItem() instanceof ICombatArmorItem provider) {
-                durabilityLossAmount = provider.generateLoss(amount, durabilityLossFactor, hits);
+            if (stackInSlot.getItem() instanceof ICombatArmorItem armorProvider) {
+                if (!(damageSource.getDirectEntity() instanceof EntityKineticBullet bullet)) return;
+                AmmoInjector.AmmoContext ammoContext = AmmoInjector.get(bullet);
+                float caliberArmorDamage;
+                if (ammoContext != null) {
+                    CaliberVariantDamageHelper.Caliber caliber = ammoContext.caliber();
+                    if (caliber.armorDamage() != 0) {
+                        caliberArmorDamage = getArmorDamage(caliber, armorProvider, caliber.armorDamage());
+                    } else {
+                        caliberArmorDamage = getArmorDamage(caliber,armorProvider,defaultArmorDamage);
+                    }
+                    durabilityLossAmount = Math.round(armorProvider.generateLoss(amount, durabilityLossFactor, hits) + caliberArmorDamage);
+                }
+
             }
             stackInSlot.getOrCreateTag().putInt("hits", hits);
             EntityKineticBullet.EntityResult result = EventUtil.getHitResult(damageSource);
@@ -47,7 +59,11 @@ public class PlateDamageEvent {
         }
     }
 
-    public static void DamageHelmet(EntityHurtByGunEvent event) {
+    private static float getArmorDamage(CaliberVariantDamageHelper.Caliber caliber, ICombatArmorItem provider, float baseDamage) {
+        return caliber.penetrationClass() * baseDamage * ((float) caliber.penetrationClass() / provider.getAbsorb());
+    }
+
+    public static void damageHelmet(EntityHurtByGunEvent event) {
         boolean isHeadshot = event.isHeadShot();
         if (!isHeadshot) return;
         Optional<Entity> entity = Optional.ofNullable(event.getHurtEntity());
@@ -67,7 +83,7 @@ public class PlateDamageEvent {
         });
     }
 
-    public static void DamagePlateRegister(LivingEntity entity, DamageSource damageSource, float amount) {
-        CuriosApi.getCuriosInventory(entity).ifPresent(inv -> DamagePlateModifier(entity, damageSource, amount, EventUtil.idHitFromBack(entity, damageSource)));
+    public static void register(LivingEntity entity, DamageSource damageSource, float amount) {
+        modify(entity, damageSource, amount, EventUtil.getHitBodyPartStack(entity, damageSource));
     }
 }

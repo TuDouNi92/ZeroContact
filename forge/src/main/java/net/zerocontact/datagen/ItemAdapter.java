@@ -180,6 +180,7 @@ public class ItemAdapter {
 
     public static class AmmoAdapter implements IAssetManager.GeneratableItem {
         public static final LinkedHashSet<GenerationRecord<?>> items = new LinkedHashSet<>();
+
         @Override
         public <T> LinkedHashSet<GenerationRecord<?>> deserializeItems(T data, String tab) {
             if (!(data instanceof ExperimentalBallisticData ammoData)) return items;
@@ -188,8 +189,9 @@ public class ItemAdapter {
             float baseDamageFactor = ammoData.baseDamageFactor;
             int penetrationClass = ammoData.penetrationClass;
             float fleshDamage = ammoData.fleshDamage;
+            float armorDamage = ammoData.armorDamage;
             int stackSize = ammoData.stackSize;
-            items.add(new GenerationRecord<>(variant, new GenerateAmmo(id, variant, baseDamageFactor, penetrationClass, fleshDamage, stackSize), tab));
+            items.add(new GenerationRecord<>(variant, new GenerateAmmo(id, variant, baseDamageFactor, penetrationClass, fleshDamage, armorDamage, stackSize), tab));
             return items;
         }
     }

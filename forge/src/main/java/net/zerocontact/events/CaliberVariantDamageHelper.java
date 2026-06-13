@@ -97,10 +97,10 @@ public enum CaliberVariantDamageHelper {
      * @param penetrationClass The penetration level for damage interceptor, bypassed when the feature is off
      * @param fleshDamage      The flesh damage for damage interceptor, bypassed when the feature is off
      */
-    public record Caliber(String id, String variant, float baseDamageFactor, int penetrationClass, float fleshDamage,
+    public record Caliber(String id, String variant, float baseDamageFactor, int penetrationClass, float fleshDamage, float armorDamage,
                           int stackSize) {
         public Caliber(String id, float baseDamageFactor, int penetrationClass, float fleshDamage) {
-            this(id, DEFAULT, baseDamageFactor, penetrationClass, fleshDamage, 30);
+            this(id, DEFAULT, baseDamageFactor, penetrationClass, fleshDamage,0, 30);
         }
 
         @Override
