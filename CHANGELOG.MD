@@ -181,3 +181,11 @@ Tutorials about customize your own datapack can be found in GitHub wiki.
 - Rebalancing calibers
 - Ai and animation optimization for the entity
 - Chinese localization
+
+## indev.1.1.2
+
+- Optimize tooltips for armors.
+- Add config to toggle bullet whizz.
+- Fix missing properties for plates.
+- Fix a crash caused by raider.
+- Add voices for raider.
