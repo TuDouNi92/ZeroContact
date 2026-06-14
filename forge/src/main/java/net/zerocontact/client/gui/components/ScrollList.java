@@ -122,4 +122,9 @@ public class ScrollList extends AbstractSelectionList<ScrollList.GearEntry> {
         this.addEntry(entry);
     }
 
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        screen.setFocused(this);
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
 }

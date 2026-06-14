@@ -33,7 +33,7 @@ public class WorkbenchScreen extends AbstractContainerScreen<WorkbenchMenu> {
         this.guiWidthMax = this.getGuiLeft() + imageWidth;
         this.guiHeightMax = this.getGuiTop() + imageHeight;
         this.button = PlainTextButton.builder(
-                        Component.translatable("gui.zerocontact.workbench.submit"), pressed -> onPressedSubmit(button)
+                        Component.translatable("gui.zerocontact.workbench.submit"), pressed -> onPressedSubmit()
                 )
                 .bounds(guiWidthMax - 42, guiHeightMax - 14, 36, 12)
                 .build();
@@ -51,7 +51,7 @@ public class WorkbenchScreen extends AbstractContainerScreen<WorkbenchMenu> {
         addRenderableWidget(scrollList);
     }
 
-    private void onPressedSubmit(Button button) {
+    private void onPressedSubmit() {
         ScrollList.GearEntry entry = scrollList.getSelected();
         if (menu.blockEntity != null) {
             if (entry != null) {
@@ -91,5 +91,13 @@ public class WorkbenchScreen extends AbstractContainerScreen<WorkbenchMenu> {
         guiGraphics.fill(getGuiLeft(), guiHeightMax, guiWidthMax, guiHeightMax + 1, 0xbb888888);
         guiGraphics.fill(getGuiLeft(), getGuiTop(), getGuiLeft() - 1, guiHeightMax, 0xbb888888);
         guiGraphics.fill(guiWidthMax, getGuiTop(), guiWidthMax + 1, guiHeightMax, 0xbb888888);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        children().forEach(entry->{
+            entry.mouseDragged(mouseX,mouseY,button,dragX,dragY);
+        });
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 }
