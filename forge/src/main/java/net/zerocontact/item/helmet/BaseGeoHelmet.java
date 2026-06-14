@@ -18,6 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
+import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.client.renderer.HelmetRender;
 import net.zerocontact.item.PlateBaseMaterial;
 import net.zerocontact.models.GenerateModel;
@@ -31,7 +32,7 @@ import software.bernie.geckolib.core.animation.AnimatableManager;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class BaseGeoHelmet extends ArmorItem implements HelmetInfoProvider, GeoItem, ICombatArmorItem {
+public class BaseGeoHelmet extends ArmorItem implements HelmetInfoProvider, GeoItem, ICombatArmorItem, IEquipmentTypeTag {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     private final int defense;
     private final int defaultDurability;
@@ -120,5 +121,10 @@ public class BaseGeoHelmet extends ArmorItem implements HelmetInfoProvider, GeoI
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
         ICombatArmorItem.super.appendHoverText(stack,level,tooltipComponents,isAdvanced);
+    }
+
+    @Override
+    public @NotNull IEquipmentTypeTag.EquipmentType getArmorType() {
+        return EquipmentType.HELMET;
     }
 }

@@ -7,13 +7,16 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkHooks;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.animation_data.AnimateData;
 import net.zerocontact.api.Toggleable;
 import net.zerocontact.client.ClientData;
@@ -188,14 +191,14 @@ public class NetworkHandler {
         }
     }
 
-    public record BuyGearsPacket(BlockPos pos, int recipeIndex) {
+    public record BuyGearsPacket(BlockPos pos, Item gearItem) {
         public void encode(FriendlyByteBuf buf) {
             buf.writeBlockPos(pos);
-            buf.writeInt(recipeIndex);
+            buf.writeItem(gearItem.getDefaultInstance());
         }
 
         public static BuyGearsPacket decode(FriendlyByteBuf buf) {
-            return new BuyGearsPacket(buf.readBlockPos(), buf.readInt());
+            return new BuyGearsPacket(buf.readBlockPos(), buf.readItem().getItem());
         }
 
         public static void handle(BuyGearsPacket msg, Supplier<NetworkEvent.Context> supplier) {
@@ -205,16 +208,18 @@ public class NetworkHandler {
                 if (player == null) return;
                 BlockEntity be = player.level().getBlockEntity(msg.pos);
                 if (!(be instanceof WorkBenchEntity workBenchEntity)) return;
-                if (msg.recipeIndex < 0 || msg.recipeIndex >= WorkBenchEntity.recipeData.size()) return;
-                GearRecipeData gearRecipeData = WorkBenchEntity.recipeData.get(msg.recipeIndex);
+                ResourceLocation gearKey = ForgeRegistries.ITEMS.getKey(msg.gearItem);
+                if(gearKey==null)return;
+                Optional<GearRecipeData> gearRecipeData = WorkBenchEntity.recipeData.stream().filter(data->data.gearId.equals(gearKey.toString())).findFirst();
+                if(gearRecipeData.isEmpty())return;
                 if (!player.isCreative()) {
-                    if (workBenchEntity.canCraft(gearRecipeData, player)) {
-                        workBenchEntity.consumeItems(gearRecipeData, player);
-                        workBenchEntity.giveItem(player, WorkBenchEntity.recipeData.get(msg.recipeIndex()).gearId);
+                    if (workBenchEntity.canCraft(gearRecipeData.get(), player)) {
+                        workBenchEntity.consumeItems(gearRecipeData.get(), player);
+                        workBenchEntity.giveItem(player, gearKey.toString());
                     }
-                } else {
-                    workBenchEntity.giveItem(player, WorkBenchEntity.recipeData.get(msg.recipeIndex()).gearId);
+                    return;
                 }
+                workBenchEntity.giveItem(player, gearKey.toString());
             });
         }
     }

@@ -102,6 +102,14 @@ public class ScrollList extends AbstractSelectionList<ScrollList.GearEntry> {
         }
     }
 
+    @Override
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        GearEntry entry = getEntryAtPosition(mouseX,mouseY);
+        if(entry==null)return;
+        guiGraphics.renderTooltip(screen.getMinecraft().font, entry.gearItem.getDefaultInstance(),mouseX,mouseY);
+    }
+
     //Fking bugjump, a scrollbar blocked me for the entire day
     @Override
     protected int getScrollbarPosition() {

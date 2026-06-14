@@ -13,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.api.PlateInfoProvider;
 import net.zerocontact.client.renderer.ItemRender;
 import net.zerocontact.item.PlateBaseMaterial;
@@ -29,7 +30,7 @@ import java.util.function.Consumer;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
 
-public class BasePlate extends ArmorItem implements PlateInfoProvider, GeoItem {
+public class BasePlate extends ArmorItem implements PlateInfoProvider, GeoItem, IEquipmentTypeTag {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private final ResourceLocation texture, model, animation;
     private final float bluntReduction;
@@ -117,5 +118,10 @@ public class BasePlate extends ArmorItem implements PlateInfoProvider, GeoItem {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
         PlateInfoProvider.super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
+    }
+
+    @Override
+    public @NotNull IEquipmentTypeTag.EquipmentType getArmorType() {
+        return EquipmentType.PLATE;
     }
 }
