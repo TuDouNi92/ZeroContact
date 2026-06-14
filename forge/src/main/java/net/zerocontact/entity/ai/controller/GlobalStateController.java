@@ -1,6 +1,10 @@
 package net.zerocontact.entity.ai.controller;
 
+import com.tacz.guns.api.item.IGun;
+import com.tacz.guns.sound.SoundManager;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.LivingEntity;
 import net.zerocontact.forge.EnvHelper;
 import net.zerocontact.api.IPhaseContext;
 import net.zerocontact.entity.ArmedRaider;
@@ -9,9 +13,11 @@ import net.zerocontact.entity.ai.controller.phase.AttackPhaseContext;
 import net.zerocontact.entity.ai.controller.phase.ChasePhaseContext;
 import net.zerocontact.entity.ai.controller.phase.EscapePhaseContext;
 import net.zerocontact.entity.ai.controller.phase.IdlePhaseContext;
+import net.zerocontact.registries.ModSoundEventsReg;
 
-import java.util.EnumMap;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class GlobalStateController {
     public final VoiceManager voiceManager;
@@ -37,27 +43,57 @@ public class GlobalStateController {
             return voicesIntegerMap.getOrDefault(voice, 0) == 0;
         }
 
-        public boolean tryUse(Voice voice, int cooldown) {
+        private boolean tryUse(Voice voice) {
             if (!canPlay(voice)) {
                 return false;
             }
-            voicesIntegerMap.put(voice, cooldown);
+            voicesIntegerMap.put(voice, voice.coolDown);
             return true;
         }
 
-        public void reset(Voice voice) {
-            voicesIntegerMap.remove(voice);
-        }
-
-        public void resetAll() {
-            voicesIntegerMap.clear();
+        public void playSound(Voice voice, LivingEntity entity, Supplier<Boolean> supplier) {
+            if (tryUse(voice) && supplier.get()) {
+                voice.playSound(entity);
+                voice.entityConsumer.accept(entity);
+            }
         }
     }
 
     public enum Voice {
-        CONTACT,
-        RELOAD,
-        HURT
+        CONTACT(200, ModSoundEventsReg.RAIDER_CONTACT_1, ModSoundEventsReg.RAIDER_CONTACT_2),
+        RELOAD(100,
+                entity -> {
+                    IGun gun = IGun.getIGunOrNull(entity.getMainHandItem());
+                    Optional.ofNullable(gun).ifPresent(iGun -> SoundManager.sendSoundToNearby(
+                            entity,
+                            6,
+                            iGun.getGunId(entity.getMainHandItem()), iGun.getGunDisplayId(entity.getMainHandItem()),
+                            SoundManager.RELOAD_EMPTY_SOUND, 1, 1));
+                },
+                ModSoundEventsReg.RAIDER_RELOAD_1, ModSoundEventsReg.RAIDER_RELOAD_2),
+        HURT(40, ModSoundEventsReg.RAIDER_HIT_1, ModSoundEventsReg.RAIDER_HIT_2, ModSoundEventsReg.RAIDER_HIT_3);
+
+        public final int coolDown;
+        private final Set<SoundEvent> soundEventSet;
+        private final Consumer<LivingEntity> entityConsumer;
+
+        Voice(int coolDown, SoundEvent... soundEvent) {
+            this.coolDown = coolDown;
+            this.entityConsumer = e -> {
+            };
+            this.soundEventSet = new HashSet<>(Arrays.stream(soundEvent).toList());
+        }
+
+        Voice(int coolDown, Consumer<LivingEntity> entityConsumer, SoundEvent... soundEvent) {
+            this.coolDown = coolDown;
+            this.entityConsumer = entityConsumer;
+            this.soundEventSet = new HashSet<>(Arrays.stream(soundEvent).toList());
+        }
+
+        void playSound(LivingEntity entity) {
+            SoundEvent pickedSound = ModSoundEventsReg.randomSound(soundEventSet);
+            entity.playSound(pickedSound);
+        }
     }
 
     public enum SignalPhase {
@@ -124,7 +160,7 @@ public class GlobalStateController {
             case ESCAPE -> new EscapePhaseContext(armedRaider);
         };
         this.currentContext.onEnter();
-        if(EnvHelper.DEBUG){
+        if (EnvHelper.DEBUG) {
             armedRaider.setCustomName(
                     Component.literal(
                             phase.name()
