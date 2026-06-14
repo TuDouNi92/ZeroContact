@@ -3,13 +3,17 @@ package net.zerocontact.client.gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.client.interaction.KeyBindingHandler;
 import net.zerocontact.client.menu.AmmoSelectorMenu;
 import net.zerocontact.network.ModMessages;
 import net.zerocontact.network.NetworkHandler;
+import net.zerocontact.registries.ModSoundEventsReg;
 import org.jetbrains.annotations.NotNull;
 
 public class AmmoSelectorScreen extends AbstractContainerScreen<AmmoSelectorMenu> {
@@ -22,6 +26,7 @@ public class AmmoSelectorScreen extends AbstractContainerScreen<AmmoSelectorMenu
             menu.ammo.size(),
             4f
     );
+    private boolean lastHovered;
 
     public AmmoSelectorScreen(AmmoSelectorMenu menu, Inventory playerInv, Component title) {
         super(menu, playerInv, title);
@@ -36,11 +41,23 @@ public class AmmoSelectorScreen extends AbstractContainerScreen<AmmoSelectorMenu
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderSelector(guiGraphics, mouseX, mouseY);
+        playSelectedSound(mouseX, mouseY);
     }
 
     @Override
     protected void renderBg(@NotNull GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
 
+    }
+
+    void playSelectedSound(int mouseX, int mouseY) {
+        boolean hovered = isMouseOver(mouseX, mouseY);
+        if (hovered && !lastHovered) {
+            ClientLevel level = mc.level;
+            Player player = mc.player;
+            if (level == null || player == null) return;
+            level.playSound(player, player.blockPosition(), ModSoundEventsReg.GUI_SELECTOR, SoundSource.PLAYERS);
+        }
+        lastHovered = hovered;
     }
 
     public void renderSelector(GuiGraphics guiGraphics, int mouseX, int mouseY) {
@@ -81,8 +98,8 @@ public class AmmoSelectorScreen extends AbstractContainerScreen<AmmoSelectorMenu
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
-            int ammoIndex = AmmoSelectorRenderUtil.getHoveredSegment(mouseX, mouseY,ring);
-            if(ammoIndex ==-1)return true;
+            int ammoIndex = AmmoSelectorRenderUtil.getHoveredSegment(mouseX, mouseY, ring);
+            if (ammoIndex == -1) return true;
             ItemStack ammoItem = menu.ammo.get(ammoIndex).getKey();
             ModMessages.sendToServer(new NetworkHandler.SelectAmmoPacket(ammoItem));
             return true;
@@ -96,6 +113,12 @@ public class AmmoSelectorScreen extends AbstractContainerScreen<AmmoSelectorMenu
             onClose();
         }
         return false;
+    }
+
+    @Override
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        int hoveredIndex = AmmoSelectorRenderUtil.getHoveredSegment(mouseX, mouseY, ring);
+        return hoveredIndex != -1;
     }
 
     @Override
