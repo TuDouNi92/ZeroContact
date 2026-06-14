@@ -67,7 +67,7 @@ public class GunHudOverlayMixin {
         if (gunStack == null) return;
         String currentAmmoKey = AmmoInjector.getAmmoVariantInGun(gunStack);
         ItemStack currentAmmo = AmmoInjector.getDefaultStack(currentAmmoKey);
-        Component ammoName = Component.translatable(currentAmmo.getDescriptionId());
+        Component ammoName = Component.literal("\uD83E\uDC35 ").append(Component.translatable(currentAmmo.getDescriptionId()));
         if (!(currentAmmo.getItem() instanceof GenerateAmmo))
             ammoName = Component.translatable("hud.zerocontact.ammo.default");
         float scale = 0.5f;

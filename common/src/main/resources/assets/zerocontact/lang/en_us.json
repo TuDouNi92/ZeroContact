@@ -86,7 +86,7 @@
   "tooltip.zerocontact.pack.zero_contact":"ZeroContact Default Pack",
   "tooltip.zerocontact.gun.ammoVariant": "Ammo variant",
 
-  "hud.zerocontact.ammo.default": "Default ammo",
+  "hud.zerocontact.ammo.default": "\uD83E\uDC35 Default ammo",
 
   "block.zerocontact.thoughbook": "ThoughBook 67",
   "gui.zerocontact.workbench.title": "ThoughBook 67 -Order Gears online",

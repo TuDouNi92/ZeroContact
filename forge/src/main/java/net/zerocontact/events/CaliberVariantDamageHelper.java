@@ -81,7 +81,7 @@ public enum CaliberVariantDamageHelper {
     private final Caliber caliber;
     private static final EnumSet<CaliberVariantDamageHelper> caliberVariantDamageHelperEnumSet = EnumSet.allOf(CaliberVariantDamageHelper.class);
     public static final Set<Caliber> experimentalBallisticSet = new HashSet<>();
-    private static final String DEFAULT = "default";
+    private static final String DEFAULT = "tacz:ammo";
 
     CaliberVariantDamageHelper(Caliber caliber) {
         this.caliber = caliber;
@@ -105,7 +105,7 @@ public enum CaliberVariantDamageHelper {
 
         @Override
         public boolean equals(Object obj) {
-            return obj instanceof Caliber caliber && Objects.equals(id, caliber.id) && Objects.equals(variant, caliber.variant.split(":")[1]);
+            return obj instanceof Caliber caliber && Objects.equals(id, caliber.id) && (Objects.equals(variant, caliber.variant.split(":")[1]) || (Objects.equals(variant,caliber.variant)));
         }
 
         @Override

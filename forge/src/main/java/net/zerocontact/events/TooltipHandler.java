@@ -37,10 +37,11 @@ public class TooltipHandler {
         if (checkStack.getItem() instanceof IGun) {
             String ammoVariantId = AmmoInjector.getAmmoVariantInGun(checkStack);
             MutableComponent ammoLabel = Component.translatable("tooltip.zerocontact.gun.ammoVariant").withStyle(ChatFormatting.GOLD).append(":");
-            Component ammoValue = Component.translatable(AmmoInjector.getDefaultStack(ammoVariantId).getDescriptionId()).withStyle(ChatFormatting.YELLOW);
-            if (!(checkStack.getItem() instanceof GenerateAmmo))
-                ammoValue = Component.translatable("hud.zerocontact.ammo.default").withStyle(ChatFormatting.YELLOW);
-            ammoLabel.append(ammoValue);
+            ItemStack ammoStack = AmmoInjector.getDefaultStack(ammoVariantId);
+            Component ammoDesrciption = Component.literal("\uD83E\uDC35 ").append(Component.translatable(ammoStack.getDescriptionId())).withStyle(ChatFormatting.YELLOW);
+            if (!(ammoStack.getItem() instanceof GenerateAmmo))
+                ammoDesrciption = Component.translatable("hud.zerocontact.ammo.default").withStyle(ChatFormatting.YELLOW);
+            ammoLabel.append(ammoDesrciption);
             event.getToolTip().add(ammoLabel);
         }
     }
