@@ -29,7 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 
 @Mixin(ModernKineticGunScriptAPI.class)
-public abstract class TaczModernKinetGunScriptAPIMixin {
+public abstract class ModernKineticGunScriptAPIMixin {
     @Shadow(remap = false)
     private LivingEntity shooter;
     @Shadow(remap = false)
@@ -74,30 +74,11 @@ public abstract class TaczModernKinetGunScriptAPIMixin {
     @Unique
     private int zeroContact$extractSyncTag(int neededAmount, CallbackInfoReturnable<Integer> cir, IItemHandler itemHandler, @Nullable ItemStack rigs) {
         int ammoCount = 0;
-        IItemHandler modifiedHandler = ServerAmmoSelector.filteredAmmoHandler(itemHandler, AmmoInjector.getClientSelectedAmmoVariant(itemStack));
+        IItemHandler modifiedHandler = ServerAmmoSelector.filteredAmmoHandler(itemHandler, AmmoInjector.getClientSelectedAmmoVariant(itemStack),itemStack);
         ammoCount = zeroContact$getAmmoCount(modifiedHandler, ammoCount, rigs);
         int actualNeededAmount = zeroContact$checkDropAmmo(neededAmount, rigs);
         zeroContact$extractAmmo(itemStack, AmmoInjector.getClientSelectedAmmoVariant(itemStack), actualNeededAmount, cir, itemHandler, modifiedHandler, ammoCount, rigs);
         return ammoCount;
-    }
-
-    @Unique
-    private void zeroContact$extractAmmo(ItemStack gunStack, String selectedVariant, int neededAmount, CallbackInfoReturnable<Integer> cir, IItemHandler itemHandler, IItemHandler modifiedHandler, int ammoCount, @Nullable ItemStack rigs) {
-        int result = this.abstractGunItem.findAndExtractInventoryAmmo(modifiedHandler, itemStack, neededAmount);
-        if (itemHandler instanceof ItemStackHandler itemStackHandler && rigs != null) {
-            rigs.getOrCreateTag().put("inventory", itemStackHandler.serializeNBT().getList("Items", Tag.TAG_COMPOUND));
-        }
-        AmmoInjector.setAmmoVariantInGun(gunStack, selectedVariant);
-        cir.setReturnValue(result);
-    }
-
-    @Unique
-    private int zeroContact$checkDropAmmo(int neededAmount, @Nullable ItemStack rigs) {
-        String clientSelected = AmmoInjector.getClientSelectedAmmoVariant(itemStack);
-        if (clientSelected.isEmpty()) return neededAmount;
-        Item selectedItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(clientSelected));
-        if (selectedItem == null) return neededAmount;
-        return ServerAmmoSelector.dropAmmoFromGun(shooter, itemStack, new ItemStack(selectedItem), neededAmount, rigs);
     }
 
     @Unique
@@ -113,4 +94,24 @@ public abstract class TaczModernKinetGunScriptAPIMixin {
         }
         return ammoCount;
     }
+
+    @Unique
+    private int zeroContact$checkDropAmmo(int neededAmount, @Nullable ItemStack rigs) {
+        String clientSelected = AmmoInjector.getClientSelectedAmmoVariant(itemStack);
+        if (clientSelected.isEmpty()) return neededAmount;
+        Item selectedItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(clientSelected));
+        if (selectedItem == null) return neededAmount;
+        return ServerAmmoSelector.dropAmmoFromGun(shooter, itemStack, new ItemStack(selectedItem), neededAmount, rigs);
+    }
+
+    @Unique
+    private void zeroContact$extractAmmo(ItemStack gunStack, String selectedVariant, int neededAmount, CallbackInfoReturnable<Integer> cir, IItemHandler itemHandler, IItemHandler modifiedHandler, int ammoCount, @Nullable ItemStack rigs) {
+        int result = this.abstractGunItem.findAndExtractInventoryAmmo(modifiedHandler, itemStack, neededAmount);
+        if (itemHandler instanceof ItemStackHandler itemStackHandler && rigs != null) {
+            rigs.getOrCreateTag().put("inventory", itemStackHandler.serializeNBT().getList("Items", Tag.TAG_COMPOUND));
+        }
+        AmmoInjector.setAmmoVariantInGun(gunStack, selectedVariant);
+        cir.setReturnValue(result);
+    }
+
 }

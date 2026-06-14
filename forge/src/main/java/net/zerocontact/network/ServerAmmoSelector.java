@@ -2,10 +2,12 @@ package net.zerocontact.network;
 
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.IAmmo;
+import com.tacz.guns.api.item.IAmmoBox;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.builder.AmmoItemBuilder;
 import com.tacz.guns.item.AmmoItem;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -50,18 +52,21 @@ public class ServerAmmoSelector {
         });
     }
 
-    public static IItemHandler filteredAmmoHandler(IItemHandler raw, String selectedAmmoKey) {
+    public static IItemHandler filteredAmmoHandler(IItemHandler raw, String selectedAmmoKey, ItemStack gunStack) {
         List<Integer> mappedSlots = new ArrayList<>();
         for (int i = 0; i < raw.getSlots(); i++) {
-            ItemStack stack = raw.getStackInSlot(i);
-            ResourceLocation stackKey = ForgeRegistries.ITEMS.getKey(stack.getItem());
+            ItemStack checkAmmoStack = raw.getStackInSlot(i);
+            ResourceLocation stackKey = ForgeRegistries.ITEMS.getKey(checkAmmoStack.getItem());
             if (stackKey != null && stackKey.toString().equals(selectedAmmoKey)) {
                 mappedSlots.add(i);
             } else if (selectedAmmoKey.isEmpty()) {
-                ResourceLocation vanillaKey = ForgeRegistries.ITEMS.getKey(stack.getItem());
+                ResourceLocation vanillaKey = ForgeRegistries.ITEMS.getKey(checkAmmoStack.getItem());
                 if (vanillaKey != null && vanillaKey.toString().equals("tacz:ammo")) {
                     mappedSlots.add(i);
                 }
+            }
+            if (checkAmmoStack.getItem() instanceof IAmmoBox iAmmoBox && iAmmoBox.isAmmoBoxOfGun(gunStack, checkAmmoStack)) {
+                mappedSlots.add(i);
             }
         }
 
@@ -104,7 +109,7 @@ public class ServerAmmoSelector {
         if (rigs != null) {
             IItemHandler handler = rigs.getCapability(ForgeCapabilities.ITEM_HANDLER, null).orElse(new ItemStackHandler());
             if (handler.getSlots() > 0) {
-                paybackFunc = stack -> addToRigs(stack, handler, player.getInventory());
+                paybackFunc = stack -> addToRigs(rigs, stack, handler, player.getInventory());
             }
         }
         CompoundTag gunTag = gunStack.getTag();
@@ -137,21 +142,17 @@ public class ServerAmmoSelector {
         return neededAmount;
     }
 
-    private static void addToRigs(ItemStack stack, IItemHandler rigsHandler, Inventory playerInv) {
-        ItemStack remain = stack;
+    private static void addToRigs(ItemStack rigs, ItemStack ammoStack, IItemHandler rigsHandler, Inventory playerInv) {
+        ItemStack remain = ammoStack;
         for (int i = 0; i < rigsHandler.getSlots() && !remain.isEmpty(); i++) {
             remain = rigsHandler.insertItem(i, remain, false);
         }
         if (!remain.isEmpty()) {
             playerInv.placeItemBackInInventory(remain);
         }
-    }
-
-    public static boolean isNeededAmmo(ItemStack checkAmmoStack, ItemStack gunStack) {
-        String ammoId = AmmoInjector.getAmmoVariantInGun(gunStack);
-        Item ammoItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(ammoId));
-        if (ammoItem == null) return false;
-        return checkAmmoStack.is(ammoItem);
+        if (rigsHandler instanceof ItemStackHandler itemStackHandler && rigs != null) {
+            rigs.getOrCreateTag().put("inventory", itemStackHandler.serializeNBT().getList("Items", Tag.TAG_COMPOUND));
+        }
     }
 
     public static LinkedHashMap<ItemStack, Integer> getCreativeAmmoForHeldGun(ServerPlayer player) {

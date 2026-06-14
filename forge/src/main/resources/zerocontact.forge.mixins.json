@@ -4,8 +4,8 @@
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "mixins": [
-    "TaczModernKinetGunScriptAPIMixin",
-    "TaczAbstractGunItemMixin",
+    "ModernKineticGunScriptAPIMixin",
+    "AbstractGunItemMixin",
     "HeadshotHelmetMixin",
     "GunHudOverlayMixin"
   ],

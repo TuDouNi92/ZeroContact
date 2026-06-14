@@ -1,11 +1,14 @@
 package net.zerocontact.mixin;
 
 import com.tacz.guns.api.item.IAmmo;
+import com.tacz.guns.api.item.IAmmoBox;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.items.IItemHandler;
+import net.zerocontact.events.AmmoInjector;
 import net.zerocontact.events.EventUtil;
 import net.zerocontact.network.ServerAmmoSelector;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractGunItem.class)
-public class TaczAbstractGunItemMixin {
+public class AbstractGunItemMixin {
     @Unique
     private LivingEntity zeroContact$shooter;
 
@@ -26,13 +29,15 @@ public class TaczAbstractGunItemMixin {
         ItemStack rigsStack = EventUtil.getCuriosStackFirst(shooter, "rigs");
         rigsStack.getCapability(ForgeCapabilities.ITEM_HANDLER, null).map(iItemHandler -> {
             for (int i = 0; i < iItemHandler.getSlots(); i++) {
-                ItemStack ammoStack = iItemHandler.getStackInSlot(i);
-                if (ammoStack.getItem() instanceof IAmmo iAmmo && iAmmo.isAmmoOfGun(gunItem, ammoStack)) {
-                    boolean isNeededAmmo = ServerAmmoSelector.isNeededAmmo(ammoStack, gunItem);
-                    cir.setReturnValue(isNeededAmmo);
-                    return isNeededAmmo;
+                ItemStack checkAmmoStack = iItemHandler.getStackInSlot(i);
+                if (checkAmmoStack.getItem() instanceof IAmmo iAmmo && iAmmo.isAmmoOfGun(gunItem, checkAmmoStack)) {
+                    cir.setReturnValue(true);
+                    return false;
                 }
-                ;
+                if (checkAmmoStack.getItem() instanceof IAmmoBox iAmmoBox && iAmmoBox.isAmmoBoxOfGun(gunItem, checkAmmoStack)) {
+                    cir.setReturnValue(true);
+                    return false;
+                }
             }
             return false;
         });

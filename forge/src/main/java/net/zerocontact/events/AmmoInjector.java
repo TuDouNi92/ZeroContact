@@ -1,5 +1,6 @@
 package net.zerocontact.events;
 
+import com.tacz.guns.api.item.builder.AmmoItemBuilder;
 import com.tacz.guns.entity.EntityKineticBullet;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -86,6 +87,15 @@ public class AmmoInjector {
     public static String getAmmoVariantInGun(ItemStack gunStack) {
         return gunStack.getOrCreateTagElement("ai_ammo").getString("existed_variant");
     }
+
+    public static ItemStack getDefaultStack(String fullKey) {
+        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(fullKey));
+        if (item instanceof GenerateAmmo ammo) {
+            return ammo.getDefaultInstance();
+        }
+        return AmmoItemBuilder.create().build();
+    }
+
 
     public static void setAmmoVariantInGun(ItemStack gunStack, String selectedVariant) {
         gunStack.getOrCreateTag().getCompound("ai_ammo").putString("existed_variant", selectedVariant);
