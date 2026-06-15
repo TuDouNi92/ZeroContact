@@ -1,6 +1,7 @@
 package net.zerocontact.item.forge;
 
 import com.google.common.collect.Multimap;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -8,6 +9,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.api.PlateInfoProvider;
@@ -15,8 +18,10 @@ import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.item.PlateBaseMaterial;
 import net.zerocontact.item.SapiIV;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class GeneratePlateImpl extends SapiIV implements ICombatArmorItem, PlateInfoProvider, IEquipmentTypeTag {
@@ -103,5 +108,10 @@ public class GeneratePlateImpl extends SapiIV implements ICombatArmorItem, Plate
     @Override
     public @NotNull IEquipmentTypeTag.EquipmentType getArmorType() {
         return EquipmentType.PLATE;
+    }
+
+    @Override
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
+        PlateInfoProvider.super.appendHoverText(stack,level,tooltipComponents,isAdvanced);
     }
 }

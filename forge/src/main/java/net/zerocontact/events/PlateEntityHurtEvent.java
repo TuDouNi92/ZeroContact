@@ -29,7 +29,7 @@ public class PlateEntityHurtEvent {
         EntityKineticBullet.EntityResult result = EventUtil.getHitResult(source);
         boolean isHeadShot = result != null && result.isHeadshot();
         if (lv instanceof ServerPlayer serverPlayer && serverPlayer.isCreative()) return false;
-        DamageSource modifiedDamageSource = ZDamageTypes.create(lv.level());
+        DamageSource modifiedDamageSource = ZDamageTypes.create(lv.level(),source.getDirectEntity(),source.getEntity(),source.getSourcePosition());
         AtomicBoolean interruptResult = new AtomicBoolean();
         ItemStack armorSlot = lv.getItemBySlot(EquipmentSlot.CHEST);
         if (isHeadShot) return false;

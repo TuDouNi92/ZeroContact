@@ -71,11 +71,8 @@ public class ServerForgeEventBus {
     public static void regEvents() {
         ModMessages.register();
         TickEvent.PLAYER_PRE.register(PlayerStamina::staminaTick);
-        dev.architectury.event.events.common.EntityEvent.LIVING_HURT.register((lv, source, amount) -> {
-                    PlateDamageEvent.register(lv, source, amount);
-                    return PlateEntityHurtEvent.entityHurtRegister(lv, source, amount);
-                }
-        );
+        dev.architectury.event.events.common.EntityEvent.LIVING_HURT.register(PlateEntityHurtEvent::entityHurtRegister);
+        dev.architectury.event.events.common.EntityEvent.LIVING_HURT.register(PlateDamageEvent::register);
     }
 
     @SubscribeEvent

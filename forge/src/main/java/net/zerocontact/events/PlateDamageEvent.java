@@ -3,6 +3,8 @@ package net.zerocontact.events;
 import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
 import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.init.ModDamageTypes;
+import dev.architectury.event.EventResult;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -16,24 +18,26 @@ import net.zerocontact.registries.ModSoundEventsReg;
 import java.util.Optional;
 
 public class PlateDamageEvent {
-    private static void modify(
+    private static boolean modify(
             LivingEntity livingEntity,
             DamageSource damageSource,
             float amount,
             ItemStack plateSlot
     ) {
-        if (plateSlot.isEmpty()) return;
-        damage(livingEntity, damageSource, amount, plateSlot);
+        if (plateSlot.isEmpty()) return false;
+        return damage(livingEntity, damageSource, amount, plateSlot);
     }
 
-    private static void damage(LivingEntity livingEntity, DamageSource damageSource, float amount, ItemStack stackInSlot) {
+    private static boolean damage(LivingEntity livingEntity, DamageSource damageSource, float amount, ItemStack stackInSlot) {
+        if (damageSource.is(ModDamageTypes.BULLET_IGNORE_ARMOR) && damageSource.typeHolder().containsTag(DamageTypeTags.BYPASSES_ARMOR))
+            return true;
         float durabilityLossFactor = 0.1f;
         float defaultArmorDamage = Math.min(amount * 0.1f, 10);
         int hits = stackInSlot.getOrCreateTag().getInt("hits") + 1;
         int durabilityLossAmount = 1;
         if (!stackInSlot.isEmpty() && (damageSource.is(ModDamageTypes.BULLETS_TAG) || damageSource.is(ZDamageTypes.ZC_DAMAGE))) {
             if (stackInSlot.getItem() instanceof ICombatArmorItem armorProvider) {
-                if (!(damageSource.getDirectEntity() instanceof EntityKineticBullet bullet)) return;
+                if (!(damageSource.getDirectEntity() instanceof EntityKineticBullet bullet)) return false;
                 AmmoInjector.AmmoContext ammoContext = AmmoInjector.get(bullet);
                 float caliberArmorDamage;
                 if (ammoContext != null) {
@@ -41,22 +45,28 @@ public class PlateDamageEvent {
                     if (caliber.armorDamage() != 0) {
                         caliberArmorDamage = getArmorDamage(caliber, armorProvider, caliber.armorDamage());
                     } else {
-                        caliberArmorDamage = getArmorDamage(caliber,armorProvider,defaultArmorDamage);
+                        caliberArmorDamage = getArmorDamage(caliber, armorProvider, defaultArmorDamage);
                     }
-                    durabilityLossAmount = Math.round(armorProvider.generateLoss(amount, durabilityLossFactor, hits) + caliberArmorDamage);
+                    int armorLoss = armorProvider.generateLoss(caliberArmorDamage, durabilityLossFactor, hits);
+                    if (armorLoss <= 0) {
+                        durabilityLossAmount = ICombatArmorItem.generateLossDefault(caliberArmorDamage, durabilityLossFactor, hits);
+                    } else {
+                        durabilityLossAmount = armorLoss;
+                    }
                 }
 
             }
             stackInSlot.getOrCreateTag().putInt("hits", hits);
             EntityKineticBullet.EntityResult result = EventUtil.getHitResult(damageSource);
             if (result != null && result.isHeadshot()) {
-                return;
+                return false;
             }
             stackInSlot.hurtAndBreak(durabilityLossAmount, livingEntity, lv -> {
                 lv.playSound(ModSoundEventsReg.ARMOR_BROKEN_PLATE, 1.0f, 1.0f);
                 ZeroContactLogger.LOG.debug("{}的插板碎掉了！", lv.getName());
             });
         }
+        return false;
     }
 
     private static float getArmorDamage(CaliberVariantDamageHelper.Caliber caliber, ICombatArmorItem provider, float baseDamage) {
@@ -83,7 +93,7 @@ public class PlateDamageEvent {
         });
     }
 
-    public static void register(LivingEntity entity, DamageSource damageSource, float amount) {
-        modify(entity, damageSource, amount, EventUtil.getHitBodyPartStack(entity, damageSource));
+    public static EventResult register(LivingEntity entity, DamageSource damageSource, float amount) {
+        return modify(entity, damageSource, amount, EventUtil.getHitBodyPartStack(entity, damageSource)) ? EventResult.interruptFalse() : EventResult.pass();
     }
 }
