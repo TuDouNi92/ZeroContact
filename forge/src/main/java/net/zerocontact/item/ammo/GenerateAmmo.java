@@ -9,16 +9,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.zerocontact.api.IEquipmentTypeTag;
-import net.zerocontact.datagen.GenerationRecord;
-import net.zerocontact.datagen.ItemAdapter;
 import net.zerocontact.events.AmmoInjector;
 import net.zerocontact.events.CaliberVariantDamageHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
 
@@ -56,19 +52,7 @@ public class GenerateAmmo extends Item implements AmmoItemDataAccessor, IEquipme
 
     @Override
     public @NotNull ItemStack getDefaultInstance() {
-        LinkedHashSet<GenerationRecord<?>> ammoSet = ItemAdapter.AmmoAdapter.items;
-        ItemStack[] ammoStacks = {new ItemStack(this)};
-        Optional<GenerationRecord<?>> matchedRecord = ammoSet.stream().filter(record -> record.id().equals(ammoVariant)).findFirst();
-        matchedRecord.ifPresent(record -> {
-            if (record.item() instanceof GenerateAmmo ammo) {
-                ItemStack ammoStack = new ItemStack(ammo);
-                AmmoInjector.write(new AmmoInjector.AmmoContext(
-                        new CaliberVariantDamageHelper.Caliber(ammoId, ammoVariant, baseDamageFactor, penetrateClass, fleshDamage, armorDamage, stackSize)
-                ), ammoStack);
-                ammoStacks[0] = ammoStack;
-            }
-        });
-        return ammoStacks[0];
+        return new ItemStack(this);
     }
 
     @Override
@@ -89,7 +73,7 @@ public class GenerateAmmo extends Item implements AmmoItemDataAccessor, IEquipme
         Component fleshDamageHint = Component.translatable("tooltip.zerocontact.bullet_flesh_damage")
                 .append(":")
                 .withStyle(ChatFormatting.GOLD)
-                .append(Component.literal(String.valueOf(fleshDamage)).withStyle(ChatFormatting.YELLOW));;
+                .append(Component.literal(String.valueOf(fleshDamage)).withStyle(ChatFormatting.YELLOW));
         tooltipComponents.addAll(List.of(penetrationHint,armorDamageHint,fleshDamageHint));
         super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
     }

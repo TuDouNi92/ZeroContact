@@ -20,8 +20,6 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.zerocontact.datagen.GenerationRecord;
-import net.zerocontact.datagen.ItemAdapter;
 import net.zerocontact.events.AmmoInjector;
 import net.zerocontact.events.EventUtil;
 import net.zerocontact.item.ammo.GenerateAmmo;
@@ -170,12 +168,13 @@ public class ServerAmmoSelector {
                 });
             }
 
-            ItemAdapter.AmmoAdapter.items
+            ForgeRegistries.ITEMS.getKeys()
                     .stream()
-                    .map(GenerationRecord::item)
-                    .filter(item -> item instanceof GenerateAmmo ammo && ammo.isAmmoOfGun(gunItem, ammo.getDefaultInstance()))
-                    .forEach(item -> items.merge(
-                            new ItemWrapper(item, ((GenerateAmmo) item).getAmmoId(item.getDefaultInstance()).toString()),
+                    .map(ForgeRegistries.ITEMS::getValue)
+                    .filter(GenerateAmmo.class::isInstance)
+                    .map(GenerateAmmo.class::cast)
+                    .forEach(ammo -> items.merge(
+                            new ItemWrapper(ammo, ammo.getAmmoId(ammo.getDefaultInstance()).toString()),
                             9999,
                             (l, r) -> r
                     ));

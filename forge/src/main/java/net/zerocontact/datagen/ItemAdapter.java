@@ -179,10 +179,9 @@ public class ItemAdapter {
     }
 
     public static class AmmoAdapter implements IAssetManager.GeneratableItem {
-        public static final LinkedHashSet<GenerationRecord<?>> items = new LinkedHashSet<>();
-
         @Override
         public <T> LinkedHashSet<GenerationRecord<?>> deserializeItems(T data, String tab) {
+            LinkedHashSet<GenerationRecord<?>> items = new LinkedHashSet<>();
             if (!(data instanceof ExperimentalBallisticData ammoData)) return items;
             String id = ammoData.ammoId;
             String variant = ammoData.variant;
