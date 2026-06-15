@@ -12,7 +12,6 @@ import net.zerocontact.item.block.WorkBenchEntity;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
 
@@ -76,36 +75,34 @@ public class ZContentLoader implements IContentLoader {
 
     @Override
     public void loadRecipes(Set<Zpack> packs) {
-        packs.forEach(pack -> {
+        Map<String, List<GearRecipeData.IngredientItems>> merged = new HashMap<>();
+        for (Zpack pack : packs) {
             Path recipesPath = pack.outerPack().resolve(RECIPES_PATH);
             try {
-                List<Path> recipePath = assetManager.getJsonListPathsFromPath(recipesPath);
-                Map<String, List<GearRecipeData.IngredientItems>> overrideMap = new HashMap<>();
-                assetManager.deserializeFromJsonList(recipePath, assetManager.getGson(), GearRecipeData.class, (data, json) -> {
-                    if (json.getFileName().toString().equals(DEFAULT_RECIPE_NAME)) {
-                        WorkBenchEntity.recipeData.addAll(data.recipes);
-                    } else {
-                        data.recipes.forEach(recipe -> overrideMap.put(recipe.gearId, recipe.ingredientItems));
-                        WorkBenchEntity.recipeData.forEach(recipe -> {
-                            List<GearRecipeData.IngredientItems> override = overrideMap.get(recipe.gearId);
-                            if (override != null) {
-                                recipe.ingredientItems = override;
-                            }
-                            Set<String> existingId = WorkBenchEntity.recipeData.stream()
-                                    .map(r -> r.gearId)
-                                    .collect(Collectors.toSet());
-                            overrideMap.forEach((key, value) -> {
-                                if (!existingId.contains(key)) {
-                                    WorkBenchEntity.recipeData.add(new GearRecipeData(key, value));
+                List<Path> recipePaths = assetManager.getJsonListPathsFromPath(recipesPath);
+                assetManager.deserializeFromJsonList(
+                        recipePaths,
+                        assetManager.getGson(),
+                        GearRecipeData.class,
+                        (data, path) -> {
+                            if (data == null || data.recipes == null) return;
+                            boolean isDefault = path.getFileName().toString().equals(DEFAULT_RECIPE_NAME);
+                            for (GearRecipeData recipe : data.recipes) {
+                                if (isDefault) {
+                                    merged.putIfAbsent(recipe.gearId, recipe.ingredientItems);
+                                } else {
+                                    merged.put(recipe.gearId, recipe.ingredientItems);
                                 }
-                            });
-                        });
-                    }
-                });
+                            }
+                        }
+                );
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        });
+        }
 
+        WorkBenchEntity.recipeData = merged.entrySet().stream()
+                .map(e -> new GearRecipeData(e.getKey(), e.getValue()))
+                .toList();
     }
 }

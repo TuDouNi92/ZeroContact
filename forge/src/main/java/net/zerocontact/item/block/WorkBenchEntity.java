@@ -90,7 +90,9 @@ public class WorkBenchEntity extends BlockEntity implements GeoBlockEntity {
     public void giveItem(ServerPlayer player, String id){
         Item targetItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(id));
         if(targetItem==null)return;
-        player.getInventory().placeItemBackInInventory(new ItemStack(targetItem,1),true);
+        ItemStack stack = new ItemStack(targetItem);
+        stack.setCount(stack.getMaxStackSize());
+        player.getInventory().placeItemBackInInventory(stack,true);
         player.inventoryMenu.broadcastChanges();
     }
 }
