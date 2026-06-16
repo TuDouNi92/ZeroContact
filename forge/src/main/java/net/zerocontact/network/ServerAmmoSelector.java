@@ -166,18 +166,18 @@ public class ServerAmmoSelector {
                     ItemStack defaultAmmoStack = AmmoItemBuilder.create().setId(defaultAmmoId).setCount(1).build();
                     finalItems.put(defaultAmmoStack, 9999);
                 });
+                ForgeRegistries.ITEMS.getKeys()
+                        .stream()
+                        .map(ForgeRegistries.ITEMS::getValue)
+                        .filter(GenerateAmmo.class::isInstance)
+                        .map(GenerateAmmo.class::cast)
+                        .filter(ammo-> ammo.isAmmoOfGun(gunItem,ammo.getDefaultInstance()))
+                        .forEach(ammo -> items.merge(
+                                new ItemWrapper(ammo, ammo.getAmmoId(ammo.getDefaultInstance()).toString()),
+                                9999,
+                                (l, r) -> r
+                        ));
             }
-
-            ForgeRegistries.ITEMS.getKeys()
-                    .stream()
-                    .map(ForgeRegistries.ITEMS::getValue)
-                    .filter(GenerateAmmo.class::isInstance)
-                    .map(GenerateAmmo.class::cast)
-                    .forEach(ammo -> items.merge(
-                            new ItemWrapper(ammo, ammo.getAmmoId(ammo.getDefaultInstance()).toString()),
-                            9999,
-                            (l, r) -> r
-                    ));
         } else {
             for (ItemStack ammoStack : vanillaInv.items) {
                 if (ammoStack.getItem() instanceof IAmmo ammo

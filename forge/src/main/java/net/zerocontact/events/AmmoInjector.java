@@ -1,9 +1,14 @@
 package net.zerocontact.events;
 
+import com.tacz.guns.api.TimelessAPI;
+import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.builder.AmmoItemBuilder;
 import com.tacz.guns.entity.EntityKineticBullet;
+import com.tacz.guns.resource.index.CommonGunIndex;
+import com.tacz.guns.resource.pojo.data.gun.GunData;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -12,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class AmmoInjector {
@@ -96,6 +102,36 @@ public class AmmoInjector {
         return AmmoItemBuilder.create().build();
     }
 
+    private static ResourceLocation getGunDefaultAmmo(ItemStack gunStack) {
+        ResourceLocation defaultAmmoId = new ResourceLocation("");
+        IGun gun = IGun.getIGunOrNull(gunStack);
+        if (gun == null) return defaultAmmoId;
+        Optional<CommonGunIndex> gunIndex = TimelessAPI.getCommonGunIndex(gun.getGunId(gunStack));
+        if (gunIndex.isPresent()) {
+            CommonGunIndex gunIndex1 = gunIndex.get();
+            GunData gunData = gunIndex1.getGunData();
+            defaultAmmoId = gunData.getAmmoId();
+        }
+        return defaultAmmoId;
+    }
+
+    private static @Nullable AmmoContext setDefaultAmmoVariantInGun(ItemStack gunStack) {
+        String defaultVariant = "tacz:ammo";
+        ResourceLocation defaultAmmo = getGunDefaultAmmo(gunStack);
+        if (defaultAmmo.toString().isEmpty()) return null;
+        gunStack.getOrCreateTagElement("ai_ammo").putString("ai_ammoId", defaultAmmo.toString());
+        gunStack.getOrCreateTagElement("ai_ammo").putString("existed_variant", defaultVariant);
+        return new AmmoContext(new CaliberVariantDamageHelper.Caliber(defaultAmmo.toString(), defaultVariant, 0, 0, 0, 0, 0));
+    }
+
+    private static void setDefaultAmmoVariantInGun(ItemStack gunStack, ResourceLocation ammoKey) {
+        ResourceLocation defaultAmmo = getGunDefaultAmmo(gunStack);
+        if (defaultAmmo.toString().isEmpty()) return;
+        if (ammoKey.toString().isEmpty()) return;
+        gunStack.getOrCreateTagElement("ai_ammo").putString("ai_ammoId", defaultAmmo.toString());
+        gunStack.getOrCreateTagElement("ai_ammo").putString("existed_variant", ammoKey.toString());
+    }
+
 
     public static void setAmmoVariantInGun(ItemStack gunStack, String selectedVariant) {
         gunStack.getOrCreateTag().getCompound("ai_ammo").putString("existed_variant", selectedVariant);
@@ -111,5 +147,25 @@ public class AmmoInjector {
 
     public static void setClientSelectedAmmoVariant(ItemStack gunStack, String selectedAmmoKey) {
         gunStack.getOrCreateTagElement("ai_ammo").putString("selected_variant", selectedAmmoKey);
+    }
+
+    public static void setEntityGunContext(ItemStack gunStack) {
+        setDefaultAmmoVariantInGun(gunStack);
+    }
+
+    public static void setEntityGunContext(ItemStack gunStack, Item ammo) {
+        ResourceLocation ammoKey = ForgeRegistries.ITEMS.getKey(ammo);
+        if (ammoKey == null) return;
+        setDefaultAmmoVariantInGun(gunStack);
+    }
+
+    public static @Nullable AmmoContext setPlayerGunContext(ServerPlayer player) {
+        ItemStack checkGunStack = player.getMainHandItem();
+        if (!IGun.mainHandHoldGun(player)) return null;
+        return setDefaultAmmoVariantInGun(checkGunStack);
+    }
+
+    public static boolean isEmptyContext(AmmoContext context) {
+        return context.caliber.id().isEmpty() || context.caliber.variant().isEmpty();
     }
 }

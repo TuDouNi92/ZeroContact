@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.AtomicDouble;
 import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.init.ModDamageTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -97,15 +98,16 @@ public enum CaliberVariantDamageHelper {
      * @param penetrationClass The penetration level for damage interceptor, bypassed when the feature is off
      * @param fleshDamage      The flesh damage for damage interceptor, bypassed when the feature is off
      */
-    public record Caliber(String id, String variant, float baseDamageFactor, int penetrationClass, float fleshDamage, float armorDamage,
+    public record Caliber(String id, String variant, float baseDamageFactor, int penetrationClass, float fleshDamage,
+                          float armorDamage,
                           int stackSize) {
         public Caliber(String id, float baseDamageFactor, int penetrationClass, float fleshDamage) {
-            this(id, DEFAULT, baseDamageFactor, penetrationClass, fleshDamage,0, 30);
+            this(id, DEFAULT, baseDamageFactor, penetrationClass, fleshDamage, 0, 30);
         }
 
         @Override
         public boolean equals(Object obj) {
-            return obj instanceof Caliber caliber && Objects.equals(id, caliber.id) && (Objects.equals(variant, caliber.variant.split(":")[1]) || (Objects.equals(variant,caliber.variant)));
+            return obj instanceof Caliber caliber && Objects.equals(id, caliber.id) && (Objects.equals(variant, caliber.variant.split(":")[1]) || (Objects.equals(variant, caliber.variant)));
         }
 
         @Override
@@ -136,7 +138,10 @@ public enum CaliberVariantDamageHelper {
                 }
 
             } else if (caliberData instanceof Caliber caliber) {
-                if (caliber.equals(ammoContext.caliber())) {
+                if (ammoContext != null && AmmoInjector.isEmptyContext(ammoContext) && source.getEntity() instanceof ServerPlayer player) {
+                    ammoContext = AmmoInjector.setPlayerGunContext(player);
+                }
+                if (ammoContext != null && caliber.equals(ammoContext.caliber())) {
                     result.set(Optional.of(caliber));
                     break;
                 }
