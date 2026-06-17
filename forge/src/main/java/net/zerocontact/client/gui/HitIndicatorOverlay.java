@@ -2,6 +2,7 @@ package net.zerocontact.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.tacz.guns.init.ModDamageTypes;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -42,7 +43,7 @@ public class HitIndicatorOverlay {
     @SubscribeEvent
     public static void livingHurt(LivingHurtEvent event) {
         DamageSource source = event.getSource();
-        if (source.is(ZDamageTypes.ZC_DAMAGE)) {
+        if (source.is(ZDamageTypes.ZC_DAMAGE) || source.is(ModDamageTypes.BULLETS_TAG)) {
             targetEntities.add(new HurtRecord(event.getEntity(), event.getAmount(), 0));
         }
     }

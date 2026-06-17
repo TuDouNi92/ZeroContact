@@ -30,7 +30,7 @@ public class PlateDamageEvent {
 
     private static boolean damage(LivingEntity livingEntity, DamageSource damageSource, float amount, ItemStack stackInSlot) {
         if (damageSource.is(ModDamageTypes.BULLET_IGNORE_ARMOR) && damageSource.typeHolder().containsTag(DamageTypeTags.BYPASSES_ARMOR))
-            return true;
+            return false;
         float durabilityLossFactor = 0.1f;
         float defaultArmorDamage = Math.min(amount * 0.1f, 10);
         int hits = stackInSlot.getOrCreateTag().getInt("hits") + 1;

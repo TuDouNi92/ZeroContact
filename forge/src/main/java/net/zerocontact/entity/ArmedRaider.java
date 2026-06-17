@@ -2,9 +2,11 @@ package net.zerocontact.entity;
 
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.entity.IGunOperator;
-import com.tacz.guns.api.item.gun.AbstractGunItem;
-import com.tacz.guns.item.AmmoItem;
+import com.tacz.guns.api.item.IGun;
+import com.tacz.guns.api.item.builder.AmmoItemBuilder;
+import com.tacz.guns.api.item.builder.GunItemBuilder;
 import com.tacz.guns.resource.index.CommonAmmoIndex;
+import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -55,7 +57,7 @@ import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import top.theillusivec4.curios.api.CuriosApi;
 
-import java.util.Objects;
+import java.util.Optional;
 
 public class ArmedRaider extends PatrollingMonster implements GeoEntity, InventoryCarrier {
     private final AnimatableInstanceCache geoCache;
@@ -69,41 +71,36 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     public final GlobalStateController stateController;
 
     protected enum Weapon {
-        AK(),
-        SKS("tacz:sks_tactical", "tacz:762x39"),
-        FN_FAL("tacz:fn_fal", "tacz:308"),
-        M4("tacz:m4a1", "tacz:556x45"),
-        SCAR_L("tacz:scar_l", "tacz:556x45"),
-        M320("tacz:m320", "tacz:40mm"),
-        AUG("tacz:aug", "tacz:556x45"),
-        HK416D("tacz:hk416d", "tacz:556x45"),
-        M16A4("tacz:m16a4", "tacz:556x45"),
-        QBZ191("tacz:qbz_191", "tacz:58x42"),
-        CZ75("tacz:cz75", "tacz:9mm"),
-        GLOCK17("tacz:glock_17", "tacz:9mm"),
-        P320("tacz:p320", "tacz:45acp"),
-        P90("tacz:p90", "tacz:57x28"),
-        VECTOR("tacz:vector45", "tacz:45acp"),
-        UZI("tacz:uzi", "tacz:9mm");
-        private String gunName;
-        private String ammoName;
+        AK("tacz:ak47"),
+        SKS("tacz:sks_tactical"),
+        FN_FAL("tacz:fn_fal"),
+        M4("tacz:m4a1"),
+        SCAR_L("tacz:scar_l"),
+        M320("tacz:m320"),
+        AUG("tacz:aug"),
+        HK416D("tacz:hk416d"),
+        M16A4("tacz:m16a4"),
+        QBZ191("tacz:qbz_191"),
+        CZ75("tacz:cz75"),
+        GLOCK17("tacz:glock_17"),
+        P320("tacz:p320"),
+        P90("tacz:p90"),
+        VECTOR("tacz:vector45"),
+        UZI("tacz:uzi");
+        private final String gunId;
+        private final ItemStack gunStack;
 
-        Weapon() {
-        }
-
-        Weapon(String gunName, String ammoName) {
-            this.gunName = gunName;
-            this.ammoName = ammoName;
+        Weapon(String gunId) {
+            this.gunId = gunId;
+            gunStack = getWeapon();
         }
 
         ItemStack getWeapon() {
-            AbstractGunItem gun = (AbstractGunItem) ForgeRegistries.ITEMS.getValue(new ResourceLocation("tacz", "modern_kinetic_gun"));
+            ItemStack gunStack = GunItemBuilder.create().setId(new ResourceLocation(gunId)).build();
+            IGun gun = IGun.getIGunOrNull(gunStack);
             if (gun == null) return null;
-            ItemStack gunStack = new ItemStack(gun);
-            gun.setGunId(gunStack, new ResourceLocation(Objects.requireNonNullElse(gunName, "tacz:ak47")));
             TimelessAPI.getCommonGunIndex(gun.getGunId(gunStack)).ifPresent(commonGunIndex -> {
                 GunData gunData = commonGunIndex.getGunData();
-                gun.hasBulletInBarrel(gunStack);
                 gun.setFireMode(gunStack, gunData.getFireModeSet().get(0));
                 gun.setCurrentAmmoCount(gunStack, gunData.getAmmoAmount());
             });
@@ -111,16 +108,18 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         }
 
         ItemStack getAmmo() {
-            CompoundTag tag = new CompoundTag();
-            AmmoItem ammo = (AmmoItem) ForgeRegistries.ITEMS.getValue(new ResourceLocation("tacz", "ammo"));
-            tag.putString("AmmoId", Objects.requireNonNullElse(ammoName, "tacz:762x39"));
-            if (ammo == null || ammoName == null) return null;
-            Integer stackSize = TimelessAPI.getCommonAmmoIndex(new ResourceLocation(ammoName)).map(CommonAmmoIndex::getStackSize).orElse(1);
-            ItemStack ammoStack = new ItemStack(ammo, stackSize);
-            ammoStack.setTag(tag);
+            ItemStack ammoStack = ItemStack.EMPTY;
+            IGun gun = IGun.getIGunOrNull(this.gunStack);
+            if (gun == null) return ammoStack;
+            Optional<CommonGunIndex> gunIndex = TimelessAPI.getCommonGunIndex(gun.getGunId(gunStack));
+            if (gunIndex.isPresent()) {
+                GunData gunData = gunIndex.get().getGunData();
+                ResourceLocation ammoId = gunData.getAmmoId();
+                Integer stackSize = TimelessAPI.getCommonAmmoIndex(ammoId).map(CommonAmmoIndex::getStackSize).orElse(1);
+                ammoStack = AmmoItemBuilder.create().setId(ammoId).setCount(stackSize).build();
+            }
             return ammoStack;
         }
-
     }
 
     private Weapon randomWeapon() {
@@ -265,9 +264,9 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
 
     private void listenPlayVoice() {
         GlobalStateController.VoiceManager manager = stateController.voiceManager;
-        manager.playSound(GlobalStateController.Voice.CONTACT,this,()->stateController.getPhase() == GlobalStateController.Phase.ATTACK);
-        manager.playSound(GlobalStateController.Voice.RELOAD,this,()->operator.getSynReloadState().getStateType().isReloading());
-        manager.playSound(GlobalStateController.Voice.HURT,this,()->stateController.getShareContext().isHurt);
+        manager.playSound(GlobalStateController.Voice.CONTACT, this, () -> stateController.getPhase() == GlobalStateController.Phase.ATTACK);
+        manager.playSound(GlobalStateController.Voice.RELOAD, this, () -> operator.getSynReloadState().getStateType().isReloading());
+        manager.playSound(GlobalStateController.Voice.HURT, this, () -> stateController.getShareContext().isHurt);
     }
 
     @Override
@@ -306,4 +305,10 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         groundPathNavigation.setCanOpenDoors(true);
         return groundPathNavigation;
     }
+
+    @Override
+    public boolean removeWhenFarAway(double distanceToClosestPlayer) {
+        return false;
+    }
+
 }

@@ -71,7 +71,7 @@ public class GlobalStateController {
                             SoundManager.RELOAD_EMPTY_SOUND, 1, 1));
                 },
                 ModSoundEventsReg.RAIDER_RELOAD_1, ModSoundEventsReg.RAIDER_RELOAD_2),
-        HURT(40, ModSoundEventsReg.RAIDER_HIT_1, ModSoundEventsReg.RAIDER_HIT_2, ModSoundEventsReg.RAIDER_HIT_3);
+        HURT(60, ModSoundEventsReg.RAIDER_HIT_1, ModSoundEventsReg.RAIDER_HIT_2, ModSoundEventsReg.RAIDER_HIT_3);
 
         public final int coolDown;
         private final Set<SoundEvent> soundEventSet;

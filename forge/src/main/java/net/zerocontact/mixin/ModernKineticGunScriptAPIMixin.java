@@ -50,8 +50,8 @@ public abstract class ModernKineticGunScriptAPIMixin {
             } else {
                 zeroContact$extractSyncTag(neededAmount, cir, zeroContact$getCreativeHandler(), null);
             }
+            cir.cancel();
         }
-        cir.cancel();
     }
 
     @Inject(method = "isReloadingNeedConsumeAmmo", at = @At("RETURN"), remap = false, cancellable = true)

@@ -52,7 +52,11 @@ public class GenerateAmmo extends Item implements AmmoItemDataAccessor, IEquipme
 
     @Override
     public @NotNull ItemStack getDefaultInstance() {
-        return new ItemStack(this);
+        ItemStack stack = new ItemStack(this);
+        AmmoInjector.write(new AmmoInjector.AmmoContext(
+                new CaliberVariantDamageHelper.Caliber(ammoId, ammoVariant, baseDamageFactor, penetrateClass, fleshDamage, armorDamage, stackSize)
+        ), stack);
+        return stack;
     }
 
     @Override

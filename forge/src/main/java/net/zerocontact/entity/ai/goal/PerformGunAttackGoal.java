@@ -1,15 +1,18 @@
 package net.zerocontact.entity.ai.goal;
 
+import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.entity.ShootResult;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.gun.FireMode;
+import com.tacz.guns.resource.index.CommonGunIndex;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.util.LandRandomPos;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.entity.ai.controller.GlobalStateController;
@@ -49,7 +52,7 @@ public class PerformGunAttackGoal extends Goal {
         Vec3 lookVec = shooter.getLookAngle().normalize();
         Vec3 toTargetVec = target.position().subtract(shooter.position()).normalize();
         double dot = lookVec.dot(toTargetVec);
-        double fovCos = Math.cos(Math.toRadians(120));
+        double fovCos = Math.cos(Math.toRadians(90));
         return dot >= fovCos && shooter.hasLineOfSight(target);
     }
 
@@ -61,24 +64,24 @@ public class PerformGunAttackGoal extends Goal {
         return (float) random.triangle(baseSpread, baseSpread * 1.25F);
     }
 
-    private void shoot(LivingEntity target) {
-        double x, y, z;
-        x = target.getX() - shooter.getX();
-        double targetY = target.getY() + target.getBbHeight() * 0.5;
-        y = targetY - shooter.getEyeY();
-        z = target.getZ() - shooter.getZ();
-        float spread = provideInaccuracy();
-        float yaw = (float) -Math.toDegrees(Math.atan2(x, z)) + Mth.randomBetween(random, -spread, spread);
-        float pitch = (float) -Math.toDegrees(Math.atan2(y, Math.sqrt(x * x + z * z))) + Mth.randomBetween(random, -spread, spread);
-        ShootResult result = operator.shoot(() -> pitch, () -> yaw);
-        if (result == ShootResult.NOT_DRAW) {
-            operator.draw(shooter::getMainHandItem);
-            return;
+    private ShootResult shoot(LivingEntity target) {
+        ShootResult result = ShootResult.UNKNOWN_FAIL;
+        ItemStack gunStack = shooter.getMainHandItem();
+        IGun gun = IGun.getIGunOrNull(shooter.getMainHandItem());
+        if (gun == null) return result;
+        Optional<CommonGunIndex> gunIndex = TimelessAPI.getCommonGunIndex(gun.getGunId(gunStack));
+        if (gunIndex.isPresent()) {
+            double x, y, z;
+            x = target.getX() - shooter.getX();
+            double targetY = target.getY() + target.getBbHeight() * 0.5;
+            y = targetY - shooter.getEyeY();
+            z = target.getZ() - shooter.getZ();
+            float spread = provideInaccuracy();
+            float yaw = (float) -Math.toDegrees(Math.atan2(x, z)) + Mth.randomBetween(random, -spread, spread);
+            float pitch = (float) -Math.toDegrees(Math.atan2(y, Math.sqrt(x * x + z * z))) + Mth.randomBetween(random, -spread, spread);
+            result = operator.shoot(() -> pitch, () -> yaw);
         }
-        if (result == ShootResult.NO_AMMO) {
-            operator.reload();
-        }
-
+        return result;
     }
 
     private static double getWantedY(Entity entity) {
@@ -89,7 +92,7 @@ public class PerformGunAttackGoal extends Goal {
         if (!IGun.mainHandHoldGun(shooter) || operator == null) return;
         LivingEntity target = shooter.getTarget();
         if (target != null) {
-            shooter.getLookControl().setLookAt(target.getX(), getWantedY(target), target.getZ(), 32f, 16f);
+            shooter.getLookControl().setLookAt(target.getX(), getWantedY(target), target.getZ(), 72f, 36f);
         } else {
             return;
         }
@@ -103,10 +106,18 @@ public class PerformGunAttackGoal extends Goal {
             }
         } else {
             if (burstInterval > 0 && isInVisionToShoot(shooter) && shooter.getLookControl().isLookingAtTarget()) {
-                shoot(target);
+                if (operator.getSynReloadState().getStateType().isReloading()) return;
+                shooter.getNavigation().stop();
+                ShootResult result = shoot(target);
+                if (result != null) {
+                    switch (result) {
+                        case NO_AMMO -> operator.reload();
+                        case NOT_DRAW -> operator.draw(shooter::getMainHandItem);
+                    }
+                }
                 burstInterval--;
             } else {
-                shootCoolDown = 20;
+                shootCoolDown = 10;
                 burstInterval = random.nextInt(15);
             }
         }
