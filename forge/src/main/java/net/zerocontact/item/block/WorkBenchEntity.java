@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.datagen.GearRecipeData;
+import net.zerocontact.network.NetworkHandler;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.*;
@@ -18,6 +19,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static net.zerocontact.forge_registries.BlocksRegForge.WORKBENCH_ENTITY;
 
@@ -30,6 +32,19 @@ public class WorkBenchEntity extends BlockEntity implements GeoBlockEntity {
 
     public WorkBenchEntity(BlockPos pos, BlockState blockState) {
         super(WORKBENCH_ENTITY.get(), pos, blockState);
+    }
+
+    public static void buy(NetworkHandler.BuyGearsPacket msg, ServerPlayer player) {
+        BlockEntity be = player.level().getBlockEntity(msg.pos());
+        if (!(be instanceof WorkBenchEntity workBenchEntity)) return;
+        ResourceLocation gearKey = ForgeRegistries.ITEMS.getKey(msg.gearItem());
+        if (gearKey == null) return;
+        Optional<GearRecipeData> gearRecipeData = recipeData.stream().filter(data -> data.gearId.equals(gearKey.toString())).findFirst();
+        if (gearRecipeData.isEmpty()) return;
+        if (workBenchEntity.canTrade(gearRecipeData.get(), player)) {
+            workBenchEntity.consumeItems(gearRecipeData.get(), player);
+            workBenchEntity.giveItem(player, gearKey.toString());
+        }
     }
 
     @Override
@@ -49,16 +64,16 @@ public class WorkBenchEntity extends BlockEntity implements GeoBlockEntity {
         return cache;
     }
 
-    public boolean canCraft(GearRecipeData data, ServerPlayer player) {
+    public boolean canTrade(GearRecipeData data, ServerPlayer player) {
+        if (player.isCreative()) return true;
         Inventory inv = player.getInventory();
         for (GearRecipeData.IngredientItems req : data.ingredientItems) {
             Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(req.itemId));
             if (item == null) return false;
             int total = 0;
             for (ItemStack stack : inv.items) {
-                if (stack.getItem() == item && stack.getCount() >= req.neededCount) {
+                if (stack.getItem() == item) {
                     total += stack.getCount();
-                    //待处理同类物品分槽的判定
                 }
             }
             if (total < req.neededCount) {
@@ -69,30 +84,30 @@ public class WorkBenchEntity extends BlockEntity implements GeoBlockEntity {
     }
 
     public void consumeItems(GearRecipeData data, ServerPlayer player) {
-        if (canCraft(data, player)) {
-            Inventory inv = player.getInventory();
-            for (GearRecipeData.IngredientItems req : data.ingredientItems) {
-                Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(req.itemId));
-                if (item == null) continue;
-                int remaining = req.neededCount;
-                for (ItemStack stack : inv.items) {
-                    if (stack.getItem() == item && remaining > 0) {
-                        int remove = Math.min(stack.getCount(), remaining);
-                        stack.shrink(remove);
-                        remaining -= remove;
-                    }
-                    if (remaining <= 0) break;
+        if (player.isCreative()) return;
+        Inventory inv = player.getInventory();
+        for (GearRecipeData.IngredientItems req : data.ingredientItems) {
+            Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(req.itemId));
+            if (item == null) continue;
+            int remaining = req.neededCount;
+            for (ItemStack stack : inv.items) {
+                if (stack.getItem() == item && remaining > 0) {
+                    int remove = Math.min(stack.getCount(), remaining);
+                    stack.shrink(remove);
+                    remaining -= remove;
                 }
+                if (remaining <= 0) break;
             }
-            inv.setChanged();
         }
+        inv.setChanged();
     }
-    public void giveItem(ServerPlayer player, String id){
+
+    public void giveItem(ServerPlayer player, String id) {
         Item targetItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(id));
-        if(targetItem==null)return;
+        if (targetItem == null) return;
         ItemStack stack = new ItemStack(targetItem);
         stack.setCount(stack.getMaxStackSize());
-        player.getInventory().placeItemBackInInventory(stack,true);
+        player.getInventory().placeItemBackInInventory(stack, true);
         player.inventoryMenu.broadcastChanges();
     }
 }

@@ -7,23 +7,19 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.animation_data.AnimateData;
 import net.zerocontact.api.Toggleable;
 import net.zerocontact.client.ClientData;
 import net.zerocontact.client.animation.VisorTracker;
 import net.zerocontact.client.menu.AmmoSelectorMenu;
 import net.zerocontact.command.CommandManager;
-import net.zerocontact.datagen.GearRecipeData;
 import net.zerocontact.item.backpack.BaseBackpack;
 import net.zerocontact.item.block.WorkBenchEntity;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -206,22 +202,10 @@ public class NetworkHandler {
             context.enqueueWork(() -> {
                 ServerPlayer player = context.getSender();
                 if (player == null) return;
-                BlockEntity be = player.level().getBlockEntity(msg.pos);
-                if (!(be instanceof WorkBenchEntity workBenchEntity)) return;
-                ResourceLocation gearKey = ForgeRegistries.ITEMS.getKey(msg.gearItem);
-                if(gearKey==null)return;
-                Optional<GearRecipeData> gearRecipeData = WorkBenchEntity.recipeData.stream().filter(data->data.gearId.equals(gearKey.toString())).findFirst();
-                if(gearRecipeData.isEmpty())return;
-                if (!player.isCreative()) {
-                    if (workBenchEntity.canCraft(gearRecipeData.get(), player)) {
-                        workBenchEntity.consumeItems(gearRecipeData.get(), player);
-                        workBenchEntity.giveItem(player, gearKey.toString());
-                    }
-                    return;
-                }
-                workBenchEntity.giveItem(player, gearKey.toString());
+                WorkBenchEntity.buy(msg, player);
             });
         }
+
     }
 
     public record OpenAmmoSelectorPacket() {

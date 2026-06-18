@@ -23,7 +23,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.animal.IronGolem;
@@ -44,6 +43,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.entity.ai.NameList;
 import net.zerocontact.entity.ai.controller.GlobalStateController;
 import net.zerocontact.entity.ai.goal.AvoidGoal;
+import net.zerocontact.entity.ai.goal.LongRangeAttackableTargetGoal;
 import net.zerocontact.entity.ai.goal.PerformGunAttackGoal;
 import net.zerocontact.entity.ai.goal.RestrictedGoalWrapper;
 import org.jetbrains.annotations.NotNull;
@@ -65,67 +65,10 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     private static final RawAnimation WALK = RawAnimation.begin().then("raider.animation.walk", Animation.LoopType.LOOP);
     private static final RawAnimation IDLE = RawAnimation.begin().then("raider.animation.idle", Animation.LoopType.LOOP);
     public final RandomSource random = this.getRandom();
-    private final SimpleContainer inventory = new SimpleContainer(5);
+    private final SimpleContainer inventory = new SimpleContainer(7);
     private final LazyOptional<IItemHandler> itemHandlerLazyOptional = LazyOptional.of(() -> new InvWrapper(inventory));
     private final IGunOperator operator;
     public final GlobalStateController stateController;
-
-    protected enum Weapon {
-        AK("tacz:ak47"),
-        SKS("tacz:sks_tactical"),
-        FN_FAL("tacz:fn_fal"),
-        M4("tacz:m4a1"),
-        SCAR_L("tacz:scar_l"),
-        M320("tacz:m320"),
-        AUG("tacz:aug"),
-        HK416D("tacz:hk416d"),
-        M16A4("tacz:m16a4"),
-        QBZ191("tacz:qbz_191"),
-        CZ75("tacz:cz75"),
-        GLOCK17("tacz:glock_17"),
-        P320("tacz:p320"),
-        P90("tacz:p90"),
-        VECTOR("tacz:vector45"),
-        UZI("tacz:uzi");
-        private final String gunId;
-        private final ItemStack gunStack;
-
-        Weapon(String gunId) {
-            this.gunId = gunId;
-            gunStack = getWeapon();
-        }
-
-        ItemStack getWeapon() {
-            ItemStack gunStack = GunItemBuilder.create().setId(new ResourceLocation(gunId)).build();
-            IGun gun = IGun.getIGunOrNull(gunStack);
-            if (gun == null) return null;
-            TimelessAPI.getCommonGunIndex(gun.getGunId(gunStack)).ifPresent(commonGunIndex -> {
-                GunData gunData = commonGunIndex.getGunData();
-                gun.setFireMode(gunStack, gunData.getFireModeSet().get(0));
-                gun.setCurrentAmmoCount(gunStack, gunData.getAmmoAmount());
-            });
-            return gunStack;
-        }
-
-        ItemStack getAmmo() {
-            ItemStack ammoStack = ItemStack.EMPTY;
-            IGun gun = IGun.getIGunOrNull(this.gunStack);
-            if (gun == null) return ammoStack;
-            Optional<CommonGunIndex> gunIndex = TimelessAPI.getCommonGunIndex(gun.getGunId(gunStack));
-            if (gunIndex.isPresent()) {
-                GunData gunData = gunIndex.get().getGunData();
-                ResourceLocation ammoId = gunData.getAmmoId();
-                Integer stackSize = TimelessAPI.getCommonAmmoIndex(ammoId).map(CommonAmmoIndex::getStackSize).orElse(1);
-                ammoStack = AmmoItemBuilder.create().setId(ammoId).setCount(stackSize).build();
-            }
-            return ammoStack;
-        }
-    }
-
-    private Weapon randomWeapon() {
-        Weapon[] values = Weapon.values();
-        return values[random.nextInt(values.length)];
-    }
 
     public ArmedRaider(EntityType<? extends PatrollingMonster> entityType, Level level) {
         super(entityType, level);
@@ -141,13 +84,14 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new HurtByTargetGoal(this));
         this.goalSelector.addGoal(2, new AvoidGoal(this, 5));
-        this.goalSelector.addGoal(2, RestrictedGoalWrapper.create(this, new OpenDoorGoal(this, false)));
+        this.goalSelector.addGoal(2, new OpenDoorGoal(this, true));
         this.goalSelector.addGoal(4, new PerformGunAttackGoal(this));
+        this.goalSelector.addGoal(5, RestrictedGoalWrapper.create(this,new MeleeAttackGoal(this, 1.2f, false),GlobalStateController.Phase.ATTACK));
         this.goalSelector.addGoal(5, RestrictedGoalWrapper.create(this, new RandomStrollGoal(this, 0.8F)));
         this.goalSelector.addGoal(8, RestrictedGoalWrapper.create(this, new RandomLookAroundGoal(this)));
-        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true, false));
-        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Monster.class, true, false));
-        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, IronGolem.class, true, false));
+        this.targetSelector.addGoal(2, new LongRangeAttackableTargetGoal<>(this, Player.class, true, false, 12.0D));
+        this.targetSelector.addGoal(1, new LongRangeAttackableTargetGoal<>(this, Monster.class, true, false, 12.0D));
+        this.targetSelector.addGoal(1, new LongRangeAttackableTargetGoal<>(this, IronGolem.class, true, false, 12.0D));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -155,8 +99,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
                 .add(Attributes.MOVEMENT_SPEED, 0.35F)
                 .add(Attributes.MAX_HEALTH, 30.0F)
                 .add(Attributes.ATTACK_DAMAGE, 3.0F)
-                .add(Attributes.FOLLOW_RANGE, 35.0F)
-                .add(Attributes.KNOCKBACK_RESISTANCE, 0.6F);
+                .add(Attributes.FOLLOW_RANGE, 75.0F);
     }
 
     @Override
@@ -307,8 +250,79 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     }
 
     @Override
+    public int getMaxFallDistance() {
+        return 3;
+    }
+
+    @Override
     public boolean removeWhenFarAway(double distanceToClosestPlayer) {
         return false;
     }
 
+    @Override
+    public boolean isAlliedTo(@NotNull Entity entity) {
+        if (super.isAlliedTo(entity)) {
+            return true;
+        } else if (entity instanceof LivingEntity livingEntity && livingEntity.getClass() == this.getClass()) {
+            return this.getTeam() == null && entity.getTeam() == null;
+        }
+        return false;
+    }
+
+    protected enum Weapon {
+        AK("tacz:ak47"),
+        SKS("tacz:sks_tactical"),
+        FN_FAL("tacz:fn_fal"),
+        M4("tacz:m4a1"),
+        SCAR_L("tacz:scar_l"),
+        M320("tacz:m320"),
+        AUG("tacz:aug"),
+        HK416D("tacz:hk416d"),
+        M16A4("tacz:m16a4"),
+        QBZ191("tacz:qbz_191"),
+        CZ75("tacz:cz75"),
+        GLOCK17("tacz:glock_17"),
+        P320("tacz:p320"),
+        P90("tacz:p90"),
+        VECTOR("tacz:vector45"),
+        UZI("tacz:uzi");
+        private final String gunId;
+        private final ItemStack gunStack;
+
+        Weapon(String gunId) {
+            this.gunId = gunId;
+            gunStack = getWeapon();
+        }
+
+        ItemStack getWeapon() {
+            ItemStack gunStack = GunItemBuilder.create().setId(new ResourceLocation(gunId)).build();
+            IGun gun = IGun.getIGunOrNull(gunStack);
+            if (gun == null) return null;
+            TimelessAPI.getCommonGunIndex(gun.getGunId(gunStack)).ifPresent(commonGunIndex -> {
+                GunData gunData = commonGunIndex.getGunData();
+                gun.setFireMode(gunStack, gunData.getFireModeSet().get(0));
+                gun.setCurrentAmmoCount(gunStack, gunData.getAmmoAmount());
+            });
+            return gunStack;
+        }
+
+        ItemStack getAmmo() {
+            ItemStack ammoStack = ItemStack.EMPTY;
+            IGun gun = IGun.getIGunOrNull(this.gunStack);
+            if (gun == null) return ammoStack;
+            Optional<CommonGunIndex> gunIndex = TimelessAPI.getCommonGunIndex(gun.getGunId(gunStack));
+            if (gunIndex.isPresent()) {
+                GunData gunData = gunIndex.get().getGunData();
+                ResourceLocation ammoId = gunData.getAmmoId();
+                Integer stackSize = TimelessAPI.getCommonAmmoIndex(ammoId).map(CommonAmmoIndex::getStackSize).orElse(1);
+                ammoStack = AmmoItemBuilder.create().setId(ammoId).setCount(stackSize).build();
+            }
+            return ammoStack;
+        }
+    }
+
+    private Weapon randomWeapon() {
+        Weapon[] values = Weapon.values();
+        return values[random.nextInt(values.length)];
+    }
 }

@@ -139,6 +139,7 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
         if (!sourceSlot.hasItem()) return copy;
         ItemStack sourceStack = sourceSlot.getItem();
         copy = sourceStack.copy();
+        if (rigsSlotEnd == 0) rigsSlotEnd = backpackSlotEnd;
         if (index < backpackSlotEnd) {
             if (!this.moveItemStackTo(sourceStack, rigsSlotEnd, slots.size(), false)) {
                 return ItemStack.EMPTY;

@@ -1,18 +1,15 @@
 package net.zerocontact.entity.ai.goal;
 
-import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.entity.ShootResult;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.gun.FireMode;
-import com.tacz.guns.resource.index.CommonGunIndex;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.util.LandRandomPos;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.entity.ai.controller.GlobalStateController;
@@ -66,21 +63,17 @@ public class PerformGunAttackGoal extends Goal {
 
     private ShootResult shoot(LivingEntity target) {
         ShootResult result = ShootResult.UNKNOWN_FAIL;
-        ItemStack gunStack = shooter.getMainHandItem();
         IGun gun = IGun.getIGunOrNull(shooter.getMainHandItem());
         if (gun == null) return result;
-        Optional<CommonGunIndex> gunIndex = TimelessAPI.getCommonGunIndex(gun.getGunId(gunStack));
-        if (gunIndex.isPresent()) {
-            double x, y, z;
-            x = target.getX() - shooter.getX();
-            double targetY = target.getY() + target.getBbHeight() * 0.5;
-            y = targetY - shooter.getEyeY();
-            z = target.getZ() - shooter.getZ();
-            float spread = provideInaccuracy();
-            float yaw = (float) -Math.toDegrees(Math.atan2(x, z)) + Mth.randomBetween(random, -spread, spread);
-            float pitch = (float) -Math.toDegrees(Math.atan2(y, Math.sqrt(x * x + z * z))) + Mth.randomBetween(random, -spread, spread);
-            result = operator.shoot(() -> pitch, () -> yaw);
-        }
+        double x, y, z;
+        x = target.getX() - shooter.getX();
+        double targetY = target.getY() + target.getBbHeight() * 0.5;
+        y = targetY - shooter.getEyeY();
+        z = target.getZ() - shooter.getZ();
+        float spread = provideInaccuracy();
+        float yaw = (float) -Math.toDegrees(Math.atan2(x, z)) + Mth.randomBetween(random, -spread, spread);
+        float pitch = (float) -Math.toDegrees(Math.atan2(y, Math.sqrt(x * x + z * z))) + Mth.randomBetween(random, -spread, spread);
+        result = operator.shoot(() -> pitch, () -> yaw);
         return result;
     }
 
@@ -100,7 +93,7 @@ public class PerformGunAttackGoal extends Goal {
             shootCoolDown--;
             FireMode fireMode = IGun.getMainHandFireMode(shooter);
             if (fireMode == FireMode.SEMI || fireMode == FireMode.BURST) {
-                burstInterval = random.nextInt(10);
+                burstInterval = random.nextInt(20);
             } else {
                 burstInterval = random.nextInt(15);
             }
