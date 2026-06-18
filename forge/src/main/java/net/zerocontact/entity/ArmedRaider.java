@@ -10,6 +10,7 @@ import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
@@ -26,6 +27,7 @@ import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.PatrollingMonster;
 import net.minecraft.world.entity.npc.InventoryCarrier;
@@ -34,9 +36,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -57,6 +61,7 @@ import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import top.theillusivec4.curios.api.CuriosApi;
 
+import java.util.List;
 import java.util.Optional;
 
 public class ArmedRaider extends PatrollingMonster implements GeoEntity, InventoryCarrier {
@@ -69,6 +74,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     private final LazyOptional<IItemHandler> itemHandlerLazyOptional = LazyOptional.of(() -> new InvWrapper(inventory));
     private final IGunOperator operator;
     public final GlobalStateController stateController;
+    private final Weapon weapon;
 
     public ArmedRaider(EntityType<? extends PatrollingMonster> entityType, Level level) {
         super(entityType, level);
@@ -76,6 +82,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         geoCache = GeckoLibUtil.createInstanceCache(this);
         NameList.setName(this, this.random);
         stateController = new GlobalStateController(this);
+        weapon = randomWeapon();
     }
 
     @Override
@@ -86,7 +93,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         this.goalSelector.addGoal(2, new AvoidGoal(this, 5));
         this.goalSelector.addGoal(2, new OpenDoorGoal(this, true));
         this.goalSelector.addGoal(4, new PerformGunAttackGoal(this));
-        this.goalSelector.addGoal(5, RestrictedGoalWrapper.create(this,new MeleeAttackGoal(this, 1.2f, false),GlobalStateController.Phase.ATTACK));
+        this.goalSelector.addGoal(5, RestrictedGoalWrapper.create(this, new MeleeAttackGoal(this, 1.2f, false), GlobalStateController.Phase.ATTACK));
         this.goalSelector.addGoal(5, RestrictedGoalWrapper.create(this, new RandomStrollGoal(this, 0.8F)));
         this.goalSelector.addGoal(8, RestrictedGoalWrapper.create(this, new RandomLookAroundGoal(this)));
         this.targetSelector.addGoal(2, new LongRangeAttackableTargetGoal<>(this, Player.class, true, false, 12.0D));
@@ -98,7 +105,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         return Monster.createMonsterAttributes()
                 .add(Attributes.MOVEMENT_SPEED, 0.35F)
                 .add(Attributes.MAX_HEALTH, 30.0F)
-                .add(Attributes.ATTACK_DAMAGE, 3.0F)
+                .add(Attributes.ATTACK_DAMAGE, 1.0F)
                 .add(Attributes.FOLLOW_RANGE, 75.0F);
     }
 
@@ -126,7 +133,6 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
 
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor level, @NotNull DifficultyInstance difficulty, @NotNull MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
-        Weapon weapon = randomWeapon();
         ItemStack gun = weapon.getWeapon();
         if (gun == null) return null;
         this.setItemInHand(InteractionHand.MAIN_HAND, gun);
@@ -269,6 +275,42 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         return false;
     }
 
+    @Override
+    public boolean canPickUpLoot() {
+        Vec3i vec3i = this.getPickupReach();
+        AABB searchArea = this.getBoundingBox().inflate(vec3i.getX(), vec3i.getY(), vec3i.getZ());
+        List<? extends Entity> ammoItems = this.level().getEntitiesOfClass(ItemEntity.class, searchArea,
+                entity -> ItemStack.isSameItemSameTags(entity.getItem(), weapon.ammoStack));
+        return !ammoItems.isEmpty() || super.canPickUpLoot();
+    }
+
+    @Override
+    public void aiStep() {
+        super.aiStep();
+        this.level().getProfiler().push("looting");
+        Vec3i vec3i = this.getPickupReach();
+        if (!this.level().isClientSide && this.canPickUpLoot() && this.isAlive() && !this.dead && ForgeEventFactory.getMobGriefingEvent(this.level(), this)) {
+            for (ItemEntity itementity : this.level().getEntitiesOfClass(ItemEntity.class, this.getBoundingBox().inflate(vec3i.getX(), vec3i.getY(), vec3i.getZ()),
+                    entity -> ItemStack.isSameItemSameTags(entity.getItem(), weapon.ammoStack))) {
+                if (!itementity.isRemoved() && !itementity.getItem().isEmpty() && !itementity.hasPickUpDelay()) {
+                    this.pickUpItem(itementity);
+                }
+            }
+        }
+
+        this.level().getProfiler().pop();
+    }
+
+    @Override
+    protected void pickUpItem(@NotNull ItemEntity itemEntity) {
+        super.pickUpItem(itemEntity);
+        ItemStack pickableStack = itemEntity.getItem();
+        if(inventory.canAddItem(pickableStack)){
+            ItemStack addedStack = inventory.addItem(pickableStack);
+            if(addedStack.isEmpty())itemEntity.discard();
+        }
+    }
+
     protected enum Weapon {
         AK("tacz:ak47"),
         SKS("tacz:sks_tactical"),
@@ -285,13 +327,17 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         P320("tacz:p320"),
         P90("tacz:p90"),
         VECTOR("tacz:vector45"),
-        UZI("tacz:uzi");
+        UZI("tacz:uzi"),
+        M700("tacz:m700"),
+        M249("tacz:m249");
         private final String gunId;
-        private final ItemStack gunStack;
+        public final ItemStack gunStack;
+        public final ItemStack ammoStack;
 
         Weapon(String gunId) {
             this.gunId = gunId;
             gunStack = getWeapon();
+            ammoStack = getAmmo();
         }
 
         ItemStack getWeapon() {

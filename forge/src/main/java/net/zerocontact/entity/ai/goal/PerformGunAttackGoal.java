@@ -8,6 +8,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.util.LandRandomPos;
 import net.minecraft.world.phys.Vec3;
@@ -43,13 +44,19 @@ public class PerformGunAttackGoal extends Goal {
         }
     }
 
-    public static <T extends ArmedRaider> boolean isInVisionToShoot(T shooter) {
+    public static <T extends Mob> boolean isInVisionToShoot(T shooter) {
         LivingEntity target = shooter.getTarget();
+        if (target == null) return false;
+        return isInVisionToShoot(shooter, target);
+    }
+
+
+    public static <T extends Mob> boolean isInVisionToShoot(T shooter, LivingEntity target) {
         if (target == null) return false;
         Vec3 lookVec = shooter.getLookAngle().normalize();
         Vec3 toTargetVec = target.position().subtract(shooter.position()).normalize();
         double dot = lookVec.dot(toTargetVec);
-        double fovCos = Math.cos(Math.toRadians(90));
+        double fovCos = Math.cos(Math.toRadians(110));
         return dot >= fovCos && shooter.hasLineOfSight(target);
     }
 
@@ -101,9 +108,11 @@ public class PerformGunAttackGoal extends Goal {
             if (burstInterval > 0 && isInVisionToShoot(shooter) && shooter.getLookControl().isLookingAtTarget()) {
                 if (operator.getSynReloadState().getStateType().isReloading()) return;
                 shooter.getNavigation().stop();
+                operator.aim(shooter.distanceTo(target) > 20.0f);
                 ShootResult result = shoot(target);
                 if (result != null) {
                     switch (result) {
+                        case NEED_BOLT -> operator.bolt();
                         case NO_AMMO -> operator.reload();
                         case NOT_DRAW -> operator.draw(shooter::getMainHandItem);
                     }
