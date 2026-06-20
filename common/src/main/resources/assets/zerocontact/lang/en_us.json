@@ -48,6 +48,9 @@
   "item.zerocontact.armor_jpc_v2_swimmer_cut": "JPC 2.0 Swimmer cut Combat vest",
   "item.zerocontact.armor_6b43": "6b43 Body armor",
   "item.zerocontact.rigs_thunderbolt_gray": "Thunderbolt (Gray)",
+  "item.zerocontact.rigs_alice_olive": "Alice (Olive)",
+  "item.zerocontact.rigs_cr498_desert":"Condor 7 Pocket Chest Rig (Desert)",
+  "item.zerocontact.rigs_sop_mr_desert": "S.O.P Micro Chest Rig (Desert)",
   "item.zerocontact.backpack_t20_multicam": "T20 backpack (Multicam)",
   "item.zerocontact.backpack_t20_umbra": "T20 backpack (Umbra)",
   "item.zerocontact.backpack_british23_red": "British backpack",
@@ -98,6 +101,11 @@
   "gui.zerocontact.workbench.loadouts": "Loadout",
   "gui.zerocontact.workbench.ammo": "Ammo",
   "gui.zerocontact.workbench.accessories": "Accessories",
+
+  "key.categories.zerocontact": "ZeroContact",
+  "key.open_backpack": "Open Backpack",
+  "key.open_selector": "Open Ammo selector",
+  "key.swap_visor": "Toggle Visor",
 
   "gui.zerocontact.workbench.submit": "Submit↵",
   "gui.zerocontact.workbench.startOS": "[    0.000000] Linux version 6.5.0-21-generic (buildd@lcy02-amd64-123)\n[    0.000000] Command line: BOOT_IMAGE=/boot/vmlinuz root=UUID=xxxx ro quiet splash\n[    0.000000] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'\n[    0.000000] BIOS-provided physical RAM map:\n[    0.000000] e820: [mem 0x0000000000000000-0x000000000009ffff] usable\n[    0.000000] e820: [mem 0x0000000000100000-0x000000003fffffff] usable\n[    0.000000] NX (Execute Disable) protection: active\n[    0.000000] SMBIOS 3.2 present.\n[    0.000000] DMI: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform\n[    0.000000] Hypervisor detected: VMware"
