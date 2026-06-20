@@ -15,26 +15,39 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 public class CommandManager {
+
+    private static final String STAMINA_COMMAND = "stamina";
+    private static final String STAMINA_MSG = "Enable Stamina:";
+    private static final String DOGTAG_COMMAND = "dogtag";
+    private static final String DOGTAG_MSG = "Enable Dogtag drop:";
+    private static final String EXP_BALLISTIC_COMMAND = "experimentalBallistic";
+    private static final String EXP_BALLISTIC_MSG = "Enable ExperimentalBallistic feature:";
+
     public static class CommandSavedData extends SavedData {
+        private static final String STAMINA_STATE = "staminaState";
+        private static final String DOGTAG_STATE = "dogTagState";
+        private static final String EXP_BALLISTIC = "experimentalBallistic";
+        private static final String DATA_NAME = "zerocontact_command_state";
         public boolean staminaState = false;
         public boolean dogTagState = false;
-        public boolean experimentalBallistic = false;
+        public boolean experimentalBallistic = true;
+
         CommandSavedData() {
         }
 
         public static CommandSavedData load(CompoundTag compoundTag) {
             CommandSavedData data = new CommandSavedData();
-            data.staminaState = compoundTag.getBoolean("staminaState");
-            data.dogTagState = compoundTag.getBoolean("dogTagState");
-            data.experimentalBallistic = compoundTag.getBoolean("experimentalBallistic");
+            data.staminaState = compoundTag.getBoolean(STAMINA_STATE);
+            data.dogTagState = compoundTag.getBoolean(DOGTAG_STATE);
+            data.experimentalBallistic = compoundTag.getBoolean(EXP_BALLISTIC);
             return data;
         }
 
         @Override
         public @NotNull CompoundTag save(@NotNull CompoundTag compoundTag) {
-            compoundTag.putBoolean("staminaState", staminaState);
-            compoundTag.putBoolean("dogTagState", dogTagState);
-            compoundTag.putBoolean("experimentalBallistic", experimentalBallistic);
+            compoundTag.putBoolean(STAMINA_STATE, staminaState);
+            compoundTag.putBoolean(DOGTAG_STATE, dogTagState);
+            compoundTag.putBoolean(EXP_BALLISTIC, experimentalBallistic);
             return compoundTag;
         }
 
@@ -48,7 +61,7 @@ public class CommandManager {
             setDirty();
         }
 
-        public void setExperimentalBallistic(boolean experimentalBallistic){
+        public void setExperimentalBallistic(boolean experimentalBallistic) {
             this.experimentalBallistic = experimentalBallistic;
             setDirty();
         }
@@ -57,20 +70,20 @@ public class CommandManager {
             return level.getDataStorage().computeIfAbsent(
                     CommandSavedData::load,
                     CommandSavedData::new,
-                    "zerocontact_command_state"
+                    DATA_NAME
             );
         }
     }
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register(Commands.literal("stamina")
+        dispatcher.register(Commands.literal(STAMINA_COMMAND)
                 .requires(commandSourceStack -> Optional.ofNullable(commandSourceStack.getPlayer()).isPresent() && commandSourceStack.hasPermission(2))
                 .then(Commands.argument("boolean", BoolArgumentType.bool())
                         .executes(context -> {
                             boolean isEnabledStamina = context.getArgument("boolean", Boolean.class);
                             CommandSavedData data = CommandSavedData.get(context.getSource().getLevel());
                             data.setStaminaState(isEnabledStamina);
-                            Component message = Component.literal("Enable Stamina:")
+                            Component message = Component.literal(STAMINA_MSG)
                                     .withStyle(ChatFormatting.GOLD)
                                     .append(Component.literal(String.valueOf(isEnabledStamina)).withStyle(isEnabledStamina ? ChatFormatting.GREEN : ChatFormatting.DARK_RED));
                             context.getSource().sendSuccess(() -> message, true);
@@ -78,7 +91,7 @@ public class CommandManager {
                         }))
 
         );
-        dispatcher.register(Commands.literal("dogtag")
+        dispatcher.register(Commands.literal(DOGTAG_COMMAND)
                 .requires(commandSourceStack ->
                         Optional.ofNullable(commandSourceStack.getPlayer()).isPresent() && commandSourceStack.hasPermission(2))
                 .then(Commands.argument("boolean", BoolArgumentType.bool())
@@ -86,7 +99,7 @@ public class CommandManager {
                             boolean isEnabledDogTag = context.getArgument("boolean", Boolean.class);
                             CommandSavedData data = CommandSavedData.get(context.getSource().getLevel());
                             data.setDogTagState(isEnabledDogTag);
-                            Component message = Component.literal("Enable Dogtag drop:")
+                            Component message = Component.literal(DOGTAG_MSG)
                                     .withStyle(ChatFormatting.GOLD)
                                     .append(Component.literal(String.valueOf(isEnabledDogTag)).withStyle(isEnabledDogTag ? ChatFormatting.GREEN : ChatFormatting.DARK_RED));
                             context.getSource().sendSuccess(() -> message, true);
@@ -95,20 +108,29 @@ public class CommandManager {
 
         );
 
-        dispatcher.register(Commands.literal("experimentalBallistic")
+        dispatcher.register(Commands.literal(EXP_BALLISTIC_COMMAND)
                 .requires(commandSourceStack ->
                         Optional.ofNullable(commandSourceStack.getPlayer()).isPresent() && commandSourceStack.hasPermission(2))
-                .then(Commands.argument("boolean",BoolArgumentType.bool())
-                .executes(context->{
-                    boolean isEnableBallistic = context.getArgument("boolean", Boolean.class);
+                .executes(context -> {
                     CommandSavedData data = CommandSavedData.get(context.getSource().getLevel());
-                    data.setExperimentalBallistic(isEnableBallistic);
-                    Component message = Component.literal("Enable ExperimentalBallistic feature:")
+                    boolean currentState = data.experimentalBallistic;
+                    Component msg = Component.literal(EXP_BALLISTIC_MSG)
                             .withStyle(ChatFormatting.GOLD)
-                            .append(Component.literal(String.valueOf(isEnableBallistic)).withStyle(isEnableBallistic ? ChatFormatting.GREEN : ChatFormatting.DARK_RED));
-                    context.getSource().sendSuccess(()->message,true);
+                            .append(Component.literal(String.valueOf(currentState)).withStyle(currentState ? ChatFormatting.GREEN : ChatFormatting.DARK_RED));
+                    context.getSource().sendSuccess(() -> msg, true);
                     return Command.SINGLE_SUCCESS;
-                }))
+                })
+                .then(Commands.argument("boolean", BoolArgumentType.bool())
+                        .executes(context -> {
+                            boolean isEnableBallistic = context.getArgument("boolean", Boolean.class);
+                            CommandSavedData data = CommandSavedData.get(context.getSource().getLevel());
+                            data.setExperimentalBallistic(isEnableBallistic);
+                            Component message = Component.literal(EXP_BALLISTIC_MSG)
+                                    .withStyle(ChatFormatting.GOLD)
+                                    .append(Component.literal(String.valueOf(isEnableBallistic)).withStyle(isEnableBallistic ? ChatFormatting.GREEN : ChatFormatting.DARK_RED));
+                            context.getSource().sendSuccess(() -> message, true);
+                            return Command.SINGLE_SUCCESS;
+                        }))
         );
     }
 }
