@@ -1,18 +1,20 @@
 package net.zerocontact.network;
 
+import com.tacz.guns.api.client.gameplay.IClientPlayerGunOperator;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
 import net.zerocontact.animation_data.AnimateData;
 import net.zerocontact.api.Toggleable;
 import net.zerocontact.client.ClientData;
 import net.zerocontact.client.animation.VisorTracker;
 import net.zerocontact.command.CommandManager;
-import net.zerocontact.datagen.GearRecipeData;
 import net.zerocontact.item.backpack.BaseBackpack;
 import net.zerocontact.item.block.WorkBenchEntity;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -179,14 +181,14 @@ public class NetworkHandler {
         }
     }
 
-    public record BuyGearsPacket(BlockPos pos, int recipeIndex) {
+    public record BuyGearsPacket(BlockPos pos, Item gearItem) {
         public void encode(FriendlyByteBuf buf) {
             buf.writeBlockPos(pos);
-            buf.writeInt(recipeIndex);
+            buf.writeItem(gearItem.getDefaultInstance());
         }
 
         public static BuyGearsPacket decode(FriendlyByteBuf buf) {
-            return new BuyGearsPacket(buf.readBlockPos(), buf.readInt());
+            return new BuyGearsPacket(buf.readBlockPos(), buf.readItem().getItem());
         }
 
         public static void handle(BuyGearsPacket msg, Supplier<NetworkEvent.Context> supplier) {
@@ -194,17 +196,56 @@ public class NetworkHandler {
             context.enqueueWork(() -> {
                 ServerPlayer player = context.getSender();
                 if (player == null) return;
-                BlockEntity be = player.level().getBlockEntity(msg.pos);
-                if (!(be instanceof WorkBenchEntity workBenchEntity)) return;
-                if (msg.recipeIndex < 0 || msg.recipeIndex >= WorkBenchEntity.recipeData.size()) return;
-                GearRecipeData gearRecipeData = WorkBenchEntity.recipeData.get(msg.recipeIndex);
-                if (!player.isCreative()) {
-                    if (workBenchEntity.canCraft(gearRecipeData, player)) {
-                        workBenchEntity.consumeItems(gearRecipeData, player);
-                        workBenchEntity.giveItem(player, WorkBenchEntity.recipeData.get(msg.recipeIndex()).gearId);
-                    }
-                } else {
-                    workBenchEntity.giveItem(player, WorkBenchEntity.recipeData.get(msg.recipeIndex()).gearId);
+                WorkBenchEntity.buy(msg, player);
+            });
+        }
+
+    }
+
+    public record OpenAmmoSelectorPacket() {
+        public void encode(FriendlyByteBuf buf) {
+        }
+
+        public static OpenAmmoSelectorPacket decode(FriendlyByteBuf buf) {
+            return new OpenAmmoSelectorPacket();
+        }
+
+        public static void handle(OpenAmmoSelectorPacket msg, Supplier<NetworkEvent.Context> supplier) {
+            ServerAmmoSelector.handleMenu(msg, supplier);
+        }
+    }
+
+    public record SelectAmmoPacket(ItemStack ammoItem) {
+        public void encode(FriendlyByteBuf buf) {
+            buf.writeItem(ammoItem);
+        }
+
+        public static SelectAmmoPacket decode(FriendlyByteBuf buf) {
+            return new SelectAmmoPacket(buf.readItem());
+        }
+
+        public static void handle(SelectAmmoPacket msg, Supplier<NetworkEvent.Context> supplier) {
+            ServerAmmoSelector.handleSelected(msg, supplier);
+        }
+    }
+
+    public record ClientAmmoReloadPacket() {
+        public void encode(FriendlyByteBuf buf) {
+        }
+
+        public static ClientAmmoReloadPacket decode(FriendlyByteBuf buf) {
+            return new ClientAmmoReloadPacket();
+        }
+
+
+        public static void handle(ClientAmmoReloadPacket __, Supplier<NetworkEvent.Context> supplier) {
+            NetworkEvent.Context context = supplier.get();
+            context.enqueueWork(() -> {
+                Minecraft mc = Minecraft.getInstance();
+                LocalPlayer player = mc.player;
+                IClientPlayerGunOperator operator = IClientPlayerGunOperator.fromLocalPlayer(player);
+                if (operator != null) {
+                    operator.reload();
                 }
             });
         }

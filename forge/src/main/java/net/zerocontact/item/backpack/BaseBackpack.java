@@ -97,13 +97,13 @@ public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl impl
 
     @Override
     public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
+        final ItemStackHandler container = new ItemStackHandler(containerSize);
         return new ICapabilityProvider() {
             @Override
             public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction arg) {
                 ListTag listTag = readInvTags(stack);
                 CompoundTag compoundTag = new CompoundTag();
                 compoundTag.put("Items", listTag);
-                ItemStackHandler container = new ItemStackHandler(containerSize);
                 container.deserializeNBT(compoundTag);
                 return ForgeCapabilities.ITEM_HANDLER.orEmpty(capability, LazyOptional.of(() -> container));
             }

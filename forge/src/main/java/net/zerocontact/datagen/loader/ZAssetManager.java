@@ -9,10 +9,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.IAssetManager;
-import net.zerocontact.datagen.GenerationRecord;
-import net.zerocontact.datagen.ItemGenData;
-import net.zerocontact.datagen.ItemAdapter;
-import net.zerocontact.datagen.RuntimeTypeAdapterFactory;
+import net.zerocontact.datagen.*;
 import net.zerocontact.registries.ItemsReg;
 
 import java.io.IOException;
@@ -90,6 +87,10 @@ public class ZAssetManager implements IAssetManager {
                 LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(plate, tab);
                 if (records.isEmpty()) return;
                 this.registerItems(ITEMS_REG_TAB, ItemsReg.ITEMS, new IAssetManager.WearableType(records, "PLATE_LIKE"));
+            } else if(data instanceof ExperimentalBallisticData ammo){
+                LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(ammo, tab);
+                if(records.isEmpty())return;
+                this.registerItems(ITEMS_REG_TAB,ItemsReg.ITEMS, new IAssetManager.WearableType(records,"AMMO"));
             }
         }));
     }

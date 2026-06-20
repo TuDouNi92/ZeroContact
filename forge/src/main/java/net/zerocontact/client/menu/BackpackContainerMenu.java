@@ -31,6 +31,7 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
     public int minSlotY = Integer.MAX_VALUE;
     public int maxSlotY = Integer.MIN_VALUE;
     public int guiWidth, guiHeight;
+    private int backpackSlotEnd, rigsSlotEnd;
     public @Nullable ItemStack backpackRenderStack;
     public ItemStack rigsRenderStack;
     public ItemStack allyStack;
@@ -47,7 +48,7 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
     }
 
     //server side
-    public BackpackContainerMenu(int containerId, Inventory playerInv, TriggerSource source, ItemStack allyStack) {
+    public BackpackContainerMenu(int containerId, Inventory playerInv, TriggerSource source, @Nullable ItemStack allyStack) {
         super(ModMenus.BACKPACK_CONTAINER.get(), containerId);
         this.triggerSource = source;
         if (triggerSource == TriggerSource.USE) {
@@ -79,7 +80,7 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
             });
 
         } else if (source == TriggerSource.ALLY) {
-            if (allyStack.getItem() instanceof BaseBackpack backpack) {
+            if (allyStack != null && allyStack.getItem() instanceof BaseBackpack backpack) {
                 this.allyStack = allyStack;
                 backpackContainer = new IndexSimpleContainer(backpack.containerSize);
                 backpackRenderStack = allyStack;
@@ -133,7 +134,32 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
 
     @Override
     public @NotNull ItemStack quickMoveStack(@NotNull Player player, int index) {
-        return ItemStack.EMPTY;
+        ItemStack copy = ItemStack.EMPTY;
+        Slot sourceSlot = this.slots.get(index);
+        if (!sourceSlot.hasItem()) return copy;
+        ItemStack sourceStack = sourceSlot.getItem();
+        copy = sourceStack.copy();
+        if (rigsSlotEnd == 0) rigsSlotEnd = backpackSlotEnd;
+        if (index < backpackSlotEnd) {
+            if (!this.moveItemStackTo(sourceStack, rigsSlotEnd, slots.size(), false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (index < rigsSlotEnd) {
+            if (!this.moveItemStackTo(sourceStack, rigsSlotEnd, slots.size(), false)) {
+                return ItemStack.EMPTY;
+            }
+        } else {
+            if (!this.moveItemStackTo(sourceStack, 0, rigsSlotEnd, false)) {
+                return ItemStack.EMPTY;
+            }
+        }
+
+        if (sourceStack.isEmpty()) {
+            sourceSlot.setByPlayer(ItemStack.EMPTY);
+        } else {
+            sourceSlot.setChanged();
+        }
+        return copy;
     }
 
     @Override
@@ -171,12 +197,14 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
                         backpackRightScreenX = startX + j * 36;
                     }
                 }
+                backpackSlotEnd = slots.size();
             }
             //Rigs part
             if (rigsSize != 0) {
                 int rCols = Mth.ceil(Mth.sqrt(rigsSize));
                 int rRows = Mth.ceil((double) rigsSize / rCols);
                 int rStartX = startX == 0 ? (176 - rCols * 18) / 2 : backpackRightScreenX + 16;
+                int size = 0;
                 for (int i = 0; i < rRows; ++i) {
                     for (int j = 0; j < rCols; ++j) {
                         rigsCustomInvY = 16 + i * 18;
@@ -186,8 +214,10 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
                                 return !(stack.getItem() instanceof BaseBackpack || stack.getItem() instanceof BaseRigs);
                             }
                         });
+                        size++;
                     }
                 }
+                rigsSlotEnd = backpackSlotEnd + size;
             }
         }
     }
@@ -215,7 +245,7 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
 
     @Override
     public void removed(@NotNull Player player) {
-        if (triggerSource == BackpackContainerMenu.TriggerSource.USE
+        if (triggerSource == TriggerSource.USE
                 && player instanceof ServerPlayer serverPlayer
         ) {
             writeInvToTag(getHandStack(serverPlayer));

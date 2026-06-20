@@ -136,5 +136,14 @@
         "type": "file"
       }
     ]
+  },
+
+  "gui/selector": {
+    "sounds": [
+      {
+        "name": "zerocontact:gui/selector",
+        "type": "file"
+      }
+    ]
   }
 }

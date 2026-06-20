@@ -4,12 +4,14 @@ import com.google.common.util.concurrent.AtomicDouble;
 import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.init.ModDamageTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.command.CommandManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -80,6 +82,7 @@ public enum CaliberVariantDamageHelper {
     private final Caliber caliber;
     private static final EnumSet<CaliberVariantDamageHelper> caliberVariantDamageHelperEnumSet = EnumSet.allOf(CaliberVariantDamageHelper.class);
     public static final Set<Caliber> experimentalBallisticSet = new HashSet<>();
+    private static final String DEFAULT = "tacz:ammo";
 
     CaliberVariantDamageHelper(Caliber caliber) {
         this.caliber = caliber;
@@ -95,18 +98,21 @@ public enum CaliberVariantDamageHelper {
      * @param penetrationClass The penetration level for damage interceptor, bypassed when the feature is off
      * @param fleshDamage      The flesh damage for damage interceptor, bypassed when the feature is off
      */
-    public record Caliber(String id, float baseDamageFactor, int penetrationClass, float fleshDamage) {
-        public Caliber(String id, float baseDamageFactor, int penetrationClass) {
-            this(id, baseDamageFactor, penetrationClass, 8);
-        }
-
-        public Caliber(String id, float baseDamageFactor) {
-            this(id, baseDamageFactor, 10, 4);
+    public record Caliber(String id, String variant, float baseDamageFactor, int penetrationClass, float fleshDamage,
+                          float armorDamage,
+                          int stackSize) {
+        public Caliber(String id, float baseDamageFactor, int penetrationClass, float fleshDamage) {
+            this(id, DEFAULT, baseDamageFactor, penetrationClass, fleshDamage, 0, 30);
         }
 
         @Override
         public boolean equals(Object obj) {
-            return obj instanceof Caliber caliber && Objects.equals(id, caliber.id);
+            return obj instanceof Caliber caliber && Objects.equals(id, caliber.id) && (Objects.equals(variant, caliber.variant.split(":")[1]) || (Objects.equals(variant, caliber.variant)));
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(id, variant);
         }
     }
 
@@ -120,24 +126,27 @@ public enum CaliberVariantDamageHelper {
      */
     private static <E> Optional<Caliber> getMatchedCaliber(DamageSource source, Set<E> set) {
         AtomicReference<Optional<Caliber>> result = new AtomicReference<>(Optional.empty());
-        if (!source.is(ModDamageTypes.BULLETS_TAG)) return Optional.empty();
-        Optional.ofNullable(source.getDirectEntity()).ifPresent(entity -> {
-            if (entity instanceof EntityKineticBullet bullet) {
-                for (E caliberData : set) {
-                    if (caliberData instanceof CaliberVariantDamageHelper caliberEnum) {
-                        if (caliberEnum.caliber.id.equals(bullet.getAmmoId().toString())) {
-                            result.set(Optional.of(caliberEnum.caliber));
-                        }
+        if (!(source.getDirectEntity() instanceof EntityKineticBullet bullet)) return result.get();
+        @Nullable AmmoInjector.AmmoContext ammoContext = AmmoInjector.get(bullet);
+        if (!source.is(ModDamageTypes.BULLETS_TAG) || ammoContext == null) return result.get();
 
-                    } else if (caliberData instanceof Caliber caliber) {
-                        if (caliber.id.equals(bullet.getAmmoId().toString())) {
-                            result.set(Optional.of(caliber));
-                        }
-                    }
+        for (E caliberData : set) {
+            if (caliberData instanceof CaliberVariantDamageHelper caliberEnum) {
+                if (caliberEnum.caliber.id.equals(bullet.getAmmoId().toString())) {
+                    result.set(Optional.of(caliberEnum.caliber));
+                    break;
+                }
+
+            } else if (caliberData instanceof Caliber caliber) {
+                if (ammoContext != null && AmmoInjector.isEmptyContext(ammoContext) && source.getEntity() instanceof ServerPlayer player) {
+                    ammoContext = AmmoInjector.setPlayerGunContext(player);
+                }
+                if (ammoContext != null && caliber.equals(ammoContext.caliber())) {
+                    result.set(Optional.of(caliber));
+                    break;
                 }
             }
-
-        });
+        }
         return result.get();
     }
 
@@ -159,20 +168,19 @@ public enum CaliberVariantDamageHelper {
                     mergedCaliberSet.removeAll(experimentalBallisticSet);
                     mergedCaliberSet.addAll(experimentalBallisticSet);
                     getMatchedCaliber(source, mergedCaliberSet).ifPresent(caliber -> {
-                        double balanceDamage = caliber.baseDamageFactor * Mth.sqrt(original) * 0.75f;
-                        double fleshDamage = getPenetratedDamage(caliber, hurtCanHold);
-                        if (fleshDamage != 0) {
-                            output.set(fleshDamage * provider.generatePenetrated());
+                        double penetratedDamage = getPenetratedDamage(caliber, hurtCanHold);
+                        if (penetratedDamage != 0) {
+                            output.set(penetratedDamage * provider.generatePenetrated());
                         } else {
-                            output.set(balanceDamage * provider.generateBlunt());
+                            output.set(caliber.fleshDamage * provider.generateBlunt());
                         }
                     });
                 } else {
                     getMatchedCaliber(source, caliberVariantDamageHelperEnumSet).ifPresent(caliber -> {
                         double balanceDamage = caliber.baseDamageFactor * Mth.sqrt(original) * 0.75f;
-                        double fleshDamage = getPenetratedDamage(caliber, hurtCanHold);
-                        if (fleshDamage != 0) {
-                            output.set(fleshDamage * provider.generatePenetrated());
+                        double penetratedDamage = getPenetratedDamage(caliber, hurtCanHold);
+                        if (penetratedDamage != 0) {
+                            output.set(penetratedDamage * provider.generatePenetrated());
                         } else {
                             output.set(balanceDamage * provider.generateBlunt());
                         }

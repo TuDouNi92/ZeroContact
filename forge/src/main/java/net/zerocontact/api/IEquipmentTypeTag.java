@@ -13,7 +13,8 @@ public interface IEquipmentTypeTag {
         HEADSET("HEADSET"),
         BACKPACK("BACKPACK"),
         RIGS("RIGS"),
-        PLATE("PLATE");
+        PLATE("PLATE"),
+        AMMO("AMMO");
         private final String name;
         private final String translationValue;
         EquipmentType(String name) {

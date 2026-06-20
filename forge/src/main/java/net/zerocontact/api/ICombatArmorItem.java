@@ -15,9 +15,12 @@ import java.util.List;
 
 public interface ICombatArmorItem {
 
+    static int generateLossDefault(float damageAmount, float durabilityLossFactor, int hits){
+        return (int) Math.round(0.4 * Math.pow(damageAmount * durabilityLossFactor, 1.5) * (1 + hits * 0.1f));
+    }
 
     default int generateLoss(float damageAmount, float durabilityLossFactor, int hits) {
-        return (int) Math.round(0.4 * Math.pow(damageAmount * durabilityLossFactor, 1.5) * (1 + hits * 0.1f));
+        return (int) Math.ceil(0.4 * Math.pow(damageAmount * durabilityLossFactor, 1.5) * (1 + hits * 0.1f));
     }
 
 

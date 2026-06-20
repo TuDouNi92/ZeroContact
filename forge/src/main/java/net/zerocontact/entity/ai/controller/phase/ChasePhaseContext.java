@@ -2,6 +2,7 @@ package net.zerocontact.entity.ai.controller.phase;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.util.LandRandomPos;
+import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
 import net.zerocontact.api.IPhaseContext;
 import net.zerocontact.entity.ArmedRaider;
@@ -32,18 +33,37 @@ public class ChasePhaseContext implements IPhaseContext {
             return;
         }
         if (cacheTarget != null) {
-            Vec3 searchPos = LandRandomPos.getPosTowards(this.raider, 12, 6, cacheTarget.position());
-            if (searchPos == null) return;
-            if (!raider.getNavigation().isDone()) return;
-            raider.getNavigation().moveTo(searchPos.x, searchPos.y, searchPos.z, 1D);
+            gotoPath(cacheTarget.position());
             raider.setTarget(cacheTarget);
         } else if (raider.getTarget() != null) {
-            Vec3 searchPos = LandRandomPos.getPosTowards(this.raider, 12, 6, raider.getTarget().position());
-            if (searchPos == null) return;
-            if (!raider.getNavigation().isDone()) return;
-            raider.getNavigation().moveTo(searchPos.x, searchPos.y, searchPos.z, 1D);
+            gotoPath(raider.getTarget().position());
         }
+    }
 
+    private void gotoPath(@Nullable Vec3 position) {
+        if (!raider.getNavigation().isDone()) {
+            return;
+        }
+        if (position == null) {
+            onExit();
+            return;
+        }
+        Vec3 searchPos = null;
+        if (raider.getTarget() != null) {
+            searchPos = LandRandomPos.getPosTowards(this.raider, 12, 6, position);
+        }
+        if (searchPos == null) {
+            onExit();
+            return;
+        }
+        raider.getNavigation().moveTo(searchPos.x, searchPos.y, searchPos.z, 1D);
+        Path onGoingPath = raider.getNavigation().getPath();
+        if (onGoingPath != null) {
+            if (onGoingPath.isDone()) {
+                onExit();
+            }
+        }
+        onExit();
     }
 
     @Override

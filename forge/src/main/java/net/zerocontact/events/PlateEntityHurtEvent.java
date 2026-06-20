@@ -29,7 +29,7 @@ public class PlateEntityHurtEvent {
         EntityKineticBullet.EntityResult result = EventUtil.getHitResult(source);
         boolean isHeadShot = result != null && result.isHeadshot();
         if (lv instanceof ServerPlayer serverPlayer && serverPlayer.isCreative()) return false;
-        DamageSource modifiedDamageSource = ZDamageTypes.create(lv.level());
+        DamageSource modifiedDamageSource = ZDamageTypes.create(lv.level(),source.getDirectEntity(),source.getEntity(),source.getSourcePosition());
         AtomicBoolean interruptResult = new AtomicBoolean();
         ItemStack armorSlot = lv.getItemBySlot(EquipmentSlot.CHEST);
         if (isHeadShot) return false;
@@ -50,16 +50,14 @@ public class PlateEntityHurtEvent {
         float hurtAmount;
         if (plateStack != null && plateStack.getItem() instanceof ICombatArmorItem) {
             int plateProtectionClass = plateStack.getOrCreateTag().getInt("protection_class");
-            if (source.is(ModDamageTypes.BULLET)) {
-                lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
+            if (source.is(ModDamageTypes.BULLETS_TAG)) {
                 hurtAmount = getHurtAmount(lv, source, amount, (ICombatArmorItem) plateStack.getItem(), (ICombatArmorItem) armorStack.getItem(), plateProtectionClass);
                 lv.hurt(modifiedDamageSource, hurtAmount);
                 interruptResult.set(true);
             }
         } else {
             int protectionClass = armorStack.getOrCreateTag().getInt("protection_class");
-            if (source.is(ModDamageTypes.BULLET)) {
-                lv.playSound(ModSoundEventsReg.ARMOR_HIT_PLATE);
+            if (source.is(ModDamageTypes.BULLETS_TAG)) {
                 if (armorStack.getItem() instanceof ICombatArmorItem provider) {
                     hurtAmount = getHurtAmount(lv, source, amount, null, provider, protectionClass);
                     lv.hurt(modifiedDamageSource, hurtAmount);
@@ -113,11 +111,10 @@ public class PlateEntityHurtEvent {
         if (livingEntity instanceof Player player) {
             player.level().playLocalSound(player.getX(), player.getY(), player.getZ(), ModSoundEventsReg.HELMET_HIT, SoundSource.PLAYERS, 1.0f, 1.0f, false);
         }
-        livingEntity.playSound(ModSoundEventsReg.HELMET_HIT);
     }
 
     public static EventResult entityHurtRegister(LivingEntity lv, DamageSource source, float amount) {
-        if (PlateEntityHurtEvent.modifyDamage(lv, source, amount, EventUtil.idHitFromBack(lv, source))) {
+        if (PlateEntityHurtEvent.modifyDamage(lv, source, amount, EventUtil.getHitBodyPartStack(lv, source))) {
             return EventResult.interruptFalse();
         }
         return EventResult.pass();

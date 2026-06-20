@@ -55,5 +55,8 @@ public interface IAssetManager {
             return new LinkedHashSet<>();
         }
 
+        default <T> LinkedHashSet<GenerationRecord<?>> deserializeItems(T data, String tab) {
+            return new LinkedHashSet<>();
+        }
     }
 }
