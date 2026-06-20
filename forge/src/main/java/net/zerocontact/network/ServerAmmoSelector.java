@@ -8,8 +8,12 @@ import com.tacz.guns.api.item.builder.AmmoItemBuilder;
 import com.tacz.guns.item.AmmoItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
@@ -19,7 +23,10 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.zerocontact.client.menu.AmmoSelectorMenu;
+import net.zerocontact.command.CommandManager;
 import net.zerocontact.events.AmmoInjector;
 import net.zerocontact.events.EventUtil;
 import net.zerocontact.item.ammo.GenerateAmmo;
@@ -35,10 +42,27 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class ServerAmmoSelector {
-    public static void handle(NetworkHandler.SelectAmmoPacket msg, Supplier<NetworkEvent.Context> supplier) {
+
+    public static void handleMenu(NetworkHandler.OpenAmmoSelectorPacket msg, Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
         ServerPlayer player = context.getSender();
-        if (player == null) return;
+        if (player == null || player.isSpectator()) return;
+        if(CommandManager.CommandSavedData.get((ServerLevel) player.level()).experimentalBallistic)
+            context.enqueueWork(() -> {
+                if (!IGun.mainHandHoldGun(player)) return;
+                LinkedHashMap<ItemStack, Integer> ammoMap = ServerAmmoSelector.getCreativeAmmoForHeldGun(player);
+                NetworkHooks.openScreen(
+                        player,
+                        new SimpleMenuProvider((id, inv, __) -> new AmmoSelectorMenu(id, ammoMap, inv), Component.translatable("")),
+                        buf -> buf.writeMap(ammoMap, FriendlyByteBuf::writeItem, FriendlyByteBuf::writeInt)
+                );
+            });
+    }
+
+    public static void handleSelected(NetworkHandler.SelectAmmoPacket msg, Supplier<NetworkEvent.Context> supplier) {
+        NetworkEvent.Context context = supplier.get();
+        ServerPlayer player = context.getSender();
+        if (player == null || player.isSpectator()) return;
         context.enqueueWork(() -> {
             if (!IGun.mainHandHoldGun(player)) return;
             ItemStack gunStack = player.getMainHandItem();
