@@ -30,7 +30,7 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
     public int maxSlotX = Integer.MIN_VALUE;
     public int minSlotY = Integer.MAX_VALUE;
     public int maxSlotY = Integer.MIN_VALUE;
-    public int guiWidth, guiHeight;
+    public int guiWidth, guiHeight, rigStackStart;
     private int backpackSlotEnd, rigsSlotEnd;
     public @Nullable ItemStack backpackRenderStack;
     public ItemStack rigsRenderStack;
@@ -92,7 +92,7 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
         new PlayerInventory(playerInv, customInventory);
         int padding = 8;
         this.guiWidth = (maxSlotX - minSlotX) + padding * 2;
-        this.guiHeight = (maxSlotY - minSlotY) + padding * 2;
+        this.guiHeight = (maxSlotY - minSlotY) + (padding+4) * 2;
     }
 
     private ItemStack getHandStack(Player player) {
@@ -184,7 +184,9 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
             if (backpackSize != 0) {
                 int cols = Mth.ceil(Mth.sqrt(backpackSize));
                 int rows = Mth.ceil((double) backpackSize / cols);
-                startX = (176 - cols * 18) / 2;
+                int backpackWidth = cols * 18;
+                int baseWidth = Math.max(176, backpackWidth + 50);
+                startX = (baseWidth - backpackWidth) / 2;
                 for (int i = 0; i < rows; ++i) {
                     for (int j = 0; j < cols; ++j) {
                         backpackCustomInvY = 16 + i * 18;
@@ -194,7 +196,7 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
                                 return !(stack.getItem() instanceof BaseBackpack);
                             }
                         });
-                        backpackRightScreenX = startX + j * 36;
+                        backpackRightScreenX = startX + j * 24;
                     }
                 }
                 backpackSlotEnd = slots.size();
@@ -203,7 +205,9 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
             if (rigsSize != 0) {
                 int rCols = Mth.ceil(Mth.sqrt(rigsSize));
                 int rRows = Mth.ceil((double) rigsSize / rCols);
-                int rStartX = startX == 0 ? (176 - rCols * 18) / 2 : backpackRightScreenX + 16;
+                int rigsWidth = rCols * 18;
+                int rigsBaseWidth = Math.max(176, rigsWidth);
+                int rStartX = startX == 0 ? (rigsBaseWidth - rigsWidth) / 2 : backpackRightScreenX + 12;
                 int size = 0;
                 for (int i = 0; i < rRows; ++i) {
                     for (int j = 0; j < rCols; ++j) {
@@ -217,6 +221,7 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
                         size++;
                     }
                 }
+                rigStackStart = rStartX - 24;
                 rigsSlotEnd = backpackSlotEnd + size;
             }
         }

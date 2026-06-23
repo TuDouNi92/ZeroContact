@@ -50,15 +50,14 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
     protected void init() {
         super.init();
         this.titleLabelX = (getXSize() - this.font.width(title)) / 2;
-        this.guiWidthMax = getGuiLeft() + menu.guiWidth;
-        this.guiHeightMax = getGuiTop() + menu.guiHeight;
         this.leftPos = (this.width - menu.guiWidth) / 2;
         this.topPos = (this.height - menu.guiHeight) / 2;
+        this.guiWidthMax = getGuiLeft() + menu.guiWidth;
+        this.guiHeightMax = Math.max(238, getGuiTop() + menu.guiHeight);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        guiGraphics.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 0xccc3bdbd, false);
+    protected void renderLabels(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
     }
 
     @Override
@@ -69,14 +68,15 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
         drawSlotBg(menu, guiGraphics);
         drawEquipmentLabel(guiGraphics);
         Optional.ofNullable(Minecraft.getInstance().player).ifPresent(
-                player -> InventoryScreen.renderEntityInInventoryFollowsAngle(guiGraphics, getGuiLeft() + 20, getGuiTop() + 96, 32, 0, 0, player));
+                player -> InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, getGuiLeft() + 12, getGuiTop() + 88, 20, getGuiLeft() + 20 - mouseX, getGuiTop() + 58 - mouseY, player));
     }
 
     private void drawEquipmentLabel(@NotNull GuiGraphics guiGraphics) {
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(getGuiLeft(), getGuiTop() + 64, 10);
-        guiGraphics.pose().scale(24.0f, -24.0f, 24.0f);
-        if (menu.backpackRenderStack != null) {
+        if (menu.backpackRenderStack != null && menu.rigsRenderStack != null) {
+
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(getGuiLeft(), getGuiTop() + 64, 10);
+            guiGraphics.pose().scale(24.0f, -24.0f, 24.0f);
             IClientItemExtensions extensions = IClientItemExtensions.of(menu.backpackRenderStack);
             extensions.getCustomRenderer().renderByItem(
                     menu.backpackRenderStack,
@@ -86,7 +86,41 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
                     15728880,
                     OverlayTexture.NO_OVERLAY
             );
+            guiGraphics.pose().popPose();
+
+
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(getGuiLeft() + menu.rigStackStart, getGuiTop() + 64, 10);
+            guiGraphics.pose().scale(24.0f, -24.0f, 24.0f);
+            IClientItemExtensions extensions1 = IClientItemExtensions.of(menu.rigsRenderStack);
+            extensions1.getCustomRenderer().renderByItem(
+                    menu.rigsRenderStack,
+                    ItemDisplayContext.GUI,
+                    guiGraphics.pose(),
+                    guiGraphics.bufferSource(),
+                    15728880,
+                    OverlayTexture.NO_OVERLAY
+            );
+            guiGraphics.pose().popPose();
+
+        } else if (menu.backpackRenderStack != null) {
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(getGuiLeft(), getGuiTop() + 64, 10);
+            guiGraphics.pose().scale(24.0f, -24.0f, 24.0f);
+            IClientItemExtensions extensions = IClientItemExtensions.of(menu.backpackRenderStack);
+            extensions.getCustomRenderer().renderByItem(
+                    menu.backpackRenderStack,
+                    ItemDisplayContext.GUI,
+                    guiGraphics.pose(),
+                    guiGraphics.bufferSource(),
+                    15728880,
+                    OverlayTexture.NO_OVERLAY
+            );
+            guiGraphics.pose().popPose();
         } else if (menu.rigsRenderStack != null) {
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(getGuiLeft(), getGuiTop() + 64, 10);
+            guiGraphics.pose().scale(24.0f, -24.0f, 24.0f);
             IClientItemExtensions extensions = IClientItemExtensions.of(menu.rigsRenderStack);
             extensions.getCustomRenderer().renderByItem(
                     menu.rigsRenderStack,
@@ -96,9 +130,8 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
                     15728880,
                     OverlayTexture.NO_OVERLAY
             );
+            guiGraphics.pose().popPose();
         }
-
-        guiGraphics.pose().popPose();
     }
 
 

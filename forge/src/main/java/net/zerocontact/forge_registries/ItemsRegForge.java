@@ -66,7 +66,7 @@ public class ItemsRegForge {
                 new Plates(),
                 new Helmets(),
                 new Armors(),
-                new Backpacks(),
+                new Loadouts(),
                 new Armbands(),
                 new Uniforms()
         );

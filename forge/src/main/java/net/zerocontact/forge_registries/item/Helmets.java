@@ -1,9 +1,6 @@
 package net.zerocontact.forge_registries.item;
 
 import dev.architectury.registry.registries.RegistrySupplier;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterials;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.zerocontact.api.TabableItem;
 import net.zerocontact.item.helmet.*;
@@ -12,7 +9,6 @@ import net.zerocontact.registries.ItemsReg;
 import java.util.List;
 
 public class Helmets implements TabableItem {
-    public static RegistrySupplier<FastMt> FAST_MT = ItemsReg.ITEMS.register("fast_mt", () -> new FastMt(ArmorMaterials.IRON, ArmorItem.Type.HELMET, new Item.Properties(), 8));
     public static RegistrySupplier<Ratnik> RATNIK_HELMET_EMR = ItemsReg.ITEMS.register("helmet_6b47_ratnik_emr", () -> Ratnik.create(4, 32, Ratnik.Color.EMR));
     public static RegistrySupplier<Ratnik> RATNIK_HELMET_ARC = ItemsReg.ITEMS.register("helmet_6b47_ratnik_arc", () -> Ratnik.create(4, 32, Ratnik.Color.ARCTIC));
     public static RegistrySupplier<Bastion> BASTION_HELMET = ItemsReg.ITEMS.register("helmet_bastion_black", () -> Bastion.create(9, 48, Bastion.Color.BLACK));
@@ -36,7 +32,7 @@ public class Helmets implements TabableItem {
 
 
     private static final List<RegistrySupplier<? extends ItemLike>> items = List.of(
-            FAST_MT, RATNIK_HELMET_EMR, RATNIK_HELMET_ARC, BASTION_HELMET, BASTION_HELMET_MULTICAM,
+            RATNIK_HELMET_EMR, RATNIK_HELMET_ARC, BASTION_HELMET, BASTION_HELMET_MULTICAM,
             BASTION_HELMET_GREEN, UNTAR_HELMET, ALTYN_VISOR_HELMET, AIRFRAME_HELMET, BRITISH23_HELMET,
             PHONETALKER_HELMET, TBH_HELMET, TAGILLA_MASK_MANHUNT, TAGILLA_MASK_YBEY, PMK2, ZK, M50, MP5,
             COLD_FEAR_MASK, CYAN_CAP, BOSS_CAP
