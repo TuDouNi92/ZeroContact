@@ -10,9 +10,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
+import net.zerocontact.compat.FirstAidCompatHandler;
 import net.zerocontact.registries.ModSoundEventsReg;
 
 import java.util.Optional;
@@ -22,24 +22,36 @@ public class PlateDamageEvent {
             LivingEntity livingEntity,
             DamageSource damageSource,
             float amount,
-            ItemStack plateSlot
+            ItemStack[] stacksInSlot
     ) {
-        if (plateSlot.isEmpty()) return false;
-        return damage(livingEntity, damageSource, amount, plateSlot);
+        damage(livingEntity, damageSource, amount, stacksInSlot);
+        return false;
     }
 
-    private static boolean damage(LivingEntity livingEntity, DamageSource damageSource, float amount, ItemStack stackInSlot) {
+    private static void damage(LivingEntity livingEntity, DamageSource damageSource, float amount, ItemStack[] stacksInSlot) {
         if (damageSource.is(ModDamageTypes.BULLET_IGNORE_ARMOR) && damageSource.typeHolder().containsTag(DamageTypeTags.BYPASSES_ARMOR))
-            return false;
+            return;
         float durabilityLossFactor = 0.1f;
         float defaultArmorDamage = Math.min(amount * 0.1f, 10);
-        int hits = stackInSlot.getOrCreateTag().getInt("hits") + 1;
         int durabilityLossAmount = 1;
+        ItemStack stackInSlot = stacksInSlot[0];
+        ItemStack stackInSlot2 = ItemStack.EMPTY;
+        if (stacksInSlot.length > 1) {
+            stackInSlot2 = stacksInSlot[1];
+        }
+        actuallyDamage(livingEntity, damageSource, stackInSlot, defaultArmorDamage, durabilityLossFactor, durabilityLossAmount);
+        if (!stackInSlot2.isEmpty()) {
+            actuallyDamage(livingEntity, damageSource, stackInSlot2, defaultArmorDamage, durabilityLossFactor, durabilityLossAmount);
+        }
+    }
+
+    private static void actuallyDamage(LivingEntity livingEntity, DamageSource damageSource, ItemStack stackInSlot, float defaultArmorDamage, float durabilityLossFactor, int durabilityLossAmount) {
         if (!stackInSlot.isEmpty() && (damageSource.is(ModDamageTypes.BULLETS_TAG) || damageSource.is(ZDamageTypes.ZC_DAMAGE))) {
             if (stackInSlot.getItem() instanceof ICombatArmorItem armorProvider) {
-                if (!(damageSource.getDirectEntity() instanceof EntityKineticBullet bullet)) return false;
+                if (!(damageSource.getDirectEntity() instanceof EntityKineticBullet bullet)) return;
                 AmmoInjector.AmmoContext ammoContext = AmmoInjector.get(bullet);
                 float caliberArmorDamage;
+                int hits = stackInSlot.getOrCreateTag().getInt("hits");
                 if (ammoContext != null) {
                     CaliberVariantDamageHelper.Caliber caliber = ammoContext.caliber();
                     if (caliber.armorDamage() != 0) {
@@ -55,22 +67,24 @@ public class PlateDamageEvent {
                     }
                 }
 
+                hits++;
+                stackInSlot.getOrCreateTag().putInt("hits", hits);
+                EntityKineticBullet.EntityResult result = EventUtil.getHitResult(damageSource);
+
+                if (result != null && result.isHeadshot()) {
+                    return;
+                }
+
+                FirstAidCompatHandler firstAidCompatHandler = FirstAidCompatHandler.create(livingEntity, damageSource);
+                if (firstAidCompatHandler != null && firstAidCompatHandler.getLimbsApplicable()) return;
+                stackInSlot.hurtAndBreak(durabilityLossAmount, livingEntity, lv -> lv.playSound(ModSoundEventsReg.ARMOR_BROKEN_PLATE, 1.0f, 1.0f));
             }
-            stackInSlot.getOrCreateTag().putInt("hits", hits);
-            EntityKineticBullet.EntityResult result = EventUtil.getHitResult(damageSource);
-            if (result != null && result.isHeadshot()) {
-                return false;
-            }
-            stackInSlot.hurtAndBreak(durabilityLossAmount, livingEntity, lv -> {
-                lv.playSound(ModSoundEventsReg.ARMOR_BROKEN_PLATE, 1.0f, 1.0f);
-                ZeroContactLogger.LOG.debug("{}的插板碎掉了！", lv.getName());
-            });
         }
-        return false;
     }
 
     private static float getArmorDamage(CaliberVariantDamageHelper.Caliber caliber, ICombatArmorItem provider, float baseDamage) {
-        return caliber.penetrationClass() * baseDamage * ((float) caliber.penetrationClass() / provider.getAbsorb());
+        int absorb = provider.getAbsorb() == 0 ? 1 : provider.getAbsorb();
+        return caliber.penetrationClass() * baseDamage * ((float) caliber.penetrationClass() / absorb);
     }
 
     public static void damageHelmet(EntityHurtByGunEvent event) {

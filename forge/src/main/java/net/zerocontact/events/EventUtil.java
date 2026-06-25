@@ -31,23 +31,27 @@ public class EventUtil {
         return false;
     }
 
-    public static ItemStack getHitBodyPartStack(LivingEntity lv, DamageSource source) {
+    public static ItemStack[] getHitBodyPartStack(LivingEntity lv, DamageSource source) {
         double incidentAngleAbs = Math.abs(getAngle(lv, source));
-        AtomicReference<ItemStack> defenseStack = new AtomicReference<>(ItemStack.EMPTY);
+        AtomicReference<ItemStack[]> defenseStacks = new AtomicReference<>(new ItemStack[]{ItemStack.EMPTY});
         if (lv.getItemBySlot(EquipmentSlot.CHEST).getItem() instanceof IEquipmentTypeTag tag && tag.getArmorType().equals(IEquipmentTypeTag.EquipmentType.ARMOR)) {
-            defenseStack.set(lv.getItemBySlot(EquipmentSlot.CHEST));
-            return defenseStack.get();
+            defenseStacks.set(new ItemStack[]{lv.getItemBySlot(EquipmentSlot.CHEST)});
+            return defenseStacks.get();
         }
-        CuriosApi.getCuriosInventory(lv).ifPresent(iCuriosItemHandler -> {
-            if (incidentAngleAbs != 361) {
-                if (incidentAngleAbs > 90) {
-                    iCuriosItemHandler.getStacksHandler("front_plate").ifPresent(stacksHandler -> defenseStack.set(stacksHandler.getStacks().getStackInSlot(0)));
-                } else {
-                    iCuriosItemHandler.getStacksHandler("back_plate").ifPresent(stacksHandler -> defenseStack.set(stacksHandler.getStacks().getStackInSlot(0)));
-                }
+        ItemStack frontPlate = getCuriosStackFirst(lv, "front_plate");
+        ItemStack backPlate = getCuriosStackFirst(lv, "back_plate");
+        ItemStack plateStack = ItemStack.EMPTY;
+        if (incidentAngleAbs != 361) {
+            if (incidentAngleAbs > 90) {
+                plateStack = frontPlate;
+            } else {
+                plateStack = backPlate;
             }
-        });
-        return defenseStack.get();
+        }
+        if (lv.getItemBySlot(EquipmentSlot.CHEST).getItem() instanceof IEquipmentTypeTag tag && tag.getArmorType().equals(IEquipmentTypeTag.EquipmentType.PLATE_CARRIER)) {
+            defenseStacks.set(new ItemStack[]{plateStack, lv.getItemBySlot(EquipmentSlot.CHEST)});
+        }
+        return defenseStacks.get();
     }
 
     private static double getAngle(LivingEntity lv, DamageSource source) {
@@ -94,7 +98,7 @@ public class EventUtil {
     }
 
     public static ItemStack getCuriosStackFirst(LivingEntity player, String id) {
-        ItemStack[] stacks = {null};
+        ItemStack[] stacks = {ItemStack.EMPTY};
         CuriosApi.getCuriosInventory(player).ifPresent(handler -> {
             handler.getStacksHandler(id).ifPresent(iCurioStacksHandler -> {
                 ItemStack stack = iCurioStacksHandler.getStacks().getStackInSlot(0);

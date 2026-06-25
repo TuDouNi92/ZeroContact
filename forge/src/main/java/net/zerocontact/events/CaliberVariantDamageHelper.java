@@ -5,7 +5,6 @@ import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.init.ModDamageTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.zerocontact.api.ICombatArmorItem;
@@ -159,7 +158,7 @@ public enum CaliberVariantDamageHelper {
      * @param provider    Interface implementation that provides the situation of getting hit by bullets
      * @return The generated damage amount
      */
-    public static float generateDamageAmount(float original, DamageSource source, int hurtCanHold, ICombatArmorItem provider) {
+    public static float generateDamageAmount(float original, DamageSource source, int hurtCanHold, @Nullable ICombatArmorItem provider) {
         AtomicDouble output = new AtomicDouble(original);
         Optional.ofNullable(source.getDirectEntity()).ifPresent(bullet -> {
             if (bullet.level() instanceof ServerLevel serverLevel) {
@@ -169,27 +168,34 @@ public enum CaliberVariantDamageHelper {
                     mergedCaliberSet.addAll(experimentalBallisticSet);
                     getMatchedCaliber(source, mergedCaliberSet).ifPresent(caliber -> {
                         double penetratedDamage = getPenetratedDamage(caliber, hurtCanHold);
-                        if (penetratedDamage != 0) {
-                            output.set(penetratedDamage * provider.generatePenetrated());
-                        } else {
-                            output.set(caliber.fleshDamage * provider.generateBlunt());
-                        }
+                        setOutput(provider, caliber, penetratedDamage, output);
                     });
                 } else {
                     getMatchedCaliber(source, caliberVariantDamageHelperEnumSet).ifPresent(caliber -> {
-                        double balanceDamage = caliber.baseDamageFactor * Mth.sqrt(original) * 0.75f;
                         double penetratedDamage = getPenetratedDamage(caliber, hurtCanHold);
-                        if (penetratedDamage != 0) {
-                            output.set(penetratedDamage * provider.generatePenetrated());
-                        } else {
-                            output.set(balanceDamage * provider.generateBlunt());
-                        }
+                        setOutput(provider, caliber, penetratedDamage, output);
                     });
                 }
             }
 
         });
         return (float) output.get();
+    }
+
+    private static void setOutput(@Nullable ICombatArmorItem provider, Caliber caliber, double penetratedDamage, AtomicDouble output) {
+        if (penetratedDamage != 0) {
+            if (provider == null) {
+                output.set(penetratedDamage);
+            } else {
+                output.set(penetratedDamage * provider.generatePenetrated());
+            }
+        } else {
+            if (provider == null) {
+                output.set(caliber.fleshDamage);
+            } else {
+                output.set(caliber.fleshDamage * provider.generateBlunt());
+            }
+        }
     }
 
     /**
