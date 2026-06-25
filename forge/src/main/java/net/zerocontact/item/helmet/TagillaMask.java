@@ -5,8 +5,8 @@ import net.minecraft.resources.ResourceLocation;
 import static net.zerocontact.ZeroContact.MOD_ID;
 
 public class TagillaMask extends BaseGeoHelmet {
-    public TagillaMask(int absorb, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
-        super(absorb, defaultDurability, texture, model, animation);
+    public TagillaMask(int absorb, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, float bluntReduction, float penetrateReduction) {
+        super(absorb, defaultDurability, texture, model, animation, bluntReduction, penetrateReduction);
     }
 
     private record ColorResources(ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
@@ -15,15 +15,15 @@ public class TagillaMask extends BaseGeoHelmet {
     public enum Color {
         MANHUNT(
                 new ColorResources(
-                        new ResourceLocation(MOD_ID,"textures/models/mask/mask_svarka_tagilla_manhunt.png"),
-                        new ResourceLocation(MOD_ID,"geo/mask/mask_svarka_tagilla_manhunt.geo.json"),
+                        new ResourceLocation(MOD_ID, "textures/models/mask/mask_svarka_tagilla_manhunt.png"),
+                        new ResourceLocation(MOD_ID, "geo/mask/mask_svarka_tagilla_manhunt.geo.json"),
                         null
                 )
         ),
         YBEY(
                 new ColorResources(
-                        new ResourceLocation(MOD_ID,"textures/models/mask/mask_svarka_tagilla_ybei.png"),
-                        new ResourceLocation(MOD_ID,"geo/mask/mask_svarka_tagilla_ybei.geo.json"),
+                        new ResourceLocation(MOD_ID, "textures/models/mask/mask_svarka_tagilla_ybei.png"),
+                        new ResourceLocation(MOD_ID, "geo/mask/mask_svarka_tagilla_ybei.geo.json"),
                         null
                 )
         );
@@ -33,7 +33,8 @@ public class TagillaMask extends BaseGeoHelmet {
             this.colorResources = colorResources;
         }
     }
-    public static TagillaMask create(int absorb, int durability,Color color){
-        return new TagillaMask(absorb,durability,color.colorResources.texture,color.colorResources.model, color.colorResources.animation);
+
+    public static TagillaMask create(int absorb, int durability, Color color, float bluntReduction, float penetrateReduction) {
+        return new TagillaMask(absorb, durability, color.colorResources.texture, color.colorResources.model, color.colorResources.animation, bluntReduction, penetrateReduction);
     }
 }

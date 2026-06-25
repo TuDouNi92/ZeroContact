@@ -27,8 +27,8 @@ public class AltynVisor {
         private static final RawAnimation DISABLE_VISOR = RawAnimation.begin().then("switch_enabled_to_disabled", Animation.LoopType.HOLD_ON_LAST_FRAME);
         private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
-        public WithVisor(int absorb, int defaultDurability) {
-            super(absorb, defaultDurability, texture, model, animation);
+        public WithVisor(int absorb, int defaultDurability, float bluntReduction, float penetrateReduction) {
+            super(absorb, defaultDurability, texture, model, animation, bluntReduction, penetrateReduction);
             SingletonGeoAnimatable.registerSyncedAnimatable(this);
         }
 

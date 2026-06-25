@@ -5,8 +5,8 @@ import net.minecraft.resources.ResourceLocation;
 import static net.zerocontact.ZeroContact.MOD_ID;
 
 public class Bastion extends BaseGeoHelmet {
-    public Bastion(int absorb, int durability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
-        super(absorb, durability, texture, model, animation);
+    public Bastion(int absorb, int durability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, float bluntReduction, float penetrateReduction) {
+        super(absorb, durability, texture, model, animation, bluntReduction, penetrateReduction);
     }
 
     public record ColorResources(ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
@@ -35,11 +35,13 @@ public class Bastion extends BaseGeoHelmet {
                 )
         );
         private final ColorResources colorResources;
+
         Color(ColorResources colorResources) {
             this.colorResources = colorResources;
         }
     }
-    public static Bastion create(int absorb, int durability,Color color){
-        return new Bastion(absorb,durability,color.colorResources.texture, color.colorResources.model, color.colorResources.animation);
+
+    public static Bastion create(int absorb, int durability, Color color, float bluntReduction, float penetrateReduction) {
+        return new Bastion(absorb, durability, color.colorResources.texture, color.colorResources.model, color.colorResources.animation, bluntReduction, penetrateReduction);
     }
 }

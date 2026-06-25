@@ -4,11 +4,12 @@ import net.minecraft.resources.ResourceLocation;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
 
-public class TBH extends BaseGeoHelmet{
-    private static final ResourceLocation  texture= new ResourceLocation(MOD_ID,"textures/models/helmet/helmet_tbhiiia_desert.png") ;
-    private static final ResourceLocation  model= new ResourceLocation(MOD_ID,"geo/helmet/helmet_tbhiiia_desert.geo.json") ;
-    private static final ResourceLocation  animation= null;
-    public TBH(int absorb, int defaultDurability) {
-        super(absorb, defaultDurability, texture, model, animation);
+public class TBH extends BaseGeoHelmet {
+    private static final ResourceLocation texture = new ResourceLocation(MOD_ID, "textures/models/helmet/helmet_tbhiiia_desert.png");
+    private static final ResourceLocation model = new ResourceLocation(MOD_ID, "geo/helmet/helmet_tbhiiia_desert.geo.json");
+    private static final ResourceLocation animation = null;
+
+    public TBH(int absorb, int defaultDurability, float bluntReduction, float penetrateReduction) {
+        super(absorb, defaultDurability, texture, model, animation, bluntReduction, penetrateReduction);
     }
 }

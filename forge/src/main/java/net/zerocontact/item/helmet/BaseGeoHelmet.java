@@ -40,8 +40,12 @@ public class BaseGeoHelmet extends ArmorItem implements HelmetInfoProvider, GeoI
     private final ResourceLocation texture;
     private final ResourceLocation model;
     private final ResourceLocation animation;
-    public BaseGeoHelmet(int absorb, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+    private final float bluntReduction, penetrateReduction;
+
+    public BaseGeoHelmet(int absorb, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, float bluntReduction, float penetrateReduction) {
         super(PlateBaseMaterial.ARMOR_STEEL, Type.HELMET, new Properties().defaultDurability(defaultDurability));
+        this.bluntReduction = bluntReduction;
+        this.penetrateReduction = penetrateReduction;
         this.defense = 4;
         this.absorb = absorb;
         this.texture = texture;
@@ -105,7 +109,7 @@ public class BaseGeoHelmet extends ArmorItem implements HelmetInfoProvider, GeoI
             @Override
             public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
                 if (this.render == null) {
-                    this.render = new HelmetRender.HelmetArmorRender<>(new GenerateModel<>(texture,model,animation));
+                    this.render = new HelmetRender.HelmetArmorRender<>(new GenerateModel<>(texture, model, animation));
                 }
                 this.render.prepForRender(livingEntity, itemStack, equipmentSlot, original);
                 return this.render;
@@ -113,18 +117,28 @@ public class BaseGeoHelmet extends ArmorItem implements HelmetInfoProvider, GeoI
 
             @Override
             public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return new HelmetRender.HelmetItemRender<>(new GenerateModel<>(texture,model,animation));
+                return new HelmetRender.HelmetItemRender<>(new GenerateModel<>(texture, model, animation));
             }
         });
     }
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
-        ICombatArmorItem.super.appendHoverText(stack,level,tooltipComponents,isAdvanced);
+        ICombatArmorItem.super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
     }
 
     @Override
     public @NotNull IEquipmentTypeTag.EquipmentType getArmorType() {
         return EquipmentType.HELMET;
+    }
+
+    @Override
+    public float generateBlunt() {
+        return this.bluntReduction;
+    }
+
+    @Override
+    public float generatePenetrated() {
+        return this.penetrateReduction;
     }
 }

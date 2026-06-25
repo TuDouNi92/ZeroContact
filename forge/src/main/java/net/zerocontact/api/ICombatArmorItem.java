@@ -12,10 +12,11 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.Function;
 
 public interface ICombatArmorItem {
 
-    static int generateLossDefault(float damageAmount, float durabilityLossFactor, int hits){
+    static int generateLossDefault(float damageAmount, float durabilityLossFactor, int hits) {
         return (int) Math.round(0.4 * Math.pow(damageAmount * durabilityLossFactor, 1.5) * (1 + hits * 0.1f));
     }
 
@@ -67,30 +68,31 @@ public interface ICombatArmorItem {
             tooltipComponents.add(armorCategoryLabel);
         }
         if (stack.getItem() instanceof ICombatArmorItem combatArmorItem) {
+            Function<Float, Integer> decimalToPercentOff = (amount) -> (int) Math.round((1 - amount) * 100);
             Component protectionLevel = Component.translatable("tooltip.zerocontact.armor_protection")
                     .append(":")
                     .withStyle(ChatFormatting.GOLD)
                     .append(
-                            Component.literal(String.valueOf(combatArmorItem.getAbsorb()))
+                            Component.literal(String.valueOf((combatArmorItem.getAbsorb())))
                                     .withStyle(ChatFormatting.YELLOW)
                     );
             Component armorBluntReduction = Component.translatable("tooltip.zerocontact.armor_blunt_reduction")
                     .append(": ")
                     .withStyle(ChatFormatting.GOLD)
                     .append(
-                            Component.literal(String.valueOf(combatArmorItem.generateBlunt()))
+                            Component.literal(String.valueOf(decimalToPercentOff.apply(combatArmorItem.generateBlunt())))
+                                    .append("%")
                                     .withStyle(ChatFormatting.YELLOW)
                     );
             Component armorPenetrateReduction = Component.translatable("tooltip.zerocontact.armor_penetrate_reduction")
                     .append(": ")
                     .withStyle(ChatFormatting.GOLD)
                     .append(
-                            Component.literal(String.valueOf(combatArmorItem.generatePenetrated()))
+                            Component.literal(String.valueOf(decimalToPercentOff.apply(combatArmorItem.generatePenetrated())))
+                                    .append("%")
                                     .withStyle(ChatFormatting.YELLOW)
                     );
-            tooltipComponents.add(protectionLevel);
-            tooltipComponents.add(armorBluntReduction);
-            tooltipComponents.add(armorPenetrateReduction);
+            tooltipComponents.addAll(List.of(protectionLevel, armorBluntReduction, armorPenetrateReduction));
         }
     }
 }

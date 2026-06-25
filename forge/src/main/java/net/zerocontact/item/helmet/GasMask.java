@@ -37,11 +37,11 @@ public class GasMask extends BaseGeoHelmet {
         }
     }
 
-    GasMask(Series series, int absorb, int defaultDurability) {
-        super(absorb, defaultDurability, series.texture, series.model, series.animation);
+    GasMask(Series series, int absorb, int defaultDurability, float bluntReduction, float penetrateReduction) {
+        super(absorb, defaultDurability, series.texture, series.model, series.animation, bluntReduction, penetrateReduction);
     }
 
-    public static GasMask create(Series series, int absorb, int defaultDurability) {
-        return new GasMask(series, absorb, defaultDurability);
+    public static GasMask create(Series series, int absorb, int defaultDurability, float bluntReduction, float penetrateReduction) {
+        return new GasMask(series, absorb, defaultDurability, bluntReduction, penetrateReduction);
     }
 }
