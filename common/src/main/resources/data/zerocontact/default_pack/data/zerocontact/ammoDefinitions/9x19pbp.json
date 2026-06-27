@@ -1,0 +1,24 @@
+{
+  //填入你需要增加弹种原版tacz子弹Id
+  "ammo_id": "tacz:9mm",
+
+  //填入你要制作的弹种，不带命名空间,其将作为新子弹注册ID注册进游戏
+  "variant": "9x19pbp",
+
+  //这个先别管，写个4留这儿
+  //Balance factor for guns using same caliber
+  "base_damage_factor": 4,
+
+  //穿甲值，伤害计算中重要的权重之一
+  //Associated with protection level of the plate, higher amount represents high pen probabilities
+  "penetration_class": 10,
+
+  "armor_damage": 0.15,
+
+  //肉伤，穿透护甲后对躯体造成的伤害，不同于不穿甲的直伤
+  //literally
+  "flesh_damage": 6,
+
+  //子弹堆叠数
+  "stack_size": 60
+}

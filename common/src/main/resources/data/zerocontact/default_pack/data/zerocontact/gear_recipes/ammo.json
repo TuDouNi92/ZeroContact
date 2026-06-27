@@ -1,0 +1,13 @@
+{
+  "recipes": [
+    {
+      "gear_id": "zerocontact:762x39bp",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:diamond",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

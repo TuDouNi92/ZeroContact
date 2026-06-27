@@ -1,5 +1,7 @@
 package net.zerocontact.datagen.loader;
 
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import com.electronwill.nightconfig.core.file.FileNotFoundAction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.PathPackResources;
@@ -32,7 +34,10 @@ public class ZPackManager implements IPackManager {
     private final ZContentLoader contentLoader;
     private static final String DEFAULT_PACK_LOCATION = "/data/zerocontact/default_pack.zip";
     private static final String DEFAULT_PACK_NAME = "default_pack";
-    private static final String MANIFEST_PATH = "data/manifest.json";
+    private static final String MANIFEST_PATH = "manifest.json";
+    private static final String CONFIG_PATH = "config/zerocontact/override.toml";
+    private static final String CONFIG_NODE = "pack.default_pack_override";
+    private boolean overridePack = true;
 
     public ZPackManager() {
         this.assetManager = new ZAssetManager();
@@ -44,8 +49,23 @@ public class ZPackManager implements IPackManager {
         return assetManager;
     }
 
+    private void loadConfig() {
+        CommentedFileConfig config = CommentedFileConfig.builder(Path.of(CONFIG_PATH)).onFileNotFound(FileNotFoundAction.CREATE_EMPTY).autosave().build();
+        config.load();
+        if (config.isEmpty()) {
+            config.set(CONFIG_NODE, overridePack);
+        }
+        this.overridePack = config.getOrElse(CONFIG_NODE, overridePack);
+        config.close();
+    }
+
     @Override
     public void createDefaultPack() throws IOException {
+        loadConfig();
+        if (!overridePack) {
+            ZeroContactLogger.LOG.warn("The Default Pack override flag is set to False!");
+            return;
+        }
         try (InputStream inputStream = ZeroContact.class.getResourceAsStream(DEFAULT_PACK_LOCATION)) {
             if (inputStream != null) {
                 try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {

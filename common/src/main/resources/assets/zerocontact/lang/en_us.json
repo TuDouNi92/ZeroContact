@@ -93,6 +93,11 @@
   "tooltip.zerocontact.pack.zero_contact":"ZeroContact Default Pack",
   "tooltip.zerocontact.gun.ammoVariant": "Ammo variant",
 
+  "tooltip.zerocontact.bullet_penetration": "Penetration",
+  "tooltip.zerocontact.bullet_armor_damage": "Armor damage",
+  "tooltip.zerocontact.bullet_flesh_damage": "Flesh damage",
+
+
   "hud.zerocontact.ammo.default": "\uD83E\uDC35 Default ammo",
 
   "block.zerocontact.thoughbook": "ThoughBook 67",

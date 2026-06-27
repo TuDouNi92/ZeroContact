@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.Function;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
 
@@ -47,7 +48,7 @@ public class GenerateAmmo extends Item implements AmmoItemDataAccessor, IEquipme
     }
 
     public CaliberVariantDamageHelper.Caliber getDefualtCaliber() {
-        return new CaliberVariantDamageHelper.Caliber(ammoId, MOD_ID+":"+ammoVariant, baseDamageFactor, penetrateClass, fleshDamage, armorDamage, stackSize);
+        return new CaliberVariantDamageHelper.Caliber(ammoId, MOD_ID + ":" + ammoVariant, baseDamageFactor, penetrateClass, fleshDamage, armorDamage, stackSize);
     }
 
     @Override
@@ -66,6 +67,7 @@ public class GenerateAmmo extends Item implements AmmoItemDataAccessor, IEquipme
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
+        Function<Float, Integer> decimalToPercent = (armorDamage) -> (int) Math.ceil(armorDamage * 100);
         Component penetrationHint = Component.translatable("tooltip.zerocontact.bullet_penetration")
                 .append(":")
                 .withStyle(ChatFormatting.GOLD)
@@ -73,12 +75,12 @@ public class GenerateAmmo extends Item implements AmmoItemDataAccessor, IEquipme
         Component armorDamageHint = Component.translatable("tooltip.zerocontact.bullet_armor_damage")
                 .append(":")
                 .withStyle(ChatFormatting.GOLD)
-                .append(Component.literal(String.valueOf(armorDamage)).withStyle(ChatFormatting.YELLOW));
+                .append(Component.literal(String.valueOf(decimalToPercent.apply(armorDamage))).withStyle(ChatFormatting.YELLOW).append("%"));
         Component fleshDamageHint = Component.translatable("tooltip.zerocontact.bullet_flesh_damage")
                 .append(":")
                 .withStyle(ChatFormatting.GOLD)
                 .append(Component.literal(String.valueOf(fleshDamage)).withStyle(ChatFormatting.YELLOW));
-        tooltipComponents.addAll(List.of(penetrationHint,armorDamageHint,fleshDamageHint));
+        tooltipComponents.addAll(List.of(penetrationHint, armorDamageHint, fleshDamageHint));
         super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
     }
 }

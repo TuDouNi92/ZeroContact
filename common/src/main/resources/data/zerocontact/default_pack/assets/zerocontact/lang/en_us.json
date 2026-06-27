@@ -1,0 +1,25 @@
+{
+  "itemGroup.zerocontact.default": "ZeroContact Default Pack",
+  "tooltip.zerocontact.pack.default": "ZeroContact Default Pack",
+
+  "item.zerocontact.9x19ap": "9x19mm AP 6.3",
+  "item.zerocontact.9x19luger_cci": "9x19mm Luger CCI",
+  "item.zerocontact.9x19pbp": "9x19mm PBP(7N31) gzh",
+  "item.zerocontact.9x19pst": "9x19mm PST gzh ",
+  "item.zerocontact.9x19rip": "9x19mm RIP ",
+
+  "item.zerocontact.556x45ap": "5.56x45mm SSA AP",
+  "item.zerocontact.556x45hp": "5.56x45mm FMJ Hollow-Point",
+  "item.zerocontact.556x45m855": "5.56x45mm NATO M855",
+  "item.zerocontact.556x45m855a1": "5.56x45mm NATO M855A1",
+  "item.zerocontact.556x45m856": "5.56x45mm NATO M856",
+  "item.zerocontact.556x45m856a1": "5.56x45mm NATO M856A1",
+  "item.zerocontact.556x45m995": "5.56x45mm NATO M995 AP",
+
+  "item.zerocontact.762x39ap": "7.62x39mm MAI AP",
+  "item.zerocontact.762x39bp": "7.62x39mm BP(7N23) gzh",
+  "item.zerocontact.762x39hp": "7.62x39mm Hollow-Point",
+  "item.zerocontact.762x39pp": "7.62x39mm PP(7N27) gzh",
+  "item.zerocontact.762x39ps": "7.62x39mm PS(57-N-231) gzh",
+  "item.zerocontact.762x39sp": "7.62x39mm SP"
+}

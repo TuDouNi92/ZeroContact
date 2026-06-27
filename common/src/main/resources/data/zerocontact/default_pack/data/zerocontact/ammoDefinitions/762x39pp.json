@@ -1,0 +1,18 @@
+{
+  //The ammo to intercept its damage
+  "ammo_id": "tacz:762x39",
+
+  "variant": "762x39pp",
+  //Balance factor for guns using same caliber
+  "base_damage_factor": 4,
+
+  //Associated with protection level of the plate, higher amount represents high pen probabilities
+  "penetration_class": 6,
+
+  "armor_damage": 0.1,
+
+  //literally
+  "flesh_damage": 5,
+
+  "stack_size": 60
+}

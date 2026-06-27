@@ -76,6 +76,12 @@ sourcesJar {
     from commonSources.archiveFile.map { zipTree(it) }
 }
 
+tasks.register('buildBuiltinResourceZip', Zip) {
+    archiveFileName = "default_pack.zip"
+    destinationDirectory = project(":common").file('src/main/resources/data/zerocontact')
+    from(project(":common").file('src/main/resources/data/zerocontact/default_pack'))
+}
+
 components.java {
     withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
         skip()
