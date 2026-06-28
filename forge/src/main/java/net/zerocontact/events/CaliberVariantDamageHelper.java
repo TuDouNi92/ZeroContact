@@ -99,9 +99,9 @@ public enum CaliberVariantDamageHelper {
      */
     public record Caliber(String id, String variant, float baseDamageFactor, int penetrationClass, float fleshDamage,
                           float armorDamage,
-                          int stackSize) {
+                          int stackSize, int[] tracerColor) {
         public Caliber(String id, float baseDamageFactor, int penetrationClass, float fleshDamage) {
-            this(id, DEFAULT, baseDamageFactor, penetrationClass, fleshDamage, 0, 30);
+            this(id, DEFAULT, baseDamageFactor, penetrationClass, fleshDamage, 0, 30, new int[]{255, 255, 255, 255});
         }
 
         @Override

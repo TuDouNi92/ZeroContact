@@ -27,4 +27,9 @@ public class ExperimentalBallisticData {
 
     @SerializedName("stack_size")
     public int stackSize =30;
+
+    //The color of this bullet tracer.
+    @SerializedName("tracer_color")
+    public int[] tracerColor = new int[]{255,255,255,255};
+
 }

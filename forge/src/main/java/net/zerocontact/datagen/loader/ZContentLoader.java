@@ -62,7 +62,8 @@ public class ZContentLoader implements IContentLoader {
                                                     data.penetrationClass,
                                                     data.fleshDamage,
                                                     data.armorDamage,
-                                                    data.stackSize
+                                                    data.stackSize,
+                                                    data.tracerColor
                                             )
                                     );
                         }

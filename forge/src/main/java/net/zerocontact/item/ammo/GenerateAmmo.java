@@ -27,8 +27,9 @@ public class GenerateAmmo extends Item implements AmmoItemDataAccessor, IEquipme
     private final float fleshDamage;
     private final float armorDamage;
     private final int stackSize;
+    private final int[] tracerColor;
 
-    public GenerateAmmo(String ammoId, String ammoVariant, float baseDamageFactor, int penetrateClass, float fleshDamage, float armorDamage, int stackSize) {
+    public GenerateAmmo(String ammoId, String ammoVariant, float baseDamageFactor, int penetrateClass, float fleshDamage, float armorDamage, int stackSize, int[] tracerColor) {
         super(new Item.Properties().stacksTo(stackSize));
         this.ammoId = ammoId;
         this.ammoVariant = ammoVariant;
@@ -37,25 +38,27 @@ public class GenerateAmmo extends Item implements AmmoItemDataAccessor, IEquipme
         this.fleshDamage = fleshDamage;
         this.armorDamage = armorDamage;
         this.stackSize = stackSize;
+        this.tracerColor = tracerColor;
     }
 
     @Override
     public @NotNull ResourceLocation getAmmoId(ItemStack ammo) {
         AmmoInjector.write(new AmmoInjector.AmmoContext(
-                new CaliberVariantDamageHelper.Caliber(ammoId, ammoVariant, baseDamageFactor, penetrateClass, fleshDamage, armorDamage, stackSize)
+                new CaliberVariantDamageHelper.Caliber(ammoId, ammoVariant, baseDamageFactor, penetrateClass, fleshDamage, armorDamage, stackSize,tracerColor)
         ), ammo);
         return new ResourceLocation(ammoId);
     }
 
     public CaliberVariantDamageHelper.Caliber getDefualtCaliber() {
-        return new CaliberVariantDamageHelper.Caliber(ammoId, MOD_ID + ":" + ammoVariant, baseDamageFactor, penetrateClass, fleshDamage, armorDamage, stackSize);
+        return new CaliberVariantDamageHelper.Caliber(ammoId, MOD_ID + ":" + ammoVariant, baseDamageFactor, penetrateClass, fleshDamage, armorDamage, stackSize,tracerColor
+        );
     }
 
     @Override
     public @NotNull ItemStack getDefaultInstance() {
         ItemStack stack = new ItemStack(this);
         AmmoInjector.write(new AmmoInjector.AmmoContext(
-                new CaliberVariantDamageHelper.Caliber(ammoId, ammoVariant, baseDamageFactor, penetrateClass, fleshDamage, armorDamage, stackSize)
+                new CaliberVariantDamageHelper.Caliber(ammoId, ammoVariant, baseDamageFactor, penetrateClass, fleshDamage, armorDamage, stackSize,tracerColor)
         ), stack);
         return stack;
     }

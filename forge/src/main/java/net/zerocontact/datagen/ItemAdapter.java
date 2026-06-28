@@ -89,9 +89,9 @@ public class ItemAdapter {
             float movementFix = data.movementFix;
             float durabilityLossProvider = data.durabilityLossModifier;
             int durability = data.durability;
-            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID,data.texture);
-            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID,data.model);
-            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID,data.animation);
+            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
+            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
+            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
             items.add(new GenerationRecord<>(id, new BasePlate(durability, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, movementFix, durabilityLossProvider, texture, model, animation), tab));
             return items;
         }
@@ -200,7 +200,8 @@ public class ItemAdapter {
             float fleshDamage = ammoData.fleshDamage;
             float armorDamage = ammoData.armorDamage;
             int stackSize = ammoData.stackSize;
-            items.add(new GenerationRecord<>(variant, new GenerateAmmo(id, variant, baseDamageFactor, penetrationClass, fleshDamage, armorDamage, stackSize), tab));
+            int[] tracerColor = ammoData.tracerColor;
+            items.add(new GenerationRecord<>(variant, new GenerateAmmo(id, variant, baseDamageFactor, penetrationClass, fleshDamage, armorDamage, stackSize, tracerColor), tab));
             return items;
         }
     }

@@ -38,6 +38,7 @@ public class AmmoInjector {
         tag.putFloat("ai_flesh_damage", caliber.fleshDamage());
         tag.putFloat("ai_armor_damage", caliber.armorDamage());
         tag.putInt("stack_size", caliber.stackSize());
+        tag.putIntArray("tracer_color", caliber.tracerColor());
         stack.getOrCreateTag().put("ai_ammo", tag);
     }
 
@@ -53,7 +54,8 @@ public class AmmoInjector {
         float flesh = tag.getFloat("ai_flesh_damage");
         float armorDamage = tag.getFloat("ai_armor_damage");
         int stackSize = tag.getInt("stack_size");
-        return new AmmoContext(new CaliberVariantDamageHelper.Caliber(id, variant, damageFactor, level, flesh, armorDamage, stackSize));
+        int[] tracerColor = tag.getIntArray("tracer_color");
+        return new AmmoContext(new CaliberVariantDamageHelper.Caliber(id, variant, damageFactor, level, flesh, armorDamage, stackSize, tracerColor));
     }
 
 
@@ -65,6 +67,7 @@ public class AmmoInjector {
         float flesh = defaultCaliber.fleshDamage();
         float armorDamage = defaultCaliber.armorDamage();
         int stackSize = defaultCaliber.stackSize();
+        int[] tracerColor = defaultCaliber.tracerColor();
         CompoundTag gunTag = gun.getOrCreateTagElement("ai_ammo");
         gunTag.putString("ai_ammoId", id);
         gunTag.putString("variant", variant);
@@ -73,10 +76,12 @@ public class AmmoInjector {
         gunTag.putFloat("ai_flesh_damage", flesh);
         gunTag.putFloat("ai_armor_damage", armorDamage);
         gunTag.putInt("stack_size", stackSize);
+        gunTag.putIntArray("tracer_color",tracerColor);
     }
 
     //Bind in spawn
     public static void bind(EntityKineticBullet bullet, AmmoContext context) {
+        bullet.getPersistentData().putIntArray(EntityKineticBullet.TRACER_COLOR_OVERRIDER_KEY, context.caliber().tracerColor());
         mapping.put(bullet.getUUID(), context);
     }
 
@@ -121,7 +126,7 @@ public class AmmoInjector {
         if (defaultAmmo.toString().isEmpty()) return null;
         gunStack.getOrCreateTagElement("ai_ammo").putString("ai_ammoId", defaultAmmo.toString());
         gunStack.getOrCreateTagElement("ai_ammo").putString("existed_variant", defaultVariant);
-        return new AmmoContext(new CaliberVariantDamageHelper.Caliber(defaultAmmo.toString(), defaultVariant, 0, 0, 0, 0, 0));
+        return new AmmoContext(new CaliberVariantDamageHelper.Caliber(defaultAmmo.toString(), defaultVariant, 0, 0, 0, 0, 0, new int[]{255, 255, 255, 255}));
     }
 
     private static void setDefaultAmmoVariantInGun(ItemStack gunStack, ResourceLocation ammoKey) {
