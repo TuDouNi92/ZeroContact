@@ -1,0 +1,17 @@
+{
+  "type":"armor",
+  "id": "mask_pmk2",
+  "defense": 0,
+  "protection_class":2,
+  "equipment_slot": "HELMET",
+  "default_durability": 12,
+  "texture": "textures/models/mask/mask_pmk2_black.png",
+  "model": "geo/mask/mask_pmk2_black.geo.json",
+  "hurt_modifier":
+  {
+    "ricochet_multiplier":0.35,
+    "penetrate_multiplier":1,
+    "blunt_multiplier":1
+  },
+  "durability_loss_modifier":1
+}

@@ -1,0 +1,18 @@
+{
+  "type":"armor",
+  "id": "armor_hexgrid_black",
+  "defense": 0,
+  "protection_class":2,
+  "equipment_slot": "PLATE_CARRIER",
+  "movement_fix": 0.01,
+  "default_durability": 31,
+  "texture": "textures/models/vest/vest_hexgrid_black.png",
+  "model": "geo/vest/vest_hexgrid_black.geo.json",
+  "hurt_modifier":
+  {
+    "ricochet_multiplier":0.35,
+    "penetrate_multiplier":1.20,
+    "blunt_multiplier":0.5
+  },
+  "durability_loss_modifier":1
+}

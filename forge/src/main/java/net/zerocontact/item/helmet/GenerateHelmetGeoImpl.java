@@ -15,6 +15,7 @@ import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.api.IAssetManager;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
+import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.client.renderer.HelmetRender;
 import net.zerocontact.datagen.GenerationRecord;
 import net.zerocontact.item.armor.forge.BaseArmorGeoImpl;
@@ -32,9 +33,9 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
     private final float bluntDamage;
     private final float penetrateDamage;
     private final float ricochetDamage;
-    private final int durabilityLossProvider;
+    private final float durabilityLossProvider;
 
-    public GenerateHelmetGeoImpl(String id, Type type, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, int defense, int absorb, float bluntDamage, float penetrateDamage, float ricochetDamage, int durabilityLossProvider, int defaultDurability) {
+    public GenerateHelmetGeoImpl(String id, Type type, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, int defense, int absorb, float bluntDamage, float penetrateDamage, float ricochetDamage, float durabilityLossProvider, int defaultDurability) {
         super(type, id, defense, defaultDurability, absorb, bluntDamage, penetrateDamage, 0, texture, model, animation);
         this.absorb = absorb;
         this.bluntDamage = bluntDamage;
@@ -71,7 +72,7 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
 
     @Override
     public int generateLoss(float damageAmount, float durabilityLossFactor, int hits) {
-        return this.durabilityLossProvider;
+        return ICombatArmorItem.generateLossDefault(damageAmount,durabilityLossProvider,hits);
     }
 
     @Override
@@ -104,4 +105,8 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
         });
     }
 
+    @Override
+    public @NotNull IEquipmentTypeTag.EquipmentType getArmorType() {
+        return EquipmentType.HELMET;
+    }
 }

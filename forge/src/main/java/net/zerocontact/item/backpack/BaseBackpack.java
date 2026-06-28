@@ -33,7 +33,7 @@ import java.util.Optional;
 import static net.zerocontact.events.EventUtil.getAllyPlayer;
 import static net.zerocontact.events.EventUtil.isLookAtTargetBack;
 
-public abstract class BaseBackpack extends AbstractGenerateGeoCurioItemImpl implements IEquipmentTypeTag, Toggleable.Backpack {
+public class BaseBackpack extends AbstractGenerateGeoCurioItemImpl implements IEquipmentTypeTag, Toggleable.Backpack {
     public final int containerSize;
 
     public BaseBackpack(ResourceLocation texture, ResourceLocation model, ResourceLocation animation, int containerSize) {

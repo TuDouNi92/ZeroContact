@@ -1,0 +1,18 @@
+{
+  "type":"armor",
+  "id": "armor_thor_black",
+  "defense": 0,
+  "protection_class":2,
+  "equipment_slot": "PLATE_CARRIER",
+  "movement_fix": -0.01,
+  "default_durability": 35,
+  "texture": "textures/models/vest/vest_thor_black.png",
+  "model": "geo/vest/vest_thor_black.geo.json",
+  "hurt_modifier":
+  {
+    "ricochet_multiplier":0.35,
+    "penetrate_multiplier":0.95,
+    "blunt_multiplier":0.35
+  },
+  "durability_loss_modifier":1
+}

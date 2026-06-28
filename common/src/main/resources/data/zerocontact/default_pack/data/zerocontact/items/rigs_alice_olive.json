@@ -1,0 +1,8 @@
+{
+  "type": "loadout",
+  "id": "rigs_alice_olive",
+  "container_size": 6,
+  "equipment_slot": "RIGS",
+  "texture": "textures/models/rigs/rig_alice_olive.png",
+  "model": "geo/rigs/rig_alice_olive.geo.json"
+}

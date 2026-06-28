@@ -1,0 +1,18 @@
+{
+  "type":"armor",
+  "id": "armor_avs",
+  "defense": 2,
+  "protection_class":3,
+  "equipment_slot": "PLATE_CARRIER",
+  "movement_fix": -0.03,
+  "default_durability": 48,
+  "texture": "textures/models/armorrig/armorrig_avs_tagilla_desert.png",
+  "model": "geo/vest/vest_avs_tagilla_desert.geo.json",
+  "hurt_modifier":
+  {
+    "ricochet_multiplier":0.20,
+    "penetrate_multiplier":0.87,
+    "blunt_multiplier":0.20
+  },
+  "durability_loss_modifier":1
+}

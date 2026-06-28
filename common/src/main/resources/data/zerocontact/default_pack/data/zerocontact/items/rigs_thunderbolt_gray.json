@@ -1,0 +1,8 @@
+{
+  "type": "loadout",
+  "id": "rigs_thunderbolt_gray",
+  "container_size": 16,
+  "equipment_slot": "RIGS",
+  "texture": "textures/models/rigs/rig_thunderbolt_grey.png",
+  "model": "geo/rigs/rig_thunderbolt_grey.geo.json"
+}

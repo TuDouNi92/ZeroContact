@@ -1,0 +1,8 @@
+{
+  "type": "loadout",
+  "id": "backpack_t20_umbra",
+  "container_size": 25,
+  "equipment_slot": "BACKPACK",
+  "texture": "textures/models/backpack/backpack_t20_umbra.png",
+  "model": "geo/backpack/backpack_t20_umbra.geo.json"
+}

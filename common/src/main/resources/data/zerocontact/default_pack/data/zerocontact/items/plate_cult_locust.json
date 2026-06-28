@@ -1,0 +1,17 @@
+{
+  "type": "plate",
+  "id": "plate_cult_locust",
+  "durability": 72,
+  "defense": 0,
+  "protection_class": 8,
+  "movement_fix": -0.025,
+  "durability_loss_modifier": 1,
+  "texture": "textures/models/plate/plate_cult_locust.png",
+  "model": "geo/plate/plate_cult_locust.geo.json",
+  "animation": "",
+  "hurt_modifier": {
+    "blunt_modifier": 0.1,
+    "penetrate_modifier": 0.75,
+    "ricochet_modifier": 0.13
+  }
+}

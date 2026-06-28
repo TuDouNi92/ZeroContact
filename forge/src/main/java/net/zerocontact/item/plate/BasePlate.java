@@ -35,11 +35,27 @@ public class BasePlate extends ArmorItem implements PlateInfoProvider, GeoItem, 
     private final ResourceLocation texture, model, animation;
     private final float bluntReduction;
     private final float penetrateReduction;
+    private final float ricochetReduction;
     private final int defense;
     private final int absorb;
     private final float movementFix;
+    private final float durabilityLoss;
 
-    private BasePlate(int durability, int defense, int absorb, float bluntReduction, float penetrateReduction, float movementFix, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+    public BasePlate(int durability, int defense, int absorb, float bluntReduction, float penetrateReduction, float ricochetReduction, float movementFix, float durabilityLoss, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+        super(PlateBaseMaterial.ARMOR_STEEL, Type.CHESTPLATE, new Properties().defaultDurability(durability));
+        this.texture = texture;
+        this.model = model;
+        this.animation = animation;
+        this.penetrateReduction = penetrateReduction;
+        this.bluntReduction = bluntReduction;
+        this.durabilityLoss = durabilityLoss;
+        this.defense = defense;
+        this.absorb = absorb;
+        this.movementFix = movementFix;
+        this.ricochetReduction = ricochetReduction;
+    }
+
+    public BasePlate(int durability, int defense, int absorb, float bluntReduction, float penetrateReduction, float movementFix, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
         super(PlateBaseMaterial.ARMOR_STEEL, Type.CHESTPLATE, new Properties().defaultDurability(durability));
         this.texture = texture;
         this.model = model;
@@ -49,6 +65,8 @@ public class BasePlate extends ArmorItem implements PlateInfoProvider, GeoItem, 
         this.defense = defense;
         this.absorb = absorb;
         this.movementFix = movementFix;
+        this.ricochetReduction = 0.1f;
+        this.durabilityLoss = 1;
     }
 
     @Override
@@ -88,6 +106,16 @@ public class BasePlate extends ArmorItem implements PlateInfoProvider, GeoItem, 
     @Override
     public float generateBlunt() {
         return bluntReduction;
+    }
+
+    @Override
+    public float generateRicochet() {
+        return ricochetReduction;
+    }
+
+    @Override
+    public int generateLoss(float damageAmount, float durabilityLossFactor, int hits) {
+        return PlateInfoProvider.super.generateLoss(damageAmount, durabilityLoss, hits);
     }
 
     @Override

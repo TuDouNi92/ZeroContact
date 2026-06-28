@@ -1,0 +1,17 @@
+{
+  "type":"armor",
+  "id": "mask_tagilla_manhunt",
+  "defense": 0,
+  "protection_class":12,
+  "equipment_slot": "HELMET",
+  "default_durability": 64,
+  "texture": "textures/models/mask/mask_svarka_tagilla_manhunt.png",
+  "model": "geo/mask/mask_svarka_tagilla_manhunt.geo.json",
+  "hurt_modifier":
+  {
+    "ricochet_multiplier":0.78,
+    "penetrate_multiplier":1,
+    "blunt_multiplier":0.25
+  },
+  "durability_loss_modifier":1
+}

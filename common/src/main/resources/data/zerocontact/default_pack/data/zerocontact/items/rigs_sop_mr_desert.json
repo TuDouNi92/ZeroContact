@@ -1,0 +1,8 @@
+{
+  "type": "loadout",
+  "id": "rigs_sop_mr_desert",
+  "container_size": 8,
+  "equipment_slot": "RIGS",
+  "texture": "textures/models/rigs/rig_sop_mr_desert.png",
+  "model": "geo/rigs/rig_sop_mr_desert.geo.json"
+}

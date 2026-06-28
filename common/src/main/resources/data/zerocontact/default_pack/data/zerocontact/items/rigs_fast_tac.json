@@ -1,0 +1,8 @@
+{
+  "type": "loadout",
+  "id": "rigs_fast_tac",
+  "container_size": 14,
+  "equipment_slot": "RIGS",
+  "texture": "textures/models/rigs/rig_fast_tac_vest_olive.png",
+  "model": "geo/rigs/rig_fast_tac_vest_olive.geo.json"
+}

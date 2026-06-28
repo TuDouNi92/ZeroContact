@@ -1,0 +1,17 @@
+{
+  "type":"armor",
+  "id": "helmet_bastion_multicam",
+  "defense": 0,
+  "protection_class":9,
+  "equipment_slot": "HELMET",
+  "default_durability": 48,
+  "texture": "textures/models/helmet/helmet_bastion_multicam.png",
+  "model": "geo/helmet/helmet_bastion_multicam.geo.json",
+  "hurt_modifier":
+  {
+    "ricochet_multiplier":0.35,
+    "penetrate_multiplier":0.84,
+    "blunt_multiplier":0.33
+  },
+  "durability_loss_modifier":1
+}

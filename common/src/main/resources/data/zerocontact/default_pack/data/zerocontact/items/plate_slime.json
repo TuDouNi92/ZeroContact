@@ -1,0 +1,17 @@
+{
+  "type": "plate",
+  "id": "plate_slime",
+  "durability": 24,
+  "defense": 0,
+  "protection_class": 4,
+  "movement_fix": 0.03,
+  "durability_loss_modifier": 1,
+  "texture": "textures/models/plate/plate_slime.png",
+  "model": "geo/plate/plate_slime.geo.json",
+  "animation": "",
+  "hurt_modifier": {
+    "blunt_modifier": 0.2,
+    "penetrate_modifier": 1,
+    "ricochet_modifier": 0.2
+  }
+}

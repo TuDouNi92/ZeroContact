@@ -1,0 +1,8 @@
+{
+  "type": "loadout",
+  "id": "rigs_cr498_desert",
+  "container_size": 6,
+  "equipment_slot": "RIGS",
+  "texture": "textures/models/rigs/rig_cr498_desert.png",
+  "model": "geo/rigs/rig_cr498_desert.geo.json"
+}

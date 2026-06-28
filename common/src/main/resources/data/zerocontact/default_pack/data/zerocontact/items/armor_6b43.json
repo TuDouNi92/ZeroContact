@@ -1,0 +1,18 @@
+{
+  "type":"armor",
+  "id": "armor_6b43",
+  "defense": 7,
+  "protection_class":12,
+  "equipment_slot": "ARMOR",
+  "movement_fix": -0.08,
+  "default_durability": 72,
+  "texture": "textures/models/vest/vest_6b43_flora.png",
+  "model": "geo/vest/vest_6b43_flora.geo.json",
+  "hurt_modifier":
+  {
+    "ricochet_multiplier":0.05,
+    "penetrate_multiplier":0.7,
+    "blunt_multiplier":0.05
+  },
+  "durability_loss_modifier":1
+}

@@ -92,7 +92,7 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
         new PlayerInventory(playerInv, customInventory);
         int padding = 8;
         this.guiWidth = (maxSlotX - minSlotX) + padding * 2;
-        this.guiHeight = (maxSlotY - minSlotY) + (padding+4) * 2;
+        this.guiHeight = (maxSlotY - minSlotY) + (padding + 4) * 2;
     }
 
     private ItemStack getHandStack(Player player) {
@@ -190,6 +190,7 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
                 for (int i = 0; i < rows; ++i) {
                     for (int j = 0; j < cols; ++j) {
                         backpackCustomInvY = 16 + i * 18;
+                        if (j + i * cols >= backpackSize) continue;
                         menu.addSlot(new Slot(backpackContainer, j + i * cols, startX + j * 18, backpackCustomInvY) {
                             @Override
                             public boolean mayPlace(@NotNull ItemStack stack) {

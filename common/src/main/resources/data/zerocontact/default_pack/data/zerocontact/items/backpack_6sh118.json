@@ -1,0 +1,8 @@
+{
+  "type": "loadout",
+  "id": "backpack_6sh118",
+  "container_size": 48,
+  "equipment_slot": "BACKPACK",
+  "texture": "textures/models/backpack/backpack_6sh118_emr.png",
+  "model": "geo/backpack/backpack_6sh118_emr.geo.json"
+}

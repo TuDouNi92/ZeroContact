@@ -9,8 +9,10 @@ import net.zerocontact.item.ammo.GenerateAmmo;
 import net.zerocontact.item.armband.GenerateUniformArmbandGeoImpl;
 import net.zerocontact.item.armor.forge.GenerateArmorGeoImpl;
 import net.zerocontact.item.armor.forge.GenerateCarrierGeoImpl;
-import net.zerocontact.item.forge.GeneratePlateImpl;
+import net.zerocontact.item.backpack.BaseBackpack;
 import net.zerocontact.item.helmet.GenerateHelmetGeoImpl;
+import net.zerocontact.item.plate.BasePlate;
+import net.zerocontact.item.rigs.BaseRigs;
 import net.zerocontact.item.uniform.GenerateUniformPantsGeoImpl;
 import net.zerocontact.item.uniform.GenerateUniformTopGeoImpl;
 
@@ -22,14 +24,16 @@ public class ItemAdapter {
     }
 
     public static <T> Mapper<?> getMapper(T data) {
+        Map<String, IEquipmentTypeTag.EquipmentType> convertMap = Arrays
+                .stream(IEquipmentTypeTag.EquipmentType.values())
+                .collect(Collectors.toMap(IEquipmentTypeTag.EquipmentType::getTypeId, type -> type));
         if (data instanceof ItemGenData.Armor armor) {
-            Map<String, IEquipmentTypeTag.EquipmentType> convertMap = Arrays
-                    .stream(IEquipmentTypeTag.EquipmentType.values())
-                    .collect(Collectors.toMap(IEquipmentTypeTag.EquipmentType::getTypeId, type -> type));
             return new Mapper<>(armor, convertMap.get(armor.equipmentSlot));
 
         } else if (data instanceof ItemGenData.Plate plate) {
             return new Mapper<>(plate, IEquipmentTypeTag.EquipmentType.PLATE);
+        } else if (data instanceof ItemGenData.Loadout loadout) {
+            return new Mapper<>(loadout, convertMap.get(loadout.equipmentSlot));
         } else if (data instanceof ExperimentalBallisticData ammo) {
             return new Mapper<>(ammo, IEquipmentTypeTag.EquipmentType.AMMO);
         }
@@ -44,7 +48,9 @@ public class ItemAdapter {
             new ArmbandAdapter(),
             new UniformTopAdapter(),
             new UniformPantsAdapter(),
-            new AmmoAdapter()
+            new AmmoAdapter(),
+            new BackpackAdapter(),
+            new RigsAdapter()
     );
 
     public static class ArmorAdapter implements IAssetManager.GeneratableItem {
@@ -56,7 +62,7 @@ public class ItemAdapter {
             int defense = data.defense;
             int defaultDurability = data.defaultDurability;
             int absorb = data.protectionClass;
-            int mass = 0;
+            float mass = data.movementFix;
             float bluntFactor = data.hurtModifier.bluntMultiplier;
             float penetratedFactor = data.hurtModifier.penetrateMultiplier;
             float ricochetFactor = data.hurtModifier.ricochetMultiplier;
@@ -81,9 +87,12 @@ public class ItemAdapter {
             int defense = data.defense;
             int absorb = data.protectionClass;
             float movementFix = data.movementFix;
-            int durabilityLossProvider = data.durabilityLossModifier;
+            float durabilityLossProvider = data.durabilityLossModifier;
             int durability = data.durability;
-            items.add(new GenerationRecord<>(id, new GeneratePlateImpl(id, durability, bluntDamage, penetrateDamage, ricochetDamage, defense, absorb, movementFix, durabilityLossProvider), tab));
+            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID,data.texture);
+            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID,data.model);
+            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID,data.animation);
+            items.add(new GenerationRecord<>(id, new BasePlate(durability, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, movementFix, durabilityLossProvider, texture, model, animation), tab));
             return items;
         }
     }
@@ -98,13 +107,14 @@ public class ItemAdapter {
             int defense = data.defense;
             int defaultDurability = data.defaultDurability;
             int absorb = data.protectionClass;
-            int mass = 0;
+            float mass = data.movementFix;
             float penetrateReduction = data.hurtModifier.penetrateMultiplier;
             float bluntReduction = data.hurtModifier.bluntMultiplier;
+            float ricochetReduction = data.hurtModifier.ricochetMultiplier;
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerationRecord<>(id, new GenerateCarrierGeoImpl(ArmorItem.Type.CHESTPLATE, id, defense, defaultDurability, absorb, bluntReduction, penetrateReduction, mass, texture, model, animation), tab));
+            items.add(new GenerationRecord<>(id, new GenerateCarrierGeoImpl(ArmorItem.Type.CHESTPLATE, id, defense, defaultDurability, absorb, bluntReduction, penetrateReduction, ricochetReduction, mass, texture, model, animation), tab));
             return items;
         }
     }
@@ -120,12 +130,12 @@ public class ItemAdapter {
             float ricochetDamage = data.hurtModifier.ricochetMultiplier;
             int defense = data.defense;
             int absorb = data.protectionClass;
-            int durabilityLossProvider = data.durabilityLossModifier;
-            int default_durability = data.defaultDurability;
+            float durabilityLossProvider = data.durabilityLossModifier;
+            int defaultDurability = data.defaultDurability;
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerationRecord<>(id, new GenerateHelmetGeoImpl(id, ArmorItem.Type.HELMET, texture, model, animation, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, durabilityLossProvider, default_durability), tab));
+            items.add(new GenerationRecord<>(id, new GenerateHelmetGeoImpl(id, ArmorItem.Type.HELMET, texture, model, animation, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, durabilityLossProvider, defaultDurability), tab));
             return items;
         }
     }
@@ -191,6 +201,38 @@ public class ItemAdapter {
             float armorDamage = ammoData.armorDamage;
             int stackSize = ammoData.stackSize;
             items.add(new GenerationRecord<>(variant, new GenerateAmmo(id, variant, baseDamageFactor, penetrationClass, fleshDamage, armorDamage, stackSize), tab));
+            return items;
+        }
+    }
+
+    public static class BackpackAdapter implements IAssetManager.GeneratableItem {
+        @Override
+        public <T> LinkedHashSet<GenerationRecord<?>> deserializeItems(T data, String tab) {
+            LinkedHashSet<GenerationRecord<?>> items = new LinkedHashSet<>();
+            if (!(data instanceof ItemGenData.Loadout loadout)) return items;
+            if (!getMapper(data).type.equals(IEquipmentTypeTag.EquipmentType.BACKPACK)) return items;
+            String id = loadout.id;
+            int containerSize = loadout.containerSize;
+            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, loadout.texture);
+            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, loadout.model);
+            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, loadout.animation);
+            items.add(new GenerationRecord<>(id, new BaseBackpack(texture, model, animation, containerSize), tab));
+            return items;
+        }
+    }
+
+    public static class RigsAdapter implements IAssetManager.GeneratableItem {
+        @Override
+        public <T> LinkedHashSet<GenerationRecord<?>> deserializeItems(T data, String tab) {
+            LinkedHashSet<GenerationRecord<?>> items = new LinkedHashSet<>();
+            if (!(data instanceof ItemGenData.Loadout loadout)) return items;
+            if (!getMapper(data).type.equals(IEquipmentTypeTag.EquipmentType.RIGS)) return items;
+            String id = loadout.id;
+            int containerSize = loadout.containerSize;
+            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, loadout.texture);
+            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, loadout.model);
+            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, loadout.animation);
+            items.add(new GenerationRecord<>(id, new BaseRigs(texture, model, animation, containerSize), tab));
             return items;
         }
     }

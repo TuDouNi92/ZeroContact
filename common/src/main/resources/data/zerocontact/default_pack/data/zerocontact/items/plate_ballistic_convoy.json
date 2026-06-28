@@ -1,0 +1,17 @@
+{
+  "type": "plate",
+  "id": "plate_ballistic_convoy",
+  "durability": 128,
+  "defense": 0,
+  "protection_class": 11,
+  "movement_fix": -0.1,
+  "durability_loss_modifier": 1,
+  "texture": "textures/models/plate/plate_cult_locust.png",
+  "model": "geo/plate/plate_cult_locust.geo.json",
+  "animation": "",
+  "hurt_modifier": {
+    "blunt_modifier": 0.05,
+    "penetrate_modifier": 0.87,
+    "ricochet_modifier": 0.02
+  }
+}

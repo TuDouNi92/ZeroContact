@@ -1,0 +1,17 @@
+{
+  "type":"armor",
+  "id": "helmet_phonetalker_iiia",
+  "defense": 0,
+  "protection_class":6,
+  "equipment_slot": "HELMET",
+  "default_durability": 32,
+  "texture": "textures/models/helmet/helmet_phonetalkeriii_blue.png",
+  "model": "geo/helmet/helmet_phonetalkeriii_blue.geo.json",
+  "hurt_modifier":
+  {
+    "ricochet_multiplier":0.35,
+    "penetrate_multiplier":0.70,
+    "blunt_multiplier":0.32
+  },
+  "durability_loss_modifier":1
+}

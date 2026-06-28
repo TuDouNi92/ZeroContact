@@ -1,0 +1,18 @@
+{
+  "type":"armor",
+  "id": "armor_untar_blue",
+  "defense": 4,
+  "protection_class":6,
+  "equipment_slot": "ARMOR",
+  "movement_fix": -0.1,
+  "default_durability": 24,
+  "texture": "textures/models/vest/vest_untar_blue.png",
+  "model": "geo/vest/vest_untar_blue.geo.json",
+  "hurt_modifier":
+  {
+    "ricochet_multiplier":0.35,
+    "penetrate_multiplier":0.98,
+    "blunt_multiplier":0.20
+  },
+  "durability_loss_modifier":1
+}

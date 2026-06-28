@@ -43,7 +43,9 @@ public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEq
     private final float mass;
     private final float penetrateReduction;
     private final float bluntReduction;
-    public BaseArmorGeoImpl(Type type, String id, int defense, int defaultDurability, int absorb, float bluntReduction, float penetrateReduction, float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+    private final float ricochetReduction;
+
+    public BaseArmorGeoImpl(Type type, String id, int defense, int defaultDurability, int absorb, float bluntReduction, float penetrateReduction, float ricochetReduction, float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
         super(PlateBaseMaterial.ARMOR_STEEL, type, new Properties().defaultDurability(defaultDurability));
         this.type = type;
         this.id = id;
@@ -55,6 +57,22 @@ public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEq
         this.mass = mass;
         this.penetrateReduction = penetrateReduction;
         this.bluntReduction = bluntReduction;
+        this.ricochetReduction = ricochetReduction;
+    }
+
+    public BaseArmorGeoImpl(Type type, String id, int defense, int defaultDurability, int absorb, float bluntReduction, float penetrateReduction,float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+        super(PlateBaseMaterial.ARMOR_STEEL, type, new Properties().defaultDurability(defaultDurability));
+        this.type = type;
+        this.id = id;
+        this.defense = defense;
+        this.texture = texture;
+        this.model = model;
+        this.animation = animation;
+        this.absorb = absorb;
+        this.mass = mass;
+        this.penetrateReduction = penetrateReduction;
+        this.bluntReduction = bluntReduction;
+        this.ricochetReduction = 0;
     }
 
     @Override
@@ -127,6 +145,7 @@ public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEq
         Multimap<Attribute, AttributeModifier> modifierMultimap = HashMultimap.create();
         stack.getOrCreateTag().putInt("protection_class", getAbsorb());
         stack.getOrCreateTag().putFloat("movement_fix", getMass());
+        modifierMultimap.put(Attributes.ARMOR, new AttributeModifier(UUID.nameUUIDFromBytes(("Armor").getBytes()), "CuriosArmorDefense", this.getDefense(), AttributeModifier.Operation.ADDITION));
         modifierMultimap.put(Attributes.MOVEMENT_SPEED, new AttributeModifier(UUID.nameUUIDFromBytes(("MoveSpeed").getBytes()), "MoveSpeed", getMass(), AttributeModifier.Operation.MULTIPLY_TOTAL));
         return modifierMultimap;
     }
@@ -144,6 +163,11 @@ public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEq
     @Override
     public float generateBlunt() {
         return bluntReduction;
+    }
+
+    @Override
+    public float generateRicochet() {
+        return ricochetReduction;
     }
 }
 

@@ -1,0 +1,18 @@
+{
+  "type":"armor",
+  "id": "armor_jpc_v2",
+  "defense": 3,
+  "protection_class":2,
+  "equipment_slot": "PLATE_CARRIER",
+  "movement_fix": 0.05,
+  "default_durability": 32,
+  "texture": "textures/models/armorrig/armorrig_jpc_2v_tan.png",
+  "model": "geo/armorrig/armorrig_jpc_2v_tan.geo.json",
+  "hurt_modifier":
+  {
+    "ricochet_multiplier":0.15,
+    "penetrate_multiplier":0.95,
+    "blunt_multiplier":0.25
+  },
+  "durability_loss_modifier":1
+}

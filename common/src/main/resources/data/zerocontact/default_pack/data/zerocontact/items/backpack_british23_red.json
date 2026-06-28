@@ -1,0 +1,8 @@
+{
+  "type": "loadout",
+  "id": "backpack_british23_red",
+  "container_size": 18,
+  "equipment_slot": "BACKPACK",
+  "texture": "textures/models/backpack/backpack_british23_red.png",
+  "model": "geo/backpack/backpack_british23_red.geo.json"
+}

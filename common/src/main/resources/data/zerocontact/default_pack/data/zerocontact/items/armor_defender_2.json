@@ -1,0 +1,18 @@
+{
+  "type":"armor",
+  "id": "armor_defender_2",
+  "defense": 2,
+  "protection_class":4,
+  "equipment_slot": "PLATE_CARRIER",
+  "movement_fix": -0.013,
+  "default_durability": 48,
+  "texture": "textures/models/vest/vest_defender_2_olive.png",
+  "model": "geo/vest/vest_defender_2_olive.geo.json",
+  "hurt_modifier":
+  {
+    "ricochet_multiplier":0.15,
+    "penetrate_multiplier":0.85,
+    "blunt_multiplier":0.33
+  },
+  "durability_loss_modifier":1
+}

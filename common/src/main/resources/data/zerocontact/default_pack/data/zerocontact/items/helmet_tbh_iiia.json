@@ -1,0 +1,17 @@
+{
+  "type":"armor",
+  "id": "helmet_tbh_iiia",
+  "defense": 0,
+  "protection_class":7,
+  "equipment_slot": "HELMET",
+  "default_durability": 36,
+  "texture": "textures/models/helmet/helmet_tbhiiia_desert.png",
+  "model": "geo/helmet/helmet_tbhiiia_desert.geo.json",
+  "hurt_modifier":
+  {
+    "ricochet_multiplier":0.35,
+    "penetrate_multiplier":0.8,
+    "blunt_multiplier":0.4
+  },
+  "durability_loss_modifier":1
+}

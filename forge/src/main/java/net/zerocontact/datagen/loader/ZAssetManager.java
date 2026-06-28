@@ -29,7 +29,8 @@ public class ZAssetManager implements IAssetManager {
             RuntimeTypeAdapterFactory
                     .of(ItemGenData.class, "type")
                     .registerSubtype(ItemGenData.Plate.class, "plate")
-                    .registerSubtype(ItemGenData.Armor.class, "armor");
+                    .registerSubtype(ItemGenData.Armor.class, "armor")
+                    .registerSubtype(ItemGenData.Loadout.class,"loadout");
     private final Gson gson = new GsonBuilder().registerTypeAdapterFactory(typeAdapterFactory).create();
 
     @Override
@@ -91,6 +92,11 @@ public class ZAssetManager implements IAssetManager {
                 LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(ammo, tab);
                 if(records.isEmpty())return;
                 this.registerItems(ITEMS_REG_TAB,ItemsReg.ITEMS, new IAssetManager.WearableType(records,"AMMO"));
+            }
+            else if(data instanceof ItemGenData.Loadout loadout){
+                LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(loadout, tab);
+                if(records.isEmpty())return;
+                this.registerItems(ITEMS_REG_TAB,ItemsReg.ITEMS, new IAssetManager.WearableType(records,"LOADOUT"));
             }
         }));
     }
