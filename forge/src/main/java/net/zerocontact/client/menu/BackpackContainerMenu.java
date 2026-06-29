@@ -92,7 +92,7 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
         new PlayerInventory(playerInv, customInventory);
         int padding = 8;
         this.guiWidth = (maxSlotX - minSlotX) + padding * 2;
-        this.guiHeight = (maxSlotY - minSlotY) + (padding + 4) * 2;
+        this.guiHeight = (maxSlotY - minSlotY) + (padding+4) * 2;
     }
 
     private ItemStack getHandStack(Player player) {
@@ -171,7 +171,6 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
         protected int backpackCustomInvY;
         protected int rigsCustomInvY;
         protected BackpackContainerMenu menu;
-        private int startX;
 
         CustomInventory(BackpackContainerMenu menu, int backpackSize, int rigsSize) {
             this.menu = menu;
@@ -180,13 +179,12 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
 
         private void addCustomInventory(int backpackSize, int rigsSize) {
             //Backpack part
-            int backpackRightScreenX = 0;
             if (backpackSize != 0) {
                 int cols = Mth.ceil(Mth.sqrt(backpackSize));
                 int rows = Mth.ceil((double) backpackSize / cols);
                 int backpackWidth = cols * 18;
                 int baseWidth = Math.max(176, backpackWidth + 50);
-                startX = (baseWidth - backpackWidth) / 2;
+                int startX = (baseWidth - backpackWidth) / 2;
                 for (int i = 0; i < rows; ++i) {
                     for (int j = 0; j < cols; ++j) {
                         backpackCustomInvY = 16 + i * 18;
@@ -197,7 +195,6 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
                                 return !(stack.getItem() instanceof BaseBackpack);
                             }
                         });
-                        backpackRightScreenX = startX + j * 24;
                     }
                 }
                 backpackSlotEnd = slots.size();
@@ -206,10 +203,9 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
             if (rigsSize != 0) {
                 int rCols = Mth.ceil(Mth.sqrt(rigsSize));
                 int rRows = Mth.ceil((double) rigsSize / rCols);
-                int rigsWidth = rCols * 18;
-                int rigsBaseWidth = Math.max(176, rigsWidth);
-                int rStartX = startX == 0 ? (rigsBaseWidth - rigsWidth) / 2 : backpackRightScreenX + 12;
+                int rStartX = maxSlotX + 24;
                 int size = 0;
+                rigStackStart = maxSlotX;
                 for (int i = 0; i < rRows; ++i) {
                     for (int j = 0; j < rCols; ++j) {
                         rigsCustomInvY = 16 + i * 18;
@@ -222,7 +218,6 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
                         size++;
                     }
                 }
-                rigStackStart = rStartX - 24;
                 rigsSlotEnd = backpackSlotEnd + size;
             }
         }
@@ -238,7 +233,7 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
         private void addPlayerInventory(Inventory inventory, CustomInventory customInventory) {
             for (int i = 0; i < 3; ++i) {
                 for (int j = 0; j < 9; ++j) {
-                    playerInvY = customInventory.backpackCustomInvY == 0 ? customInventory.rigsCustomInvY + 24 + i * 18 : customInventory.backpackCustomInvY + 24 + i * 18;
+                    playerInvY = customInventory.backpackCustomInvY == 0 ? customInventory.rigsCustomInvY + 24 + i * 18 : Math.max(customInventory.backpackCustomInvY + 24 + i * 18, customInventory.rigsCustomInvY + 24 + i * 18);
                     customInventory.menu.addSlot(new Slot(inventory, j + i * 9 + 9, 8 + j * 18, playerInvY)
                     );
                 }

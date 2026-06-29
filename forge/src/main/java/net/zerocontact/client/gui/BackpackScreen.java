@@ -53,7 +53,7 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
         this.leftPos = (this.width - menu.guiWidth) / 2;
         this.topPos = (this.height - menu.guiHeight) / 2;
         this.guiWidthMax = getGuiLeft() + menu.guiWidth;
-        this.guiHeightMax = Math.max(238, getGuiTop() + menu.guiHeight);
+        this.guiHeightMax = getGuiTop() + menu.guiHeight;
     }
 
     @Override
