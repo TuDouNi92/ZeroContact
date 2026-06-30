@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -27,8 +28,16 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.Optional;
 
+import static net.zerocontact.ZeroContact.MOD_ID;
+
 @Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMenu> {
+
+    private static final ResourceLocation BACKGROUND = new ResourceLocation(MOD_ID,"textures/gui/kevlar_bg.png");
+    private static final int OUTLINE_COLOR = 0xcc141414;
+    private static final int SLOT_BG_COLOR = 0x55a1a1a1;
+    private static final int VIGNETTE_COLOR = 0x88000000;
+
     @SubscribeEvent
     public static void onRenderGameOverlay(RenderGuiOverlayEvent event) {
         Minecraft mc = Minecraft.getInstance();
@@ -39,8 +48,8 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
         }
     }
 
-    private int guiWidthMax;
-    private int guiHeightMax;
+    private int guiWidthXMax;
+    private int guiHeightYMax;
 
     public BackpackScreen(BackpackContainerMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -52,8 +61,8 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
         this.titleLabelX = (getXSize() - this.font.width(title)) / 2;
         this.leftPos = (this.width - menu.guiWidth) / 2;
         this.topPos = (this.height - menu.guiHeight) / 2;
-        this.guiWidthMax = getGuiLeft() + menu.guiWidth;
-        this.guiHeightMax = getGuiTop() + menu.guiHeight;
+        this.guiWidthXMax = getGuiLeft() + menu.guiWidth;
+        this.guiHeightYMax = getGuiTop() + menu.guiHeight;
     }
 
     @Override
@@ -62,9 +71,9 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
 
     @Override
     protected void renderBg(@NotNull GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        guiGraphics.fill(0, 0, width, height, 0, 0x88000000);
-        guiGraphics.fill(getGuiLeft(), getGuiTop(), guiWidthMax, guiHeightMax, 0x88000000);
-        drawBgOutline(guiGraphics, guiWidthMax, guiHeightMax);
+        guiGraphics.fill(0, 0, width, height, 0, VIGNETTE_COLOR);
+        guiGraphics.blitRepeating(BACKGROUND,getGuiLeft(),getGuiTop(),menu.guiWidth,menu.guiHeight,0,0,16,16,16,16);
+        drawBgOutline(guiGraphics, guiWidthXMax, guiHeightYMax);
         drawSlotBg(menu, guiGraphics);
         drawEquipmentLabel(guiGraphics);
         Optional.ofNullable(Minecraft.getInstance().player).ifPresent(
@@ -139,7 +148,8 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
         for (Slot slot : menu.slots) {
             int slotX = leftPos + slot.x;
             int slotY = topPos + slot.y;
-            guiGraphics.fill(slotX, slotY, slotX + 16, slotY + 16, 2, 0x55FFFFFF);
+            guiGraphics.fill(slotX, slotY, slotX + 16, slotY + 16, 2, SLOT_BG_COLOR);
+            guiGraphics.renderOutline(slotX,slotY,16,17,0xccffffff);
         }
     }
 
@@ -150,10 +160,10 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
     }
 
     private void drawBgOutline(@NotNull GuiGraphics guiGraphics, int guiWidthMax, int guiHeightMax) {
-        guiGraphics.fill(getGuiLeft(), getGuiTop(), guiWidthMax, getGuiTop() - 1, 0xbb888888);
-        guiGraphics.fill(getGuiLeft(), guiHeightMax, guiWidthMax, guiHeightMax + 1, 0xbb888888);
-        guiGraphics.fill(getGuiLeft(), getGuiTop(), getGuiLeft() - 1, guiHeightMax, 0xbb888888);
-        guiGraphics.fill(guiWidthMax, getGuiTop(), guiWidthMax + 1, guiHeightMax, 0xbb888888);
+        guiGraphics.fill(getGuiLeft(), getGuiTop(), guiWidthMax, getGuiTop() - 2, OUTLINE_COLOR);
+        guiGraphics.fill(getGuiLeft(), guiHeightMax, guiWidthMax, guiHeightMax + 2, OUTLINE_COLOR);
+        guiGraphics.fill(getGuiLeft(), getGuiTop(), getGuiLeft() - 2, guiHeightMax, OUTLINE_COLOR);
+        guiGraphics.fill(guiWidthMax, getGuiTop(), guiWidthMax + 2, guiHeightMax, OUTLINE_COLOR);
     }
 
     @Override
