@@ -1,6 +1,7 @@
 package net.zerocontact.client.gui;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -99,7 +100,8 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
 
 
             guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(getGuiLeft() + menu.rigStackStart, getGuiTop() + 64, 10);
+            guiGraphics.pose().translate(getGuiLeft()+24 + menu.rigStackStart, getGuiTop() + 64, 10);
+            guiGraphics.pose().mulPose(Axis.YP.rotationDegrees(180));
             guiGraphics.pose().scale(24.0f, -24.0f, 24.0f);
             IClientItemExtensions extensions1 = IClientItemExtensions.of(menu.rigsRenderStack);
             extensions1.getCustomRenderer().renderByItem(
@@ -128,7 +130,8 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
             guiGraphics.pose().popPose();
         } else if (menu.rigsRenderStack != null) {
             guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(getGuiLeft(), getGuiTop() + 64, 10);
+            guiGraphics.pose().translate(getGuiLeft()+24, getGuiTop() + 64, 10);
+            guiGraphics.pose().mulPose(Axis.YP.rotationDegrees(180));
             guiGraphics.pose().scale(24.0f, -24.0f, 24.0f);
             IClientItemExtensions extensions = IClientItemExtensions.of(menu.rigsRenderStack);
             extensions.getCustomRenderer().renderByItem(
