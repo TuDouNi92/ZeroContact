@@ -54,7 +54,7 @@ public enum CaliberVariantDamageHelper {
             new Caliber("tacz:50bmg", 4, 18, 18.5f)
     ),
     CALIBER_12G(
-            new Caliber("tacz:12g", 0.2f, 3, 10)
+            new Caliber("tacz:12g", 0.2f, 3, 1.25f)
     ),
     CALIBER_22WMR(
             new Caliber("tacz:22wmr", 1.5f, 5, 6)

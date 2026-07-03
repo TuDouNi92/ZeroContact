@@ -21,5 +21,31 @@
   "item.zerocontact.762x39hp": "7.62x39mm Hollow-Point",
   "item.zerocontact.762x39pp": "7.62x39mm PP(7N27) gzh",
   "item.zerocontact.762x39ps": "7.62x39mm PS(57-N-231) gzh",
-  "item.zerocontact.762x39sp": "7.62x39mm SP"
+  "item.zerocontact.762x39sp": "7.62x39mm SP",
+
+  "item.zerocontact.45acp_ap": ".45ACP AP",
+  "item.zerocontact.45acp_fmj": ".45ACP FMJ",
+  "item.zerocontact.45acp_hs": ".45ACP HS",
+  "item.zerocontact.45acp_rip": ".45ACP RIP",
+
+  "item.zerocontact.308_m62": ".308 NATO M62 (Tracer)",
+  "item.zerocontact.308_m80": ".308 NATO M80",
+  "item.zerocontact.308_m80a1": ".308 NATO M80A1",
+  "item.zerocontact.308_m993": ".308 NATO M993",
+  "item.zerocontact.308_sp": ".308 SP",
+  "item.zerocontact.308_un": ".308 UN",
+
+  "item.zerocontact.338_ap": ".338 LM AP",
+  "item.zerocontact.338_fmj": ".338 LM FMJ",
+  "item.zerocontact.338_tacx": ".338 LM TAC-X",
+  "item.zerocontact.338_ucw": ".338 LM UCW",
+
+  "item.zerocontact.545x39bp": "5.45x39mm BP(7N22) gzh",
+  "item.zerocontact.545x39bs": "5.45x39mm BS(7N24) gzh",
+  "item.zerocontact.545x39bt": "5.45x39mm BT(7BT4) gzh",
+  "item.zerocontact.545x39pp": "5.45x39mm PP(7N10) gzh",
+  "item.zerocontact.545x39ps": "5.45x39mm BP(7N6) gzh",
+  "item.zerocontact.545x39t": "5.45x39mm T(7T3) gzh"
+
+
 }
