@@ -12,6 +12,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.zerocontact.ZeroContact;
 import net.zerocontact.item.ammo.GenerateAmmo;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,7 +59,7 @@ public class AmmoInjector {
         return new AmmoContext(new CaliberVariantDamageHelper.Caliber(id, variant, damageFactor, level, flesh, armorDamage, stackSize, tracerColor));
     }
 
-
+    //Sync tags when change cartridge;
     private static void copyTags(CaliberVariantDamageHelper.Caliber defaultCaliber, ItemStack gun) {
         String id = defaultCaliber.id();
         float damageFactor = defaultCaliber.baseDamageFactor();
@@ -76,29 +77,29 @@ public class AmmoInjector {
         gunTag.putFloat("ai_flesh_damage", flesh);
         gunTag.putFloat("ai_armor_damage", armorDamage);
         gunTag.putInt("stack_size", stackSize);
-        gunTag.putIntArray("tracer_color",tracerColor);
+        gunTag.putIntArray("tracer_color", tracerColor);
     }
 
     //Bind in spawn
     public static void bind(EntityKineticBullet bullet, AmmoContext context) {
-        bullet.getPersistentData().putIntArray(EntityKineticBullet.TRACER_COLOR_OVERRIDER_KEY, context.caliber().tracerColor());
         mapping.put(bullet.getUUID(), context);
     }
 
-    //Consume in hurt event
     public static @Nullable AmmoContext get(EntityKineticBullet bullet) {
         return mapping.get(bullet.getUUID());
     }
 
-    //Consume in hurt event
+    //Consume in leave event
     public static void consume(EntityKineticBullet bullet) {
         mapping.remove(bullet.getUUID());
     }
 
+    //Get cartridge for held gun
     public static String getAmmoVariantInGun(ItemStack gunStack) {
         return gunStack.getOrCreateTagElement("ai_ammo").getString("existed_variant");
     }
 
+    //Get generated cartridge stack;
     public static ItemStack getDefaultStack(String fullKey) {
         Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(fullKey));
         if (item instanceof GenerateAmmo ammo) {
@@ -107,6 +108,7 @@ public class AmmoInjector {
         return AmmoItemBuilder.create().build();
     }
 
+    //Get default tacz ammoId for gun.
     private static ResourceLocation getGunDefaultAmmo(ItemStack gunStack) {
         ResourceLocation defaultAmmoId = new ResourceLocation("");
         IGun gun = IGun.getIGunOrNull(gunStack);
@@ -120,6 +122,7 @@ public class AmmoInjector {
         return defaultAmmoId;
     }
 
+    //Set default ammo in gun once spawn
     private static @Nullable AmmoContext setDefaultAmmoVariantInGun(ItemStack gunStack) {
         String defaultVariant = "tacz:ammo";
         ResourceLocation defaultAmmo = getGunDefaultAmmo(gunStack);
@@ -137,9 +140,9 @@ public class AmmoInjector {
         gunStack.getOrCreateTagElement("ai_ammo").putString("existed_variant", ammoKey.toString());
     }
 
-
+    //Update cartridge tag in gun
     public static void setAmmoVariantInGun(ItemStack gunStack, String selectedVariant) {
-        gunStack.getOrCreateTag().getCompound("ai_ammo").putString("existed_variant", selectedVariant);
+        gunStack.getOrCreateTagElement("ai_ammo").putString("existed_variant", selectedVariant);
         Item ammoItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(selectedVariant));
         if (!(ammoItem instanceof GenerateAmmo ammo)) return;
         CaliberVariantDamageHelper.Caliber caliber = ammo.getDefualtCaliber();
@@ -154,16 +157,19 @@ public class AmmoInjector {
         gunStack.getOrCreateTagElement("ai_ammo").putString("selected_variant", selectedAmmoKey);
     }
 
+    //Set default cartridge for entity
     public static void setEntityGunContext(ItemStack gunStack) {
         setDefaultAmmoVariantInGun(gunStack);
     }
 
+    //Use for changing the cartridges from custom entities
     public static void setEntityGunContext(ItemStack gunStack, Item ammo) {
-        ResourceLocation ammoKey = ForgeRegistries.ITEMS.getKey(ammo);
-        if (ammoKey == null) return;
-        setDefaultAmmoVariantInGun(gunStack);
+        if (ammo instanceof GenerateAmmo generateAmmo) {
+            setAmmoVariantInGun(gunStack, ZeroContact.MOD_ID + ":" + generateAmmo);
+        }
     }
 
+    //Correct the default context on mainHand in damage processing if it is somehow empty
     public static @Nullable AmmoContext setPlayerGunContext(ServerPlayer player) {
         ItemStack checkGunStack = player.getMainHandItem();
         if (!IGun.mainHandHoldGun(player)) return null;

@@ -10,9 +10,13 @@ import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 public class ArmedRaiderRender extends GeoEntityRenderer<ArmedRaider> {
     private final ArmedRaiderGunRenderQueue gunRenderQueue = new ArmedRaiderGunRenderQueue();
+
     public ArmedRaiderRender(EntityRendererProvider.Context renderManager) {
         super(renderManager, new ArmedRaiderModel());
-        this.addRenderLayer(new ArmedRaiderItemLayer(this,gunRenderQueue));
+        this.addRenderLayer(new ArmedRaiderArmorLayer(this));
+        this.addRenderLayer(new ArmedRaiderBackpackLayer(this));
+        this.addRenderLayer(new ArmedRaiderArmbandLayer(this));
+        this.addRenderLayer(new ArmedRaiderItemLayer(this, gunRenderQueue));
     }
 
     @Override
@@ -20,7 +24,7 @@ public class ArmedRaiderRender extends GeoEntityRenderer<ArmedRaider> {
         gunRenderQueue.clear();
 
         poseStack.pushPose();
-        poseStack.scale(1,0.9f,1);
+        poseStack.scale(1, 0.9f, 1);
         super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
         poseStack.popPose();
 

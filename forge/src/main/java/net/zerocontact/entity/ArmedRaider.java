@@ -1,18 +1,10 @@
 package net.zerocontact.entity;
 
-import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.entity.IGunOperator;
-import com.tacz.guns.api.item.IGun;
-import com.tacz.guns.api.item.builder.AmmoItemBuilder;
-import com.tacz.guns.api.item.builder.GunItemBuilder;
-import com.tacz.guns.resource.index.CommonAmmoIndex;
-import com.tacz.guns.resource.index.CommonGunIndex;
-import com.tacz.guns.resource.pojo.data.gun.GunData;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.DifficultyInstance;
@@ -43,7 +35,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.entity.ai.NameList;
 import net.zerocontact.entity.ai.controller.GlobalStateController;
 import net.zerocontact.entity.ai.goal.AvoidGoal;
@@ -65,6 +57,22 @@ import java.util.List;
 import java.util.Optional;
 
 public class ArmedRaider extends PatrollingMonster implements GeoEntity, InventoryCarrier {
+    public static final String FRONT_PLATE = "front_plate";
+    public static final String BACK_PLATE = "back_plate";
+    public static final String BACKPACK = "backpack";
+    public static final String ARMBAND = "armband";
+
+    public static final String GUN_ID = "gun_id";
+    public static final String CARTRIDGE_ID = "cartridge_id";
+    public static final String HELMET_ID = "helmet_id";
+    public static final String ARMOR_ID = "armor_id";
+    public static final String PLATE_ID = "plate_id";
+    public static final String BACKPACK_ID = "backpack_id";
+    public static final String ARMBAND_ID = "armband_id";
+
+    public static final String INITIALIZED = "initialized";
+    public static final String TACZ_NAMESPACE_PREFIX = "tacz:";
+    public static final String TACZ_TAG = "tacz";
     private final AnimatableInstanceCache geoCache;
     private static final RawAnimation SHOOT_ANIM = RawAnimation.begin().then("raider.animation.alert", Animation.LoopType.HOLD_ON_LAST_FRAME);
     private static final RawAnimation WALK = RawAnimation.begin().then("raider.animation.walk", Animation.LoopType.LOOP);
@@ -74,7 +82,14 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     private final LazyOptional<IItemHandler> itemHandlerLazyOptional = LazyOptional.of(() -> new InvWrapper(inventory));
     private final IGunOperator operator;
     public final GlobalStateController stateController;
-    private final Weapon weapon;
+    private LoadoutHolder.LoadoutData loadout = randomLoadout()
+            .setArmor(null)
+            .setPlate(null)
+            .setHelmet(null)
+            .setBackpack(null)
+            .setArmband(null)
+            .build();
+    private boolean loadOutInitialized;
 
     public ArmedRaider(EntityType<? extends PatrollingMonster> entityType, Level level) {
         super(entityType, level);
@@ -82,7 +97,6 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         geoCache = GeckoLibUtil.createInstanceCache(this);
         NameList.setName(this, this.random);
         stateController = new GlobalStateController(this);
-        weapon = randomWeapon();
     }
 
     @Override
@@ -133,36 +147,59 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
 
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor level, @NotNull DifficultyInstance difficulty, @NotNull MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
-        ItemStack gun = weapon.getWeapon();
-        if (gun == null) return null;
-        this.setItemInHand(InteractionHand.MAIN_HAND, gun);
-        finalizeInvs(weapon);
-        finalizeArmors();
-        operator.initialData();
+        prepareLoadout();
         return super.finalizeSpawn(level, difficulty, reason, spawnData, dataTag);
     }
 
-    private void finalizeInvs(Weapon weapon) {
+    private void prepareLoadout() {
+        ItemStack gun = loadout.gunStack();
+        if (gun == null) return;
+        this.setItemInHand(InteractionHand.MAIN_HAND, gun);
+        operator.initialData();
+        if (loadOutInitialized) return;
+        finalizeLoadout();
+    }
+
+    private void finalizeInvs() {
         for (int i = 0; i < inventory.getContainerSize(); i++) {
-            ItemStack ammo = weapon.getAmmo();
+            if (!inventory.getItem(i).isEmpty()) continue;
+            ItemStack ammo = loadout.ammoStack();
             if (ammo == null) return;
             inventory.addItem(ammo);
         }
     }
 
     private void finalizeArmors() {
-        Item armor = ForgeRegistries.ITEMS.getValue(new ResourceLocation("zerocontact", "armor_jpc_v1"));
-        if (armor != null) {
-            this.setItemSlot(EquipmentSlot.CHEST, new ItemStack(armor));
+        Item armor = loadout.armorStack().getItem();
+        Item helmet = loadout.helmetStack().getItem();
+        this.setItemSlot(EquipmentSlot.CHEST, new ItemStack(armor));
+        if (armor instanceof IEquipmentTypeTag tag && tag.getArmorType().equals(IEquipmentTypeTag.EquipmentType.PLATE_CARRIER)) {
             CuriosApi.getCuriosInventory(this).ifPresent(handler -> {
-                Item plate = ForgeRegistries.ITEMS.getValue(new ResourceLocation("zerocontact", "plate_steel"));
-                if (plate != null) {
-                    ItemStack plateStack = new ItemStack(plate);
-                    handler.setEquippedCurio("front_plate", 0, plateStack);
-                    handler.setEquippedCurio("back_plate", 0, plateStack.copy());
-                }
+                Item plate = loadout.plateStack().getItem();
+                ItemStack plateStack = new ItemStack(plate);
+                handler.setEquippedCurio(FRONT_PLATE, 0, plateStack);
+                handler.setEquippedCurio(BACK_PLATE, 0, plateStack.copy());
             });
         }
+        this.setItemSlot(EquipmentSlot.HEAD, new ItemStack(helmet));
+    }
+
+    private void finalizeGears() {
+        Item backpack = loadout.backpackStack().getItem();
+        Item armband = loadout.armbandStack().getItem();
+        CuriosApi.getCuriosInventory(this).ifPresent(handler -> {
+            if (backpack instanceof IEquipmentTypeTag tag && tag.getArmorType().equals(IEquipmentTypeTag.EquipmentType.BACKPACK)) {
+                handler.setEquippedCurio(BACKPACK, 0, new ItemStack(backpack));
+            }
+            handler.setEquippedCurio(ARMBAND, 0, new ItemStack(armband));
+        });
+    }
+
+    private void finalizeLoadout() {
+        finalizeInvs();
+        finalizeArmors();
+        finalizeGears();
+        loadOutInitialized = true;
     }
 
     @Override
@@ -172,10 +209,10 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         if (random.nextFloat() < .3F) {
             this.spawnAtLocation(mainHandItem.copy());
         }
-        Containers.dropContents(this.level(), this.getOnPos(), randomAddLootsList());
+        Containers.dropContents(this.level(), this.getOnPos(), getRandomLootList());
     }
 
-    private @NotNull NonNullList<ItemStack> randomAddLootsList() {
+    private @NotNull NonNullList<ItemStack> getRandomLootList() {
         NonNullList<ItemStack> stackList = NonNullList.create();
         for (int i = 0; i < inventory.getContainerSize(); i++) {
             if (random.nextFloat() <= .07F && !inventory.getItem(i).isEmpty()) {
@@ -187,14 +224,59 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
 
     @Override
     public void addAdditionalSaveData(@NotNull CompoundTag compound) {
-        this.writeInventoryToTag(compound);
+        CompoundTag taczTag = createWeaponTag();
+        compound.put(TACZ_TAG, taczTag);
+        writeInventoryToTag(compound);
         super.addAdditionalSaveData(compound);
+    }
+
+    private @NotNull CompoundTag createWeaponTag() {
+        CompoundTag taczTag = new CompoundTag();
+        taczTag.putString(GUN_ID, loadout.gunId());
+        taczTag.putString(CARTRIDGE_ID, Optional.ofNullable(loadout.ammoId()).orElse(TACZ_NAMESPACE_PREFIX + loadout.ammoStack().getItem()));
+        taczTag.putBoolean(INITIALIZED, loadOutInitialized);
+        return taczTag;
     }
 
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag compound) {
         super.readAdditionalSaveData(compound);
-        this.readInventoryFromTag(compound);
+        readInventoryFromTag(compound);
+        importWeaponTag(compound);
+    }
+
+    private void importWeaponTag(@Nullable CompoundTag dataTag) {
+        if (dataTag != null) {
+            CompoundTag taczTag = dataTag.getCompound(TACZ_TAG);
+            String gunId = taczTag.getString(GUN_ID);
+            String ammoId = taczTag.getString(CARTRIDGE_ID);
+            String helmetId = taczTag.getString(HELMET_ID);
+            String armorId = taczTag.getString(ARMOR_ID);
+            String plateId = taczTag.getString(PLATE_ID);
+            String backPackId = taczTag.getString(BACKPACK_ID);
+            String armbandId = taczTag.getString(ARMBAND_ID);
+            loadOutInitialized = taczTag.getBoolean(INITIALIZED);
+            if (taczTag.isEmpty()) return;
+            if (!ammoId.isEmpty()) {
+                loadout = LoadoutHolder.create(gunId, ammoId)
+                        .setHelmet(helmetId)
+                        .setArmor(armorId)
+                        .setPlate(plateId)
+                        .setBackpack(backPackId)
+                        .setArmband(armbandId)
+                        .build();
+                prepareLoadout();
+            } else {
+                loadout = LoadoutHolder.create(gunId, null)
+                        .setHelmet(helmetId)
+                        .setArmor(armorId)
+                        .setPlate(plateId)
+                        .setBackpack(backPackId)
+                        .setArmband(armbandId)
+                        .build();
+                prepareLoadout();
+            }
+        }
     }
 
     @Override
@@ -222,11 +304,11 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     public void tick() {
         super.tick();
         listenPlayVoice();
-        attackPredicate();
+        attackAnimPredicate();
         stateController.tick();
     }
 
-    private void attackPredicate() {
+    private void attackAnimPredicate() {
         if (this.level().isClientSide) return;
         if (stateController.getPhase() == GlobalStateController.Phase.ATTACK && !this.walkAnimation.isMoving()) {
             this.triggerAnim("fire", "shoot");
@@ -257,7 +339,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
 
     @Override
     public int getMaxFallDistance() {
-        return 3;
+        return 6;
     }
 
     @Override
@@ -280,7 +362,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         Vec3i vec3i = this.getPickupReach();
         AABB searchArea = this.getBoundingBox().inflate(vec3i.getX(), vec3i.getY(), vec3i.getZ());
         List<? extends Entity> ammoItems = this.level().getEntitiesOfClass(ItemEntity.class, searchArea,
-                entity -> ItemStack.isSameItemSameTags(entity.getItem(), weapon.ammoStack));
+                entity -> ItemStack.isSameItemSameTags(entity.getItem(), loadout.ammoStack()));
         return !ammoItems.isEmpty() || super.canPickUpLoot();
     }
 
@@ -291,7 +373,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         Vec3i vec3i = this.getPickupReach();
         if (!this.level().isClientSide && this.canPickUpLoot() && this.isAlive() && !this.dead && ForgeEventFactory.getMobGriefingEvent(this.level(), this)) {
             for (ItemEntity itementity : this.level().getEntitiesOfClass(ItemEntity.class, this.getBoundingBox().inflate(vec3i.getX(), vec3i.getY(), vec3i.getZ()),
-                    entity -> ItemStack.isSameItemSameTags(entity.getItem(), weapon.ammoStack))) {
+                    entity -> ItemStack.isSameItemSameTags(entity.getItem(), loadout.ammoStack()))) {
                 if (!itementity.isRemoved() && !itementity.getItem().isEmpty() && !itementity.hasPickUpDelay()) {
                     this.pickUpItem(itementity);
                 }
@@ -305,70 +387,14 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     protected void pickUpItem(@NotNull ItemEntity itemEntity) {
         super.pickUpItem(itemEntity);
         ItemStack pickableStack = itemEntity.getItem();
-        if(inventory.canAddItem(pickableStack)){
+        if (inventory.canAddItem(pickableStack)) {
             ItemStack addedStack = inventory.addItem(pickableStack);
-            if(addedStack.isEmpty())itemEntity.discard();
+            if (addedStack.isEmpty()) itemEntity.discard();
         }
     }
 
-    protected enum Weapon {
-        AK("tacz:ak47"),
-        SKS("tacz:sks_tactical"),
-        FN_FAL("tacz:fn_fal"),
-        M4("tacz:m4a1"),
-        SCAR_L("tacz:scar_l"),
-        M320("tacz:m320"),
-        AUG("tacz:aug"),
-        HK416D("tacz:hk416d"),
-        M16A4("tacz:m16a4"),
-        QBZ191("tacz:qbz_191"),
-        CZ75("tacz:cz75"),
-        GLOCK17("tacz:glock_17"),
-        P320("tacz:p320"),
-        P90("tacz:p90"),
-        VECTOR("tacz:vector45"),
-        UZI("tacz:uzi"),
-        M700("tacz:m700"),
-        M249("tacz:m249");
-        private final String gunId;
-        public final ItemStack gunStack;
-        public final ItemStack ammoStack;
-
-        Weapon(String gunId) {
-            this.gunId = gunId;
-            gunStack = getWeapon();
-            ammoStack = getAmmo();
-        }
-
-        ItemStack getWeapon() {
-            ItemStack gunStack = GunItemBuilder.create().setId(new ResourceLocation(gunId)).build();
-            IGun gun = IGun.getIGunOrNull(gunStack);
-            if (gun == null) return null;
-            TimelessAPI.getCommonGunIndex(gun.getGunId(gunStack)).ifPresent(commonGunIndex -> {
-                GunData gunData = commonGunIndex.getGunData();
-                gun.setFireMode(gunStack, gunData.getFireModeSet().get(0));
-                gun.setCurrentAmmoCount(gunStack, gunData.getAmmoAmount());
-            });
-            return gunStack;
-        }
-
-        ItemStack getAmmo() {
-            ItemStack ammoStack = ItemStack.EMPTY;
-            IGun gun = IGun.getIGunOrNull(this.gunStack);
-            if (gun == null) return ammoStack;
-            Optional<CommonGunIndex> gunIndex = TimelessAPI.getCommonGunIndex(gun.getGunId(gunStack));
-            if (gunIndex.isPresent()) {
-                GunData gunData = gunIndex.get().getGunData();
-                ResourceLocation ammoId = gunData.getAmmoId();
-                Integer stackSize = TimelessAPI.getCommonAmmoIndex(ammoId).map(CommonAmmoIndex::getStackSize).orElse(1);
-                ammoStack = AmmoItemBuilder.create().setId(ammoId).setCount(stackSize).build();
-            }
-            return ammoStack;
-        }
-    }
-
-    private Weapon randomWeapon() {
-        Weapon[] values = Weapon.values();
-        return values[random.nextInt(values.length)];
+    private LoadoutHolder randomLoadout() {
+        LoadoutHolder.LoadoutTypes[] values = LoadoutHolder.LoadoutTypes.values();
+        return values[random.nextInt(values.length)].loadoutHolder;
     }
 }
