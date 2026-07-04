@@ -189,3 +189,30 @@ Tutorials about customize your own datapack can be found in GitHub wiki.
 - Fix missing properties for plates.
 - Fix a crash caused by raider.
 - Add voices for raider.
+
+## Release.1.1.3
+
+- New Cartridge/Ammo Type system as a completion of the mod, support data pack, check wiki
+  - This feature is active by default. If you want old behavior, command `/experimentalBallistic false` 
+- New rigs:  
+  - Alice
+  - Condor 498
+  - Fast Tac
+  - S.O.P
+- New backpack: 6sh118
+- New built-in cartridges for caliber:
+    - 9x19: AP,Luger,Pbp,Pst,Rip
+    - .45ACP: AP,FMJ,HS,Rip
+    - .308: M62,M80,M80A1,M993,SP,UN
+    - .338LM: AP,FMJ,TAC-X,UCW
+    - 5.45x39: BP,BS,BT,PP,PS,T
+    - 5.56x45: AP,HP,M855,M855A1,M856,M856A1,M995
+    - 7.62x39: AP,BP,HP,PP,PS,SP
+    - 7.62x54: FMJ,HP,LPS,SNB
+    - All above's data can be edited from the datapack, Check wiki.
+- Compatibility for `FirstAid`,`FirstAidCompat`
+- Compatibility for NVG from `ModernMayhem`
+- Refine the GUI for backpack container
+- Miscellaneous fixes
+- Migrate built-in Armor/Ammo data into default datapack, check wiki to modify them.
+- `Raider` supports custom NBT spawn with loadout, check wiki
