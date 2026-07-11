@@ -1,13 +1,13 @@
 {
   "required": true,
-  "package": "net.zerocontact.mixin",
+  "package": "net.zerocontact.mixin.tacz",
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "mixins": [
-    "ModernKineticGunScriptAPIMixin",
     "AbstractGunItemMixin",
+    "GunHudOverlayMixin",
     "HeadshotHelmetMixin",
-    "GunHudOverlayMixin"
+    "ModernKineticGunScriptAPIMixin"
   ],
   "injectors": {
     "defaultRequire": 1

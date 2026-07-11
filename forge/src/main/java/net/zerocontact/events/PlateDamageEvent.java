@@ -12,6 +12,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
+import net.zerocontact.caliber.AmmoInjector;
+import net.zerocontact.caliber.BulletBinder;
+import net.zerocontact.caliber.CaliberVariantDamageHelper;
 import net.zerocontact.compat.FirstAidCompatHandler;
 import net.zerocontact.registries.ModSoundEventsReg;
 
@@ -49,7 +52,7 @@ public class PlateDamageEvent {
         if (!stackInSlot.isEmpty() && (damageSource.is(ModDamageTypes.BULLETS_TAG) || damageSource.is(ZDamageTypes.ZC_DAMAGE))) {
             if (stackInSlot.getItem() instanceof ICombatArmorItem armorProvider) {
                 if (!(damageSource.getDirectEntity() instanceof EntityKineticBullet bullet)) return;
-                AmmoInjector.AmmoContext ammoContext = AmmoInjector.get(bullet);
+                AmmoInjector.AmmoContext ammoContext = BulletBinder.getContext(bullet);
                 float caliberArmorDamage;
                 int hits = stackInSlot.getOrCreateTag().getInt("hits");
                 if (ammoContext != null) {

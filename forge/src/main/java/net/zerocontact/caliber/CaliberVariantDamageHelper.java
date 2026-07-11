@@ -1,4 +1,4 @@
-package net.zerocontact.events;
+package net.zerocontact.caliber;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import com.tacz.guns.entity.EntityKineticBullet;
@@ -106,7 +106,7 @@ public enum CaliberVariantDamageHelper {
 
         @Override
         public boolean equals(Object obj) {
-            return obj instanceof Caliber caliber && Objects.equals(id, caliber.id) && (Objects.equals(variant, caliber.variant.split(":")[1]) || (Objects.equals(variant, caliber.variant)));
+            return obj instanceof Caliber caliber && Objects.equals(id, caliber.id) && (Objects.equals(variant, caliber.variant));
         }
 
         @Override
@@ -126,7 +126,7 @@ public enum CaliberVariantDamageHelper {
     private static <E> Optional<Caliber> getMatchedCaliber(DamageSource source, Set<E> set) {
         AtomicReference<Optional<Caliber>> result = new AtomicReference<>(Optional.empty());
         if (!(source.getDirectEntity() instanceof EntityKineticBullet bullet)) return result.get();
-        @Nullable AmmoInjector.AmmoContext ammoContext = AmmoInjector.get(bullet);
+        @Nullable AmmoInjector.AmmoContext ammoContext = BulletBinder.getContext(bullet);
         if (!source.is(ModDamageTypes.BULLETS_TAG) || ammoContext == null) return result.get();
 
         for (E caliberData : set) {
@@ -137,7 +137,7 @@ public enum CaliberVariantDamageHelper {
                 }
 
             } else if (caliberData instanceof Caliber caliber) {
-                if (ammoContext != null && AmmoInjector.isEmptyContext(ammoContext) && source.getEntity() instanceof ServerPlayer player) {
+                if (ammoContext != null && ammoContext.isEmpty() && source.getEntity() instanceof ServerPlayer player) {
                     ammoContext = AmmoInjector.setPlayerGunContext(player);
                 }
                 if (ammoContext != null && caliber.equals(ammoContext.caliber())) {

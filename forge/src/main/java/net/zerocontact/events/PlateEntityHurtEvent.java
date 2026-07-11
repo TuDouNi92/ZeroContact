@@ -10,6 +10,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
+import net.zerocontact.caliber.CaliberVariantDamageHelper;
 import net.zerocontact.compat.FirstAidCompatHandler;
 import org.jetbrains.annotations.Nullable;
 

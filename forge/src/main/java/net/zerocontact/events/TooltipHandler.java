@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.forge_registries.ItemsRegForge;
 import net.zerocontact.item.ammo.GenerateAmmo;
 
@@ -34,15 +35,17 @@ public class TooltipHandler {
 
     private static void appendAmmoInfoToGun(ItemTooltipEvent event) {
         ItemStack checkStack = event.getItemStack();
-        if (checkStack.getItem() instanceof IGun) {
-            String ammoVariantId = AmmoInjector.getAmmoVariantInGun(checkStack);
-            MutableComponent ammoLabel = Component.translatable("tooltip.zerocontact.gun.ammoVariant").withStyle(ChatFormatting.GOLD).append(":");
-            ItemStack ammoStack = AmmoInjector.getDefaultStack(ammoVariantId);
-            Component ammoDesrciption = Component.literal("\uD83E\uDC35 ").append(Component.translatable(ammoStack.getDescriptionId())).withStyle(ChatFormatting.YELLOW);
-            if (!(ammoStack.getItem() instanceof GenerateAmmo))
-                ammoDesrciption = Component.translatable("hud.zerocontact.ammo.default").withStyle(ChatFormatting.YELLOW);
-            ammoLabel.append(ammoDesrciption);
-            event.getToolTip().add(ammoLabel);
+        if (IGun.getIGunOrNull(checkStack)!=null) {
+            checkStack.getCapability(CapabilityRegistries.CARTRIDGE).ifPresent(cap->{
+                String ammoVariantId = cap.getAmmoVariantInGun(checkStack);
+                MutableComponent ammoLabel = Component.translatable("tooltip.zerocontact.gun.ammoVariant").withStyle(ChatFormatting.GOLD).append(":");
+                ItemStack ammoStack = cap.getDefaultStack(ammoVariantId);
+                Component ammoDesrciption = Component.literal("\uD83E\uDC35 ").append(Component.translatable(ammoStack.getDescriptionId())).withStyle(ChatFormatting.YELLOW);
+                if (!(ammoStack.getItem() instanceof GenerateAmmo))
+                    ammoDesrciption = Component.translatable("hud.zerocontact.ammo.default").withStyle(ChatFormatting.YELLOW);
+                ammoLabel.append(ammoDesrciption);
+                event.getToolTip().add(ammoLabel);
+            });
         }
     }
 }

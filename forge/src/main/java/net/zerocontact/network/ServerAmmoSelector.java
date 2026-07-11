@@ -25,9 +25,11 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.zerocontact.api.ICartridgeHolder;
+import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.client.menu.AmmoSelectorMenu;
 import net.zerocontact.command.CommandManager;
-import net.zerocontact.events.AmmoInjector;
+import net.zerocontact.compat.MagazinesCompatHandler;
 import net.zerocontact.events.EventUtil;
 import net.zerocontact.item.ammo.GenerateAmmo;
 import org.jetbrains.annotations.NotNull;
@@ -47,9 +49,14 @@ public class ServerAmmoSelector {
         NetworkEvent.Context context = supplier.get();
         ServerPlayer player = context.getSender();
         if (player == null || player.isSpectator()) return;
-        if(CommandManager.CommandSavedData.get((ServerLevel) player.level()).experimentalBallistic)
+        if (CommandManager.CommandSavedData.get((ServerLevel) player.level()).experimentalBallistic)
             context.enqueueWork(() -> {
                 if (!IGun.mainHandHoldGun(player)) return;
+                ItemStack gunStack = player.getMainHandItem();
+                MagazinesCompatHandler handler = MagazinesCompatHandler.getInstance();
+                if (handler.isModLoaded()) {
+                    if (handler.isMagazineCompatibleWithGun(gunStack)) return;
+                }
                 LinkedHashMap<ItemStack, Integer> ammoMap = ServerAmmoSelector.getCreativeAmmoForHeldGun(player);
                 NetworkHooks.openScreen(
                         player,
@@ -69,7 +76,7 @@ public class ServerAmmoSelector {
             ItemStack selectedAmmoStack = msg.ammoItem();
             ResourceLocation selectedAmmoKey = ForgeRegistries.ITEMS.getKey(selectedAmmoStack.getItem());
             if (selectedAmmoKey == null) return;
-            AmmoInjector.setClientSelectedAmmoVariant(gunStack, selectedAmmoKey.toString());
+            gunStack.getCapability(CapabilityRegistries.CARTRIDGE).ifPresent(cap -> cap.setClientSelectedAmmoVariant(gunStack, selectedAmmoKey.toString()));
             ModMessages.sendToPlayer(new NetworkHandler.ClientAmmoReloadPacket(), player);
         });
     }
@@ -138,7 +145,9 @@ public class ServerAmmoSelector {
         IGun gun = IGun.getIGunOrNull(gunStack);
         if (gun == null) return neededAmount;
         if (gunTag == null) return neededAmount;
-        String existedAmmoKey = AmmoInjector.getAmmoVariantInGun(gunStack);
+        ICartridgeHolder cap = gunStack.getCapability(CapabilityRegistries.CARTRIDGE).resolve().orElse(null);
+        if (cap == null) return neededAmount;
+        String existedAmmoKey = cap.getAmmoVariantInGun(gunStack);
         Item existedAmmo = ForgeRegistries.ITEMS.getValue(new ResourceLocation(existedAmmoKey));
         if (existedAmmo == null) return neededAmount;
         if (!newAmmoStack.is(existedAmmo)) {
@@ -177,6 +186,14 @@ public class ServerAmmoSelector {
         }
     }
 
+    public static ItemStack getCreativeMagForHeldGun(ServerPlayer player){
+        ItemStack finalItem = ItemStack.EMPTY;
+        ItemStack gunItem = player.getMainHandItem();
+        IGun igun = IGun.getIGunOrNull(gunItem);
+        if(igun==null)return finalItem;
+        finalItem = MagazinesCompatHandler.getInstance().getCompatibleMag(gunItem);
+        return finalItem;
+    }
     public static LinkedHashMap<ItemStack, Integer> getCreativeAmmoForHeldGun(ServerPlayer player) {
         Inventory vanillaInv = player.getInventory();
         ItemStack gunItem = player.getMainHandItem();
@@ -195,7 +212,7 @@ public class ServerAmmoSelector {
                         .map(ForgeRegistries.ITEMS::getValue)
                         .filter(GenerateAmmo.class::isInstance)
                         .map(GenerateAmmo.class::cast)
-                        .filter(ammo-> ammo.isAmmoOfGun(gunItem,ammo.getDefaultInstance()))
+                        .filter(ammo -> ammo.isAmmoOfGun(gunItem, ammo.getDefaultInstance()))
                         .forEach(ammo -> items.merge(
                                 new ItemWrapper(ammo, ammo.getAmmoId(ammo.getDefaultInstance()).toString()),
                                 9999,

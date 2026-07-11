@@ -1,4 +1,4 @@
-package net.zerocontact.mixin;
+package net.zerocontact.mixin.tacz;
 
 import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.init.ModDamageTypes;
