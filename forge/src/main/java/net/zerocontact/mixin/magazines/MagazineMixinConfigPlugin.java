@@ -23,7 +23,7 @@ public class MagazineMixinConfigPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        MagazinesCompatHandler handler = MagazinesCompatHandler.getInstance();
+        MagazinesCompatHandler handler = MagazinesCompatHandler.get();
         return handler.foundInModList(mixinClassName);
     }
 

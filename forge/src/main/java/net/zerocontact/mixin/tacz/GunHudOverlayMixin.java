@@ -44,7 +44,7 @@ public class GunHudOverlayMixin {
                         for (int i = 0; i < itemHandler.getSlots(); ++i) {
                             ItemStack inventoryAmmo = itemHandler.getStackInSlot(i);
                             if (inventoryAmmo.getItem() instanceof IAmmo iAmmo) {
-                                if(!MagazinesCompatHandler.getInstance().isModLoaded()){
+                                if(!MagazinesCompatHandler.get().isModLoaded()){
                                     if (iAmmo.isAmmoOfGun(stack, inventoryAmmo)) {
                                         cacheInventoryAmmoCount += inventoryAmmo.getCount();
                                     }

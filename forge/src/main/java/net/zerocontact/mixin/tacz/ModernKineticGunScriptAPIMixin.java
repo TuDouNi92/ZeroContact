@@ -16,7 +16,6 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.api.ICartridgeHolder;
-import net.zerocontact.caliber.AmmoInjector;
 import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.compat.MagazinesCompatHandler;
 import net.zerocontact.events.EventUtil;
@@ -69,11 +68,10 @@ public class ModernKineticGunScriptAPIMixin {
         } else {
             ItemStack rigs = EventUtil.getCuriosStackFirst(shooter, "rigs");
             boolean result = rigs.getCapability(ForgeCapabilities.ITEM_HANDLER).map(cap -> {
-                for(int i = 0; i < cap.getSlots(); ++i) {
+                for (int i = 0; i < cap.getSlots(); ++i) {
                     ItemStack checkAmmoStack = cap.getStackInSlot(i);
                     Item ammoItem = checkAmmoStack.getItem();
-                    if(!MagazinesCompatHandler.getInstance().isModLoaded()
-                            || !MagazinesCompatHandler.getInstance().isMagazineCompatibleWithGun(itemStack)){
+                    if (MagazinesCompatHandler.get().getCompat().map(compat->compat.isMagazineCompatibleWithGun(itemStack)).orElse(false)) {
                         if (ammoItem instanceof IAmmo iAmmo) {
                             if (iAmmo.isAmmoOfGun(this.itemStack, checkAmmoStack)) {
                                 return true;
@@ -108,8 +106,7 @@ public class ModernKineticGunScriptAPIMixin {
         NonNullList<ItemStack> stackNonNullList = ammoWrap.keySet().stream().peek(stack -> stack.setCount(stack.getMaxStackSize())).collect(Collectors.toCollection(NonNullList::create));
         if (stackNonNullList.isEmpty()) return itemHandler;
         itemHandler = new ItemStackHandler(stackNonNullList);
-        if (MagazinesCompatHandler.getInstance().isModLoaded()
-                && MagazinesCompatHandler.getInstance().isMagazineCompatibleWithGun(itemStack)) {
+        if (MagazinesCompatHandler.get().getCompat().map(compat->compat.isMagazineCompatibleWithGun(itemStack)).orElse(false)) {
             itemHandler = new ItemStackHandler();
             itemHandler.insertItem(0, ServerAmmoSelector.getCreativeMagForHeldGun(player), false);
         }
@@ -120,7 +117,7 @@ public class ModernKineticGunScriptAPIMixin {
     private int zeroContact$checkDropAmmo(int neededAmount, @Nullable ItemStack rigs) {
         ICartridgeHolder cap = itemStack.getCapability(CapabilityRegistries.CARTRIDGE).resolve().orElse(null);
         if (cap == null) return neededAmount;
-        if (MagazinesCompatHandler.getInstance().isModLoaded()) return neededAmount;
+        if (MagazinesCompatHandler.get().isModLoaded()) return neededAmount;
         String clientSelected = cap.getClientSelectedAmmoVariant(itemStack);
         if (clientSelected.isEmpty()) return neededAmount;
         Item selectedItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(clientSelected));
@@ -163,19 +160,8 @@ public class ModernKineticGunScriptAPIMixin {
 
 
     @Unique
-    private void zeroContact$setVariantFromMag(IItemHandler itemHandler, ICartridgeHolder cap) {
-        for (int i = 0; i < itemHandler.getSlots(); ++i) {
-            ItemStack checkAmmoStack = itemHandler.getStackInSlot(i);
-            Item ammoStackItem = checkAmmoStack.getItem();
-            if (ammoStackItem instanceof IAmmoBox iAmmoBox) {
-                if (iAmmoBox.isAmmoBoxOfGun(itemStack, checkAmmoStack)) {
-                    AmmoInjector.AmmoContext context = AmmoInjector.read(checkAmmoStack);
-                    if (context.isEmpty()) continue;
-                    cap.setAmmoVariantInGun(itemStack, context.caliber().variant());
-
-                }
-            }
-        }
+    private void zeroContact$setVariantFromMag(ItemStack magStack, ICartridgeHolder cap) {
+        MagazinesCompatHandler.get().getCompat().ifPresent(compat->compat.setVariantFromMag(itemStack,magStack,cap));
     }
 
     @Unique
@@ -191,10 +177,11 @@ public class ModernKineticGunScriptAPIMixin {
         ICartridgeHolder cap = itemStack.getCapability(CapabilityRegistries.CARTRIDGE).resolve().orElse(null);
         if (cap == null) return;
         cap.setAmmoVariantInGun(gunStack, selectedVariant);
-        if (MagazinesCompatHandler.getInstance().isModLoaded()) {
-            zeroContact$setVariantFromMag(modifiedHandler, cap);
-        }
         int result = this.abstractGunItem.findAndExtractInventoryAmmo(modifiedHandler, itemStack, neededAmount);
+        ItemStack changedMagStack = ServerAmmoSelector.changedMagStack;
+        if (!changedMagStack.isEmpty()) {
+            zeroContact$setVariantFromMag(changedMagStack, cap);
+        }
         if (itemHandler instanceof ItemStackHandler itemStackHandler && rigs != null) {
             rigs.getOrCreateTag().put("inventory", itemStackHandler.serializeNBT().getList("Items", Tag.TAG_COMPOUND));
         }

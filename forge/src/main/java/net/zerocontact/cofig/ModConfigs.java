@@ -41,7 +41,7 @@ public class ModConfigs {
             builder.push("client");
             playBulletSound = builder
                     .comment("Play bullet whizz sound")
-                    .define(ENABLE_BULLET_SOUND, true);
+                    .define(ENABLE_BULLET_SOUND, false);
             builder.pop();
         }
     }

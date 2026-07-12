@@ -5,6 +5,7 @@ import com.tacz.guns.api.item.IAmmo;
 import com.tacz.guns.api.item.IAmmoBox;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.builder.AmmoItemBuilder;
+import com.tacz.guns.item.AmmoBoxItem;
 import com.tacz.guns.item.AmmoItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -26,6 +27,7 @@ import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.api.ICartridgeHolder;
+import net.zerocontact.caliber.AmmoInjector;
 import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.client.menu.AmmoSelectorMenu;
 import net.zerocontact.command.CommandManager;
@@ -44,6 +46,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class ServerAmmoSelector {
+    public static ItemStack changedMagStack = ItemStack.EMPTY;
 
     public static void handleMenu(NetworkHandler.OpenAmmoSelectorPacket msg, Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
@@ -53,10 +56,9 @@ public class ServerAmmoSelector {
             context.enqueueWork(() -> {
                 if (!IGun.mainHandHoldGun(player)) return;
                 ItemStack gunStack = player.getMainHandItem();
-                MagazinesCompatHandler handler = MagazinesCompatHandler.getInstance();
-                if (handler.isModLoaded()) {
-                    if (handler.isMagazineCompatibleWithGun(gunStack)) return;
-                }
+                MagazinesCompatHandler handler = MagazinesCompatHandler.get();
+                if (handler.getCompat().map(compat -> compat.isMagazineCompatibleWithGun(gunStack)).orElse(false))
+                    return;
                 LinkedHashMap<ItemStack, Integer> ammoMap = ServerAmmoSelector.getCreativeAmmoForHeldGun(player);
                 NetworkHooks.openScreen(
                         player,
@@ -85,18 +87,42 @@ public class ServerAmmoSelector {
         List<Integer> mappedSlots = new ArrayList<>();
         for (int i = 0; i < raw.getSlots(); i++) {
             ItemStack checkAmmoStack = raw.getStackInSlot(i);
-            ResourceLocation stackKey = ForgeRegistries.ITEMS.getKey(checkAmmoStack.getItem());
-            if (stackKey != null && stackKey.toString().equals(selectedAmmoKey)) {
-                mappedSlots.add(i);
-            } else if (selectedAmmoKey.isEmpty()) {
-                ResourceLocation vanillaKey = ForgeRegistries.ITEMS.getKey(checkAmmoStack.getItem());
-                if (vanillaKey != null && vanillaKey.toString().equals("tacz:ammo")) {
+            if (checkAmmoStack.getItem() instanceof IAmmo) {
+                ResourceLocation stackKey = ForgeRegistries.ITEMS.getKey(checkAmmoStack.getItem());
+                if (stackKey != null && stackKey.toString().equals(selectedAmmoKey)) {
                     mappedSlots.add(i);
+                } else if (selectedAmmoKey.isEmpty()) {
+                    ResourceLocation vanillaKey = ForgeRegistries.ITEMS.getKey(checkAmmoStack.getItem());
+                    if (vanillaKey != null && vanillaKey.toString().equals("tacz:ammo")) {
+                        mappedSlots.add(i);
+                    }
                 }
+            } else if (checkAmmoStack.getItem() instanceof IAmmoBox iAmmoBox && iAmmoBox.isAmmoBoxOfGun(gunStack, checkAmmoStack)) {
+                AmmoInjector.AmmoContext contextFromBox = AmmoInjector.read(checkAmmoStack);
+                String stackKey = contextFromBox.caliber().variant();
+                if (checkAmmoStack.getItem() instanceof AmmoBoxItem) {
+                    if (stackKey.equals(selectedAmmoKey)) {
+                        mappedSlots.add(i);
+                    } else if (stackKey.isEmpty() && selectedAmmoKey.equals("tacz:ammo")) {
+                        mappedSlots.add(i);
+                    }
+                } else if (MagazinesCompatHandler
+                        .get()
+                        .getCompat()
+                        .map(compat -> compat.instanceOfMagazine(checkAmmoStack.getItem())).orElse(false)) {
+                    mappedSlots.add(i);
+
+                    //Reserve an extra slot for the magazine mixin to return a magazine that differs from the ones in the inventory.
+                    for (int j = 0; j < raw.getSlots(); j++) {
+                        if (raw.getStackInSlot(j).isEmpty()) {
+                            mappedSlots.add(j);
+                            break;
+                        }
+                    }
+                }
+
             }
-            if (checkAmmoStack.getItem() instanceof IAmmoBox iAmmoBox && iAmmoBox.isAmmoBoxOfGun(gunStack, checkAmmoStack)) {
-                mappedSlots.add(i);
-            }
+
         }
 
         return new IItemHandler() {
@@ -117,7 +143,14 @@ public class ServerAmmoSelector {
 
             @Override
             public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
-                return raw.extractItem(mappedSlots.get(slot), amount, simulate);
+                ItemStack stack = raw.extractItem(mappedSlots.get(slot), amount, simulate);
+                if (MagazinesCompatHandler
+                        .get()
+                        .getCompat()
+                        .map(compat -> compat.instanceOfMagazine(stack.getItem())).orElse(false)) {
+                    changedMagStack = stack;
+                }
+                return stack;
             }
 
             @Override
@@ -186,14 +219,15 @@ public class ServerAmmoSelector {
         }
     }
 
-    public static ItemStack getCreativeMagForHeldGun(ServerPlayer player){
+    public static ItemStack getCreativeMagForHeldGun(ServerPlayer player) {
         ItemStack finalItem = ItemStack.EMPTY;
         ItemStack gunItem = player.getMainHandItem();
         IGun igun = IGun.getIGunOrNull(gunItem);
-        if(igun==null)return finalItem;
-        finalItem = MagazinesCompatHandler.getInstance().getCompatibleMag(gunItem);
+        if (igun == null) return finalItem;
+        finalItem = MagazinesCompatHandler.get().getCompat().map(compat -> compat.getCompatibleMag(gunItem)).orElse(finalItem);
         return finalItem;
     }
+
     public static LinkedHashMap<ItemStack, Integer> getCreativeAmmoForHeldGun(ServerPlayer player) {
         Inventory vanillaInv = player.getInventory();
         ItemStack gunItem = player.getMainHandItem();

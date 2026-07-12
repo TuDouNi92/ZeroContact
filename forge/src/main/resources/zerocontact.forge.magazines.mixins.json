@@ -12,5 +12,8 @@
   "plugin": "net.zerocontact.mixin.magazines.MagazineMixinConfigPlugin",
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "client": [
+    "MagazineTooltipRendererMixin"
+  ]
 }
