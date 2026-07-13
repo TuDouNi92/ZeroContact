@@ -27,7 +27,7 @@ import java.util.Optional;
 public class AmmoBoxItemMixin {
     @Unique
     @Nullable
-    private static ItemStack zeroContact$ammoBox;
+    private ItemStack zeroContact$ammoBox;
 
     @Unique
     private boolean zeroContact$updateCartridge(ItemStack ammoBoxStack, Slot slot) {
@@ -66,7 +66,7 @@ public class AmmoBoxItemMixin {
         if (shouldCancel) cir.cancel();
     }
 
-    @Inject(method = "overrideStackedOnOther", at = @At("HEAD"))
+    @Inject(method = "overrideStackedOnOther", at = @At("HEAD"), remap = true)
     public void overrideStackedOnOther(ItemStack ammoBox, Slot slot, ClickAction action, Player player, CallbackInfoReturnable<Boolean> cir) {
         zeroContact$ammoBox = ammoBox;
     }
@@ -88,7 +88,7 @@ public class AmmoBoxItemMixin {
         return ammoStack;
     }
 
-    @Inject(method = "getTooltipImage", at = @At("HEAD"))
+    @Inject(method = "getTooltipImage", at = @At("HEAD"), remap = true)
     public void getTooltipImage(ItemStack stack, CallbackInfoReturnable<Optional<TooltipComponent>> cir) {
         if (stack.getItem() instanceof IAmmoBox) {
             zeroContact$ammoBox = stack;
@@ -98,7 +98,7 @@ public class AmmoBoxItemMixin {
 
     @ModifyVariable(method = "getTooltipImage",
             at = @At("STORE"),
-            name = "ammoStack")
+            name = "ammoStack", remap = true)
     public ItemStack replaceAmmoStack(ItemStack stack) {
         if (zeroContact$ammoBox == null) return stack;
         AmmoInjector.AmmoContext context = AmmoInjector.read(zeroContact$ammoBox);

@@ -26,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
-@Mixin(value = MagazineItem.class, remap = false)
+@Mixin(value = MagazineItem.class)
 public abstract class MagazineItemMixin {
     @Shadow
     public abstract int getAmmoCount(ItemStack magazine);
