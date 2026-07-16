@@ -14,6 +14,7 @@ public class AttachCapListener {
     public static void attachStackCap(AttachCapabilitiesEvent<ItemStack> stackAttachCapabilitiesEvent) {
         if (IGun.getIGunOrNull(stackAttachCapabilitiesEvent.getObject()) != null) {
             stackAttachCapabilitiesEvent.addCapability(new ResourceLocation(ZeroContact.MOD_ID, "cartridge"), new GunCartridgeTypeCapProvider());
+            stackAttachCapabilitiesEvent.addCapability(new ResourceLocation(ZeroContact.MOD_ID,"repair_kit"), new RepairKitCapProvider());
         }
     }
 }

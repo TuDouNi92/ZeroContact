@@ -4,6 +4,7 @@ import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
 import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.init.ModDamageTypes;
 import dev.architectury.event.EventResult;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -80,13 +81,14 @@ public class PlateDamageEvent {
 
                 FirstAidCompatHandler firstAidCompatHandler = FirstAidCompatHandler.create(livingEntity, damageSource);
                 if (firstAidCompatHandler != null && firstAidCompatHandler.getLimbsApplicable()) return;
-                stackInSlot.hurtAndBreak(durabilityLossAmount, livingEntity, lv -> lv.playSound(ModSoundEventsReg.ARMOR_BROKEN_PLATE, 1.0f, 1.0f));
+                stackInSlot.hurtAndBreak(durabilityLossAmount, livingEntity, holder -> holder.level().playSound(null, holder.blockPosition(), ModSoundEventsReg.ARMOR_BROKEN_PLATE, SoundSource.PLAYERS));
             }
         }
     }
 
     private static float getArmorDamage(CaliberVariantDamageHelper.Caliber caliber, ICombatArmorItem provider, float baseDamage) {
         int absorb = provider.getAbsorb() == 0 ? 1 : provider.getAbsorb();
+        baseDamage = baseDamage <= 0 ? (float) 0.01 : baseDamage;
         return caliber.penetrationClass() * baseDamage * ((float) caliber.penetrationClass() / absorb);
     }
 
@@ -104,7 +106,7 @@ public class PlateDamageEvent {
                 if (stack.getItem() instanceof ICombatArmorItem durabilityLossProvider && stack.getItem() instanceof HelmetInfoProvider) {
                     durabilityLossAmount = durabilityLossProvider.generateLoss(amount, durabilityLossFactor, hits);
                     stack.getOrCreateTag().putInt("hits", hits);
-                    stack.hurtAndBreak(durabilityLossAmount, livingEntity, broken -> livingEntity.playSound(ModSoundEventsReg.ARMOR_BROKEN_PLATE, 1.0f, 1.0f));
+                    stack.hurtAndBreak(durabilityLossAmount, livingEntity, holder -> holder.level().playSound(null, holder.blockPosition(), ModSoundEventsReg.ARMOR_BROKEN_PLATE, SoundSource.PLAYERS));
                 }
             }
         });

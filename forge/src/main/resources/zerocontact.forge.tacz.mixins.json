@@ -7,7 +7,7 @@
     "AbstractGunItemMixin",
     "AmmoBoxItemMixin",
     "GunHudOverlayMixin",
-    "HeadshotHelmetMixin",
+    "ItemStackMixin",
     "ModernKineticGunScriptAPIMixin"
   ],
   "injectors": {

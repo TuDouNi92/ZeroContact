@@ -61,7 +61,7 @@ public class AmmoInjector {
         ResourceLocation defaultAmmo = getGunDefaultAmmo(gunStack);
         if (defaultAmmo.toString().isEmpty()) return null;
         gunStack.getOrCreateTagElement("ai_ammo").putString("ai_ammoId", defaultAmmo.toString());
-        gunStack.getOrCreateTagElement("ai_ammo").putString("selected_variant",defaultVariant);
+        gunStack.getOrCreateTagElement("ai_ammo").putString("selected_variant", defaultVariant);
         gunStack.getOrCreateTagElement("ai_ammo").putString("existed_variant", defaultVariant);
         return new AmmoContext(new CaliberVariantDamageHelper.Caliber(defaultAmmo.toString(), defaultVariant, 0, 0, 0, 0, 0, new int[]{255, 255, 255, 255}));
     }
@@ -74,7 +74,12 @@ public class AmmoInjector {
     public static void setAmmoVariantInGun(ItemStack gunStack, String selectedVariant) {
         gunStack.getOrCreateTagElement("ai_ammo").putString("existed_variant", selectedVariant);
         Item ammoItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(selectedVariant));
-        if (!(ammoItem instanceof GenerateAmmo ammo)) return;
+        if (!(ammoItem instanceof GenerateAmmo ammo)) {
+            AmmoContext context = setDefaultAmmoVariantInGun(gunStack);
+            if (context == null) return;
+            copyTags(context.caliber(), gunStack);
+            return;
+        }
         CaliberVariantDamageHelper.Caliber caliber = ammo.getDefualtCaliber();
         copyTags(caliber, gunStack);
     }

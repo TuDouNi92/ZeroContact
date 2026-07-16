@@ -111,18 +111,17 @@ public class ServerAmmoSelector {
                         .getCompat()
                         .map(compat -> compat.instanceOfMagazine(checkAmmoStack.getItem())).orElse(false)) {
                     mappedSlots.add(i);
-
-                    //Reserve an extra slot for the magazine mixin to return a magazine that differs from the ones in the inventory.
-                    for (int j = 0; j < raw.getSlots(); j++) {
-                        if (raw.getStackInSlot(j).isEmpty()) {
-                            mappedSlots.add(j);
-                            break;
-                        }
-                    }
                 }
-
             }
-
+        }
+        //Reserve 2 extra slots for the magazine mixin to return a magazine that differs from the ones in the inventory.
+        for (int j = 0; j < raw.getSlots(); j++) {
+            if (raw.getStackInSlot(j).isEmpty()) {
+                mappedSlots.add(j);
+                if(mappedSlots.size()>=2){
+                    break;
+                }
+            }
         }
 
         return new IItemHandler() {

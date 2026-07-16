@@ -59,6 +59,9 @@ public class PlateEntityHurtEvent {
                         return;
                     int protectionClass = stack.getOrCreateTag().getInt("protection_class");
                     float hurtAmount = getHurtAmount(livingEntity, damageSource, amount, null, entityHurtProvider, protectionClass);
+                    if (stack.getMaxDamage() - stack.getDamageValue() <= 1) {
+                        hurtAmount = getHurtAmount(livingEntity, damageSource, amount, null, null, protectionClass);
+                    }
                     eventPre.setBaseAmount(hurtAmount);
                     if (firstAidCompat != null && firstAidCompat.getHeadApplicable()) {
                         eventPre.setHeadshotMultiplier(0.2f);

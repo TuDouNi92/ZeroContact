@@ -52,8 +52,8 @@ public enum PlateBaseMaterial implements ArmorMaterial {
     }
 
     @Override
-    public Ingredient getRepairIngredient() {
-        return null;
+    public @NotNull Ingredient getRepairIngredient() {
+        return Ingredient.EMPTY;
     }
 
     @Override

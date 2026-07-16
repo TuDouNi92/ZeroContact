@@ -2,7 +2,9 @@ package net.zerocontact.api;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.zerocontact.caliber.AmmoInjector;
 import net.zerocontact.caliber.CaliberVariantDamageHelper;
+import org.jetbrains.annotations.Nullable;
 
 public interface ICartridgeHolder {
     void copyTags(CaliberVariantDamageHelper.Caliber defaultCaliber, ItemStack gun);
@@ -16,7 +18,7 @@ public interface ICartridgeHolder {
     //Get default tacz ammoId for gun.
     ResourceLocation getGunDefaultAmmo(ItemStack gunStack);
 
-    void setDefaultAmmoVariantInGun(ItemStack gunStack, ResourceLocation ammoKey);
+    @Nullable AmmoInjector.AmmoContext setDefaultAmmoVariantInGun(ItemStack gunStack);
 
     //Update cartridge tag in gun
     void setAmmoVariantInGun(ItemStack gunStack, String selectedVariant);

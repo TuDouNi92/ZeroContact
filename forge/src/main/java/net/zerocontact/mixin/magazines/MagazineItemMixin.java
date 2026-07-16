@@ -28,7 +28,7 @@ import java.util.List;
 
 @Mixin(value = MagazineItem.class)
 public abstract class MagazineItemMixin {
-    @Shadow
+    @Shadow(remap = false)
     public abstract int getAmmoCount(ItemStack magazine);
 
     @Unique
@@ -47,7 +47,8 @@ public abstract class MagazineItemMixin {
     @Inject(method = "overrideStackedOnOther",
             at = @At(
                     value = "INVOKE",
-                    target = "Lcom/raiiiden/taczmagazines/item/MagazineItem;setAmmoId(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/resources/ResourceLocation;)V"),
+                    target = "Lcom/raiiiden/taczmagazines/item/MagazineItem;setAmmoId(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/resources/ResourceLocation;)V",
+                    remap = false),
             cancellable = true
     )
 
@@ -73,7 +74,8 @@ public abstract class MagazineItemMixin {
             at = @At(
                     value = "INVOKE",
                     target = "Lcom/raiiiden/taczmagazines/item/MagazineItem;getAmmoId(Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/resources/ResourceLocation;",
-                    ordinal = 1),
+                    ordinal = 1,
+                    remap = false),
             cancellable = true)
     public void overrideOtherStackedOnMeLoad(ItemStack magazine, ItemStack heldStack, Slot slot, ClickAction action, Player player, SlotAccess heldAccess, CallbackInfoReturnable<Boolean> cir) {
         zeroContact$updateCartridge(magazine, heldStack, cir);

@@ -183,7 +183,7 @@ public enum CaliberVariantDamageHelper {
     }
 
     private static void setOutput(@Nullable ICombatArmorItem provider, Caliber caliber, double penetratedDamage, AtomicDouble output) {
-        if (penetratedDamage != 0) {
+        if (penetratedDamage > 0) {
             if (provider == null) {
                 output.set(penetratedDamage);
             } else {
@@ -193,7 +193,7 @@ public enum CaliberVariantDamageHelper {
             if (provider == null) {
                 output.set(caliber.fleshDamage);
             } else {
-                output.set(caliber.fleshDamage * provider.generateBlunt());
+                output.set(caliber.penetrationClass * 0.3 * provider.generateBlunt());
             }
         }
     }

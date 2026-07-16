@@ -106,15 +106,21 @@ public class HurtPipeLine {
                 float finalHurtAmount = context.originalAmount;
                 DamageResultBuilder builder = current;
                 if (armor != null || plate != null) {
-
                     if (armor != null && plate != null) {
                         if (armor.getItem() instanceof ICombatArmorItem armorProvider && plate.getItem() instanceof ICombatArmorItem plateProvider) {
+                            if (plate.getMaxDamage() - plate.getDamageValue() <= 1) {
+                                finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, null, null,0);
+                                return builder.shouldCancelEvent(true).finalAmount(finalHurtAmount);
+                            }
                             builder = builder.withPlateProvider(plateProvider);
-                            int protectionLevel = plate.getOrCreateTag().getInt("protection_class");
-                            finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, plateProvider, armorProvider, protectionLevel);
+                            finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, plateProvider, armorProvider, plateProvider.getAbsorb());
                         }
                     } else if (armor != null) {
                         if (armor.getItem() instanceof ICombatArmorItem armorProvider) {
+                            if (armor.getMaxDamage() - armor.getDamageValue() <= 1) {
+                                finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, null, armorProvider, 0);
+                                return builder.shouldCancelEvent(true).finalAmount(finalHurtAmount);
+                            }
                             builder = builder.withArmorProvider(armorProvider);
                             int protectionLevel = armor.getOrCreateTag().getInt("protection_class");
                             finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, null, armorProvider, protectionLevel);

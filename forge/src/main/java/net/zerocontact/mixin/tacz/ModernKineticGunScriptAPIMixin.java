@@ -67,27 +67,46 @@ public class ModernKineticGunScriptAPIMixin {
             cir.setReturnValue(this.abstractGunItem.getDummyAmmoAmount(this.itemStack) > 0);
         } else {
             ItemStack rigs = EventUtil.getCuriosStackFirst(shooter, "rigs");
-            boolean result = rigs.getCapability(ForgeCapabilities.ITEM_HANDLER).map(cap -> {
-                for (int i = 0; i < cap.getSlots(); ++i) {
-                    ItemStack checkAmmoStack = cap.getStackInSlot(i);
-                    Item ammoItem = checkAmmoStack.getItem();
-                    if (MagazinesCompatHandler.get().getCompat().map(compat->compat.isMagazineCompatibleWithGun(itemStack)).orElse(false)) {
+            if (!rigs.isEmpty()) {
+                cir.setReturnValue(rigs.getCapability(ForgeCapabilities.ITEM_HANDLER).map(cap -> {
+                            for (int i = 0; i < cap.getSlots(); ++i) {
+                                ItemStack checkAmmoStack = cap.getStackInSlot(i);
+                                Item ammoItem = checkAmmoStack.getItem();
+                                if (ammoItem instanceof IAmmo iAmmo) {
+                                    if (iAmmo.isAmmoOfGun(this.itemStack, checkAmmoStack)) {
+                                        return true;
+                                    }
+                                }
+                                ammoItem = checkAmmoStack.getItem();
+                                if (ammoItem instanceof IAmmoBox iAmmoBox) {
+                                    if (iAmmoBox.isAmmoBoxOfGun(this.itemStack, checkAmmoStack)) {
+                                        return true;
+                                    }
+                                }
+                            }
+                            return false;
+                        }).orElse(false)
+                );
+            } else {
+                cir.setReturnValue(shooter.getCapability(ForgeCapabilities.ITEM_HANDLER).map(cap -> {
+                    for (int i = 0; i < cap.getSlots(); ++i) {
+                        ItemStack checkAmmoStack = cap.getStackInSlot(i);
+                        Item ammoItem = checkAmmoStack.getItem();
                         if (ammoItem instanceof IAmmo iAmmo) {
                             if (iAmmo.isAmmoOfGun(this.itemStack, checkAmmoStack)) {
                                 return true;
                             }
                         }
-                    }
-                    ammoItem = checkAmmoStack.getItem();
-                    if (ammoItem instanceof IAmmoBox iAmmoBox) {
-                        if (iAmmoBox.isAmmoBoxOfGun(this.itemStack, checkAmmoStack)) {
-                            return true;
+                        ammoItem = checkAmmoStack.getItem();
+                        if (ammoItem instanceof IAmmoBox iAmmoBox) {
+                            if (iAmmoBox.isAmmoBoxOfGun(this.itemStack, checkAmmoStack)) {
+                                return true;
+                            }
                         }
                     }
-                }
-                return false;
-            }).orElse(false);
-            cir.setReturnValue(result);
+                    return false;
+                }).orElse(false));
+            }
         }
 
     }
@@ -106,8 +125,8 @@ public class ModernKineticGunScriptAPIMixin {
         NonNullList<ItemStack> stackNonNullList = ammoWrap.keySet().stream().peek(stack -> stack.setCount(stack.getMaxStackSize())).collect(Collectors.toCollection(NonNullList::create));
         if (stackNonNullList.isEmpty()) return itemHandler;
         itemHandler = new ItemStackHandler(stackNonNullList);
-        if (MagazinesCompatHandler.get().getCompat().map(compat->compat.isMagazineCompatibleWithGun(itemStack)).orElse(false)) {
-            itemHandler = new ItemStackHandler();
+        if (MagazinesCompatHandler.get().getCompat().map(compat -> compat.isMagazineCompatibleWithGun(itemStack)).orElse(false)) {
+            itemHandler = new ItemStackHandler(2);
             itemHandler.insertItem(0, ServerAmmoSelector.getCreativeMagForHeldGun(player), false);
         }
         return itemHandler;
@@ -117,7 +136,7 @@ public class ModernKineticGunScriptAPIMixin {
     private int zeroContact$checkDropAmmo(int neededAmount, @Nullable ItemStack rigs) {
         ICartridgeHolder cap = itemStack.getCapability(CapabilityRegistries.CARTRIDGE).resolve().orElse(null);
         if (cap == null) return neededAmount;
-        if (MagazinesCompatHandler.get().isModLoaded()) return neededAmount;
+        if (MagazinesCompatHandler.get().getCompat().map(compat->compat.isMagazineCompatibleWithGun(itemStack)).orElse(false)) return neededAmount;
         String clientSelected = cap.getClientSelectedAmmoVariant(itemStack);
         if (clientSelected.isEmpty()) return neededAmount;
         Item selectedItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(clientSelected));
@@ -161,7 +180,7 @@ public class ModernKineticGunScriptAPIMixin {
 
     @Unique
     private void zeroContact$setVariantFromMag(ItemStack magStack, ICartridgeHolder cap) {
-        MagazinesCompatHandler.get().getCompat().ifPresent(compat->compat.setVariantFromMag(itemStack,magStack,cap));
+        MagazinesCompatHandler.get().getCompat().ifPresent(compat -> compat.setVariantFromMag(itemStack, magStack, cap));
     }
 
     @Unique

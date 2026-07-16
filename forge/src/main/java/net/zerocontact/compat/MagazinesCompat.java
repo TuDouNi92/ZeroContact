@@ -1,5 +1,6 @@
 package net.zerocontact.compat;
 
+import com.raiiiden.taczmagazines.capability.GunMagazineProvider;
 import com.raiiiden.taczmagazines.item.MagazineItem;
 import com.raiiiden.taczmagazines.item.MagazineRegistrar;
 import com.raiiiden.taczmagazines.magazine.MagazineFamilySystem;
@@ -23,9 +24,15 @@ public class MagazinesCompat {
         ResourceLocation gunId = gun.getGunId(gunStack);
         String familyId = MagazineFamilySystem.getFamilyForGun(gunId);
         if (familyId == null) return magStack;
-        Item magItem = MagazineRegistrar.MAGAZINE.get();
-        magStack = MagazineItem.createMagazineByFamily(magItem, familyId, MagazineFamilySystem.getCapacityForFamily(familyId));
-        return magStack;
+        return gunStack.getCapability(GunMagazineProvider.GUN_MAGAZINE).map(cap -> {
+            ItemStack stored = cap.getStoredMagazine();
+            if (stored.isEmpty()) {
+                Item magItem = MagazineRegistrar.MAGAZINE.get();
+                stored = MagazineItem.createMagazineByFamily(magItem, familyId, MagazineFamilySystem.getCapacityForFamily(familyId));
+            }
+            return stored.copy();
+        }).orElse(ItemStack.EMPTY);
+
     }
 
     public boolean isMagazineCompatibleWithGun(ItemStack gunStack) {

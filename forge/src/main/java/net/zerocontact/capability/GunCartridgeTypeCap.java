@@ -14,6 +14,7 @@ import net.zerocontact.caliber.AmmoInjector;
 import net.zerocontact.caliber.CaliberSerializer;
 import net.zerocontact.caliber.CaliberVariantDamageHelper;
 import net.zerocontact.item.ammo.GenerateAmmo;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -53,19 +54,26 @@ public class GunCartridgeTypeCap implements ICartridgeHolder {
     }
 
 
-    public void setDefaultAmmoVariantInGun(ItemStack gunStack, ResourceLocation ammoKey) {
+    public @Nullable AmmoInjector.AmmoContext setDefaultAmmoVariantInGun(ItemStack gunStack) {
+        String defaultVariant = "tacz:ammo";
         ResourceLocation defaultAmmo = getGunDefaultAmmo(gunStack);
-        if (defaultAmmo.toString().isEmpty()) return;
-        if (ammoKey.toString().isEmpty()) return;
+        if (defaultAmmo.toString().isEmpty()) return null;
         gunStack.getOrCreateTagElement("ai_ammo").putString("ai_ammoId", defaultAmmo.toString());
-        gunStack.getOrCreateTagElement("ai_ammo").putString("existed_variant", ammoKey.toString());
+        gunStack.getOrCreateTagElement("ai_ammo").putString("selected_variant", defaultVariant);
+        gunStack.getOrCreateTagElement("ai_ammo").putString("existed_variant", defaultVariant);
+        return new AmmoInjector.AmmoContext(new CaliberVariantDamageHelper.Caliber(defaultAmmo.toString(), defaultVariant, 0, 0, 0, 0, 0, new int[]{255, 255, 255, 255}));
     }
 
     //Update cartridge tag in gun
     public void setAmmoVariantInGun(ItemStack gunStack, String selectedVariant) {
         gunStack.getOrCreateTagElement("ai_ammo").putString("existed_variant", selectedVariant);
         Item ammoItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(selectedVariant));
-        if (!(ammoItem instanceof GenerateAmmo ammo)) return;
+        if (!(ammoItem instanceof GenerateAmmo ammo)) {
+            AmmoInjector.AmmoContext context = setDefaultAmmoVariantInGun(gunStack);
+            if (context == null) return;
+            copyTags(context.caliber(), gunStack);
+            return;
+        }
         CaliberVariantDamageHelper.Caliber caliber = ammo.getDefualtCaliber();
         copyTags(caliber, gunStack);
     }
