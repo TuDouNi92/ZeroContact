@@ -46,13 +46,9 @@ public class AmmoBoxItemMixin {
                     value = "INVOKE",
                     target = "Lcom/tacz/guns/item/AmmoBoxItem;setAmmoId(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/resources/ResourceLocation;)V"),
             cancellable = true)
-    public void updateExtractBox(int boxAmmoCount,
-                                 ResourceLocation boxAmmoId,
-                                 Slot slot, ItemStack ammoBox,
-                                 Player player, CommonAmmoIndex index,
-                                 CallbackInfo ci) {
+    public void updateExtractBox(int boxAmmoCount, ResourceLocation boxAmmoId, Slot slot, ItemStack ammoBox, Player player, CommonAmmoIndex index, CallbackInfoReturnable<Boolean> cir) {
         boolean shouldCancel = zeroContact$updateCartridge(ammoBox, slot);
-        if (shouldCancel) ci.cancel();
+        if (shouldCancel) cir.cancel();
     }
 
     @Inject(method = "overrideStackedOnOther",
