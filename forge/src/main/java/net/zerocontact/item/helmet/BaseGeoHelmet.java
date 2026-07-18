@@ -104,7 +104,8 @@ public class BaseGeoHelmet extends ArmorItem implements HelmetInfoProvider, GeoI
     @Override
     public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new IClientItemExtensions() {
-            private HelmetRender.HelmetArmorRender<FastMt> render;
+            private HelmetRender.HelmetArmorRender<BaseGeoHelmet> render;
+            private HelmetRender.HelmetItemRender<BaseGeoHelmet> itemRender;
 
             @Override
             public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
@@ -117,7 +118,10 @@ public class BaseGeoHelmet extends ArmorItem implements HelmetInfoProvider, GeoI
 
             @Override
             public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return new HelmetRender.HelmetItemRender<>(new GenerateModel<>(texture, model, animation));
+                if (this.itemRender == null) {
+                    this.itemRender = new HelmetRender.HelmetItemRender<>(new GenerateModel<>(texture, model, animation));
+                }
+                return this.itemRender;
             }
         });
     }

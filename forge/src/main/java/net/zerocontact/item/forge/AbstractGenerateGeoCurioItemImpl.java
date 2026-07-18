@@ -30,7 +30,6 @@ public abstract class AbstractGenerateGeoCurioItemImpl extends ArmorItem impleme
     protected final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     public final String id;
     public final ResourceLocation texture, model, animation;
-    public ArmorRender<AbstractGenerateGeoCurioItemImpl> render;
 
     public AbstractGenerateGeoCurioItemImpl(String id, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
         super(PlateBaseMaterial.ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Properties().defaultDurability(defaultDurability));
@@ -38,7 +37,6 @@ public abstract class AbstractGenerateGeoCurioItemImpl extends ArmorItem impleme
         this.texture = texture;
         this.model = model;
         this.animation = animation;
-        this.render = null;
     }
 
     @Override
@@ -64,6 +62,9 @@ public abstract class AbstractGenerateGeoCurioItemImpl extends ArmorItem impleme
     @Override
     public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new IClientItemExtensions() {
+            private ArmorRender<AbstractGenerateGeoCurioItemImpl> render;
+            private ArmorRender.ItemRender<AbstractGenerateGeoCurioItemImpl> itemRender;
+
             @Override
             public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
                 if (texture == null || model == null) return render;
@@ -73,8 +74,6 @@ public abstract class AbstractGenerateGeoCurioItemImpl extends ArmorItem impleme
                 render.prepForRender(livingEntity, itemStack, equipmentSlot, original);
                 return render;
             }
-
-            private ArmorRender.ItemRender<BaseArmorGeoImpl> itemRender;
 
             @Override
             public BlockEntityWithoutLevelRenderer getCustomRenderer() {
