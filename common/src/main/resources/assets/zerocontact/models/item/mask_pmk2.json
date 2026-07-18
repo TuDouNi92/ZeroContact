@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/mask_pmk2"
+    "layer0": "zerocontact:models/mask/mask_pmk2_black"
   },
   "display": {
     "gui": {

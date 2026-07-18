@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/rigs/rigs_sop_mr_desert"
+    "layer0": "zerocontact:models/rigs/rig_sop_mr_desert"
   },
   "display": {
     "gui": {

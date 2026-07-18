@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/uniform_spn_top"
+    "layer0": "zerocontact:models/uniform/uniform_spn_bottom"
   },
   "display": {
     "gui": {

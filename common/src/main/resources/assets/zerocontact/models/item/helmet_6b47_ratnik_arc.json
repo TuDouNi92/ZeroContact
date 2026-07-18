@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/helmet_6b47_ratnik_arc"
+    "layer0": "zerocontact:models/helmet/helmet_6b47_cover_arctic"
   },
   "display": {
     "gui": {

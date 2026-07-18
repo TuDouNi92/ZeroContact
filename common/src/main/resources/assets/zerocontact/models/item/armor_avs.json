@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/armor_avs"
+    "layer0": "zerocontact:item/avs_armor"
   },
   "display": {
     "gui": {

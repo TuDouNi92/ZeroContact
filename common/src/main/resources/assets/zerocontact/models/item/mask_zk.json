@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/mask_zk"
+    "layer0": "zerocontact:models/mask/mask_zelinsky_kummant_rubber"
   },
   "display": {
     "gui": {

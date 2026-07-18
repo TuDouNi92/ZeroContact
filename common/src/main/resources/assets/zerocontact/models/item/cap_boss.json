@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/cap_boss"
+    "layer0": "zerocontact:models/helmet/helmet_cap_boss"
   },
   "display": {
     "gui": {

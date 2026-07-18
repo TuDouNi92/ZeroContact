@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/armor_jpc_v1"
+    "layer0": "zerocontact:models/armorrig/armorrig_jpc_1v_tan"
   },
   "display": {
     "gui": {

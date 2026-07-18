@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/helmet_bastion_multicam"
+    "layer0": "zerocontact:models/helmet/helmet_bastion_multicam"
   },
   "display": {
     "gui": {

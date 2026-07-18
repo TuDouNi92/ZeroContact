@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/rigs/rigs_thunderbolt_gray"
+    "layer0": "zerocontact:models/rigs/rig_thunderbolt_grey"
   },
   "display": {
     "gui": {

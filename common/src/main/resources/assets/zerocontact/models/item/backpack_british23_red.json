@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/backpack/backpack_british23_red"
+    "layer0": "zerocontact:models/backpack/backpack_british23_red"
   },
   "display": {
     "gui": {

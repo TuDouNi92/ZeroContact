@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/uniform_british23_topuniform_british23_top.json"
+    "layer0": "zerocontact:models/uniform/uniform_british23_top"
   },
   "display": {
     "gui": {

@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/mask_tagilla_manhunt"
+    "layer0": "zerocontact:models/mask/mask_svarka_tagilla_manhunt"
   },
   "display": {
     "gui": {
