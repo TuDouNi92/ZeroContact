@@ -1,5 +1,6 @@
 package net.zerocontact.mixin.tacz;
 
+import com.tacz.guns.api.DefaultAssets;
 import com.tacz.guns.api.item.IAmmoBox;
 import com.tacz.guns.item.AmmoBoxItem;
 import com.tacz.guns.resource.index.CommonAmmoIndex;
@@ -18,7 +19,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Optional;
@@ -35,7 +35,9 @@ public class AmmoBoxItemMixin {
         if (!(ammoBoxStack.getItem() instanceof IAmmoBox box)) return false;
         if (box.getAmmoCount(ammoBoxStack) <= 0) {
             AmmoInjector.write(contextFromAmmo, ammoBoxStack);
-            contextFromAmmo = AmmoInjector.read(slot.getItem());
+        } else if (box.isCreative(ammoBoxStack) && box.getAmmoId(ammoBoxStack).equals(DefaultAssets.EMPTY_AMMO_ID)) {
+            AmmoInjector.write(contextFromAmmo, ammoBoxStack);
+            box.setAmmoId(ammoBoxStack, new ResourceLocation(contextFromAmmo.caliber().id()));
         }
         AmmoInjector.AmmoContext contextFromMag = AmmoInjector.read(ammoBoxStack);
         return !contextFromAmmo.caliber().equals(contextFromMag.caliber());

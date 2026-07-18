@@ -105,6 +105,8 @@ public class ServerAmmoSelector {
                         mappedSlots.add(i);
                     } else if (stackKey.isEmpty() && selectedAmmoKey.equals("tacz:ammo")) {
                         mappedSlots.add(i);
+                    } else if(stackKey.isEmpty() &&iAmmoBox.isAllTypeCreative(checkAmmoStack)){
+                        mappedSlots.add(i);
                     }
                 } else if (MagazinesCompatHandler
                         .get()

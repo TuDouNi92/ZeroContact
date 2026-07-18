@@ -111,5 +111,9 @@
   "key.open_backpack": "打开背包",
   "key.open_selector": "打开弹种轮盘",
   "key.swap_visor": "切换目镜",
-  "gui.zerocontact.workbench.startOS": "[    0.000000] Linux version 6.5.0-21-generic (buildd@lcy02-amd64-123)\n[    0.000000] Command line: BOOT_IMAGE=/boot/vmlinuz root=UUID=xxxx ro quiet splash\n[    0.000000] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'\n[    0.000000] BIOS-provided physical RAM map:\n[    0.000000] e820: [mem 0x0000000000000000-0x000000000009ffff] usable\n[    0.000000] e820: [mem 0x0000000000100000-0x000000003fffffff] usable\n[    0.000000] NX (Execute Disable) protection: active\n[    0.000000] SMBIOS 3.2 present.\n[    0.000000] DMI: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform\n[    0.000000] Hypervisor detected: VMware"
+  "gui.zerocontact.workbench.startOS": "[    0.000000] Linux version 6.5.0-21-generic (buildd@lcy02-amd64-123)\n[    0.000000] Command line: BOOT_IMAGE=/boot/vmlinuz root=UUID=xxxx ro quiet splash\n[    0.000000] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'\n[    0.000000] BIOS-provided physical RAM map:\n[    0.000000] e820: [mem 0x0000000000000000-0x000000000009ffff] usable\n[    0.000000] e820: [mem 0x0000000000100000-0x000000003fffffff] usable\n[    0.000000] NX (Execute Disable) protection: active\n[    0.000000] SMBIOS 3.2 present.\n[    0.000000] DMI: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform\n[    0.000000] Hypervisor detected: VMware",
+  "item.zerocontact.rigs_fast_tac": "FAST TAC 胸挂",
+  "item.zerocontact.kit_armor": "护甲维修套件",
+  "tootip.zerocontact.kit_armor": "拿起套件 [右键] 护甲物品以修理",
+  "tooltip.zerocontact.rig": "装备胸挂后，你将无法直接从库存里装弹，仅抽取胸挂弹药"
 }

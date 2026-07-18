@@ -15,7 +15,6 @@ public class ArmedRaiderRender extends GeoEntityRenderer<ArmedRaider> {
         super(renderManager, new ArmedRaiderModel());
         this.addRenderLayer(new ArmedRaiderArmorLayer(this));
         this.addRenderLayer(new ArmedRaiderBackpackLayer(this));
-        this.addRenderLayer(new ArmedRaiderArmbandLayer(this));
         this.addRenderLayer(new ArmedRaiderItemLayer(this, gunRenderQueue));
     }
 

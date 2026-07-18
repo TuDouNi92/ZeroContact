@@ -108,8 +108,8 @@ public class HurtPipeLine {
                 if (armor != null || plate != null) {
                     if (armor != null && plate != null) {
                         if (armor.getItem() instanceof ICombatArmorItem armorProvider && plate.getItem() instanceof ICombatArmorItem plateProvider) {
-                            if (plate.getMaxDamage() - plate.getDamageValue() <= 1) {
-                                finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, null, null,0);
+                            if (armor.getMaxDamage() - armor.getDamageValue() <= 1) {
+                                finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, plateProvider, armorProvider, plateProvider.getAbsorb()) * (1 + armorProvider.generateBlunt());
                                 return builder.shouldCancelEvent(true).finalAmount(finalHurtAmount);
                             }
                             builder = builder.withPlateProvider(plateProvider);

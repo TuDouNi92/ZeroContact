@@ -9,13 +9,13 @@ import net.zerocontact.client.renderer.ItemRender;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.function.Consumer;
 
 public class GeoBlockItem extends BlockItem implements GeoItem {
-    private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private final ResourceLocation texture, model, animation;
 
     public GeoBlockItem(Block block, Properties properties, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {

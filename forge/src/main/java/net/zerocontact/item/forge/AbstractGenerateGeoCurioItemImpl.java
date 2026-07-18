@@ -20,15 +20,14 @@ import net.zerocontact.models.GenerateModel;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
-import top.theillusivec4.curios.api.SlotContext;
+import software.bernie.geckolib.util.GeckoLibUtil;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 import java.util.function.Consumer;
 
 public abstract class AbstractGenerateGeoCurioItemImpl extends ArmorItem implements ICurioItem, GeoItem {
-    protected final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
+    protected final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     public final String id;
     public final ResourceLocation texture, model, animation;
     public ArmorRender<AbstractGenerateGeoCurioItemImpl> render;

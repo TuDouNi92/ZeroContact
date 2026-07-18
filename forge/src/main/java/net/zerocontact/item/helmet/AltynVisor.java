@@ -9,9 +9,9 @@ import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -25,7 +25,7 @@ public class AltynVisor {
         private static final ResourceLocation VISOR_TEXTURE = new ResourceLocation(MOD_ID, "textures/gui/altyn_vision_sky_240p.png");
         private static final RawAnimation ENABLE_VISOR = RawAnimation.begin().then("switch_disabled_to_enabled", Animation.LoopType.HOLD_ON_LAST_FRAME);
         private static final RawAnimation DISABLE_VISOR = RawAnimation.begin().then("switch_enabled_to_disabled", Animation.LoopType.HOLD_ON_LAST_FRAME);
-        private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
+        private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
         public WithVisor(int absorb, int defaultDurability, float bluntReduction, float penetrateReduction) {
             super(absorb, defaultDurability, texture, model, animation, bluntReduction, penetrateReduction);

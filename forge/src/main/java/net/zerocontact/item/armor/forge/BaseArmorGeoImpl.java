@@ -26,15 +26,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEquipmentTypeTag, ICombatArmorItem {
-    protected final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
+    protected final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     protected final Type type;
     protected final int defense;
     public final String id;

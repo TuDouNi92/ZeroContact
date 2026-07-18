@@ -33,8 +33,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -42,7 +42,7 @@ import java.util.function.Consumer;
 import static net.zerocontact.ZeroContact.MOD_ID;
 
 public class ArmorRepairKit extends Item implements GeoItem {
-    private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private static final ResourceLocation texture = new ResourceLocation(MOD_ID, "textures/item/kit_armor.png");
     private static final ResourceLocation model = new ResourceLocation(MOD_ID, "geo/kit_armor.geo.json");
     private static final ResourceLocation animation = new ResourceLocation("");

@@ -9,6 +9,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.api.ICombatArmorItem;
+import net.zerocontact.api.IEquipmentTypeTag;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -45,6 +46,8 @@ public abstract class ItemStackMixin {
     public <T extends LivingEntity> void hurtAndBreakConditionally(int amount, T entity, Consumer<T> onBroken, CallbackInfo ci) {
         Item item = this.getItem();
         if (!(item instanceof ICombatArmorItem)) return;
+        if (item instanceof IEquipmentTypeTag tag && tag.getArmorType().equals(IEquipmentTypeTag.EquipmentType.PLATE))
+            return;
         int remainValue = (this.getMaxDamage() - this.getDamageValue());
         if (remainValue - amount <= 0) {
             this.setDamageValue(this.getMaxDamage() - 1);
