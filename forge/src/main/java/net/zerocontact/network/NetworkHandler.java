@@ -70,13 +70,12 @@ public class NetworkHandler {
         }
     }
 
-    public record ToggleVisorPacket(boolean isToggle) {
+    public record FlipVisorPacket() {
         public void encode(FriendlyByteBuf buf) {
-            buf.writeBoolean(isToggle);
         }
 
-        public static ToggleVisorPacket decode(FriendlyByteBuf buf) {
-            return new ToggleVisorPacket(buf.readBoolean());
+        public static FlipVisorPacket decode(FriendlyByteBuf buf) {
+            return new FlipVisorPacket();
         }
 
         public void handle(Supplier<NetworkEvent.Context> supplier) {
@@ -87,18 +86,16 @@ public class NetworkHandler {
                 Optional<ItemStack> helmet = Optional.of(player.getItemBySlot(EquipmentSlot.HEAD));
                 helmet.ifPresent(stack -> {
                     if (stack.getItem() instanceof Toggleable toggleable) {
-                        boolean isEnabled = toggleable.getEnabled(stack);
-                        toggleable.setTriggered(true, stack);
-                        ModMessages.sendToPlayer(new ToggleVisorResultPacket(isEnabled, toggleable.readAnimData(stack)), player);
+                        toggleable.flipState(toggleable, stack);
+                        ModMessages.sendToPlayer(new ToggleVisorResultPacket(toggleable.readAnimData(stack)), player);
                     }
                 });
             });
         }
     }
 
-    public record ToggleVisorResultPacket(boolean lastSwitch, AnimateData.VisorAnimateData visorAnimateData) {
+    public record ToggleVisorResultPacket(AnimateData.VisorAnimateData visorAnimateData) {
         public void encode(FriendlyByteBuf buf) {
-            buf.writeBoolean(lastSwitch);
             String animName = "";
             boolean isPlaying = false;
             double animLength = 0;
@@ -114,7 +111,6 @@ public class NetworkHandler {
 
         public static ToggleVisorResultPacket decode(FriendlyByteBuf buf) {
             return new ToggleVisorResultPacket(
-                    buf.readBoolean(),
                     new AnimateData.VisorAnimateData(
                             buf.readUtf(),
                             buf.readDouble(),
@@ -125,10 +121,7 @@ public class NetworkHandler {
 
         public static void handle(ToggleVisorResultPacket msg, Supplier<NetworkEvent.Context> supplier) {
             NetworkEvent.Context context = supplier.get();
-            context.enqueueWork(() -> {
-                ClientData.setLastToggleVisorEnabled(msg.lastSwitch);
-                VisorTracker.update(msg.visorAnimateData);
-            });
+            context.enqueueWork(() -> VisorTracker.update(msg.visorAnimateData));
         }
     }
 

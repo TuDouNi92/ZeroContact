@@ -19,7 +19,6 @@ import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.zerocontact.client.ClientData;
 import net.zerocontact.client.interaction.KeyBindingHandler;
 import net.zerocontact.client.menu.BackpackContainerMenu;
 import net.zerocontact.network.ModMessages;
@@ -178,7 +177,6 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
             Optional.ofNullable(Minecraft.getInstance().player).ifPresent(LocalPlayer::closeContainer);
             ModMessages.sendToServer(new NetworkHandler.ToggleBackpackPacket(false));
         }
-        ClientData.justCloseBackpack = true;
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 }

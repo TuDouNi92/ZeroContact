@@ -2,18 +2,22 @@ package net.zerocontact.item.helmet;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.zerocontact.api.Toggleable;
 import net.zerocontact.animation_data.AnimateData;
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
 
@@ -61,35 +65,6 @@ public class AltynVisor {
         }
 
         @Override
-        public boolean getEnabled(ItemStack stack) {
-            return stack.getOrCreateTag().getBoolean("VisorOn");
-        }
-
-        @Override
-        public boolean isTriggered(ItemStack stack) {
-            return stack.getOrCreateTag().getBoolean("isTriggered");
-        }
-
-        @Override
-        public void setTriggered(boolean toggling, ItemStack stack) {
-            stack.getOrCreateTag().putBoolean("isTriggered", toggling);
-        }
-
-        @Override
-        public boolean flipState(ItemStack stack) {
-            AtomicBoolean state = new AtomicBoolean(false);
-            state.set(readStatus(stack, "VisorOn"));
-            saveStatus(stack, !state.get());
-            return !state.get();
-        }
-
-        @Override
-        public void saveStatus(ItemStack stack, boolean switchOn) {
-            stack.getOrCreateTag().putBoolean("VisorOn", switchOn);
-        }
-
-
-        @Override
         public AnimateData.VisorAnimateData readAnimData(ItemStack stack) {
             CompoundTag tag = stack.getOrCreateTag().getCompound("AnimCompound");
             AnimateData.VisorAnimateData animateData = AnimateData.VisorAnimateData.create("empty", 0, false);
@@ -114,5 +89,28 @@ public class AltynVisor {
         public AnimatableInstanceCache getAnimatableInstanceCache() {
             return cache;
         }
+
+        @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
+        static class VisorAnim {
+            @SubscribeEvent
+            public static void visorTick(net.minecraftforge.event.TickEvent.PlayerTickEvent tickEvent) {
+                Player player = tickEvent.player;
+                if (player.level() instanceof ServerLevel serverLevel) {
+                    ItemStack helmetStack = tickEvent.player.getItemBySlot(EquipmentSlot.HEAD);
+                    if (helmetStack.getItem() instanceof Toggleable toggleable
+                            && helmetStack.getItem() instanceof SingletonGeoAnimatable animatable) {
+                        if (toggleable.getTriggered(helmetStack)) {
+                            if (toggleable.readStatus(helmetStack, "VisorOn")) {
+                                animatable.triggerArmorAnim(player, GeoItem.getOrAssignId(helmetStack, serverLevel), "controller", "disable");
+                            } else {
+                                animatable.triggerArmorAnim(player, GeoItem.getOrAssignId(helmetStack, serverLevel), "controller", "enable");
+                            }
+                        }
+                        toggleable.triggered(helmetStack, false);
+                    }
+                }
+            }
+        }
+
     }
 }
