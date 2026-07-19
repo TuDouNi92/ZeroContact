@@ -92,6 +92,7 @@
   "tooltip.zerocontact.armor_penetrate_reduction": "Penetrate reduction",
   "tooltip.zerocontact.armor_blunt_reduction": "Blunt reduction",
   "tooltip.zerocontact.pack.zero_contact":"ZeroContact Default Pack",
+  "tooltip.zerocontact.pack_hint": "Hold [SHIFT] to see Pack information",
   "tooltip.zerocontact.gun.ammoVariant": "Ammo variant",
 
   "tooltip.zerocontact.bullet_penetration": "Penetration",

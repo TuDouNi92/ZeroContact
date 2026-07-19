@@ -57,7 +57,7 @@ public class ItemsRegForge {
         onGoingRegItems.forEach(reg -> reg.attach(ITEMS_REG_TAB));
         List<RegistrySupplier<? extends ItemLike>> items = List.of(ARMOR_KIT,RAIDER_EGG);
         items.forEach(item -> ITEMS_REG_TAB.put(item, DEFAULT_TAB));
-        ZPackManager packManager = new ZPackManager();
+        ZPackManager packManager = ZPackManager.getInstance();
         packManager.init();
         IAssetManager assetManager = packManager.getAssetManager();
         assetManager.register();
