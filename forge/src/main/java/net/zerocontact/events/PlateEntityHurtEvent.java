@@ -17,10 +17,17 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 public class PlateEntityHurtEvent {
-    public static boolean modifyDamage(LivingEntity lv, DamageSource source, float amount, ItemStack plateSlot) {
-        ItemStack armorSlot = lv.getItemBySlot(EquipmentSlot.CHEST);
+    public static boolean modifyDamage(LivingEntity lv, DamageSource source, float amount, ItemStack[] hitStacks) {
+        ItemStack armorStack;
+        ItemStack plateStack = null;
+        if (hitStacks.length <= 1) {
+            armorStack = hitStacks[0];
+        } else {
+            armorStack = hitStacks[1];
+            plateStack = hitStacks[0];
+        }
         HurtPipeLine pipeLine = new HurtPipeLine();
-        HurtPipeLine.DamageResult result = pipeLine.process(new HurtPipeLine.DamageContext(lv, source, amount, plateSlot, armorSlot));
+        HurtPipeLine.DamageResult result = pipeLine.process(new HurtPipeLine.DamageContext(lv, source, amount, plateStack, armorStack));
         return pipeLine.execute(result, () -> lv.hurt(result.finalSource(), result.finalAmount()));
     }
 
@@ -75,7 +82,7 @@ public class PlateEntityHurtEvent {
 
 
     public static EventResult entityHurtRegister(LivingEntity lv, DamageSource source, float amount) {
-        if (PlateEntityHurtEvent.modifyDamage(lv, source, amount, EventUtil.getHitBodyPartStack(lv, source)[0])) {
+        if (PlateEntityHurtEvent.modifyDamage(lv, source, amount, EventUtil.getHitBodyPartStack(lv, source))) {
             return EventResult.interruptFalse();
         }
         return EventResult.pass();

@@ -61,6 +61,7 @@ public class AmmoInjector {
         ResourceLocation defaultAmmo = getGunDefaultAmmo(gunStack);
         if (defaultAmmo.toString().isEmpty()) return null;
         gunStack.getOrCreateTagElement("ai_ammo").putString("ai_ammoId", defaultAmmo.toString());
+        gunStack.getOrCreateTagElement("ai_ammo").putString("variant",defaultVariant);
         gunStack.getOrCreateTagElement("ai_ammo").putString("selected_variant", defaultVariant);
         gunStack.getOrCreateTagElement("ai_ammo").putString("existed_variant", defaultVariant);
         return new AmmoContext(new CaliberVariantDamageHelper.Caliber(defaultAmmo.toString(), defaultVariant, 0, 0, 0, 0, 0, new int[]{255, 255, 255, 255}));

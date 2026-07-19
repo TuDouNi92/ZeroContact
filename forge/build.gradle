@@ -50,6 +50,7 @@ dependencies {
 //    modLocalRuntime files('libs/oculus-mc1.20.1-1.8.0 (1).jar')
     modCompileOnly('curse.maven:tacz-magazines-1504588:8356810')
 //    modLocalRuntime('curse.maven:tacz-magazines-1504588:8356810')
+    modLocalRuntime('curse.maven:tacz-simple-enemy-1471691:8289695')
 }
 
 processResources {
