@@ -23,6 +23,7 @@ public class VisorHUD {
     private static int yCor;
     private static int currentTick;
     private static String cachedAnim;
+
     @SubscribeEvent
     public static void onRenderGameOverlay(RenderGuiEvent.Pre event) {
         Minecraft mc = Minecraft.getInstance();
@@ -42,11 +43,9 @@ public class VisorHUD {
             RenderSystem.depthMask(false);
             RenderSystem.enableBlend();
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-            RenderSystem.setShaderColor(1, 1, 1, 1);
+            RenderSystem.defaultBlendFunc();
             blitToggleableVisor(toggleable, helmet, height, graphics, width);
             RenderSystem.depthMask(true);
-            RenderSystem.defaultBlendFunc();
             RenderSystem.enableDepthTest();
             RenderSystem.disableBlend();
             RenderSystem.setShaderColor(1, 1, 1, 1);
@@ -58,23 +57,24 @@ public class VisorHUD {
             AnimateData.VisorAnimateData animateData = toggleable.readAnimData(visorStack);
             String animName = animateData.animationName;
             double animLength = Math.ceil(animateData.animLength);
-            double progress = currentTick / animLength;
-            if(!animName.equals(cachedAnim)) {
+            if (!animName.equals(cachedAnim)) {
                 currentTick = 0;
-            };
-            currentTick++;
-            if(currentTick>animLength){
-                currentTick =Mth.floor(animLength);
             }
-            if (animName.equals("empty")) {
-                yCor = 0;
-
-            } else if (animName.equals("switch_disabled_to_enabled"))
+            double progress = currentTick / animLength;
+            currentTick++;
+            if (currentTick > animLength) {
+                currentTick = Mth.floor(animLength);
+            }
+            if(animName.isEmpty() || animLength<=0)return;
+            if (animName.equals("switch_disabled_to_enabled")) {
                 yCor = Mth.floor(progress * height - height);
-            else {
+                RenderSystem.setShaderColor(1, 1, 1, (float) progress);
+            } else {
                 yCor = Mth.floor(-progress * height);
+                RenderSystem.setShaderColor(1, 1, 1, (float) (1 - progress));
             }
             cachedAnim = animName;
+            RenderSystem.setShaderTexture(0, toggleable.getVisorTexture());
             graphics.blit(toggleable.getVisorTexture(), 0, yCor, -100, 0, 0, width, height, width, height);
         }
     }

@@ -1,14 +1,10 @@
 package net.zerocontact.events;
 
-import com.tacz.guns.entity.EntityKineticBullet;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.Entity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.zerocontact.client.interaction.BulletPassBy;
 import net.zerocontact.client.interaction.KeyBindingHandler;
 import net.zerocontact.network.ModMessages;
 import net.zerocontact.network.NetworkHandler;
@@ -22,16 +18,7 @@ public class ClientForgeEventBus {
         listenBackpackKey();
         listenAmmoSelectorKey();
     }
-    @SubscribeEvent
-    public static void clientEntityTick(EntityEvent event){
-        playBulletSound(event);
-    }
-    private static void playBulletSound(EntityEvent event) {
-        Entity entity = event.getEntity();
-        if (entity instanceof EntityKineticBullet) {
-            BulletPassBy.playBulletPassBySound(entity, Minecraft.getInstance().player);
-        }
-    }
+
     private static void listenAmmoSelectorKey(){
         while (KeyBindingHandler.TOGGLE_AMMO_SELECTOR.consumeClick()){
             if(Minecraft.getInstance().screen == null){

@@ -115,5 +115,8 @@
   "item.zerocontact.rigs_fast_tac": "FAST TAC 胸挂",
   "item.zerocontact.kit_armor": "护甲维修套件",
   "tootip.zerocontact.kit_armor": "拿起套件 [右键] 护甲物品以修理",
-  "tooltip.zerocontact.rig": "装备胸挂后，你将无法直接从库存里装弹，仅抽取胸挂弹药"
+  "tooltip.zerocontact.rig": "装备胸挂后，你将无法直接从库存里装弹，仅抽取胸挂弹药",
+
+  "config.zerocontact.client": "Client",
+  "config.zerocontact.client.bullet_suppression": "Bullet Suppression Effect"
 }

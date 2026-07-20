@@ -1,12 +1,15 @@
 package net.zerocontact.forge;
 
 import dev.architectury.platform.forge.EventBuses;
+import net.minecraft.network.chat.Component;
+import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.zerocontact.ZeroContact;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.zerocontact.capability.CapabilityRegistries;
+import net.zerocontact.client.gui.ConfigScreen;
 import net.zerocontact.cofig.ModConfigs;
 import net.zerocontact.datagen.Predicate;
 import net.zerocontact.events.*;
@@ -16,28 +19,38 @@ import software.bernie.geckolib.GeckoLib;
 
 @Mod(ZeroContact.MOD_ID)
 public class ZeroContactForge {
-    public ZeroContactForge() {
+    public ZeroContactForge(FMLJavaModLoadingContext context) {
         // Submit our event bus to let architectury register our content on the right time
-        EventBuses.registerModEventBus(ZeroContact.MOD_ID, FMLJavaModLoadingContext.get().getModEventBus());
+        EventBuses.registerModEventBus(ZeroContact.MOD_ID, context.getModEventBus());
         ZeroContact.init();
         GeckoLib.initialize();
         ServerForgeEventBus.regEvents();
         ModEntitiesReg.register();
-        BlocksRegForge.register(FMLJavaModLoadingContext.get().getModEventBus());
+        BlocksRegForge.register(context.getModEventBus());
         Predicate.predicateCurios();
         EntityDeathDogTagEvent.register();
-        regConfig();
+        regConfig(context);
+        regConfigScreen(context);
         CapabilityRegistries.register();
     }
 
-    private static void regConfig() {
-        ModLoadingContext.get().registerConfig(
+    private static void regConfig(FMLJavaModLoadingContext context) {
+        context.registerConfig(
                 ModConfig.Type.COMMON,
                 ModConfigs.COMMON_CONFIG_SPEC
         );
-        ModLoadingContext.get().registerConfig(
+        context.registerConfig(
                 ModConfig.Type.CLIENT,
                 ModConfigs.CLIENT_CONFIG_SPEC
+        );
+    }
+
+    private static void regConfigScreen(FMLJavaModLoadingContext context) {
+        context.registerExtensionPoint(
+                ConfigScreenHandler.ConfigScreenFactory.class,
+                () -> new ConfigScreenHandler.ConfigScreenFactory(
+                        (mc, parent) -> new ConfigScreen(Component.literal("Config screen"), parent)
+                )
         );
     }
 

@@ -76,6 +76,11 @@ public class ModMessages {
                 .encoder(NetworkHandler.ClientAmmoReloadPacket::encode)
                 .consumerMainThread(NetworkHandler.ClientAmmoReloadPacket::handle)
                 .add();
+        net.messageBuilder(AppendSuppressionPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(AppendSuppressionPacket::decode)
+                .encoder(AppendSuppressionPacket::encode)
+                .consumerMainThread(AppendSuppressionPacket::handle)
+                .add();
     }
 
     public static <MSG> void sendToServer(MSG msg) {

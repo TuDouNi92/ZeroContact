@@ -50,7 +50,6 @@ public class ModRegEventBus {
             MenuScreens.register(ModMenus.WORKBENCH_MENU.get(), WorkbenchScreen::new);
             MenuScreens.register(ModMenus.AMMO_SELECTOR.get(), AmmoSelectorScreen::new);
             RegCurioGeoItemRender();
-            regConfigScreen();
         }
         @SubscribeEvent
         public static void onRegisterMappings(RegisterKeyMappingsEvent event) {
@@ -77,14 +76,5 @@ public class ModRegEventBus {
                 CuriosRendererRegistry.register(abstractGenerateGeoCurioItem, () -> new AccessoriesRender<>(abstractGenerateGeoCurioItem));
             }
         });
-    }
-
-    private static void regConfigScreen() {
-        ModLoadingContext.get().registerExtensionPoint(
-                ConfigScreenHandler.ConfigScreenFactory.class,
-                () -> new ConfigScreenHandler.ConfigScreenFactory(
-                        (mc, parent) -> new ConfigScreen(Component.literal("Config screen"), parent)
-                )
-        );
     }
 }
