@@ -12,11 +12,13 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.caliber.AmmoInjector;
+import net.zerocontact.compat.MagazinesCompatHandler;
 import net.zerocontact.item.ammo.GenerateAmmo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 class LoadoutHolder {
     public static final String DEFAULT_ARMOR = "zerocontact:armor_jpc_v1";
@@ -99,10 +101,10 @@ class LoadoutHolder {
         Optional<CommonGunIndex> gunIndex = TimelessAPI.getCommonGunIndex(gun.getGunId(gunStack));
         if (gunIndex.isPresent()) {
             GunData gunData = gunIndex.get().getGunData();
-            ResourceLocation ammoResource = gunData.getAmmoId();
-            Integer stackSize = TimelessAPI.getCommonAmmoIndex(ammoResource).map(CommonAmmoIndex::getStackSize).orElse(1);
+            ResourceLocation ammoIdFromGun = gunData.getAmmoId();
+            Integer stackSize = TimelessAPI.getCommonAmmoIndex(ammoIdFromGun).map(CommonAmmoIndex::getStackSize).orElse(1);
             //If input is not vanilla ammo, find its resource and build. Or build the vanilla ammo
-            if (ammoId != null && !ammoId.equals(ammoResource.toString())) {
+            if (ammoId != null && !ammoId.equals(ammoIdFromGun.toString())) {
                 @Nullable Item ammoItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(ammoId));
                 @Nullable GenerateAmmo generateAmmo = ammoItem instanceof GenerateAmmo ? (GenerateAmmo) ammoItem : null;
                 if (generateAmmo != null) {
@@ -111,10 +113,22 @@ class LoadoutHolder {
                     ammoStack.setCount(ammoStack.getMaxStackSize());
                     AmmoInjector.setEntityGunContext(gunStack, generateAmmo);
                     this.ammoStack = ammoStack;
+                    MagazinesCompatHandler.get().getCompat().ifPresent(magazinesCompat -> {
+                        if (magazinesCompat.isMagazineCompatibleWithGun(gunStack)) {
+                            net.zerocontact.caliber.CaliberVariantDamageHelper.Caliber caliber = generateAmmo.getDefualtCaliber();
+                            this.ammoStack = magazinesCompat.getCompatibleMag(gunStack);
+                            AmmoInjector.write(new AmmoInjector.AmmoContext(caliber), this.ammoStack);
+                        }
+                    });
                     return;
                 }
             }
-            this.ammoStack = AmmoItemBuilder.create().setId(ammoResource).setCount(stackSize).build();
+            this.ammoStack = AmmoItemBuilder.create().setId(ammoIdFromGun).setCount(stackSize).build();
+            MagazinesCompatHandler.get().getCompat().ifPresent(magazinesCompat -> {
+                if (magazinesCompat.isMagazineCompatibleWithGun(gunStack)) {
+                    this.ammoStack = magazinesCompat.getCompatibleMag(gunStack);
+                }
+            });
         }
     }
 
@@ -172,32 +186,32 @@ class LoadoutHolder {
     }
 
     enum LoadoutTypes {
-        AK(new LoadoutHolder("tacz:ak47")),
-        SKS(new LoadoutHolder("tacz:sks_tactical")),
-        FN_FAL(new LoadoutHolder("tacz:fn_fal")),
-        M4(new LoadoutHolder("tacz:m4a1")),
-        SCAR_L(new LoadoutHolder("tacz:scar_l")),
-        M320(new LoadoutHolder("tacz:m320")),
-        AUG(new LoadoutHolder("tacz:aug")),
-        HK416D(new LoadoutHolder("tacz:hk416d")),
-        M16A4(new LoadoutHolder("tacz:m16a4")),
-        QBZ191(new LoadoutHolder("tacz:qbz_191")),
-        CZ75(new LoadoutHolder("tacz:cz75")),
-        GLOCK17(new LoadoutHolder("tacz:glock_17")),
-        P320(new LoadoutHolder("tacz:p320")),
-        P90(new LoadoutHolder("tacz:p90")),
-        VECTOR(new LoadoutHolder("tacz:vector45")),
-        UZI(new LoadoutHolder("tacz:uzi")),
-        M700(new LoadoutHolder("tacz:m700")),
-        M249(new LoadoutHolder("tacz:m249"));
-        public final LoadoutHolder loadoutHolder;
+        AK(()->new LoadoutHolder("tacz:ak47")),
+        SKS(()->new LoadoutHolder("tacz:sks_tactical")),
+        FN_FAL(()->new LoadoutHolder("tacz:fn_fal")),
+        M4(()->new LoadoutHolder("tacz:m4a1")),
+        SCAR_L(()->new LoadoutHolder("tacz:scar_l")),
+        M320(()->new LoadoutHolder("tacz:m320")),
+        AUG(()->new LoadoutHolder("tacz:aug")),
+        HK416D(()->new LoadoutHolder("tacz:hk416d")),
+        M16A4(()->new LoadoutHolder("tacz:m16a4")),
+        QBZ191(()->new LoadoutHolder("tacz:qbz_191")),
+        CZ75(()->new LoadoutHolder("tacz:cz75")),
+        GLOCK17(()->new LoadoutHolder("tacz:glock_17")),
+        P320(()->new LoadoutHolder("tacz:p320")),
+        P90(()->new LoadoutHolder("tacz:p90")),
+        VECTOR(()->new LoadoutHolder("tacz:vector45")),
+        UZI(()->new LoadoutHolder("tacz:uzi")),
+        M700(()->new LoadoutHolder("tacz:m700")),
+        M249(()->new LoadoutHolder("tacz:m249"));
+        public final Supplier<LoadoutHolder> loadoutHolder;
         public final ItemStack gunStack;
         public final ItemStack ammoStack;
 
-        LoadoutTypes(LoadoutHolder loadoutHolder) {
+        LoadoutTypes(Supplier<LoadoutHolder> loadoutHolder) {
             this.loadoutHolder = loadoutHolder;
-            gunStack = loadoutHolder.gunStack;
-            ammoStack = loadoutHolder.ammoStack;
+            gunStack = loadoutHolder.get().gunStack;
+            ammoStack = loadoutHolder.get().ammoStack;
         }
     }
 }
