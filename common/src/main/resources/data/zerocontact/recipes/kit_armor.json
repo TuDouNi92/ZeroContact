@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "111",
+    "232",
+    "222"
+  ],
+  "key": {
+    "1": {
+      "item": "zerocontact:plate_steel"
+    },
+    "2": {
+      "item": "minecraft:iron_ingot"
+    },
+    "3": {
+      "item": "minecraft:iron_block"
+    }
+  },
+  "result": {
+    "item": "zerocontact:kit_armor",
+    "count": 1
+  }
+}
