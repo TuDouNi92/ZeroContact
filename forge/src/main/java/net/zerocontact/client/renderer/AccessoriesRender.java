@@ -21,6 +21,7 @@ public class AccessoriesRender<T extends AbstractGenerateGeoCurioItemImpl> imple
     public AccessoriesRender(T item) {
         this.item = item;
         render = new ArmorRender<>(new GenerateModel<>(item.texture, item.model, item.animation));
+        item.armorRender = (ArmorRender<AbstractGenerateGeoCurioItemImpl>) render;
     }
 
     @Override

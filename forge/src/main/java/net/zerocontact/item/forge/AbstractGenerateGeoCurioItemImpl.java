@@ -15,7 +15,6 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.client.renderer.ArmorRender;
 import net.zerocontact.item.PlateBaseMaterial;
-import net.zerocontact.item.armor.forge.BaseArmorGeoImpl;
 import net.zerocontact.models.GenerateModel;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
@@ -30,6 +29,7 @@ public abstract class AbstractGenerateGeoCurioItemImpl extends ArmorItem impleme
     protected final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     public final String id;
     public final ResourceLocation texture, model, animation;
+    public ArmorRender<AbstractGenerateGeoCurioItemImpl> armorRender = null;
 
     public AbstractGenerateGeoCurioItemImpl(String id, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
         super(PlateBaseMaterial.ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Properties().defaultDurability(defaultDurability));
