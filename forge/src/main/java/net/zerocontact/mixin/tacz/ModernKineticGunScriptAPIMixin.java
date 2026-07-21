@@ -12,6 +12,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -32,13 +33,18 @@ import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 
 @Mixin(ModernKineticGunScriptAPI.class)
-public class ModernKineticGunScriptAPIMixin {
+public abstract class ModernKineticGunScriptAPIMixin {
     @Shadow(remap = false)
     private LivingEntity shooter;
     @Shadow(remap = false)
     private AbstractGunItem abstractGunItem;
     @Shadow(remap = false)
     private ItemStack itemStack;
+
+    @Unique
+    private boolean zeroContact$incrementalReload;
+    @Unique
+    private boolean zeroContact$replaceAmmoInBarrel;
 
     @Inject(method = "consumeAmmoFromPlayer", at = @At("HEAD"), remap = false, cancellable = true)
     public void zeroContact$consumeAmmoFromPlayerRigs(int neededAmount, CallbackInfoReturnable<Integer> cir) {
@@ -59,6 +65,7 @@ public class ModernKineticGunScriptAPIMixin {
 
     @Inject(method = "hasAmmoToConsume", at = @At("RETURN"), remap = false, cancellable = true)
     private void zeroContact$hasAmmoToConsume(CallbackInfoReturnable<Boolean> cir) {
+        this.zeroContact$incrementalReload = false;
         if (shooter instanceof ServerPlayer player && player.isCreative()) {
             cir.setReturnValue(true);
             return;
@@ -66,49 +73,21 @@ public class ModernKineticGunScriptAPIMixin {
         if (this.abstractGunItem.useDummyAmmo(this.itemStack)) {
             cir.setReturnValue(this.abstractGunItem.getDummyAmmoAmount(this.itemStack) > 0);
         } else {
+            LazyOptional<ICartridgeHolder> gunCartridgeHolder = itemStack.getCapability(CapabilityRegistries.CARTRIDGE);
+            LazyOptional<IItemHandler> playerInv = shooter.getCapability(ForgeCapabilities.ITEM_HANDLER);
+            String selectedVariant = gunCartridgeHolder.map(cap -> cap.getClientSelectedAmmoVariant(itemStack)).orElse("");
             ItemStack rigs = EventUtil.getCuriosStackFirst(shooter, "rigs");
+            IItemHandler filteredHandler = ServerAmmoSelector.filteredAmmoHandler(playerInv.resolve().orElse(new ItemStackHandler()), selectedVariant, itemStack);
+            int foundCount = zeroContact$getAmmoCount(filteredHandler, 0, null);
             if (!rigs.isEmpty()) {
-                cir.setReturnValue(rigs.getCapability(ForgeCapabilities.ITEM_HANDLER).map(cap -> {
-                            for (int i = 0; i < cap.getSlots(); ++i) {
-                                ItemStack checkAmmoStack = cap.getStackInSlot(i);
-                                Item ammoItem = checkAmmoStack.getItem();
-                                if (ammoItem instanceof IAmmo iAmmo) {
-                                    if (iAmmo.isAmmoOfGun(this.itemStack, checkAmmoStack)) {
-                                        return true;
-                                    }
-                                }
-                                ammoItem = checkAmmoStack.getItem();
-                                if (ammoItem instanceof IAmmoBox iAmmoBox) {
-                                    if (iAmmoBox.isAmmoBoxOfGun(this.itemStack, checkAmmoStack)) {
-                                        return true;
-                                    }
-                                }
-                            }
-                            return false;
-                        }).orElse(false)
-                );
-            } else {
-                cir.setReturnValue(shooter.getCapability(ForgeCapabilities.ITEM_HANDLER).map(cap -> {
-                    for (int i = 0; i < cap.getSlots(); ++i) {
-                        ItemStack checkAmmoStack = cap.getStackInSlot(i);
-                        Item ammoItem = checkAmmoStack.getItem();
-                        if (ammoItem instanceof IAmmo iAmmo) {
-                            if (iAmmo.isAmmoOfGun(this.itemStack, checkAmmoStack)) {
-                                return true;
-                            }
-                        }
-                        ammoItem = checkAmmoStack.getItem();
-                        if (ammoItem instanceof IAmmoBox iAmmoBox) {
-                            if (iAmmoBox.isAmmoBoxOfGun(this.itemStack, checkAmmoStack)) {
-                                return true;
-                            }
-                        }
-                    }
-                    return false;
-                }).orElse(false));
+                LazyOptional<IItemHandler> rigInv = rigs.getCapability(ForgeCapabilities.ITEM_HANDLER);
+                filteredHandler = ServerAmmoSelector.filteredAmmoHandler(rigInv.resolve().orElse(new ItemStackHandler()), selectedVariant, itemStack);
+                foundCount = zeroContact$getAmmoCount(filteredHandler, 0, rigs);
             }
+            boolean hasSelectedAmmo = foundCount > 0;
+            this.zeroContact$incrementalReload = hasSelectedAmmo;
+            cir.setReturnValue(hasSelectedAmmo);
         }
-
     }
 
     @Inject(method = "isReloadingNeedConsumeAmmo", at = @At("RETURN"), remap = false, cancellable = true)
@@ -136,12 +115,28 @@ public class ModernKineticGunScriptAPIMixin {
     private int zeroContact$checkDropAmmo(int neededAmount, @Nullable ItemStack rigs) {
         ICartridgeHolder cap = itemStack.getCapability(CapabilityRegistries.CARTRIDGE).resolve().orElse(null);
         if (cap == null) return neededAmount;
-        if (MagazinesCompatHandler.get().getCompat().map(compat->compat.isMagazineCompatibleWithGun(itemStack)).orElse(false)) return neededAmount;
+        if (MagazinesCompatHandler.get().getCompat().map(compat -> compat.isMagazineCompatibleWithGun(itemStack)).orElse(false))
+            return neededAmount;
         String clientSelected = cap.getClientSelectedAmmoVariant(itemStack);
         if (clientSelected.isEmpty()) return neededAmount;
         Item selectedItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(clientSelected));
         if (selectedItem == null) return neededAmount;
-        return ServerAmmoSelector.dropAmmoFromGun(shooter, itemStack, new ItemStack(selectedItem), neededAmount, rigs);
+        int currentAmmoCount = this.abstractGunItem.getCurrentAmmoCount(itemStack);
+        boolean hadAmmoInBarrel = this.abstractGunItem.hasBulletInBarrel(itemStack);
+        if (this.zeroContact$incrementalReload && hadAmmoInBarrel) {
+            this.abstractGunItem.setCurrentAmmoCount(itemStack, currentAmmoCount + 1);
+            this.abstractGunItem.setBulletInBarrel(itemStack, false);
+        }
+        int adjustedAmount = ServerAmmoSelector.dropAmmoFromGun(shooter, itemStack, new ItemStack(selectedItem), neededAmount, rigs);
+        if (adjustedAmount == neededAmount) {
+            if (this.zeroContact$incrementalReload && hadAmmoInBarrel) {
+                this.abstractGunItem.setCurrentAmmoCount(itemStack, currentAmmoCount);
+                this.abstractGunItem.setBulletInBarrel(itemStack, true);
+            }
+        } else {
+            this.zeroContact$replaceAmmoInBarrel = this.zeroContact$incrementalReload && hadAmmoInBarrel;
+        }
+        return adjustedAmount;
     }
 
     @Unique
@@ -150,10 +145,10 @@ public class ModernKineticGunScriptAPIMixin {
         int ammoCount = 0;
         ICartridgeHolder cap = itemStack.getCapability(CapabilityRegistries.CARTRIDGE).resolve().orElse(null);
         if (cap != null) {
+            int actualNeededAmount = zeroContact$checkDropAmmo(neededAmount, rigs);
             IItemHandler modifiedHandler = ServerAmmoSelector.filteredAmmoHandler(itemHandler, cap.getClientSelectedAmmoVariant(itemStack), itemStack);
             ammoCount = zeroContact$getAmmoCount(modifiedHandler, ammoCount, rigs);
-            int actualNeededAmount = zeroContact$checkDropAmmo(neededAmount, rigs);
-            zeroContact$extractAmmo(itemStack, cap.getClientSelectedAmmoVariant(itemStack), actualNeededAmount, cir, itemHandler, modifiedHandler, ammoCount, rigs);
+            zeroContact$extractAmmo(itemStack, cap.getClientSelectedAmmoVariant(itemStack), neededAmount, actualNeededAmount, cir, itemHandler, modifiedHandler, rigs);
         }
         return ammoCount;
     }
@@ -165,16 +160,23 @@ public class ModernKineticGunScriptAPIMixin {
             Item ammoStackItem = checkAmmoStack.getItem();
             if (ammoStackItem instanceof IAmmo iAmmo) {
                 if (iAmmo.isAmmoOfGun(itemStack, checkAmmoStack)) {
-                    ammoCount += checkAmmoStack.getCount();
+                    ammoCount = zeroContact$saturatedAdd(ammoCount, checkAmmoStack.getCount());
                 }
             }
             if (ammoStackItem instanceof IAmmoBox iAmmoBox) {
                 if (iAmmoBox.isAmmoBoxOfGun(itemStack, checkAmmoStack)) {
-                    ammoCount += iAmmoBox.getAmmoCount(checkAmmoStack);
+                    ammoCount = zeroContact$saturatedAdd(ammoCount, iAmmoBox.getAmmoCount(checkAmmoStack));
                 }
             }
         }
         return ammoCount;
+    }
+
+    @Unique
+    private int zeroContact$saturatedAdd(int currentAmount, int addedAmount) {
+        if (addedAmount <= 0) return currentAmount;
+        if (currentAmount >= Integer.MAX_VALUE - addedAmount) return Integer.MAX_VALUE;
+        return currentAmount + addedAmount;
     }
 
 
@@ -187,16 +189,28 @@ public class ModernKineticGunScriptAPIMixin {
     private void zeroContact$extractAmmo(
             ItemStack gunStack,
             String selectedVariant,
-            int neededAmount,
+            int requestedAmount,
+            int extractionAmount,
             CallbackInfoReturnable<Integer> cir,
             IItemHandler itemHandler,
             IItemHandler modifiedHandler,
-            int ammoCount,
             @Nullable ItemStack rigs) {
         ICartridgeHolder cap = itemStack.getCapability(CapabilityRegistries.CARTRIDGE).resolve().orElse(null);
         if (cap == null) return;
         cap.setAmmoVariantInGun(gunStack, selectedVariant);
-        int result = this.abstractGunItem.findAndExtractInventoryAmmo(modifiedHandler, itemStack, neededAmount);
+        int extractedAmount = this.abstractGunItem.findAndExtractInventoryAmmo(modifiedHandler, itemStack, extractionAmount);
+        int amountForCaller = extractedAmount;
+        if (extractionAmount > requestedAmount) {
+            amountForCaller = Math.min(extractedAmount, requestedAmount);
+            int replacedAmmoAmount = extractedAmount - amountForCaller;
+            if (this.zeroContact$replaceAmmoInBarrel && replacedAmmoAmount > 0) {
+                this.abstractGunItem.setBulletInBarrel(gunStack, true);
+                replacedAmmoAmount--;
+            }
+            this.abstractGunItem.setCurrentAmmoCount(gunStack, replacedAmmoAmount);
+        }
+        this.zeroContact$incrementalReload = false;
+        this.zeroContact$replaceAmmoInBarrel = false;
         ItemStack changedMagStack = ServerAmmoSelector.changedMagStack;
         if (!changedMagStack.isEmpty()) {
             zeroContact$setVariantFromMag(changedMagStack, cap);
@@ -204,7 +218,7 @@ public class ModernKineticGunScriptAPIMixin {
         if (itemHandler instanceof ItemStackHandler itemStackHandler && rigs != null) {
             rigs.getOrCreateTag().put("inventory", itemStackHandler.serializeNBT().getList("Items", Tag.TAG_COMPOUND));
         }
-        cir.setReturnValue(result);
+        cir.setReturnValue(amountForCaller);
     }
 
 }

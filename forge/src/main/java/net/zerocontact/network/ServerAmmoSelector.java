@@ -101,11 +101,11 @@ public class ServerAmmoSelector {
                 AmmoInjector.AmmoContext contextFromBox = AmmoInjector.read(checkAmmoStack);
                 String stackKey = contextFromBox.caliber().variant();
                 if (checkAmmoStack.getItem() instanceof AmmoBoxItem) {
-                    if (stackKey.equals(selectedAmmoKey)) {
+                    if (iAmmoBox.isAllTypeCreative(checkAmmoStack)) {
+                        mappedSlots.add(i);
+                    } else if (stackKey.equals(selectedAmmoKey)) {
                         mappedSlots.add(i);
                     } else if (stackKey.isEmpty() && selectedAmmoKey.equals("tacz:ammo")) {
-                        mappedSlots.add(i);
-                    } else if(stackKey.isEmpty() &&iAmmoBox.isAllTypeCreative(checkAmmoStack)){
                         mappedSlots.add(i);
                     }
                 } else if (MagazinesCompatHandler
