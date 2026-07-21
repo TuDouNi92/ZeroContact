@@ -20,6 +20,7 @@ import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.zerocontact.client.interaction.KeyBindingHandler;
+import net.zerocontact.events.ClientForgeEventBus;
 import net.zerocontact.client.menu.BackpackContainerMenu;
 import net.zerocontact.network.ModMessages;
 import net.zerocontact.network.NetworkHandler;
@@ -170,13 +171,23 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (KeyBindingHandler.TOGGLE_BACKPACK_KEY.matches(keyCode, scanCode)
-                || Minecraft.getInstance().options.keyInventory.isActiveAndMatches(InputConstants.getKey(keyCode, scanCode))
+        if (KeyBindingHandler.TOGGLE_BACKPACK_KEY.matches(keyCode, scanCode)) {
+            ClientForgeEventBus.suppressBackpackOpenUntilKeyRelease();
+            closeBackpack();
+            return true;
+        }
+
+        if (Minecraft.getInstance().options.keyInventory.isActiveAndMatches(InputConstants.getKey(keyCode, scanCode))
                 || keyCode == GLFW.GLFW_KEY_ESCAPE
         ) {
-            Optional.ofNullable(Minecraft.getInstance().player).ifPresent(LocalPlayer::closeContainer);
-            ModMessages.sendToServer(new NetworkHandler.ToggleBackpackPacket(false));
+            closeBackpack();
+            return true;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    private void closeBackpack() {
+        Optional.ofNullable(Minecraft.getInstance().player).ifPresent(LocalPlayer::closeContainer);
+        ModMessages.sendToServer(new NetworkHandler.ToggleBackpackPacket(false));
     }
 }

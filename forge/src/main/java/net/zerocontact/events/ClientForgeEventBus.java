@@ -11,6 +11,8 @@ import net.zerocontact.network.NetworkHandler;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class ClientForgeEventBus {
+    private static boolean suppressBackpackOpenUntilKeyRelease;
+
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END || Minecraft.getInstance().player == null) return;
@@ -28,10 +30,18 @@ public class ClientForgeEventBus {
     }
     private static void listenBackpackKey() {
         while (KeyBindingHandler.TOGGLE_BACKPACK_KEY.consumeClick()) {
-            if (Minecraft.getInstance().screen == null) {
+            if (!suppressBackpackOpenUntilKeyRelease && Minecraft.getInstance().screen == null) {
                 ModMessages.sendToServer(new NetworkHandler.ToggleBackpackPacket(true));
             }
         }
+
+        if (suppressBackpackOpenUntilKeyRelease && !KeyBindingHandler.TOGGLE_BACKPACK_KEY.isDown()) {
+            suppressBackpackOpenUntilKeyRelease = false;
+        }
+    }
+
+    public static void suppressBackpackOpenUntilKeyRelease() {
+        suppressBackpackOpenUntilKeyRelease = true;
     }
 
     private static void listenVisorKey() {
