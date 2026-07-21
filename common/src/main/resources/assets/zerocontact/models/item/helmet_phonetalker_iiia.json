@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/helmet_phonetalker_iiia"
+    "layer0": "zerocontact:models/helmet/helmet_phonetalkeriii_blue"
   },
   "display": {
     "gui": {

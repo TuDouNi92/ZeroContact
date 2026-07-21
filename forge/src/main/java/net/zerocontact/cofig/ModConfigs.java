@@ -9,7 +9,7 @@ public class ModConfigs {
     public static final Common COMMON;
     public static final Client CLIENT;
     public static final String ENABLE_STAMINA = "enableStamina";
-    public static final String ENABLE_BULLET_SOUND = "playBulletSound";
+    public static final String ENABLE_BULLET_SUPPRESSION = "bulletSuppression";
 
     static {
         Pair<Client, ForgeConfigSpec> clientPair = new ForgeConfigSpec.Builder()
@@ -20,6 +20,10 @@ public class ModConfigs {
         CLIENT_CONFIG_SPEC = clientPair.getRight();
         COMMON = commonPair.getLeft();
         CLIENT = clientPair.getLeft();
+    }
+
+    public static void flipValue(ForgeConfigSpec.BooleanValue booleanValue) {
+        booleanValue.set(!booleanValue.get());
     }
 
     public static class Common {
@@ -35,14 +39,20 @@ public class ModConfigs {
     }
 
     public static class Client {
-        public final ForgeConfigSpec.BooleanValue playBulletSound;
+        public final ForgeConfigSpec.BooleanValue enableBulletSuppression;
 
         Client(ForgeConfigSpec.Builder builder) {
+            enableBulletSuppression = getEnableBulletSuppression(builder);
+        }
+
+        private ForgeConfigSpec.BooleanValue getEnableBulletSuppression(ForgeConfigSpec.Builder builder) {
+            final ForgeConfigSpec.BooleanValue enableBulletSuppression;
             builder.push("client");
-            playBulletSound = builder
-                    .comment("Play bullet whizz sound")
-                    .define(ENABLE_BULLET_SOUND, true);
+            enableBulletSuppression = builder
+                    .comment("Bullet suppression")
+                    .define(ENABLE_BULLET_SUPPRESSION, true);
             builder.pop();
+            return enableBulletSuppression;
         }
     }
 }

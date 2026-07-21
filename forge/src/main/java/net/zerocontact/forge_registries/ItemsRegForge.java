@@ -15,10 +15,8 @@ import net.zerocontact.api.IAssetManager;
 import net.zerocontact.api.TabableItem;
 import net.zerocontact.datagen.loader.ZPackManager;
 import net.zerocontact.forge_registries.item.*;
-import net.zerocontact.item.armor.forge.*;
+import net.zerocontact.item.kit.ArmorRepairKit;
 import net.zerocontact.item.dogtag.DogTag;
-import net.zerocontact.item.uniform.*;
-import net.zerocontact.item.helmet.*;
 import net.zerocontact.registries.ItemsReg;
 
 import java.util.*;
@@ -47,6 +45,7 @@ public class ItemsRegForge {
         if (!event.getRegistryKey().equals(Registries.ITEM)) return;
         RegistrySupplier<DogTag> DOG_TAG = ItemsReg.ITEMS.register("dog_tag", () -> new DogTag(new Item.Properties()));
         RegistrySupplier<ForgeSpawnEggItem> RAIDER_EGG = ItemsReg.ITEMS.register("raider_egg", () -> new ForgeSpawnEggItem(ModEntitiesReg.ARMED_RAIDER, 0x3d6145, 0xcfc08a, new Item.Properties()));
+        RegistrySupplier<ArmorRepairKit> ARMOR_KIT = ItemsReg.ITEMS.register("kit_armor", ArmorRepairKit::new);
         List<TabableItem> onGoingRegItems = List.of(
                 new Plates(),
                 new Helmets(),
@@ -56,9 +55,9 @@ public class ItemsRegForge {
                 new Uniforms()
         );
         onGoingRegItems.forEach(reg -> reg.attach(ITEMS_REG_TAB));
-        List<RegistrySupplier<? extends ItemLike>> items = List.of(RAIDER_EGG);
+        List<RegistrySupplier<? extends ItemLike>> items = List.of(ARMOR_KIT,RAIDER_EGG);
         items.forEach(item -> ITEMS_REG_TAB.put(item, DEFAULT_TAB));
-        ZPackManager packManager = new ZPackManager();
+        ZPackManager packManager = ZPackManager.getInstance();
         packManager.init();
         IAssetManager assetManager = packManager.getAssetManager();
         assetManager.register();

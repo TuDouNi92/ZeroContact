@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/backpack/backpack_6sh118"
+    "layer0": "zerocontact:models/backpack/backpack_6sh118_emr"
   },
   "display": {
     "gui": {

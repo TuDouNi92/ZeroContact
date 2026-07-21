@@ -5,6 +5,7 @@ import com.tacz.guns.api.item.IAmmo;
 import com.tacz.guns.api.item.IAmmoBox;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.builder.AmmoItemBuilder;
+import com.tacz.guns.item.AmmoBoxItem;
 import com.tacz.guns.item.AmmoItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -25,9 +26,12 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.zerocontact.api.ICartridgeHolder;
+import net.zerocontact.caliber.AmmoInjector;
+import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.client.menu.AmmoSelectorMenu;
 import net.zerocontact.command.CommandManager;
-import net.zerocontact.events.AmmoInjector;
+import net.zerocontact.compat.MagazinesCompatHandler;
 import net.zerocontact.events.EventUtil;
 import net.zerocontact.item.ammo.GenerateAmmo;
 import org.jetbrains.annotations.NotNull;
@@ -42,14 +46,19 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class ServerAmmoSelector {
+    public static ItemStack changedMagStack = ItemStack.EMPTY;
 
     public static void handleMenu(NetworkHandler.OpenAmmoSelectorPacket msg, Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
         ServerPlayer player = context.getSender();
         if (player == null || player.isSpectator()) return;
-        if(CommandManager.CommandSavedData.get((ServerLevel) player.level()).experimentalBallistic)
+        if (CommandManager.CommandSavedData.get((ServerLevel) player.level()).experimentalBallistic)
             context.enqueueWork(() -> {
                 if (!IGun.mainHandHoldGun(player)) return;
+                ItemStack gunStack = player.getMainHandItem();
+                MagazinesCompatHandler handler = MagazinesCompatHandler.get();
+                if (handler.getCompat().map(compat -> compat.isMagazineCompatibleWithGun(gunStack)).orElse(false))
+                    return;
                 LinkedHashMap<ItemStack, Integer> ammoMap = ServerAmmoSelector.getCreativeAmmoForHeldGun(player);
                 NetworkHooks.openScreen(
                         player,
@@ -69,7 +78,7 @@ public class ServerAmmoSelector {
             ItemStack selectedAmmoStack = msg.ammoItem();
             ResourceLocation selectedAmmoKey = ForgeRegistries.ITEMS.getKey(selectedAmmoStack.getItem());
             if (selectedAmmoKey == null) return;
-            AmmoInjector.setClientSelectedAmmoVariant(gunStack, selectedAmmoKey.toString());
+            gunStack.getCapability(CapabilityRegistries.CARTRIDGE).ifPresent(cap -> cap.setClientSelectedAmmoVariant(gunStack, selectedAmmoKey.toString()));
             ModMessages.sendToPlayer(new NetworkHandler.ClientAmmoReloadPacket(), player);
         });
     }
@@ -78,17 +87,42 @@ public class ServerAmmoSelector {
         List<Integer> mappedSlots = new ArrayList<>();
         for (int i = 0; i < raw.getSlots(); i++) {
             ItemStack checkAmmoStack = raw.getStackInSlot(i);
-            ResourceLocation stackKey = ForgeRegistries.ITEMS.getKey(checkAmmoStack.getItem());
-            if (stackKey != null && stackKey.toString().equals(selectedAmmoKey)) {
-                mappedSlots.add(i);
-            } else if (selectedAmmoKey.isEmpty()) {
-                ResourceLocation vanillaKey = ForgeRegistries.ITEMS.getKey(checkAmmoStack.getItem());
-                if (vanillaKey != null && vanillaKey.toString().equals("tacz:ammo")) {
+            if (checkAmmoStack.getItem() instanceof IAmmo) {
+                ResourceLocation stackKey = ForgeRegistries.ITEMS.getKey(checkAmmoStack.getItem());
+                if (stackKey != null && stackKey.toString().equals(selectedAmmoKey)) {
+                    mappedSlots.add(i);
+                } else if (selectedAmmoKey.isEmpty()) {
+                    ResourceLocation vanillaKey = ForgeRegistries.ITEMS.getKey(checkAmmoStack.getItem());
+                    if (vanillaKey != null && vanillaKey.toString().equals("tacz:ammo")) {
+                        mappedSlots.add(i);
+                    }
+                }
+            } else if (checkAmmoStack.getItem() instanceof IAmmoBox iAmmoBox && iAmmoBox.isAmmoBoxOfGun(gunStack, checkAmmoStack)) {
+                AmmoInjector.AmmoContext contextFromBox = AmmoInjector.read(checkAmmoStack);
+                String stackKey = contextFromBox.caliber().variant();
+                if (checkAmmoStack.getItem() instanceof AmmoBoxItem) {
+                    if (stackKey.equals(selectedAmmoKey)) {
+                        mappedSlots.add(i);
+                    } else if (stackKey.isEmpty() && selectedAmmoKey.equals("tacz:ammo")) {
+                        mappedSlots.add(i);
+                    } else if(stackKey.isEmpty() &&iAmmoBox.isAllTypeCreative(checkAmmoStack)){
+                        mappedSlots.add(i);
+                    }
+                } else if (MagazinesCompatHandler
+                        .get()
+                        .getCompat()
+                        .map(compat -> compat.instanceOfMagazine(checkAmmoStack.getItem())).orElse(false)) {
                     mappedSlots.add(i);
                 }
             }
-            if (checkAmmoStack.getItem() instanceof IAmmoBox iAmmoBox && iAmmoBox.isAmmoBoxOfGun(gunStack, checkAmmoStack)) {
-                mappedSlots.add(i);
+        }
+        //Reserve 2 extra slots for the magazine mixin to return a magazine that differs from the ones in the inventory.
+        for (int j = 0; j < raw.getSlots(); j++) {
+            if (raw.getStackInSlot(j).isEmpty()) {
+                mappedSlots.add(j);
+                if(mappedSlots.size()>=2){
+                    break;
+                }
             }
         }
 
@@ -110,7 +144,14 @@ public class ServerAmmoSelector {
 
             @Override
             public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
-                return raw.extractItem(mappedSlots.get(slot), amount, simulate);
+                ItemStack stack = raw.extractItem(mappedSlots.get(slot), amount, simulate);
+                if (MagazinesCompatHandler
+                        .get()
+                        .getCompat()
+                        .map(compat -> compat.instanceOfMagazine(stack.getItem())).orElse(false)) {
+                    changedMagStack = stack;
+                }
+                return stack;
             }
 
             @Override
@@ -138,7 +179,9 @@ public class ServerAmmoSelector {
         IGun gun = IGun.getIGunOrNull(gunStack);
         if (gun == null) return neededAmount;
         if (gunTag == null) return neededAmount;
-        String existedAmmoKey = AmmoInjector.getAmmoVariantInGun(gunStack);
+        ICartridgeHolder cap = gunStack.getCapability(CapabilityRegistries.CARTRIDGE).resolve().orElse(null);
+        if (cap == null) return neededAmount;
+        String existedAmmoKey = cap.getAmmoVariantInGun(gunStack);
         Item existedAmmo = ForgeRegistries.ITEMS.getValue(new ResourceLocation(existedAmmoKey));
         if (existedAmmo == null) return neededAmount;
         if (!newAmmoStack.is(existedAmmo)) {
@@ -177,6 +220,15 @@ public class ServerAmmoSelector {
         }
     }
 
+    public static ItemStack getCreativeMagForHeldGun(ServerPlayer player) {
+        ItemStack finalItem = ItemStack.EMPTY;
+        ItemStack gunItem = player.getMainHandItem();
+        IGun igun = IGun.getIGunOrNull(gunItem);
+        if (igun == null) return finalItem;
+        finalItem = MagazinesCompatHandler.get().getCompat().map(compat -> compat.getCompatibleMag(gunItem)).orElse(finalItem);
+        return finalItem;
+    }
+
     public static LinkedHashMap<ItemStack, Integer> getCreativeAmmoForHeldGun(ServerPlayer player) {
         Inventory vanillaInv = player.getInventory();
         ItemStack gunItem = player.getMainHandItem();
@@ -195,7 +247,7 @@ public class ServerAmmoSelector {
                         .map(ForgeRegistries.ITEMS::getValue)
                         .filter(GenerateAmmo.class::isInstance)
                         .map(GenerateAmmo.class::cast)
-                        .filter(ammo-> ammo.isAmmoOfGun(gunItem,ammo.getDefaultInstance()))
+                        .filter(ammo -> ammo.isAmmoOfGun(gunItem, ammo.getDefaultInstance()))
                         .forEach(ammo -> items.merge(
                                 new ItemWrapper(ammo, ammo.getAmmoId(ammo.getDefaultInstance()).toString()),
                                 9999,

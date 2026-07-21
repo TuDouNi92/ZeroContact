@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/plate_steel"
+    "layer0": "zerocontact:item/steel_plate"
   },
   "display": {
     "gui": {

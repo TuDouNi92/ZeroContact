@@ -16,7 +16,7 @@ This is an example description! Tell everyone what your mod is about!
 [[dependencies.zerocontact]]
 modId = "forge"
 mandatory = true
-versionRange = "[47.2.20,)"
+versionRange = "[47.3.10,)"
 ordering = "NONE"
 side = "BOTH"
 

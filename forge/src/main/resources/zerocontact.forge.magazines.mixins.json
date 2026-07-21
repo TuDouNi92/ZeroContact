@@ -1,0 +1,19 @@
+{
+  "required": false,
+  "package": "net.zerocontact.mixin.magazines",
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "mixins": [
+    "BulletTransferPacketMixin",
+    "LoadOneFromHandPacketMixin",
+    "MagazineItemMixin",
+    "UnloadOneFromHandPacketMixin"
+  ],
+  "plugin": "net.zerocontact.mixin.magazines.MagazineMixinConfigPlugin",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "MagazineTooltipRendererMixin"
+  ]
+}

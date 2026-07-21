@@ -4,6 +4,7 @@ import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
 import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.init.ModDamageTypes;
 import dev.architectury.event.EventResult;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -12,6 +13,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
+import net.zerocontact.caliber.AmmoInjector;
+import net.zerocontact.caliber.BulletBinder;
+import net.zerocontact.caliber.CaliberVariantDamageHelper;
 import net.zerocontact.compat.FirstAidCompatHandler;
 import net.zerocontact.registries.ModSoundEventsReg;
 
@@ -49,7 +53,7 @@ public class PlateDamageEvent {
         if (!stackInSlot.isEmpty() && (damageSource.is(ModDamageTypes.BULLETS_TAG) || damageSource.is(ZDamageTypes.ZC_DAMAGE))) {
             if (stackInSlot.getItem() instanceof ICombatArmorItem armorProvider) {
                 if (!(damageSource.getDirectEntity() instanceof EntityKineticBullet bullet)) return;
-                AmmoInjector.AmmoContext ammoContext = AmmoInjector.get(bullet);
+                AmmoInjector.AmmoContext ammoContext = BulletBinder.getContext(bullet);
                 float caliberArmorDamage;
                 int hits = stackInSlot.getOrCreateTag().getInt("hits");
                 if (ammoContext != null) {
@@ -77,13 +81,14 @@ public class PlateDamageEvent {
 
                 FirstAidCompatHandler firstAidCompatHandler = FirstAidCompatHandler.create(livingEntity, damageSource);
                 if (firstAidCompatHandler != null && firstAidCompatHandler.getLimbsApplicable()) return;
-                stackInSlot.hurtAndBreak(durabilityLossAmount, livingEntity, lv -> lv.playSound(ModSoundEventsReg.ARMOR_BROKEN_PLATE, 1.0f, 1.0f));
+                stackInSlot.hurtAndBreak(durabilityLossAmount, livingEntity, holder -> holder.level().playSound(null, holder.blockPosition(), ModSoundEventsReg.ARMOR_BROKEN_PLATE, SoundSource.PLAYERS));
             }
         }
     }
 
     private static float getArmorDamage(CaliberVariantDamageHelper.Caliber caliber, ICombatArmorItem provider, float baseDamage) {
         int absorb = provider.getAbsorb() == 0 ? 1 : provider.getAbsorb();
+        baseDamage = baseDamage <= 0 ? (float) 0.01 : baseDamage;
         return caliber.penetrationClass() * baseDamage * ((float) caliber.penetrationClass() / absorb);
     }
 
@@ -101,7 +106,7 @@ public class PlateDamageEvent {
                 if (stack.getItem() instanceof ICombatArmorItem durabilityLossProvider && stack.getItem() instanceof HelmetInfoProvider) {
                     durabilityLossAmount = durabilityLossProvider.generateLoss(amount, durabilityLossFactor, hits);
                     stack.getOrCreateTag().putInt("hits", hits);
-                    stack.hurtAndBreak(durabilityLossAmount, livingEntity, broken -> livingEntity.playSound(ModSoundEventsReg.ARMOR_BROKEN_PLATE, 1.0f, 1.0f));
+                    stack.hurtAndBreak(durabilityLossAmount, livingEntity, holder -> holder.level().playSound(null, holder.blockPosition(), ModSoundEventsReg.ARMOR_BROKEN_PLATE, SoundSource.PLAYERS));
                 }
             }
         });

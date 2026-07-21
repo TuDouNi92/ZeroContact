@@ -9,8 +9,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.zerocontact.api.IEquipmentTypeTag;
-import net.zerocontact.events.AmmoInjector;
-import net.zerocontact.events.CaliberVariantDamageHelper;
+import net.zerocontact.caliber.AmmoInjector;
+import net.zerocontact.caliber.CaliberVariantDamageHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,13 +44,13 @@ public class GenerateAmmo extends Item implements AmmoItemDataAccessor, IEquipme
     @Override
     public @NotNull ResourceLocation getAmmoId(ItemStack ammo) {
         AmmoInjector.write(new AmmoInjector.AmmoContext(
-                new CaliberVariantDamageHelper.Caliber(ammoId, ammoVariant, baseDamageFactor, penetrateClass, fleshDamage, armorDamage, stackSize,tracerColor)
+                new CaliberVariantDamageHelper.Caliber(ammoId, MOD_ID + ":" + ammoVariant, baseDamageFactor, penetrateClass, fleshDamage, armorDamage, stackSize, tracerColor)
         ), ammo);
         return new ResourceLocation(ammoId);
     }
 
     public CaliberVariantDamageHelper.Caliber getDefualtCaliber() {
-        return new CaliberVariantDamageHelper.Caliber(ammoId, MOD_ID + ":" + ammoVariant, baseDamageFactor, penetrateClass, fleshDamage, armorDamage, stackSize,tracerColor
+        return new CaliberVariantDamageHelper.Caliber(ammoId, MOD_ID + ":" + ammoVariant, baseDamageFactor, penetrateClass, fleshDamage, armorDamage, stackSize, tracerColor
         );
     }
 
@@ -58,7 +58,7 @@ public class GenerateAmmo extends Item implements AmmoItemDataAccessor, IEquipme
     public @NotNull ItemStack getDefaultInstance() {
         ItemStack stack = new ItemStack(this);
         AmmoInjector.write(new AmmoInjector.AmmoContext(
-                new CaliberVariantDamageHelper.Caliber(ammoId, ammoVariant, baseDamageFactor, penetrateClass, fleshDamage, armorDamage, stackSize,tracerColor)
+                new CaliberVariantDamageHelper.Caliber(ammoId,MOD_ID + ":" + ammoVariant, baseDamageFactor, penetrateClass, fleshDamage, armorDamage, stackSize, tracerColor)
         ), stack);
         return stack;
     }

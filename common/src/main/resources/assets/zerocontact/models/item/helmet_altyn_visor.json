@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/helmet_6b47_ratnik_emr"
+    "layer0": "zerocontact:models/helmet/helmet_altyn_visor_olive"
   },
   "display": {
     "gui": {

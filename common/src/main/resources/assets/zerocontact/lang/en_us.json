@@ -51,6 +51,7 @@
   "item.zerocontact.rigs_alice_olive": "Alice (Olive)",
   "item.zerocontact.rigs_cr498_desert":"Condor 7 Pocket Chest Rig (Desert)",
   "item.zerocontact.rigs_sop_mr_desert": "S.O.P Micro Chest Rig (Desert)",
+  "item.zerocontact.rigs_fast_tac": "FAST TAC Chest Rig",
   "item.zerocontact.backpack_t20_multicam": "T20 backpack (Multicam)",
   "item.zerocontact.backpack_t20_umbra": "T20 backpack (Umbra)",
   "item.zerocontact.backpack_6sh118": "Ratnik 6sh118 raid backpack (Emr)",
@@ -69,7 +70,7 @@
   "item.zerocontact.uniform_g99_bottom": "G99 Combat uniform (Pants)",
   "item.zerocontact.uniform_spn_top": "SPN (Uniform)",
   "item.zerocontact.uniform_spn_bottom": "SPN (Pants)",
-
+  "item.zerocontact.kit_armor": "Armor repair kit",
 
   "itemGroup.zerocontact.zero_contact": "ZeroContact",
   "curios.modifiers.front_plate": "Front plate",
@@ -91,12 +92,16 @@
   "tooltip.zerocontact.armor_penetrate_reduction": "Penetrate reduction",
   "tooltip.zerocontact.armor_blunt_reduction": "Blunt reduction",
   "tooltip.zerocontact.pack.zero_contact":"ZeroContact Default Pack",
+  "tooltip.zerocontact.pack_hint": "Hold [SHIFT] to see Pack information",
   "tooltip.zerocontact.gun.ammoVariant": "Ammo variant",
 
   "tooltip.zerocontact.bullet_penetration": "Penetration",
   "tooltip.zerocontact.bullet_armor_damage": "Armor damage",
   "tooltip.zerocontact.bullet_flesh_damage": "Flesh damage",
 
+  "tootip.zerocontact.kit_armor": "[Right-click] over the equipment you want to repair",
+
+  "tooltip.zerocontact.rig": "You cannot reload the gun directly from inventory once you equip the chest rig. Put your ammo in your chest rig.",
 
   "hud.zerocontact.ammo.default": "\uD83E\uDC35 Default ammo",
 
@@ -114,5 +119,9 @@
   "key.swap_visor": "Toggle Visor",
 
   "gui.zerocontact.workbench.submit": "Submit↵",
-  "gui.zerocontact.workbench.startOS": "[    0.000000] Linux version 6.5.0-21-generic (buildd@lcy02-amd64-123)\n[    0.000000] Command line: BOOT_IMAGE=/boot/vmlinuz root=UUID=xxxx ro quiet splash\n[    0.000000] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'\n[    0.000000] BIOS-provided physical RAM map:\n[    0.000000] e820: [mem 0x0000000000000000-0x000000000009ffff] usable\n[    0.000000] e820: [mem 0x0000000000100000-0x000000003fffffff] usable\n[    0.000000] NX (Execute Disable) protection: active\n[    0.000000] SMBIOS 3.2 present.\n[    0.000000] DMI: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform\n[    0.000000] Hypervisor detected: VMware"
+  "gui.zerocontact.workbench.startOS": "[    0.000000] Linux version 6.5.0-21-generic (buildd@lcy02-amd64-123)\n[    0.000000] Command line: BOOT_IMAGE=/boot/vmlinuz root=UUID=xxxx ro quiet splash\n[    0.000000] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'\n[    0.000000] BIOS-provided physical RAM map:\n[    0.000000] e820: [mem 0x0000000000000000-0x000000000009ffff] usable\n[    0.000000] e820: [mem 0x0000000000100000-0x000000003fffffff] usable\n[    0.000000] NX (Execute Disable) protection: active\n[    0.000000] SMBIOS 3.2 present.\n[    0.000000] DMI: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform\n[    0.000000] Hypervisor detected: VMware",
+
+  "config.zerocontact.client": "Client",
+  "config.zerocontact.client.bullet_suppression": "Bullet Suppression Effect"
+
 }

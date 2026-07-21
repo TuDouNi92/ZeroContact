@@ -1,4 +1,4 @@
-package net.zerocontact.mixin;
+package net.zerocontact.mixin.tacz;
 
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.IAmmo;
@@ -25,24 +25,26 @@ public class AbstractGunItemMixin {
     @Unique
     private LivingEntity zeroContact$shooter;
 
-    @Inject(method = "canReload", at = @At("RETURN"), remap = false, cancellable = true)
+    @Inject(method = "canReload", at = @At("HEAD"), remap = false, cancellable = true)
     public void zeroContact$canReload(LivingEntity shooter, ItemStack gunItem, CallbackInfoReturnable<Boolean> cir) {
         this.zeroContact$shooter = shooter;
         ItemStack rigsStack = EventUtil.getCuriosStackFirst(shooter, "rigs");
+        //Essential check since a NPE occurred here but in MinecraftOrRainbow client.
+        if (rigsStack == null) return;
         zeroContact$grantVanillaFullAmmoReload(gunItem, cir);
-        rigsStack.getCapability(ForgeCapabilities.ITEM_HANDLER, null).map(iItemHandler -> {
+        rigsStack.getCapability(ForgeCapabilities.ITEM_HANDLER, null).ifPresent(iItemHandler -> {
             for (int i = 0; i < iItemHandler.getSlots(); i++) {
                 ItemStack checkAmmoStack = iItemHandler.getStackInSlot(i);
                 if (checkAmmoStack.getItem() instanceof IAmmo iAmmo && iAmmo.isAmmoOfGun(gunItem, checkAmmoStack)) {
                     cir.setReturnValue(true);
-                    return false;
+                    return;
                 }
                 if (checkAmmoStack.getItem() instanceof IAmmoBox iAmmoBox && iAmmoBox.isAmmoBoxOfGun(gunItem, checkAmmoStack)) {
+
                     cir.setReturnValue(true);
-                    return false;
+                    return;
                 }
             }
-            return false;
         });
     }
 

@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/helmet_british23"
+    "layer0": "zerocontact:models/helmet/helmet_british23_black"
   },
   "display": {
     "gui": {

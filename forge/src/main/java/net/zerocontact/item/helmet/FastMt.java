@@ -87,6 +87,7 @@ public class FastMt extends ArmorItem implements HelmetInfoProvider, GeoItem, IC
     public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new IClientItemExtensions() {
             private HelmetRender.HelmetArmorRender<FastMt> render;
+            private HelmetRender.HelmetItemRender<FastMt> itemRender;
 
             @Override
             public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
@@ -99,7 +100,10 @@ public class FastMt extends ArmorItem implements HelmetInfoProvider, GeoItem, IC
 
             @Override
             public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return new HelmetRender.HelmetItemRender<>(new FastMtModel());
+                if (this.itemRender == null) {
+                    this.itemRender = new HelmetRender.HelmetItemRender<>(new FastMtModel());
+                }
+                return this.itemRender;
             }
         });
     }

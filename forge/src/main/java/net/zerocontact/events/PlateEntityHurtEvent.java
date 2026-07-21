@@ -10,16 +10,24 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
+import net.zerocontact.caliber.CaliberVariantDamageHelper;
 import net.zerocontact.compat.FirstAidCompatHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
 public class PlateEntityHurtEvent {
-    public static boolean modifyDamage(LivingEntity lv, DamageSource source, float amount, ItemStack plateSlot) {
-        ItemStack armorSlot = lv.getItemBySlot(EquipmentSlot.CHEST);
+    public static boolean modifyDamage(LivingEntity lv, DamageSource source, float amount, ItemStack[] hitStacks) {
+        ItemStack armorStack;
+        ItemStack plateStack = null;
+        if (hitStacks.length <= 1) {
+            armorStack = hitStacks[0];
+        } else {
+            armorStack = hitStacks[1];
+            plateStack = hitStacks[0];
+        }
         HurtPipeLine pipeLine = new HurtPipeLine();
-        HurtPipeLine.DamageResult result = pipeLine.process(new HurtPipeLine.DamageContext(lv, source, amount, plateSlot, armorSlot));
+        HurtPipeLine.DamageResult result = pipeLine.process(new HurtPipeLine.DamageContext(lv, source, amount, plateStack, armorStack));
         return pipeLine.execute(result, () -> lv.hurt(result.finalSource(), result.finalAmount()));
     }
 
@@ -58,6 +66,9 @@ public class PlateEntityHurtEvent {
                         return;
                     int protectionClass = stack.getOrCreateTag().getInt("protection_class");
                     float hurtAmount = getHurtAmount(livingEntity, damageSource, amount, null, entityHurtProvider, protectionClass);
+                    if (stack.getMaxDamage() - stack.getDamageValue() <= 1) {
+                        hurtAmount = getHurtAmount(livingEntity, damageSource, amount, null, null, protectionClass);
+                    }
                     eventPre.setBaseAmount(hurtAmount);
                     if (firstAidCompat != null && firstAidCompat.getHeadApplicable()) {
                         eventPre.setHeadshotMultiplier(0.2f);
@@ -71,7 +82,7 @@ public class PlateEntityHurtEvent {
 
 
     public static EventResult entityHurtRegister(LivingEntity lv, DamageSource source, float amount) {
-        if (PlateEntityHurtEvent.modifyDamage(lv, source, amount, EventUtil.getHitBodyPartStack(lv, source)[0])) {
+        if (PlateEntityHurtEvent.modifyDamage(lv, source, amount, EventUtil.getHitBodyPartStack(lv, source))) {
             return EventResult.interruptFalse();
         }
         return EventResult.pass();

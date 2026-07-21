@@ -28,7 +28,7 @@ import java.util.zip.ZipInputStream;
 
 public class ZPackManager implements IPackManager {
     private static final Path defaultPath = Paths.get("config/zerocontact/packs");
-    private final Set<Zpack> outerPacks = new HashSet<>();
+    public final Set<Zpack> outerPacks = new HashSet<>();
     private static final Set<Pack> vanillaPacks = new HashSet<>();
     private final ZAssetManager assetManager;
     private final ZContentLoader contentLoader;
@@ -38,10 +38,19 @@ public class ZPackManager implements IPackManager {
     private static final String CONFIG_PATH = "config/zerocontact/override.toml";
     private static final String CONFIG_NODE = "pack.default_pack_override";
     private boolean overridePack = true;
+    private static ZPackManager singleton;
 
-    public ZPackManager() {
+    private ZPackManager() {
         this.assetManager = new ZAssetManager();
         this.contentLoader = new ZContentLoader(assetManager);
+    }
+
+    public static ZPackManager getInstance() {
+        if (singleton == null) {
+            singleton = new ZPackManager();
+            return singleton;
+        }
+        return singleton;
     }
 
     @Override
@@ -99,8 +108,9 @@ public class ZPackManager implements IPackManager {
                                     data -> outerPacks.add(
                                             new Zpack(
                                                     data.tabName(),
-                                                    packPath
-                                            )
+                                                    packPath,
+                                                    data.author(),
+                                                    data.version())
                                     ));
                         } catch (IllegalArgumentException | IOException e) {
                             ZeroContactLogger.LOG.error(e);

@@ -35,10 +35,10 @@ public class ModMessages {
                 .encoder(NetworkHandler.ToggleStaminaPacket::encode)
                 .consumerMainThread(NetworkHandler.ToggleStaminaPacket::handle)
                 .add();
-        net.messageBuilder(NetworkHandler.ToggleVisorPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(NetworkHandler.ToggleVisorPacket::decode)
-                .encoder(NetworkHandler.ToggleVisorPacket::encode)
-                .consumerMainThread(NetworkHandler.ToggleVisorPacket::handle)
+        net.messageBuilder(NetworkHandler.FlipVisorPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(NetworkHandler.FlipVisorPacket::decode)
+                .encoder(NetworkHandler.FlipVisorPacket::encode)
+                .consumerMainThread(NetworkHandler.FlipVisorPacket::handle)
                 .add();
         net.messageBuilder(NetworkHandler.ToggleVisorResultPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(NetworkHandler.ToggleVisorResultPacket::decode)
@@ -75,6 +75,11 @@ public class ModMessages {
                 .decoder(NetworkHandler.ClientAmmoReloadPacket::decode)
                 .encoder(NetworkHandler.ClientAmmoReloadPacket::encode)
                 .consumerMainThread(NetworkHandler.ClientAmmoReloadPacket::handle)
+                .add();
+        net.messageBuilder(AppendSuppressionPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(AppendSuppressionPacket::decode)
+                .encoder(AppendSuppressionPacket::encode)
+                .consumerMainThread(AppendSuppressionPacket::handle)
                 .add();
     }
 

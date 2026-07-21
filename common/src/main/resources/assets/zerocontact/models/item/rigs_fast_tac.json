@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/rigs/rigs_fast_tac"
+    "layer0": "zerocontact:models/rigs/rig_fast_tac_vest_olive"
   },
   "display": {
     "gui": {

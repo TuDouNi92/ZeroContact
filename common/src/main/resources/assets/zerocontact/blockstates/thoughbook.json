@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=north": { "model": "zerocontact:block/thoughbook" },
+    "facing=south": { "model": "zerocontact:block/thoughbook" },
+    "facing=west": { "model": "zerocontact:block/thoughbook" },
+    "facing=east": { "model": "zerocontact:block/thoughbook" },
+    "facing=up": { "model": "zerocontact:block/thoughbook" },
+    "facing=down": { "model": "zerocontact:block/thoughbook" }
+  }
+}

@@ -1,4 +1,4 @@
-package net.zerocontact.events;
+package net.zerocontact.caliber;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import com.tacz.guns.entity.EntityKineticBullet;
@@ -106,7 +106,7 @@ public enum CaliberVariantDamageHelper {
 
         @Override
         public boolean equals(Object obj) {
-            return obj instanceof Caliber caliber && Objects.equals(id, caliber.id) && (Objects.equals(variant, caliber.variant.split(":")[1]) || (Objects.equals(variant, caliber.variant)));
+            return obj instanceof Caliber caliber && Objects.equals(id, caliber.id) && (Objects.equals(variant, caliber.variant));
         }
 
         @Override
@@ -126,7 +126,7 @@ public enum CaliberVariantDamageHelper {
     private static <E> Optional<Caliber> getMatchedCaliber(DamageSource source, Set<E> set) {
         AtomicReference<Optional<Caliber>> result = new AtomicReference<>(Optional.empty());
         if (!(source.getDirectEntity() instanceof EntityKineticBullet bullet)) return result.get();
-        @Nullable AmmoInjector.AmmoContext ammoContext = AmmoInjector.get(bullet);
+        @Nullable AmmoInjector.AmmoContext ammoContext = BulletBinder.getContext(bullet);
         if (!source.is(ModDamageTypes.BULLETS_TAG) || ammoContext == null) return result.get();
 
         for (E caliberData : set) {
@@ -137,7 +137,7 @@ public enum CaliberVariantDamageHelper {
                 }
 
             } else if (caliberData instanceof Caliber caliber) {
-                if (ammoContext != null && AmmoInjector.isEmptyContext(ammoContext) && source.getEntity() instanceof ServerPlayer player) {
+                if (ammoContext != null && ammoContext.isEmpty() && source.getEntity() instanceof ServerPlayer player) {
                     ammoContext = AmmoInjector.setPlayerGunContext(player);
                 }
                 if (ammoContext != null && caliber.equals(ammoContext.caliber())) {
@@ -183,7 +183,7 @@ public enum CaliberVariantDamageHelper {
     }
 
     private static void setOutput(@Nullable ICombatArmorItem provider, Caliber caliber, double penetratedDamage, AtomicDouble output) {
-        if (penetratedDamage != 0) {
+        if (penetratedDamage > 0) {
             if (provider == null) {
                 output.set(penetratedDamage);
             } else {
@@ -193,7 +193,7 @@ public enum CaliberVariantDamageHelper {
             if (provider == null) {
                 output.set(caliber.fleshDamage);
             } else {
-                output.set(caliber.fleshDamage * provider.generateBlunt());
+                output.set(caliber.penetrationClass * 0.3 * provider.generateBlunt());
             }
         }
     }
@@ -207,9 +207,12 @@ public enum CaliberVariantDamageHelper {
      */
     private static double getPenetratedDamage(@NotNull Caliber caliber, int hurtCanHold) {
         RandomSource randomSource = RandomSource.create();
-        if (hurtCanHold > caliber.penetrationClass) {
-            double penetrateProbability = Math.min(0.05f, (double) caliber.penetrationClass / hurtCanHold);
-            if (randomSource.nextFloat() < penetrateProbability) {
+        if (hurtCanHold >= caliber.penetrationClass) {
+            double preOdds = 0.42139
+                    + 2.00643 * caliber.penetrationClass
+                    - 1.80617 * hurtCanHold;
+            double penetrateOdds = 1.0 / (1.0 + Math.exp(-preOdds));
+            if (randomSource.nextFloat() < penetrateOdds) {
                 return caliber.fleshDamage;
             }
             return 0.0;

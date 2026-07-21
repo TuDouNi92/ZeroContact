@@ -10,14 +10,15 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.zerocontact.client.gui.AmmoSelectorScreen;
 import net.zerocontact.client.gui.BackpackScreen;
 import net.zerocontact.client.gui.ConfigScreen;
 import net.zerocontact.client.gui.WorkbenchScreen;
 import net.zerocontact.client.interaction.KeyBindingHandler;
+import net.zerocontact.forge.ZeroContactForge;
 import net.zerocontact.forge_registries.ModMenus;
 import net.zerocontact.client.renderer.AccessoriesRender;
 import net.zerocontact.entity.ArmedRaider;
@@ -41,6 +42,7 @@ public class ModRegEventBus {
             event.put(ModEntitiesReg.ARMED_RAIDER.get(), ArmedRaider.createAttributes().build());
         }
     }
+
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     static class ClientDistribution {
         @SubscribeEvent
@@ -50,14 +52,16 @@ public class ModRegEventBus {
             MenuScreens.register(ModMenus.WORKBENCH_MENU.get(), WorkbenchScreen::new);
             MenuScreens.register(ModMenus.AMMO_SELECTOR.get(), AmmoSelectorScreen::new);
             RegCurioGeoItemRender();
-            regConfigScreen();
+            regConfigScreen(ZeroContactForge.getFmlJavaModLoadingContext());
         }
+
         @SubscribeEvent
         public static void onRegisterMappings(RegisterKeyMappingsEvent event) {
             KeyBindingHandler.register(event);
         }
+
         @SubscribeEvent
-        public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event){
+        public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
             event.registerBlockEntityRenderer(
                     WORKBENCH_ENTITY.get(), arg -> new GeoBlockRenderer<>(
                             new GenerateModel<>(
@@ -79,8 +83,8 @@ public class ModRegEventBus {
         });
     }
 
-    private static void regConfigScreen() {
-        ModLoadingContext.get().registerExtensionPoint(
+    private static void regConfigScreen(FMLJavaModLoadingContext context) {
+        context.registerExtensionPoint(
                 ConfigScreenHandler.ConfigScreenFactory.class,
                 () -> new ConfigScreenHandler.ConfigScreenFactory(
                         (mc, parent) -> new ConfigScreen(Component.literal("Config screen"), parent)

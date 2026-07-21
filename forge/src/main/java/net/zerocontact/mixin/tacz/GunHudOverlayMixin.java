@@ -1,4 +1,4 @@
-package net.zerocontact.mixin;
+package net.zerocontact.mixin.tacz;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.tacz.guns.api.item.IAmmo;
@@ -17,7 +17,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.zerocontact.events.AmmoInjector;
+import net.zerocontact.capability.CapabilityRegistries;
+import net.zerocontact.compat.MagazinesCompatHandler;
 import net.zerocontact.item.ammo.GenerateAmmo;
 import net.zerocontact.item.rigs.BaseRigs;
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,27 +34,26 @@ public class GunHudOverlayMixin {
     @Shadow(remap = false)
     private static int cacheInventoryAmmoCount;
 
-    @Inject(method = "handleInventoryAmmo", at = @At("RETURN"), remap = false)
+    @Inject(method = "handleInventoryAmmo", at = @At("HEAD"), remap = false)
     private static void zeroContact$handleInventoryAmmo(ItemStack stack, Inventory inventory, CallbackInfo ci) {
         CuriosApi.getCuriosInventory(inventory.player).ifPresent(curioHandler -> {
             curioHandler.getStacksHandler("rigs").ifPresent(stacksHandler -> {
                 ItemStack rigsStack = stacksHandler.getStacks().getStackInSlot(0);
                 if (rigsStack.getItem() instanceof BaseRigs) {
-                    rigsStack.getCapability(ForgeCapabilities.ITEM_HANDLER, null).map(itemHandler -> {
+                    rigsStack.getCapability(ForgeCapabilities.ITEM_HANDLER, null).ifPresent(itemHandler -> {
                         for (int i = 0; i < itemHandler.getSlots(); ++i) {
                             ItemStack inventoryAmmo = itemHandler.getStackInSlot(i);
                             if (inventoryAmmo.getItem() instanceof IAmmo iAmmo) {
-                                if (iAmmo.isAmmoOfGun(stack, inventoryAmmo)) {
-                                    cacheInventoryAmmoCount += inventoryAmmo.getCount();
+                                if(!MagazinesCompatHandler.get().isModLoaded()){
+                                    if (iAmmo.isAmmoOfGun(stack, inventoryAmmo)) {
+                                        cacheInventoryAmmoCount += inventoryAmmo.getCount();
+                                    }
                                 }
                             }
-
                             if (inventoryAmmo.getItem() instanceof IAmmoBox iAmmoBox && iAmmoBox.isAmmoBoxOfGun(stack, inventoryAmmo)) {
-                                cacheInventoryAmmoCount = 9999;
+                                cacheInventoryAmmoCount +=iAmmoBox.getAmmoCount(inventoryAmmo);
                             }
-
                         }
-                        return cacheInventoryAmmoCount;
                     });
                 }
             });
@@ -65,25 +65,25 @@ public class GunHudOverlayMixin {
         if (player == null) return;
         ItemStack gunStack = IGun.mainHandHoldGun(player) ? player.getMainHandItem() : null;
         if (gunStack == null) return;
-        String currentAmmoKey = AmmoInjector.getAmmoVariantInGun(gunStack);
-        ItemStack currentAmmo = AmmoInjector.getDefaultStack(currentAmmoKey);
-        Component ammoName = Component.literal("\uD83E\uDC35 ").append(Component.translatable(currentAmmo.getDescriptionId()));
-        if (!(currentAmmo.getItem() instanceof GenerateAmmo))
-            ammoName = Component.translatable("hud.zerocontact.ammo.default");
-        float scale = 0.5f;
-        poseStack.pushPose();
-        poseStack.scale(scale, scale, 1);
-        graphics.drawString(
-                mc.font,
-                ammoName,
-                width,
-                height,
-                ammoCountColor,
-                false
-        );
+        gunStack.getCapability(CapabilityRegistries.CARTRIDGE).ifPresent(cap -> {
+            String currentAmmoKey = cap.getAmmoVariantInGun(gunStack);
+            ItemStack currentAmmo = cap.getDefaultStack(currentAmmoKey);
+            Component ammoName = Component.literal("\uD83E\uDC35 ").append(Component.translatable(currentAmmo.getDescriptionId()));
+            if (!(currentAmmo.getItem() instanceof GenerateAmmo))
+                ammoName = Component.translatable("hud.zerocontact.ammo.default");
+            float scale = 0.5f;
+            poseStack.pushPose();
+            poseStack.scale(scale, scale, 1);
+            graphics.drawString(
+                    mc.font,
+                    ammoName,
+                    width,
+                    height,
+                    ammoCountColor,
+                    false
+            );
 
-        poseStack.popPose();
-//        graphics.drawString(mc.font, ammoName, (int) ((width - 75) / 1.5F), (int) ((height - 72) / 1.5F), ammoCountColor);
-
+            poseStack.popPose();
+        });
     }
 }

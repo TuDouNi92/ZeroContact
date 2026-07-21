@@ -1,7 +1,7 @@
 {
   "parent": "builtin/entity",
   "textures": {
-    "layer0": "zerocontact:item/armor_6b2"
+    "layer0": "zerocontact:models/vest/vest_6b2_flora"
   },
   "display": {
     "gui": {

@@ -395,6 +395,6 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
 
     private LoadoutHolder randomLoadout() {
         LoadoutHolder.LoadoutTypes[] values = LoadoutHolder.LoadoutTypes.values();
-        return values[random.nextInt(values.length)].loadoutHolder;
+        return values[random.nextInt(values.length)].loadoutHolder.get();
     }
 }

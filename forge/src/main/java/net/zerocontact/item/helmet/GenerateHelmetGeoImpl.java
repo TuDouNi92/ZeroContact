@@ -88,6 +88,7 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
     public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new IClientItemExtensions() {
             private HelmetRender.HelmetArmorRender<GenerateHelmetGeoImpl> render;
+            private HelmetRender.HelmetItemRender<GenerateHelmetGeoImpl> itemRender;
 
             @Override
             public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
@@ -100,7 +101,10 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
 
             @Override
             public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return new HelmetRender.HelmetItemRender<>(new GenerateModel<>(texture, model, animation));
+                if (this.itemRender == null) {
+                    this.itemRender = new HelmetRender.HelmetItemRender<>(new GenerateModel<>(texture, model, animation));
+                }
+                return this.itemRender;
             }
         });
     }

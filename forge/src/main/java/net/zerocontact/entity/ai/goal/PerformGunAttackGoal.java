@@ -4,7 +4,6 @@ import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.entity.ShootResult;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.gun.FireMode;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,6 +17,7 @@ import net.zerocontact.entity.ai.controller.GlobalStateController;
 import java.util.Optional;
 
 public class PerformGunAttackGoal extends Goal {
+    private static final double MAX_INACCURACY = 3.0D;
     private final ArmedRaider shooter;
     private int shootCoolDown = 0;
     private int burstInterval = 0;
@@ -60,26 +60,29 @@ public class PerformGunAttackGoal extends Goal {
         return dot >= fovCos && shooter.hasLineOfSight(target);
     }
 
-    private float provideInaccuracy() {
-        float baseSpread = 5;
-        if (random.nextFloat() < .1F) {
-            return (float) random.triangle(baseSpread / 2, baseSpread);
-        }
-        return (float) random.triangle(baseSpread, baseSpread * 1.25F);
+    private Vec3 provideInaccuracy(Vec3 targetPos) {
+        Vec3 offset;
+        do {
+            offset = new Vec3(
+                    random.nextDouble() * 2.0D - 1.0D,
+                    random.nextDouble() * 2.0D - 1.0D,
+                    random.nextDouble() * 2.0D - 1.0D
+            );
+        } while (offset.lengthSqr() > 1.0D);
+        return targetPos.add(offset.scale(MAX_INACCURACY));
     }
 
     private ShootResult shoot(LivingEntity target) {
         ShootResult result = ShootResult.UNKNOWN_FAIL;
         IGun gun = IGun.getIGunOrNull(shooter.getMainHandItem());
         if (gun == null) return result;
-        double x, y, z;
-        x = target.getX() - shooter.getX();
-        double targetY = target.getY() + target.getBbHeight() * 0.5;
-        y = targetY - shooter.getEyeY();
-        z = target.getZ() - shooter.getZ();
-        float spread = provideInaccuracy();
-        float yaw = (float) -Math.toDegrees(Math.atan2(x, z)) + Mth.randomBetween(random, -spread, spread);
-        float pitch = (float) -Math.toDegrees(Math.atan2(y, Math.sqrt(x * x + z * z))) + Mth.randomBetween(random, -spread, spread);
+        Vec3 targetPos = new Vec3(target.getX(), target.getY() + target.getBbHeight() * 0.5D, target.getZ());
+        Vec3 inaccurateTargetPos = provideInaccuracy(targetPos);
+        double x = inaccurateTargetPos.x - shooter.getX();
+        double y = inaccurateTargetPos.y - shooter.getEyeY();
+        double z = inaccurateTargetPos.z - shooter.getZ();
+        float yaw = (float) -Math.toDegrees(Math.atan2(x, z));
+        float pitch = (float) -Math.toDegrees(Math.atan2(y, Math.sqrt(x * x + z * z)));
         result = operator.shoot(() -> pitch, () -> yaw);
         return result;
     }

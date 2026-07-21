@@ -4,6 +4,8 @@ import java.nio.file.Path;
 
 public record Zpack(
         String tab,
-        Path outerPack
+        Path outerPack,
+        String author,
+        String version
 ) {
 }
