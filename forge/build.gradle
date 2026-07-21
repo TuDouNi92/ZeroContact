@@ -11,7 +11,7 @@ loom {
     forge {
         convertAccessWideners = true
         extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
-        mixinConfig("zerocontact.forge.tacz.mixins.json","zerocontact.forge.magazines.mixins.json")
+        mixinConfig("zerocontact.forge.tacz.mixins.json", "zerocontact.forge.magazines.mixins.json")
     }
 }
 
@@ -49,7 +49,7 @@ dependencies {
 //    modLocalRuntime files('libs/embeddium-0.3.31+mc1.20.1 (1).jar')
 //    modLocalRuntime files('libs/oculus-mc1.20.1-1.8.0 (1).jar')
     modCompileOnly('curse.maven:tacz-magazines-1504588:8356810')
-//    modLocalRuntime('curse.maven:tacz-magazines-1504588:8356810')
+    modLocalRuntime('curse.maven:tacz-magazines-1504588:8356810')
     modLocalRuntime('curse.maven:tacz-simple-enemy-1471691:8289695')
 }
 
