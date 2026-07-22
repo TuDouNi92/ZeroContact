@@ -216,3 +216,43 @@ Tutorials about customize your own datapack can be found in GitHub wiki.
 - Miscellaneous fixes
 - Migrate built-in Armor/Ammo data into default datapack, check wiki to modify them.
 - `Raider` supports custom NBT spawn with loadout, check wiki
+
+## Release 1.1.4
+
+- Update Forge dependency to 47.3.10, versions before this are no longer supported
+- Update TaCZ dependency to 1.1.8-hotfix, versions before this are no longer supported
+- Compatibility for TaCZ:Magazines
+- New repair kit. Armors are no longer broken and vanished anymore.
+- Fix the issue where manual-feed guns failed to load any ammo
+- Fix the issue where failed to extract ammo from ammo boxes
+- Fix the issue where system cannot apply the proper blunt damage
+- The penetrations odds are more realistic now
+- Improve the effect for bullet suppression scenario
+- Uniform arm layers now render in first-person, unknown incompatibilities for now.
+- Miscellaneous Fixes and Improvements
+
+
+TaCZ:magazines Compatibility Notes:
+
+The magazines provided by the TaCZ:magazines mod support two methods of loading ammunition:
+
+In the inventory: Pick up ammunition and right-click a magazine to load it into the magazine. Right-click the magazine again to unload the ammunition.
+When holding the magazine: Left-click to load ammunition, and right-click to unload ammunition.
+
+Q: The magazine does not automatically load ZeroContact ammunition when first held. What should I do?
+A: In the inventory screen, pick up the ammunition and load at least one round into the magazine first. After that, you can continue loading ammunition while holding the magazine.
+
+Q: Do magazines support mixed ammunition/catridge types?
+A: Currently, the compatibility system does not support mixed ammunition types in a single magazine.
+
+Q: How do I select ammunition/cartridge types in Creative Mode?
+A: In Creative Mode, the magazine loading system works by copying data from the weapon's currently installed magazine and applying it to newly generated magazines.
+
+For ZeroContact ammunition/cartridge types, you can:
+
+Take an empty magazine.
+Load the desired ammunition type into it.
+Switch to Survival Mode and equip that magazine on the weapon.
+Switch back to Creative Mode.
+
+The weapon will then be able to use that ammunition type infinitely in Creative Mode.
