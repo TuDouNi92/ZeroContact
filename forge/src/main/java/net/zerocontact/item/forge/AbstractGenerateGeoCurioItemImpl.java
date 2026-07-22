@@ -31,8 +31,8 @@ public abstract class AbstractGenerateGeoCurioItemImpl extends ArmorItem impleme
     public final ResourceLocation texture, model, animation;
     public ArmorRender<AbstractGenerateGeoCurioItemImpl> armorRender = null;
 
-    public AbstractGenerateGeoCurioItemImpl(String id, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
-        super(PlateBaseMaterial.ARMOR_STEEL, ArmorItem.Type.CHESTPLATE, new Properties().defaultDurability(defaultDurability));
+    public AbstractGenerateGeoCurioItemImpl(String id, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, ArmorItem.Type armorType) {
+        super(PlateBaseMaterial.ARMOR_STEEL, armorType, new Properties().defaultDurability(defaultDurability));
         this.id = id;
         this.texture = texture;
         this.model = model;

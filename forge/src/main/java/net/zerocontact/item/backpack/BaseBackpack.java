@@ -11,6 +11,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
@@ -39,7 +40,7 @@ public class BaseBackpack extends AbstractGenerateGeoCurioItemImpl implements IE
     public final int containerSize;
 
     public BaseBackpack(ResourceLocation texture, ResourceLocation model, ResourceLocation animation, int containerSize) {
-        super("", 0, texture, model, animation);
+        super("", 0, texture, model, animation, ArmorItem.Type.CHESTPLATE);
         this.containerSize = containerSize;
     }
 

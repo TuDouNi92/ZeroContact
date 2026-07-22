@@ -1,6 +1,7 @@
 package net.zerocontact.item.uniform;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ArmorItem;
 import net.zerocontact.api.IAssetManager;
 import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.datagen.GenerationRecord;
@@ -14,7 +15,7 @@ public class GenerateUniformPantsGeoImpl extends AbstractGenerateGeoCurioItemImp
     public final Set<GenerationRecord<?>> items = new HashSet<>();
 
     public GenerateUniformPantsGeoImpl(String id, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
-        super(id, defaultDurability, texture, model, animation);
+        super(id, defaultDurability, texture, model, animation, ArmorItem.Type.LEGGINGS);
     }
 
     @Override

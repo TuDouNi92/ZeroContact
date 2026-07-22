@@ -1,6 +1,7 @@
 package net.zerocontact.item.armband;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ArmorItem;
 import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
 import org.jetbrains.annotations.NotNull;
@@ -9,7 +10,7 @@ import static net.zerocontact.ZeroContact.MOD_ID;
 
 public class Armband extends AbstractGenerateGeoCurioItemImpl implements IEquipmentTypeTag {
     public Armband(ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
-        super("",0,texture, model, animation);
+        super("", 0, texture, model, animation, ArmorItem.Type.CHESTPLATE);
     }
     public record ArmbandResources(ResourceLocation texture, ResourceLocation model, ResourceLocation animation){}
 
