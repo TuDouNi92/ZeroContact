@@ -256,3 +256,9 @@ Switch to Survival Mode and equip that magazine on the weapon.
 Switch back to Creative Mode.
 
 The weapon will then be able to use that ammunition type infinitely in Creative Mode.
+
+## Release 1.1.4-hotfix
+
+- Fix the issue where damage reduction applies to non-armored entity or invulnerable to entity with plate-carrier installed.
+- Fix the issue where uniform no longer render in a specific situation.
+- Fix the issue where user can trigger infinite kit repairing when kit has low durability and equals to the target item's.
