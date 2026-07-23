@@ -19,7 +19,7 @@ import java.util.Optional;
 public class PlateEntityHurtEvent {
     public static boolean modifyDamage(LivingEntity lv, DamageSource source, float amount, ItemStack[] hitStacks) {
         ItemStack armorStack;
-        ItemStack plateStack = null;
+        ItemStack plateStack = ItemStack.EMPTY;
         if (hitStacks.length <= 1) {
             armorStack = hitStacks[0];
         } else {

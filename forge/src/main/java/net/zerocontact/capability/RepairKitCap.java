@@ -99,6 +99,7 @@ public class RepairKitCap implements IRepairKit {
 
 
     public void repair(ServerPlayer player, ItemStack kitStack, ItemStack slotItemStack) {
+        if (!canRepair(kitStack, slotItemStack)) stopRepair();
         kitStack.hurtAndBreak(1, player, playerHolder -> playerHolder.playNotifySound(ModSoundEventsReg.ARMOR_BROKEN_PLATE, SoundSource.PLAYERS, 1.0f, 1.0f));
         slotItemStack.setDamageValue(slotItemStack.getDamageValue() - 1);
         player.level().playSound(null, player.blockPosition(), SoundEvents.ARMOR_EQUIP_LEATHER, SoundSource.PLAYERS);

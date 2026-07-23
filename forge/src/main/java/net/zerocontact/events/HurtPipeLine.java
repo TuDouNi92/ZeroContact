@@ -9,6 +9,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.compat.FirstAidCompatHandler;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class HurtPipeLine {
             public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
                 DamageResultBuilder builder = current;
                 if (context.target instanceof ServerPlayer player && player.isCreative()) {
-                    builder = current.setStopPipe(true);
+                    builder = current.stopExecute(true);
                 }
                 return builder;
             }
@@ -81,18 +82,22 @@ public class HurtPipeLine {
         public static class BulletProvider implements DamageModifier {
             @Override
             public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
-                if (!context.source.is(ModDamageTypes.BULLETS_TAG)) return current.setStopPipe(true);
-                return current.withBullet(true).shouldCancelEvent(true);
+                if (!context.source.is(ModDamageTypes.BULLETS_TAG)) {
+                    return current.stopExecute(true);
+                } else if (!context.armor.isEmpty() || !context.plate.isEmpty()) {
+                    return current.withBullet(true).shouldCancelEvent(true);
+                } else return current.shouldCancelEvent(false).stopExecute(true);
             }
         }
 
         public static class BulletSourceFilter implements DamageModifier {
             @Override
             public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
-                if (
-                        context.source.is(ModDamageTypes.BULLET_IGNORE_ARMOR) && context.source.typeHolder().containsTag(DamageTypeTags.BYPASSES_ARMOR)
-                ) {
-                    return current.shouldCancelEvent(true).setStopPipe(true);
+                if (context.source.is(ModDamageTypes.BULLET_IGNORE_ARMOR) && context.source.typeHolder().containsTag(DamageTypeTags.BYPASSES_ARMOR)) {
+                    if (!context.armor.isEmpty() || !context.plate.isEmpty()) {
+                        return current.shouldCancelEvent(true).stopExecute(true);
+                    }
+                    return current.shouldCancelEvent(false).stopExecute(true);
                 }
                 return current;
             }
@@ -105,8 +110,8 @@ public class HurtPipeLine {
                 ItemStack plate = context.plate;
                 float finalHurtAmount = context.originalAmount;
                 DamageResultBuilder builder = current;
-                if (armor != null || plate != null) {
-                    if (armor != null && plate != null) {
+                if (!armor.isEmpty() || !plate.isEmpty()) {
+                    if (!armor.isEmpty() && !plate.isEmpty()) {
                         if (armor.getItem() instanceof ICombatArmorItem armorProvider && plate.getItem() instanceof ICombatArmorItem plateProvider) {
                             if (armor.getMaxDamage() - armor.getDamageValue() <= 1) {
                                 finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, plateProvider, armorProvider, plateProvider.getAbsorb()) * (1 + armorProvider.generateBlunt());
@@ -115,7 +120,7 @@ public class HurtPipeLine {
                             builder = builder.withPlateProvider(plateProvider);
                             finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, plateProvider, armorProvider, plateProvider.getAbsorb());
                         }
-                    } else if (armor != null) {
+                    } else if (!armor.isEmpty()) {
                         if (armor.getItem() instanceof ICombatArmorItem armorProvider) {
                             if (armor.getMaxDamage() - armor.getDamageValue() <= 1) {
                                 finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, null, armorProvider, 0);
@@ -161,8 +166,8 @@ public class HurtPipeLine {
             LivingEntity target,
             DamageSource source,
             float originalAmount,
-            @Nullable ItemStack plate,
-            @Nullable ItemStack armor
+            @NotNull ItemStack plate,
+            @NotNull ItemStack armor
     ) {
     }
 
@@ -174,7 +179,7 @@ public class HurtPipeLine {
             @Nullable ICombatArmorItem armorProvider,
             @Nullable ICombatArmorItem plateProvider,
             boolean shouldCancelEvent,
-            boolean shouldStopPipe
+            boolean shouldStopExecute
     ) {
     }
 
@@ -184,7 +189,7 @@ public class HurtPipeLine {
         float finalAmount;
         DamageSource finalSource;
         boolean shouldCancelEvent;
-        boolean shouldStopPipeline;
+        boolean stopExecute;
         @Nullable ICombatArmorItem armorProvider;
         @Nullable ICombatArmorItem plateProvider;
 
@@ -233,8 +238,8 @@ public class HurtPipeLine {
             return this;
         }
 
-        public DamageResultBuilder setStopPipe(boolean stopPipe) {
-            this.shouldStopPipeline = stopPipe;
+        public DamageResultBuilder stopExecute(boolean stop) {
+            this.stopExecute = stop;
             return this;
         }
 
@@ -247,7 +252,7 @@ public class HurtPipeLine {
                     armorProvider,
                     plateProvider,
                     shouldCancelEvent,
-                    shouldStopPipeline
+                    stopExecute
             );
         }
 
@@ -255,7 +260,7 @@ public class HurtPipeLine {
 
     public boolean execute(DamageResult result, Runnable runnable) {
         if (result.isBullet() && !result.isHeadshot()) {
-            if (result.shouldStopPipe()) return result.shouldCancelEvent();
+            if (result.shouldStopExecute()) return result.shouldCancelEvent();
             if (result.shouldCancelEvent()) {
                 runnable.run();
             }
