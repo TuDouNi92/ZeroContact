@@ -17,7 +17,7 @@ public class CameraShake {
 
     @SubscribeEvent
     public static void onCameraAngles(ViewportEvent.ComputeCameraAngles event) {
-        if (!ModConfigs.CLIENT.enableBulletSuppression.get()) return;
+        if (!ModConfigs.CLIENT.enableBulletSuppression().get()) return;
         float suppression = SuppressionManager.suppressionLevel;
         ClientLevel level = Minecraft.getInstance().level;
         if (level == null) return;

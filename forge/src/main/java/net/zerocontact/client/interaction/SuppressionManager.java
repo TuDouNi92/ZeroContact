@@ -11,7 +11,7 @@ public class SuppressionManager {
     public static final float DECAY_RATE = 0.0065f;
 
     public static void increaseSuppression(float amount, Runnable callback) {
-        if (!ModConfigs.CLIENT.enableBulletSuppression.get()) return;
+        if (!ModConfigs.CLIENT.enableBulletSuppression().get()) return;
         suppressionLevel = (float) Math.min(1.0, suppressionLevel + amount);
         callback.run();
     }

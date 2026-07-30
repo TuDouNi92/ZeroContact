@@ -19,6 +19,7 @@ import org.joml.Vector2i;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ConfigOptionsList extends ContainerObjectSelectionList<ConfigOptionsList.OptionEntry> {
     public final List<OptionEntry> entries;
@@ -68,13 +69,21 @@ public class ConfigOptionsList extends ContainerObjectSelectionList<ConfigOption
 
         public record WidgetBox(AbstractWidget widget, int offsetX, int offsetY) {
 
-            public static List<WidgetBox> booleanWidget(ConfigOptionsList list, String descriptionKey, Font font, ForgeConfigSpec.BooleanValue booleanValue) {
+            public static List<WidgetBox> booleanWidget(ConfigOptionsList list, String descriptionKey, Font font, ForgeConfigSpec.BooleanValue booleanValue, ForgeConfigSpec configSpec) {
+                boolean configSpecLoaded = configSpec.isLoaded();
+                boolean operatorPlayer = Optional.ofNullable(Minecraft.getInstance().player)
+                        .map(player -> player.hasPermissions(2)).orElse(false);
                 WidgetBox buttonBox = new WidgetBox(
                         new Button.Builder(
-                                Component.literal(String.valueOf(booleanValue.get())),
+                                configSpecLoaded
+                                        ? Component.literal(String.valueOf(booleanValue.get()))
+                                        : Component.translatable("config.zerocontact.unavailable"),
                                 btn -> {
-                                    ModConfigs.flipValue(booleanValue);
-                                    btn.setMessage(Component.literal(String.valueOf(booleanValue.get())));
+                                    if (configSpecLoaded) {
+                                        if (!operatorPlayer && configSpec == ModConfigs.SERVER_CONFIG_SPEC) return;
+                                        ModConfigs.flipValue(booleanValue);
+                                        btn.setMessage(Component.literal(String.valueOf(booleanValue.get())));
+                                    }
                                 }
                         )
                                 .width(48)
@@ -82,6 +91,13 @@ public class ConfigOptionsList extends ContainerObjectSelectionList<ConfigOption
                         list.getRowRight() - 64,
                         list.itemHeight / 2
                 );
+                if (configSpecLoaded) {
+                    if (configSpec == ModConfigs.SERVER_CONFIG_SPEC) {
+                        if (!operatorPlayer) buttonBox.widget.active = false;
+                    }
+                } else {
+                    buttonBox.widget.active = false;
+                }
                 return List.of(
                         new WidgetBox(
                                 new StringWidget(

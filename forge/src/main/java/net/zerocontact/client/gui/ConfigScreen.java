@@ -25,13 +25,27 @@ public class ConfigScreen extends Screen {
         int y = 48;
         this.configOptionsList = new ConfigOptionsList(this, minecraft, width, height, y, height - 48, 32);
         ConfigOptionsList.Title clientCategory = new ConfigOptionsList.Title(Component.translatable("config.zerocontact.client"));
+        ConfigOptionsList.Title serverCategory = new ConfigOptionsList.Title(Component.translatable("config.zerocontact.server"));
         ConfigOptionsList.OptionEntry bulletSuppressionEntry = new ConfigOptionsList.OptionEntry();
+        ConfigOptionsList.OptionEntry universalFleshEntry = new ConfigOptionsList.OptionEntry();
         bulletSuppressionEntry.addWidget(
                 ConfigOptionsList.OptionEntry.WidgetBox.booleanWidget(
                         configOptionsList,
                         "config.zerocontact.client.bullet_suppression", font,
-                        ModConfigs.CLIENT.enableBulletSuppression)
+                        ModConfigs.CLIENT.enableBulletSuppression(),
+                        ModConfigs.CLIENT_CONFIG_SPEC
+                )
         );
+        universalFleshEntry.addWidget(
+                ConfigOptionsList.OptionEntry.WidgetBox.booleanWidget(
+                        configOptionsList,
+                        "config.zerocontact.server.universal_flesh", font,
+                        ModConfigs.SERVER.enableUniversalFleshDamage(),
+                        ModConfigs.SERVER_CONFIG_SPEC
+                )
+        );
+        configOptionsList.add(serverCategory);
+        configOptionsList.add(universalFleshEntry);
         configOptionsList.add(clientCategory);
         configOptionsList.add(bulletSuppressionEntry);
         addRenderableWidget(configOptionsList);

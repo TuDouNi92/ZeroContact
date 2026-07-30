@@ -8,6 +8,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.api.ICombatArmorItem;
+import net.zerocontact.cofig.ModConfigs;
 import net.zerocontact.compat.FirstAidCompatHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -86,17 +87,29 @@ public class HurtPipeLine {
                     return current.stopExecute(true);
                 } else if (!context.armor.isEmpty() || !context.plate.isEmpty()) {
                     return current.withBullet(true).shouldCancelEvent(true);
-                } else return current.shouldCancelEvent(false).stopExecute(true);
+                } else if (ModConfigs.SERVER.enableUniversalFleshDamage().get()) {
+                    return current.withBullet(true).shouldCancelEvent(true);
+                }
+                return current.shouldCancelEvent(false).stopExecute(true);
             }
         }
 
         public static class BulletSourceFilter implements DamageModifier {
             @Override
             public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
+
+                //Intercepting bypass armor damage for proper damage generation and leave the general source
                 if (context.source.is(ModDamageTypes.BULLET_IGNORE_ARMOR) && context.source.typeHolder().containsTag(DamageTypeTags.BYPASSES_ARMOR)) {
                     if (!context.armor.isEmpty() || !context.plate.isEmpty()) {
                         return current.shouldCancelEvent(true).stopExecute(true);
                     }
+
+                    //Interception for unarmored entity while config enabled
+                    else if (ModConfigs.SERVER.enableUniversalFleshDamage().get()) {
+                        return current.shouldCancelEvent(true).stopExecute(true);
+                    }
+
+                    //final case for unarmored and disabled config
                     return current.shouldCancelEvent(false).stopExecute(true);
                 }
                 return current;
@@ -109,8 +122,15 @@ public class HurtPipeLine {
                 ItemStack armor = context.armor;
                 ItemStack plate = context.plate;
                 float finalHurtAmount = context.originalAmount;
+
+                //Generate damage for unarmored entity
+                if (ModConfigs.SERVER.enableUniversalFleshDamage().get()) {
+                    finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, null, null, 0);
+                }
+
                 DamageResultBuilder builder = current;
                 if (!armor.isEmpty() || !plate.isEmpty()) {
+                    //Generate damage for plate-carrier
                     if (!armor.isEmpty() && !plate.isEmpty()) {
                         if (armor.getItem() instanceof ICombatArmorItem armorProvider && plate.getItem() instanceof ICombatArmorItem plateProvider) {
                             if (armor.getMaxDamage() - armor.getDamageValue() <= 1) {
@@ -120,7 +140,9 @@ public class HurtPipeLine {
                             builder = builder.withPlateProvider(plateProvider);
                             finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, plateProvider, armorProvider, plateProvider.getAbsorb());
                         }
-                    } else if (!armor.isEmpty()) {
+                    }
+                    //Generate damage for body armor
+                    else if (!armor.isEmpty()) {
                         if (armor.getItem() instanceof ICombatArmorItem armorProvider) {
                             if (armor.getMaxDamage() - armor.getDamageValue() <= 1) {
                                 finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, null, armorProvider, 0);
@@ -130,7 +152,9 @@ public class HurtPipeLine {
                             int protectionLevel = armor.getOrCreateTag().getInt("protection_class");
                             finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, null, armorProvider, protectionLevel);
                         }
-                    } else {
+                    }
+                    //Illegal state, only plates equipped
+                    else {
                         finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, null, null, 0);
                     }
                     builder = builder.shouldCancelEvent(true);

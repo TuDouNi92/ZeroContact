@@ -16,6 +16,7 @@ import software.bernie.geckolib.GeckoLib;
 @Mod(ZeroContact.MOD_ID)
 public class ZeroContactForge {
     private static FMLJavaModLoadingContext fmlJavaModLoadingContext = null;
+
     public ZeroContactForge(FMLJavaModLoadingContext context) {
         // Submit our event bus to let architectury register our content on the right time
         EventBuses.registerModEventBus(ZeroContact.MOD_ID, context.getModEventBus());
@@ -39,6 +40,10 @@ public class ZeroContactForge {
         context.registerConfig(
                 ModConfig.Type.CLIENT,
                 ModConfigs.CLIENT_CONFIG_SPEC
+        );
+        context.registerConfig(
+                ModConfig.Type.SERVER,
+                ModConfigs.SERVER_CONFIG_SPEC
         );
     }
 
