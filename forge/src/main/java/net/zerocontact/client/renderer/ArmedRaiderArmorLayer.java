@@ -92,6 +92,9 @@ public class ArmedRaiderArmorLayer extends ItemArmorGeoLayer<ArmedRaider> {
         float scaleX = (float) (armorBoneSizeX / actualArmorSizeX);
         float scaleY = (float) (armorBoneSizeY / actualArmorSizeY);
         float scaleZ = (float) (armorBoneSizeZ / actualArmorSizeZ);
+        sourcePart.xRot = 0;
+        sourcePart.yRot = 0;
+        sourcePart.zRot = 0;
         sourcePart.setPos(-bone.getPivotX(), -bone.getPivotY(), bone.getPivotZ());
         poseStack.scale(scaleX, scaleY, scaleZ);
         switch (bone.getName()) {
