@@ -26,6 +26,7 @@ import net.zerocontact.forge_registries.ModEntitiesReg;
 import net.zerocontact.client.renderer.ArmedRaiderRender;
 import net.zerocontact.item.block.Workbench;
 import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
+import net.zerocontact.item.helmet.GenerateHelmetGeoImpl;
 import net.zerocontact.models.GenerateModel;
 import net.zerocontact.registries.ItemsReg;
 import software.bernie.geckolib.renderer.GeoBlockRenderer;
@@ -79,6 +80,9 @@ public class ModRegEventBus {
             Item item = itemRegistrySupplier.get();
             if (item instanceof AbstractGenerateGeoCurioItemImpl abstractGenerateGeoCurioItem) {
                 CuriosRendererRegistry.register(abstractGenerateGeoCurioItem, () -> new AccessoriesRender<>(abstractGenerateGeoCurioItem));
+            }
+            if (item instanceof GenerateHelmetGeoImpl generateHelmetGeo) {
+                CuriosRendererRegistry.register(generateHelmetGeo, () -> new AccessoriesRender<>(generateHelmetGeo));
             }
         });
     }

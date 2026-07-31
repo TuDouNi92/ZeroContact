@@ -13,23 +13,22 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.zerocontact.api.IGeoCurioItem;
 import net.zerocontact.client.renderer.ArmorRender;
 import net.zerocontact.item.PlateBaseMaterial;
 import net.zerocontact.models.GenerateModel;
 import org.jetbrains.annotations.NotNull;
-import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
-import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 import java.util.function.Consumer;
 
-public abstract class AbstractGenerateGeoCurioItemImpl extends ArmorItem implements ICurioItem, GeoItem {
+public abstract class AbstractGenerateGeoCurioItemImpl extends ArmorItem implements IGeoCurioItem {
     protected final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     public final String id;
     public final ResourceLocation texture, model, animation;
-    public ArmorRender<AbstractGenerateGeoCurioItemImpl> armorRender = null;
+    public ArmorRender<?> armorRender = null;
 
     public AbstractGenerateGeoCurioItemImpl(String id, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, ArmorItem.Type armorType) {
         super(PlateBaseMaterial.ARMOR_STEEL, armorType, new Properties().defaultDurability(defaultDurability));
@@ -83,5 +82,25 @@ public abstract class AbstractGenerateGeoCurioItemImpl extends ArmorItem impleme
                 return itemRender;
             }
         });
+    }
+
+    @Override
+    public ResourceLocation texture() {
+        return this.texture;
+    }
+
+    @Override
+    public ResourceLocation model() {
+        return this.model;
+    }
+
+    @Override
+    public ResourceLocation animation() {
+        return this.animation;
+    }
+
+    @Override
+    public void setArmorRender(ArmorRender<?> render) {
+        this.armorRender = render;
     }
 }

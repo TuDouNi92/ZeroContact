@@ -1,0 +1,5 @@
+{
+  "order": 2,
+  "size": 1,
+  "validators": ["zerocontact:zc_predicate"]
+}

@@ -3,7 +3,7 @@
   "id": "mask_pmk2",
   "defense": 0,
   "protection_class":2,
-  "equipment_slot": "HELMET",
+  "equipment_slot": "MASK",
   "default_durability": 12,
   "texture": "textures/models/mask/mask_pmk2_black.png",
   "model": "geo/mask/mask_pmk2_black.geo.json",

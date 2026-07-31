@@ -3,7 +3,7 @@
   "id": "mask_zk",
   "defense": 0,
   "protection_class":2,
-  "equipment_slot": "HELMET",
+  "equipment_slot": "MASK",
   "default_durability": 12,
   "texture": "textures/models/mask/mask_zelinsky_kummant_rubber.png",
   "model": "geo/mask/mask_zelinsky_kummant_rubber.geo.json",

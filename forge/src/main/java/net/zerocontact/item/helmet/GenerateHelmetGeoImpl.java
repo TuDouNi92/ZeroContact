@@ -12,21 +12,19 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.zerocontact.api.IAssetManager;
-import net.zerocontact.api.ICombatArmorItem;
-import net.zerocontact.api.HelmetInfoProvider;
-import net.zerocontact.api.IEquipmentTypeTag;
+import net.zerocontact.api.*;
 import net.zerocontact.client.renderer.HelmetRender;
 import net.zerocontact.datagen.GenerationRecord;
+import net.zerocontact.events.ArmorUnEquippedHelper;
 import net.zerocontact.item.armor.forge.BaseArmorGeoImpl;
 import net.zerocontact.models.GenerateModel;
 import org.jetbrains.annotations.NotNull;
-import software.bernie.geckolib.animatable.GeoItem;
+import top.theillusivec4.curios.api.SlotContext;
 
 import java.util.*;
 import java.util.function.Consumer;
 
-public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInfoProvider, GeoItem, ICombatArmorItem, IAssetManager.GeneratableItem {
+public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInfoProvider, IGeoCurioItem, ICombatArmorItem, IAssetManager.GeneratableItem {
     private final int defaultDurability;
     private final int absorb;
     public final Set<GenerationRecord<?>> items = new HashSet<>();
@@ -34,8 +32,10 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
     private final float penetrateDamage;
     private final float ricochetDamage;
     private final float durabilityLossProvider;
+    private final ResourceLocation texture, model, animation;
+    private final EquipmentType equipmentType;
 
-    public GenerateHelmetGeoImpl(String id, Type type, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, int defense, int absorb, float bluntDamage, float penetrateDamage, float ricochetDamage, float durabilityLossProvider, int defaultDurability) {
+    public GenerateHelmetGeoImpl(String id, Type type, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, int defense, int absorb, float bluntDamage, float penetrateDamage, float ricochetDamage, float durabilityLossProvider, int defaultDurability, EquipmentType equipmentType) {
         super(type, id, defense, defaultDurability, absorb, bluntDamage, penetrateDamage, 0, texture, model, animation);
         this.absorb = absorb;
         this.bluntDamage = bluntDamage;
@@ -43,6 +43,10 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
         this.ricochetDamage = ricochetDamage;
         this.durabilityLossProvider = durabilityLossProvider;
         this.defaultDurability = defaultDurability;
+        this.texture = texture;
+        this.model = model;
+        this.animation = animation;
+        this.equipmentType = equipmentType;
     }
 
     @Override
@@ -72,7 +76,7 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
 
     @Override
     public int generateLoss(float damageAmount, float durabilityLossFactor, int hits) {
-        return ICombatArmorItem.generateLossDefault(damageAmount,durabilityLossProvider,hits);
+        return ICombatArmorItem.generateLossDefault(damageAmount, durabilityLossProvider, hits);
     }
 
     @Override
@@ -110,7 +114,27 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
     }
 
     @Override
+    public void curioTick(SlotContext slotContext, ItemStack stack) {
+        ArmorUnEquippedHelper.onArmorUnequipped(slotContext, stack);
+    }
+
+    @Override
     public @NotNull IEquipmentTypeTag.EquipmentType getArmorType() {
-        return EquipmentType.HELMET;
+        return equipmentType;
+    }
+
+    @Override
+    public ResourceLocation texture() {
+        return this.texture;
+    }
+
+    @Override
+    public ResourceLocation model() {
+        return this.model;
+    }
+
+    @Override
+    public ResourceLocation animation() {
+        return this.animation;
     }
 }

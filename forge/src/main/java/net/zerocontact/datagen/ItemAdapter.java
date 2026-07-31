@@ -45,6 +45,7 @@ public class ItemAdapter {
             new PlateAdapter(),
             new CarrierAdapter(),
             new HelmetAdapter(),
+            new MaskAdapter(),
             new ArmbandAdapter(),
             new UniformTopAdapter(),
             new UniformPantsAdapter(),
@@ -135,7 +136,28 @@ public class ItemAdapter {
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerationRecord<>(id, new GenerateHelmetGeoImpl(id, ArmorItem.Type.HELMET, texture, model, animation, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, durabilityLossProvider, defaultDurability), tab));
+            items.add(new GenerationRecord<>(id, new GenerateHelmetGeoImpl(id, ArmorItem.Type.HELMET, texture, model, animation, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, durabilityLossProvider, defaultDurability, IEquipmentTypeTag.EquipmentType.HELMET), tab));
+            return items;
+        }
+    }
+
+    public static class MaskAdapter implements IAssetManager.GeneratableItem {
+        @Override
+        public <T extends ItemGenData.Armor> LinkedHashSet<GenerationRecord<?>> deserializeItems(T data, String tab) {
+            LinkedHashSet<GenerationRecord<?>> items = new LinkedHashSet<>();
+            if (getMapper(data).type != IEquipmentTypeTag.EquipmentType.MASK) return items;
+            String id = data.id;
+            float bluntDamage = data.hurtModifier.bluntMultiplier;
+            float penetrateDamage = data.hurtModifier.penetrateMultiplier;
+            float ricochetDamage = data.hurtModifier.ricochetMultiplier;
+            int defense = data.defense;
+            int absorb = data.protectionClass;
+            float durabilityLossProvider = data.durabilityLossModifier;
+            int defaultDurability = data.defaultDurability;
+            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
+            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
+            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
+            items.add(new GenerationRecord<>(id, new GenerateHelmetGeoImpl(id, ArmorItem.Type.HELMET, texture, model, animation, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, durabilityLossProvider, defaultDurability, IEquipmentTypeTag.EquipmentType.MASK), tab));
             return items;
         }
     }

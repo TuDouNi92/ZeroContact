@@ -15,6 +15,7 @@ public interface IEquipmentTypeTag {
         PLATE_CARRIER("PLATE_CARRIER"),
         ARMOR("ARMOR"),
         HELMET("HELMET"),
+        MASK("MASK"),
         UNIFORM_TOP("UNIFORM_TOP"),
         UNIFORM_PANTS("UNIFORM_PANTS"),
         ARMBAND("ARMBAND"),

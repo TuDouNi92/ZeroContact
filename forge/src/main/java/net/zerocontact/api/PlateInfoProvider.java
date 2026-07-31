@@ -14,7 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.zerocontact.entity.ArmedRaider;
-import net.zerocontact.events.PlateUnEquippedHelper;
+import net.zerocontact.events.ArmorUnEquippedHelper;
 import net.zerocontact.registries.ModSoundEventsReg;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,7 +44,7 @@ public interface PlateInfoProvider extends ICurioItem, ICombatArmorItem {
     }
 
     default void curioTick(SlotContext slotContext, ItemStack stack) {
-        PlateUnEquippedHelper.onArmorUnequipped(slotContext, stack);
+        ArmorUnEquippedHelper.onArmorUnequipped(slotContext, stack);
     }
 
     @NotNull

@@ -29,7 +29,6 @@ public class VisorHUD {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
         drawHUD(event, mc);
-        trickyKeepAnimationLoaded(mc, event.getGuiGraphics(), 0, 0, 0, event.getPartialTick());
     }
 
     private static void drawHUD(RenderGuiEvent event, Minecraft mc) {
@@ -39,6 +38,7 @@ public class VisorHUD {
         if (mc.player == null) return;
         ItemStack helmet = mc.player.getItemBySlot(EquipmentSlot.HEAD);
         if (helmet.getItem() instanceof Toggleable toggleable) {
+            trickyKeepAnimationLoaded(mc, event.getGuiGraphics(), 0, 0, 0, event.getPartialTick());
             RenderSystem.disableDepthTest();
             RenderSystem.depthMask(false);
             RenderSystem.enableBlend();

@@ -21,9 +21,8 @@ public class Predicate {
             ) {
                 return true;
             }
-            if (slotResult.stack().getItem() instanceof IEquipmentTypeTag IEquipmentTypeTag) {
-                IEquipmentTypeTag.getArmorType();
-                return Objects.equals(slotResult.slotContext().identifier(), IEquipmentTypeTag.getArmorType().getTypeId().toLowerCase());
+            if (slotResult.stack().getItem() instanceof IEquipmentTypeTag equipmentTypeTag) {
+                return Objects.equals(slotResult.slotContext().identifier(), equipmentTypeTag.getArmorType().getTypeId().toLowerCase());
             }
             return false;
         });
