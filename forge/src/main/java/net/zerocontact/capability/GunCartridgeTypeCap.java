@@ -5,6 +5,8 @@ import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.builder.AmmoItemBuilder;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
+import com.tacz.guns.resource.pojo.data.gun.GunRecoil;
+import com.tacz.guns.resource.pojo.data.gun.InaccuracyType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -14,8 +16,10 @@ import net.zerocontact.caliber.AmmoInjector;
 import net.zerocontact.caliber.CaliberSerializer;
 import net.zerocontact.caliber.CaliberVariantDamageHelper;
 import net.zerocontact.item.ammo.GenerateAmmo;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
 import java.util.Optional;
 
 public class GunCartridgeTypeCap implements ICartridgeHolder {
@@ -61,7 +65,7 @@ public class GunCartridgeTypeCap implements ICartridgeHolder {
         gunStack.getOrCreateTagElement("ai_ammo").putString("ai_ammoId", defaultAmmo.toString());
         gunStack.getOrCreateTagElement("ai_ammo").putString("selected_variant", defaultVariant);
         gunStack.getOrCreateTagElement("ai_ammo").putString("existed_variant", defaultVariant);
-        return new AmmoInjector.AmmoContext(new CaliberVariantDamageHelper.Caliber(defaultAmmo.toString(), defaultVariant, 0, 0, 0, 0, 0, new int[]{255, 255, 255, 255}));
+        return new AmmoInjector.AmmoContext(CaliberVariantDamageHelper.Caliber.createDefaultCaliberFromGun(defaultAmmo.toString(), gunStack));
     }
 
     //Update cartridge tag in gun
@@ -84,5 +88,19 @@ public class GunCartridgeTypeCap implements ICartridgeHolder {
 
     public void setClientSelectedAmmoVariant(ItemStack gunStack, String selectedAmmoKey) {
         gunStack.getOrCreateTagElement("ai_ammo").putString("selected_variant", selectedAmmoKey);
+    }
+
+    @Override
+    public @Nullable GunRecoil getRecoil(ItemStack gunStack) {
+        AmmoInjector.AmmoContext context = CaliberSerializer.load(gunStack.getTag(),gunStack);
+        if (context.isEmpty()) return null;
+        return context.caliber().getRecoil(gunStack);
+    }
+
+    @Override
+    public @NotNull Map<InaccuracyType, Float> getInaccuracy(ItemStack gunStack) {
+        AmmoInjector.AmmoContext context = CaliberSerializer.load(gunStack.getTag(),gunStack);
+        if (context.isEmpty()) return Map.of();
+        return context.caliber().getInaccuracy(gunStack);
     }
 }

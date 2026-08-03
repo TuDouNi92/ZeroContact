@@ -6,7 +6,9 @@
   "mixins": [
     "AbstractGunItemMixin",
     "AmmoBoxItemMixin",
+    "CameraSetupEventMixin",
     "ClientGunToolTipMixin",
+    "EntityKineticBulletAccessor",
     "GunHudOverlayMixin",
     "ItemStackMixin",
     "ModernKineticGunScriptAPIMixin"

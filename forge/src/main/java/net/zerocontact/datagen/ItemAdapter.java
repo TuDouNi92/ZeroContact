@@ -34,7 +34,7 @@ public class ItemAdapter {
             return new Mapper<>(plate, IEquipmentTypeTag.EquipmentType.PLATE);
         } else if (data instanceof ItemGenData.Loadout loadout) {
             return new Mapper<>(loadout, convertMap.get(loadout.equipmentSlot));
-        } else if (data instanceof ExperimentalBallisticData ammo) {
+        } else if (data instanceof AmmoDataPOJO ammo) {
             return new Mapper<>(ammo, IEquipmentTypeTag.EquipmentType.AMMO);
         }
         return new Mapper<>(null, null);
@@ -214,16 +214,8 @@ public class ItemAdapter {
         @Override
         public <T> LinkedHashSet<GenerationRecord<?>> deserializeItems(T data, String tab) {
             LinkedHashSet<GenerationRecord<?>> items = new LinkedHashSet<>();
-            if (!(data instanceof ExperimentalBallisticData ammoData)) return items;
-            String id = ammoData.ammoId;
-            String variant = ammoData.variant;
-            float baseDamageFactor = ammoData.baseDamageFactor;
-            int penetrationClass = ammoData.penetrationClass;
-            float fleshDamage = ammoData.fleshDamage;
-            float armorDamage = ammoData.armorDamage;
-            int stackSize = ammoData.stackSize;
-            int[] tracerColor = ammoData.tracerColor;
-            items.add(new GenerationRecord<>(variant, new GenerateAmmo(id, variant, baseDamageFactor, penetrationClass, fleshDamage, armorDamage, stackSize, tracerColor), tab));
+            if (!(data instanceof AmmoDataPOJO ammoData)) return items;
+            items.add(new GenerationRecord<>(ammoData.variant, new GenerateAmmo(ammoData.toCaliber()), tab));
             return items;
         }
     }

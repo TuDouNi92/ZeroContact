@@ -28,7 +28,7 @@ public class ClientGunToolTipMixin {
     @Inject(method = "<init>",at = @At("RETURN"),remap = false)
     private void replaceAmmoStack(GunTooltip tooltip, CallbackInfo ci){
         AmmoInjector.AmmoContext context = AmmoInjector.read(this.gun);
-        if(!context.caliber().variant().isEmpty() && !context.caliber().variant().equals("tacz:ammo")){
+        if(!context.isEmpty() && !context.caliber().variant().equals("tacz:ammo")){
             Item variantItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(context.caliber().variant()));
             if(variantItem!=null){
                 this.ammo = variantItem.getDefaultInstance();

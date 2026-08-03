@@ -6,18 +6,21 @@ import com.tacz.guns.api.item.IAmmoBox;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.resource.index.CommonGunIndex;
+import com.tacz.guns.resource.pojo.data.gun.InaccuracyType;
 import com.tacz.guns.util.AttachmentDataUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.events.EventUtil;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractGunItem.class)
@@ -74,5 +77,23 @@ public class AbstractGunItemMixin {
             return true;
         }
         return simulate;
+    }
+
+    @ModifyVariable(
+            method = "doBulletSpread",
+            at = @At("HEAD"),
+            argsOnly = true,
+            ordinal = 1,
+            remap = false
+    )
+    private float zeroContact$modifyInaccuracy(float original) {
+        ItemStack gunStack = zeroContact$shooter.getMainHandItem();
+        if (IGun.getIGunOrNull(gunStack) == null) return original;
+        return gunStack.getCapability(CapabilityRegistries.CARTRIDGE).map(
+                cap -> {
+                    InaccuracyType type = InaccuracyType.getInaccuracyType(zeroContact$shooter);
+                    return cap.getInaccuracy(gunStack).get(type);
+                }
+        ).orElse(original);
     }
 }

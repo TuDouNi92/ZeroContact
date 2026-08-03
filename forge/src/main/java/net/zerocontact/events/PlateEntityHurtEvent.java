@@ -2,7 +2,10 @@ package net.zerocontact.events;
 
 import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
 import com.tacz.guns.api.event.common.GunDamageSourcePart;
+import com.tacz.guns.entity.EntityKineticBullet;
 import dev.architectury.event.EventResult;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -10,7 +13,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
-import net.zerocontact.caliber.CaliberVariantDamageHelper;
+import net.zerocontact.caliber.*;
+import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.compat.FirstAidCompatHandler;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +32,16 @@ public class PlateEntityHurtEvent {
         }
         HurtPipeLine pipeLine = new HurtPipeLine();
         HurtPipeLine.DamageResult result = pipeLine.process(new HurtPipeLine.DamageContext(lv, source, amount, plateStack, armorStack));
-        return pipeLine.execute(result, () -> lv.hurt(result.finalSource(), result.finalAmount()));
+        return pipeLine.execute(result, () -> {
+            lv.hurt(result.finalSource(), result.finalAmount());
+            EntityKineticBullet bullet = (EntityKineticBullet) source.getDirectEntity();
+            Entity causingEntity = source.getEntity();
+            if (bullet != null && lv.level() instanceof ServerLevel serverLevel && causingEntity instanceof LivingEntity) {
+                AmmoInjector.AmmoContext context = BulletBinder.getContext(bullet);
+                if (context == null) return;
+                HookDispatcher.fire(HookEventTrigger.HIT_ENTITY, new HookContext(serverLevel, (LivingEntity) causingEntity, lv, lv.position(), context.caliber()));
+            }
+        });
     }
 
 

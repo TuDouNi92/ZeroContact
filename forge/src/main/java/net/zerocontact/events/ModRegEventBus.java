@@ -7,6 +7,7 @@ import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -18,6 +19,8 @@ import net.zerocontact.client.gui.BackpackScreen;
 import net.zerocontact.client.gui.ConfigScreen;
 import net.zerocontact.client.gui.WorkbenchScreen;
 import net.zerocontact.client.interaction.KeyBindingHandler;
+import net.zerocontact.client.tooltip.BallisticToolTipComponent;
+import net.zerocontact.client.tooltip.ClientBallisticToolTipComponent;
 import net.zerocontact.forge.ZeroContactForge;
 import net.zerocontact.forge_registries.ModMenus;
 import net.zerocontact.client.renderer.AccessoriesRender;
@@ -54,6 +57,11 @@ public class ModRegEventBus {
             MenuScreens.register(ModMenus.AMMO_SELECTOR.get(), AmmoSelectorScreen::new);
             RegCurioGeoItemRender();
             regConfigScreen(ZeroContactForge.getFmlJavaModLoadingContext());
+        }
+
+        @SubscribeEvent
+        public static void registerTooltipComponents(RegisterClientTooltipComponentFactoriesEvent event){
+            event.register(BallisticToolTipComponent.class, ClientBallisticToolTipComponent::new);
         }
 
         @SubscribeEvent

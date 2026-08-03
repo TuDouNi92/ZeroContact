@@ -1,9 +1,9 @@
 package net.zerocontact.datagen.loader;
 
-import net.zerocontact.ZeroContact;
 import net.zerocontact.api.IAssetManager;
 import net.zerocontact.api.IContentLoader;
-import net.zerocontact.datagen.ExperimentalBallisticData;
+import net.zerocontact.caliber.CaliberRegistry;
+import net.zerocontact.datagen.AmmoDataPOJO;
 import net.zerocontact.datagen.GearRecipeData;
 import net.zerocontact.datagen.ItemGenData;
 import net.zerocontact.datagen.Zpack;
@@ -51,22 +51,10 @@ public class ZContentLoader implements IContentLoader {
                 assetManager.deserializeFromJsonList(
                         ammoList,
                         assetManager.getGson(),
-                        ExperimentalBallisticData.class,
+                        AmmoDataPOJO.class,
                         (data, __) -> {
                             itemGenData.put(data, pack.tab());
-                            CaliberVariantDamageHelper.experimentalBallisticSet.
-                                    add(
-                                            new CaliberVariantDamageHelper.Caliber(
-                                                    data.ammoId,
-                                                    ZeroContact.MOD_ID + ":" + data.variant,
-                                                    data.baseDamageFactor,
-                                                    data.penetrationClass,
-                                                    data.fleshDamage,
-                                                    data.armorDamage,
-                                                    data.stackSize,
-                                                    data.tracerColor
-                                            )
-                                    );
+                            CaliberRegistry.register(data.toCaliber());
                         }
                 );
             } catch (IOException e) {

@@ -88,7 +88,7 @@ public class ZAssetManager implements IAssetManager {
                 LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(plate, tab);
                 if (records.isEmpty()) return;
                 this.registerItems(ITEMS_REG_TAB, ItemsReg.ITEMS, new IAssetManager.WearableType(records, "PLATE_LIKE"));
-            } else if(data instanceof ExperimentalBallisticData ammo){
+            } else if(data instanceof AmmoDataPOJO ammo){
                 LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(ammo, tab);
                 if(records.isEmpty())return;
                 this.registerItems(ITEMS_REG_TAB,ItemsReg.ITEMS, new IAssetManager.WearableType(records,"AMMO"));

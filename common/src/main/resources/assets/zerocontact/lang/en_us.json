@@ -96,6 +96,7 @@
   "tooltip.zerocontact.bullet_penetration": "Penetration",
   "tooltip.zerocontact.bullet_armor_damage": "Armor damage",
   "tooltip.zerocontact.bullet_flesh_damage": "Flesh damage",
+  "tooltip.zerocontact.ballistic_chart": "Nominal trajectory",
   "tootip.zerocontact.kit_armor": "[Right-click] over the equipment you want to repair",
   "tooltip.zerocontact.rig": "You cannot reload the gun directly from inventory once you equip the chest rig. Put your ammo in your chest rig.",
   "hud.zerocontact.ammo.default": "\uD83E\uDC35 Default ammo",

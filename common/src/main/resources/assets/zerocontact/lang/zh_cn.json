@@ -90,6 +90,7 @@
   "tooltip.zerocontact.bullet_penetration": "穿甲",
   "tooltip.zerocontact.bullet_armor_damage": "甲伤",
   "tooltip.zerocontact.bullet_flesh_damage": "肉伤",
+  "tooltip.zerocontact.ballistic_chart": "标称弹道",
   "item.zerocontact.steel_ingot": "Steel ingot",
   "item.zerocontact.steel_sheet": "Steel sheet",
   "item.zerocontact.fabric_roll": "Fabric roll",

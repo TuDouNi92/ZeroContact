@@ -20,7 +20,7 @@ public class AmmoInjector {
 
     public record AmmoContext(CaliberVariantDamageHelper.Caliber caliber) {
         public boolean isEmpty() {
-            return caliber.id().isEmpty() || caliber.variant().isEmpty();
+            return caliber == null || caliber.id().isEmpty() || caliber.variant().isEmpty();
         }
     }
 
@@ -33,7 +33,7 @@ public class AmmoInjector {
 
     //Read and bind Bullet and Gun in the spawn event
     public static AmmoContext read(ItemStack stack) {
-        return CaliberSerializer.load(stack.getTag());
+        return CaliberSerializer.load(stack.getTag(),stack);
     }
 
     //Sync tags when change cartridge;
@@ -61,10 +61,10 @@ public class AmmoInjector {
         ResourceLocation defaultAmmo = getGunDefaultAmmo(gunStack);
         if (defaultAmmo.toString().isEmpty()) return null;
         gunStack.getOrCreateTagElement("ai_ammo").putString("ai_ammoId", defaultAmmo.toString());
-        gunStack.getOrCreateTagElement("ai_ammo").putString("variant",defaultVariant);
+        gunStack.getOrCreateTagElement("ai_ammo").putString("variant", defaultVariant);
         gunStack.getOrCreateTagElement("ai_ammo").putString("selected_variant", defaultVariant);
         gunStack.getOrCreateTagElement("ai_ammo").putString("existed_variant", defaultVariant);
-        return new AmmoContext(new CaliberVariantDamageHelper.Caliber(defaultAmmo.toString(), defaultVariant, 0, 0, 0, 0, 0, new int[]{255, 255, 255, 255}));
+        return new AmmoContext(CaliberVariantDamageHelper.Caliber.createDefaultCaliberFromGun(defaultAmmo.toString(), gunStack));
     }
 
     public static @Nullable Item getAmmoVariantItem(AmmoContext context) {

@@ -1,14 +1,22 @@
 package net.zerocontact.caliber;
 
 import com.google.common.util.concurrent.AtomicDouble;
+import com.tacz.guns.api.TimelessAPI;
+import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.init.ModDamageTypes;
+import com.tacz.guns.resource.index.CommonGunIndex;
+import com.tacz.guns.resource.pojo.data.gun.*;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.item.ItemStack;
+import net.zerocontact.api.ICartridgeType;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.command.CommandManager;
+import net.zerocontact.datagen.AmmoDataPOJO;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -80,12 +88,12 @@ public enum CaliberVariantDamageHelper {
 
     private final Caliber caliber;
     private static final EnumSet<CaliberVariantDamageHelper> caliberVariantDamageHelperEnumSet = EnumSet.allOf(CaliberVariantDamageHelper.class);
-    public static final Set<Caliber> experimentalBallisticSet = new HashSet<>();
     private static final String DEFAULT = "tacz:ammo";
 
     CaliberVariantDamageHelper(Caliber caliber) {
         this.caliber = caliber;
     }
+
 
     /**
      * Represents the caliber infos of a type of ammo
@@ -97,11 +105,83 @@ public enum CaliberVariantDamageHelper {
      * @param penetrationClass The penetration level for damage interceptor, bypassed when the feature is off
      * @param fleshDamage      The flesh damage for damage interceptor, bypassed when the feature is off
      */
-    public record Caliber(String id, String variant, float baseDamageFactor, int penetrationClass, float fleshDamage,
-                          float armorDamage,
-                          int stackSize, int[] tracerColor) {
-        public Caliber(String id, float baseDamageFactor, int penetrationClass, float fleshDamage) {
-            this(id, DEFAULT, baseDamageFactor, penetrationClass, fleshDamage, 0, 30, new int[]{255, 255, 255, 255});
+    public record Caliber(
+            String id,
+            String variant,
+            int life,
+            float speed,
+            float friction,
+            float gravity,
+            float knockback,
+            float recoilMultiplier,
+            float inaccuracyMultiplier,
+            AmmoDataPOJO.Explosion explosion,
+            AmmoDataPOJO.Ignite ignite,
+            float baseDamageFactor,
+            int penetrationClass,
+            float fleshDamage,
+            float armorDamage,
+            int stackSize,
+            int[] tracerColor,
+            EventHook[] hooks
+    ) implements ICartridgeType {
+
+        public Caliber {
+            explosion = Objects.requireNonNullElse(explosion, AmmoDataPOJO.Explosion.NONE);
+            ignite = Objects.requireNonNullElse(ignite, AmmoDataPOJO.Ignite.NONE);
+            tracerColor = tracerColor == null ? new int[]{255, 255, 255, 255} : tracerColor.clone();
+            hooks = hooks == null ? new EventHook[]{} : hooks;
+        }
+
+        //This constructor is only for enums;
+        private Caliber(String id, float baseDamageFactor, int penetrationClass, float fleshDamage) {
+            this(
+                    id,
+                    DEFAULT,
+                    30,
+                    1,
+                    0.015f,
+                    0.15f,
+                    0,
+                    1,
+                    1,
+                    AmmoDataPOJO.Explosion.NONE,
+                    AmmoDataPOJO.Ignite.NONE,
+                    baseDamageFactor,
+                    penetrationClass,
+                    fleshDamage,
+                    0,
+                    30,
+                    new int[]{255, 255, 255, 255},
+                    new EventHook[]{}
+            );
+        }
+
+        public static Caliber createDefaultCaliberFromGun(String id, ItemStack gunStack) {
+            ResourceLocation gunId = Optional.ofNullable(IGun.getIGunOrNull(gunStack)).map(ig -> ig.getGunId(gunStack)).orElse(new ResourceLocation(""));
+            GunData gunData = TimelessAPI.getCommonGunIndex(gunId).map(CommonGunIndex::getGunData).orElse(null);
+            if (gunData == null) return null;
+            BulletData bulletData = gunData.getBulletData();
+            return new Caliber(
+                    id,
+                    DEFAULT,
+                    Math.round(bulletData.getLifeSecond() * 20),
+                    bulletData.getSpeed(),
+                    bulletData.getFriction(),
+                    bulletData.getGravity(),
+                    bulletData.getKnockback(),
+                    1,
+                    1,
+                    AmmoDataPOJO.Explosion.NONE,
+                    AmmoDataPOJO.Ignite.NONE,
+                    0,
+                    0,
+                    0,
+                    0,
+                    30,
+                    new int[]{255, 255, 255, 255},
+                    new EventHook[]{}
+            );
         }
 
         @Override
@@ -112,6 +192,65 @@ public enum CaliberVariantDamageHelper {
         @Override
         public int hashCode() {
             return Objects.hash(id, variant);
+        }
+
+        @Override
+        public @NotNull Map<InaccuracyType, Float> getInaccuracy(ItemStack gunStack) {
+            ResourceLocation gunId = Optional.ofNullable(IGun.getIGunOrNull(gunStack)).map(ig -> ig.getGunId(gunStack)).orElse(new ResourceLocation(""));
+            GunData gunData = TimelessAPI.getCommonGunIndex(gunId).map(CommonGunIndex::getGunData).orElse(null);
+            if (gunData != null) {
+                Map<InaccuracyType, Float> inaccuracyMap = new EnumMap<>(InaccuracyType.class);
+                inaccuracyMap.putAll(gunData.getInaccuracy());
+                inaccuracyMap.replaceAll((__, value) -> value * inaccuracyMultiplier);
+                return inaccuracyMap;
+            }
+            return Map.of();
+        }
+
+        @Override
+        public GunRecoil getRecoil(ItemStack gunStack) {
+            ResourceLocation gunId = Optional.ofNullable(IGun.getIGunOrNull(gunStack)).map(ig -> ig.getGunId(gunStack)).orElse(new ResourceLocation(""));
+            GunData gunData = TimelessAPI.getCommonGunIndex(gunId).map(CommonGunIndex::getGunData).orElse(null);
+            if (gunData == null) return null;
+            GunRecoil gunRecoil = copyRecoil(gunData.getRecoil());
+            if (gunRecoil == null) return null;
+            GunRecoilKeyFrame[] yawFrame = gunRecoil.getYaw();
+            GunRecoilKeyFrame[] pitchFrame = gunRecoil.getPitch();
+            if (yawFrame != null && pitchFrame != null) {
+                for (GunRecoilKeyFrame frame : yawFrame) {
+                    frame.getValue()[0] *= recoilMultiplier;
+                    frame.getValue()[1] *= recoilMultiplier;
+                }
+
+                for (GunRecoilKeyFrame frame : pitchFrame) {
+                    frame.getValue()[0] *= recoilMultiplier;
+                    frame.getValue()[1] *= recoilMultiplier;
+                }
+            }
+            return gunRecoil;
+        }
+
+        private static GunRecoil copyRecoil(GunRecoil source) {
+            if (source == null) return null;
+            GunRecoil copy = new GunRecoil();
+            copy.setYaw(copyKeyFrames(source.getYaw()));
+            copy.setPitch(copyKeyFrames(source.getPitch()));
+            return copy;
+        }
+
+        private static GunRecoilKeyFrame[] copyKeyFrames(GunRecoilKeyFrame[] source) {
+            if (source == null) return null;
+            GunRecoilKeyFrame[] copy = new GunRecoilKeyFrame[source.length];
+            for (int i = 0; i < source.length; i++) {
+                GunRecoilKeyFrame frame = source[i];
+                if (frame == null) continue;
+                GunRecoilKeyFrame frameCopy = new GunRecoilKeyFrame();
+                frameCopy.setTime(frame.getTime());
+                float[] value = frame.getValue();
+                frameCopy.setValue(value == null ? null : value.clone());
+                copy[i] = frameCopy;
+            }
+            return copy;
         }
     }
 
@@ -164,8 +303,8 @@ public enum CaliberVariantDamageHelper {
             if (bullet.level() instanceof ServerLevel serverLevel) {
                 if (CommandManager.CommandSavedData.get(serverLevel).experimentalBallistic) {
                     Set<Caliber> mergedCaliberSet = caliberVariantDamageHelperEnumSet.stream().map(a -> a.caliber).collect(Collectors.toSet());
-                    mergedCaliberSet.removeAll(experimentalBallisticSet);
-                    mergedCaliberSet.addAll(experimentalBallisticSet);
+                    mergedCaliberSet.removeAll(CaliberRegistry.calibers().values());
+                    mergedCaliberSet.addAll(CaliberRegistry.calibers().values());
                     getMatchedCaliber(source, mergedCaliberSet).ifPresent(caliber -> {
                         double penetratedDamage = getPenetratedDamage(caliber, hurtCanHold);
                         setOutput(provider, caliber, penetratedDamage, output);
