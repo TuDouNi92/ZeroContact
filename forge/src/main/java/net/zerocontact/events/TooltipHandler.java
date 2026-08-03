@@ -13,6 +13,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.zerocontact.capability.CapabilityRegistries;
+import net.zerocontact.cofig.ModConfigs;
 import net.zerocontact.datagen.loader.ZPackManager;
 import net.zerocontact.forge_registries.ItemsRegForge;
 import net.zerocontact.item.ammo.GenerateAmmo;
@@ -55,6 +56,7 @@ public class TooltipHandler {
     }
 
     private static void appendAmmoInfoToGun(ItemTooltipEvent event) {
+        if(!ModConfigs.CLIENT.ammoTypeTooltip().get())return;
         ItemStack checkStack = event.getItemStack();
         if (IGun.getIGunOrNull(checkStack) != null) {
             checkStack.getCapability(CapabilityRegistries.CARTRIDGE).ifPresent(cap -> {

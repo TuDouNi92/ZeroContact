@@ -61,6 +61,18 @@ public class ConfigOptionsList extends ContainerObjectSelectionList<ConfigOption
         return this.owner.getFocused() == this;
     }
 
+    public void registerBoolEntry(String descriptionKey, Font font, ForgeConfigSpec.BooleanValue booleanValue, ForgeConfigSpec spec) {
+        OptionEntry entry = new OptionEntry();
+        entry.addWidget(
+                ConfigOptionsList.OptionEntry.WidgetBox.booleanWidget(
+                        this,
+                        descriptionKey, font,
+                        booleanValue,
+                        spec
+                ));
+        this.add(entry);
+    }
+
     public static class OptionEntry extends Entry<OptionEntry> {
         private OptionEntry parentTitle;
         protected final Minecraft client = Minecraft.getInstance();

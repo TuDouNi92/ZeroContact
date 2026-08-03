@@ -116,6 +116,9 @@
   "config.zerocontact.client": "Client",
   "config.zerocontact.server": "Server",
   "config.zerocontact.unavailable": "Not loaded",
-  "config.zerocontact.server.universal_flesh": "Apply flesh damage from stat to unarmored entity",
-  "config.zerocontact.client.bullet_suppression": "Bullet Suppression Effect"
+  "config.zerocontact.server.universal_flesh": "Apply Flesh Damage from stat to unarmored entity",
+  "config.zerocontact.client.bullet_suppression": "Bullet Suppression Effect",
+  "config.zerocontact.client.trajectory_tooltip": "Display Trajectory Tooltip",
+  "config.zerocontact.client.ammo_type_overlay": "Display Ammo Type overlay",
+  "config.zerocontact.client.ammo_type_tooltip": "Display Ammo Type tooltip"
 }

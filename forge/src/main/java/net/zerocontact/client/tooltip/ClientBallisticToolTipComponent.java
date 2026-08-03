@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.caliber.CaliberVariantDamageHelper;
+import net.zerocontact.cofig.ModConfigs;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,7 +53,11 @@ public class ClientBallisticToolTipComponent implements ClientTooltipComponent {
 
     @Override
     public int getHeight() {
-        return trajectory==null?0:HEIGHT;
+        if (!ModConfigs.CLIENT.enableTrajectoryTooltip().get() || trajectory == null) {
+            trajectory = null;
+            return 0;
+        }
+        return HEIGHT;
     }
 
     @Override
@@ -62,7 +67,7 @@ public class ClientBallisticToolTipComponent implements ClientTooltipComponent {
 
     @Override
     public void renderImage(@NotNull Font font, int x, int y, @NotNull GuiGraphics guiGraphics) {
-        if(trajectory==null)return;
+        if (trajectory == null) return;
         int plotLeft = x + PLOT_LEFT_PADDING;
         int plotTop = y + PLOT_TOP_PADDING;
         int plotWidth = WIDTH - PLOT_LEFT_PADDING - PLOT_RIGHT_PADDING;
