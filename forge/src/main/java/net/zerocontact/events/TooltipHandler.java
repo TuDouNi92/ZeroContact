@@ -12,7 +12,10 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
+import net.zerocontact.caliber.AmmoInjector;
+import net.zerocontact.caliber.CaliberVariantDamageHelper;
 import net.zerocontact.capability.CapabilityRegistries;
+import net.zerocontact.client.tooltip.AdvancedAmmoInfoComponents;
 import net.zerocontact.cofig.ModConfigs;
 import net.zerocontact.datagen.loader.ZPackManager;
 import net.zerocontact.forge_registries.ItemsRegForge;
@@ -23,6 +26,8 @@ import java.util.List;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class TooltipHandler {
+    public static final String SHOW_BULLET_DATA_LABEL = "tooltip.zerocontact.bullet_data";
+
     @SubscribeEvent
     public static void onToolTip(ItemTooltipEvent event) {
         appendPackInfo(event);
@@ -56,18 +61,25 @@ public class TooltipHandler {
     }
 
     private static void appendAmmoInfoToGun(ItemTooltipEvent event) {
-        if(!ModConfigs.CLIENT.ammoTypeTooltip().get())return;
+        if (!ModConfigs.CLIENT.ammoTypeTooltip().get()) return;
         ItemStack checkStack = event.getItemStack();
         if (IGun.getIGunOrNull(checkStack) != null) {
             checkStack.getCapability(CapabilityRegistries.CARTRIDGE).ifPresent(cap -> {
                 String ammoVariantId = cap.getAmmoVariantInGun(checkStack);
+                CaliberVariantDamageHelper.Caliber caliber = AmmoInjector.read(checkStack).caliber();
                 MutableComponent ammoLabel = Component.translatable("tooltip.zerocontact.gun.ammoVariant").withStyle(ChatFormatting.GOLD).append(":");
                 ItemStack ammoStack = cap.getDefaultStack(ammoVariantId);
-                Component ammoDesrciption = Component.literal("\uD83E\uDC35 ").append(Component.translatable(ammoStack.getDescriptionId())).withStyle(ChatFormatting.YELLOW);
+                Component ammoName = Component.literal("\uD83E\uDC35 ").append(Component.translatable(ammoStack.getDescriptionId())).withStyle(ChatFormatting.YELLOW);
+                Component ammoAdvancedInfo = Component.translatable(SHOW_BULLET_DATA_LABEL).withStyle(ChatFormatting.GRAY);
+
                 if (!(ammoStack.getItem() instanceof GenerateAmmo))
-                    ammoDesrciption = Component.translatable("hud.zerocontact.ammo.default").withStyle(ChatFormatting.YELLOW);
-                ammoLabel.append(ammoDesrciption);
-                event.getToolTip().add(ammoLabel);
+                    ammoName = Component.translatable("hud.zerocontact.ammo.default").withStyle(ChatFormatting.YELLOW);
+                ammoLabel.append(ammoName);
+                event.getToolTip().addAll(List.of(ammoLabel, ammoAdvancedInfo));
+                if (DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> Screen::hasShiftDown)) {
+                    List<Component> fullAmmoData = AdvancedAmmoInfoComponents.create(caliber,false);
+                    event.getToolTip().addAll(fullAmmoData);
+                }
             });
         }
     }
