@@ -28,7 +28,6 @@ public abstract class AbstractGenerateGeoCurioItemImpl extends ArmorItem impleme
     protected final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     public final String id;
     public final ResourceLocation texture, model, animation;
-    public ArmorRender<?> armorRender = null;
 
     public AbstractGenerateGeoCurioItemImpl(String id, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, ArmorItem.Type armorType) {
         super(PlateBaseMaterial.ARMOR_STEEL, armorType, new Properties().defaultDurability(defaultDurability));
@@ -99,8 +98,4 @@ public abstract class AbstractGenerateGeoCurioItemImpl extends ArmorItem impleme
         return this.animation;
     }
 
-    @Override
-    public void setArmorRender(ArmorRender<?> render) {
-        this.armorRender = render;
-    }
 }

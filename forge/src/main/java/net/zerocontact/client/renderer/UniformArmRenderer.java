@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderArmEvent;
@@ -24,8 +23,8 @@ import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.cache.object.*;
+import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class UniformArmRenderer {
@@ -39,16 +38,17 @@ public class UniformArmRenderer {
         renderArm(player, arm, poseStack, source, packedLight, event);
     }
 
-    private static <T extends Item & GeoItem> void renderArm(Player player, HumanoidArm arm, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, RenderArmEvent event) {
+    private static void renderArm(Player player, HumanoidArm arm, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, RenderArmEvent event) {
         ItemStack uniformStack = EventUtil.getCuriosStackFirst(player, "uniform_top");
         if (!(uniformStack.getItem() instanceof AbstractGenerateGeoCurioItemImpl abstractGenerateGeoCurioItem)) return;
-        ArmorRender<?> baseRenderer = abstractGenerateGeoCurioItem.armorRender;
+        AccessoriesRender<?> baseRenderer = (AccessoriesRender<?>) CuriosRendererRegistry.getRenderer(abstractGenerateGeoCurioItem).orElse(null);
         if (baseRenderer == null) return;
-        ArmorRender<T> renderer = (ArmorRender<T>) abstractGenerateGeoCurioItem.armorRender;
+        ArmorRender<?> renderer = baseRenderer.render;
         PlayerRenderer playerRenderer = (PlayerRenderer) Minecraft.getInstance().getEntityRenderDispatcher().getRenderer((AbstractClientPlayer) player);
-        GeoBone armBone = arm == HumanoidArm.LEFT ? renderer.getLeftArmBone() : renderer.getRightArmBone();
+        BakedGeoModel bakedGeoModel = renderer.getGeoModel().getBakedGeoModel(abstractGenerateGeoCurioItem.model.toString());
+        GeoBone armBone = arm == HumanoidArm.LEFT ? bakedGeoModel.getBone("armorLeftArm").orElse(null) : bakedGeoModel.getBone("armorRightArm").orElse(null);
         if (armBone == null) return;
-        RenderType renderType = renderer.getRenderType((T) abstractGenerateGeoCurioItem, renderer.getTextureLocation((T) abstractGenerateGeoCurioItem), bufferSource, 0.0f);
+        RenderType renderType = RenderType.armorCutoutNoCull(abstractGenerateGeoCurioItem.texture);
         poseStack.pushPose();
         poseStack.translate(0, 1.5f, 0);
         poseStack.mulPose(Axis.ZP.rotationDegrees(180));

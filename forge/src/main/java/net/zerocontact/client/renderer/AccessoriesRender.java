@@ -16,13 +16,12 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
 
 public class AccessoriesRender<T extends Item & IGeoCurioItem> implements ICurioRenderer.HumanoidRender {
-    private final ArmorRender<T> render;
+    public final ArmorRender<T> render;
     private final T item;
 
     public AccessoriesRender(T item) {
         this.item = item;
         render = new ArmorRender<>(new GenerateModel<>(item.texture(), item.model(), item.animation()));
-        item.setArmorRender(render);
     }
 
     @Override
