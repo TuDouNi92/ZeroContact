@@ -5,10 +5,12 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class CaliberSerializer {
-
+    public static final String DEFAULT_AMMO = "tacz:ammo";
     public static final String AI_AMMO_ID = "ai_ammoId";
     public static final String VARIANT = "variant";
     public static final String AI_AMMO = "ai_ammo";
+    public static final String SELECTED_VARIANT = "selected_variant";
+    public static final String EXISTED_VARIANT = "existed_variant";
 
 
     public static CompoundTag save(AmmoInjector.AmmoContext context) {

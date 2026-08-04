@@ -16,6 +16,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
+import static net.zerocontact.caliber.CaliberSerializer.*;
+
 public class AmmoInjector {
 
     public record AmmoContext(CaliberVariantDamageHelper.Caliber caliber) {
@@ -33,16 +35,16 @@ public class AmmoInjector {
 
     //Read and bind Bullet and Gun in the spawn event
     public static AmmoContext read(ItemStack stack) {
-        return CaliberSerializer.load(stack.getTag(),stack);
+        return CaliberSerializer.load(stack.getTag(), stack);
     }
 
     //Sync tags when change cartridge;
-    private static void copyTags(CaliberVariantDamageHelper.Caliber defaultCaliber, ItemStack gun) {
+    public static void copyTags(CaliberVariantDamageHelper.Caliber defaultCaliber, ItemStack gun) {
         gun.getOrCreateTag().merge(CaliberSerializer.save(new AmmoContext(defaultCaliber)));
     }
 
     //Get default tacz ammoId for gun.
-    private static ResourceLocation getGunDefaultAmmo(ItemStack gunStack) {
+    public static ResourceLocation getGunDefaultAmmo(ItemStack gunStack) {
         ResourceLocation defaultAmmoId = new ResourceLocation("");
         IGun gun = IGun.getIGunOrNull(gunStack);
         if (gun == null) return defaultAmmoId;
@@ -56,15 +58,15 @@ public class AmmoInjector {
     }
 
     //Set default ammo in gun once spawn
-    private static @Nullable AmmoContext setDefaultAmmoVariantInGun(ItemStack gunStack) {
-        String defaultVariant = "tacz:ammo";
+    public static @Nullable AmmoContext setDefaultAmmoVariantInGun(ItemStack gunStack) {
+        String defaultVariant = DEFAULT_AMMO;
         ResourceLocation defaultAmmo = getGunDefaultAmmo(gunStack);
         if (defaultAmmo.toString().isEmpty()) return null;
-        gunStack.getOrCreateTagElement("ai_ammo").putString("ai_ammoId", defaultAmmo.toString());
-        gunStack.getOrCreateTagElement("ai_ammo").putString("variant", defaultVariant);
-        gunStack.getOrCreateTagElement("ai_ammo").putString("selected_variant", defaultVariant);
-        gunStack.getOrCreateTagElement("ai_ammo").putString("existed_variant", defaultVariant);
-        return new AmmoContext(CaliberVariantDamageHelper.Caliber.createDefaultCaliberFromGun(defaultAmmo.toString(), gunStack));
+        gunStack.getOrCreateTagElement(AI_AMMO).putString(AI_AMMO_ID, defaultAmmo.toString());
+        gunStack.getOrCreateTagElement(AI_AMMO).putString(VARIANT, defaultVariant);
+        gunStack.getOrCreateTagElement(AI_AMMO).putString(SELECTED_VARIANT, defaultVariant);
+        gunStack.getOrCreateTagElement(AI_AMMO).putString(EXISTED_VARIANT, defaultVariant);
+        return CaliberSerializer.load(gunStack.getTag(), gunStack);
     }
 
     public static @Nullable Item getAmmoVariantItem(AmmoContext context) {
@@ -73,7 +75,7 @@ public class AmmoInjector {
 
     //Update cartridge tag in gun
     public static void setAmmoVariantInGun(ItemStack gunStack, String selectedVariant) {
-        gunStack.getOrCreateTagElement("ai_ammo").putString("existed_variant", selectedVariant);
+        gunStack.getOrCreateTagElement(AI_AMMO).putString(EXISTED_VARIANT, selectedVariant);
         Item ammoItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(selectedVariant));
         if (!(ammoItem instanceof GenerateAmmo ammo)) {
             AmmoContext context = setDefaultAmmoVariantInGun(gunStack);

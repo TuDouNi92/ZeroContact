@@ -2,12 +2,17 @@ package net.zerocontact.caliber;
 
 import net.zerocontact.ZeroContactLogger;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 public final class CaliberRegistry {
     private static final Map<CaliberKey, CaliberVariantDamageHelper.Caliber> CALIBERS = new HashMap<>();
+
+    static {
+        Arrays.stream(CaliberVariantDamageHelper.values()).forEach(helper -> register(helper.caliber));
+    }
 
     public static void register(CaliberVariantDamageHelper.Caliber caliber) {
         CaliberKey key = new CaliberKey(

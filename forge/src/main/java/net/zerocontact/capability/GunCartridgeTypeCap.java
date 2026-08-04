@@ -1,10 +1,6 @@
 package net.zerocontact.capability;
 
-import com.tacz.guns.api.TimelessAPI;
-import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.builder.AmmoItemBuilder;
-import com.tacz.guns.resource.index.CommonGunIndex;
-import com.tacz.guns.resource.pojo.data.gun.GunData;
 import com.tacz.guns.resource.pojo.data.gun.GunRecoil;
 import com.tacz.guns.resource.pojo.data.gun.InaccuracyType;
 import net.minecraft.resources.ResourceLocation;
@@ -20,18 +16,19 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
-import java.util.Optional;
+
+import static net.zerocontact.caliber.CaliberSerializer.*;
 
 public class GunCartridgeTypeCap implements ICartridgeHolder {
     //Sync tags when change cartridge;
     public void copyTags(CaliberVariantDamageHelper.Caliber defaultCaliber, ItemStack gun) {
-        gun.getOrCreateTag().merge(CaliberSerializer.save(new AmmoInjector.AmmoContext(defaultCaliber)));
+        AmmoInjector.copyTags(defaultCaliber, gun);
     }
 
 
     //Get cartridge for held gun
     public String getAmmoVariantInGun(ItemStack gunStack) {
-        return gunStack.getOrCreateTagElement("ai_ammo").getString("existed_variant");
+        return gunStack.getOrCreateTagElement(AI_AMMO).getString(EXISTED_VARIANT);
     }
 
     //Get generated cartridge stack;
@@ -45,61 +42,37 @@ public class GunCartridgeTypeCap implements ICartridgeHolder {
 
     //Get default tacz ammoId for gun.
     public ResourceLocation getGunDefaultAmmo(ItemStack gunStack) {
-        ResourceLocation defaultAmmoId = new ResourceLocation("");
-        IGun gun = IGun.getIGunOrNull(gunStack);
-        if (gun == null) return defaultAmmoId;
-        Optional<CommonGunIndex> gunIndex = TimelessAPI.getCommonGunIndex(gun.getGunId(gunStack));
-        if (gunIndex.isPresent()) {
-            CommonGunIndex gunIndex1 = gunIndex.get();
-            GunData gunData = gunIndex1.getGunData();
-            defaultAmmoId = gunData.getAmmoId();
-        }
-        return defaultAmmoId;
+        return AmmoInjector.getGunDefaultAmmo(gunStack);
     }
 
 
     public @Nullable AmmoInjector.AmmoContext setDefaultAmmoVariantInGun(ItemStack gunStack) {
-        String defaultVariant = "tacz:ammo";
-        ResourceLocation defaultAmmo = getGunDefaultAmmo(gunStack);
-        if (defaultAmmo.toString().isEmpty()) return null;
-        gunStack.getOrCreateTagElement("ai_ammo").putString("ai_ammoId", defaultAmmo.toString());
-        gunStack.getOrCreateTagElement("ai_ammo").putString("selected_variant", defaultVariant);
-        gunStack.getOrCreateTagElement("ai_ammo").putString("existed_variant", defaultVariant);
-        return new AmmoInjector.AmmoContext(CaliberVariantDamageHelper.Caliber.createDefaultCaliberFromGun(defaultAmmo.toString(), gunStack));
+        return AmmoInjector.setDefaultAmmoVariantInGun(gunStack);
     }
 
     //Update cartridge tag in gun
     public void setAmmoVariantInGun(ItemStack gunStack, String selectedVariant) {
-        gunStack.getOrCreateTagElement("ai_ammo").putString("existed_variant", selectedVariant);
-        Item ammoItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(selectedVariant));
-        if (!(ammoItem instanceof GenerateAmmo ammo)) {
-            AmmoInjector.AmmoContext context = setDefaultAmmoVariantInGun(gunStack);
-            if (context == null) return;
-            copyTags(context.caliber(), gunStack);
-            return;
-        }
-        CaliberVariantDamageHelper.Caliber caliber = ammo.getDefualtCaliber();
-        copyTags(caliber, gunStack);
+        AmmoInjector.setAmmoVariantInGun(gunStack, selectedVariant);
     }
 
     public String getClientSelectedAmmoVariant(ItemStack gunStack) {
-        return gunStack.getOrCreateTag().getCompound("ai_ammo").getString("selected_variant");
+        return gunStack.getOrCreateTag().getCompound(AI_AMMO).getString(SELECTED_VARIANT);
     }
 
     public void setClientSelectedAmmoVariant(ItemStack gunStack, String selectedAmmoKey) {
-        gunStack.getOrCreateTagElement("ai_ammo").putString("selected_variant", selectedAmmoKey);
+        gunStack.getOrCreateTagElement(AI_AMMO).putString(SELECTED_VARIANT, selectedAmmoKey);
     }
 
     @Override
     public @Nullable GunRecoil getRecoil(ItemStack gunStack) {
-        AmmoInjector.AmmoContext context = CaliberSerializer.load(gunStack.getTag(),gunStack);
+        AmmoInjector.AmmoContext context = CaliberSerializer.load(gunStack.getTag(), gunStack);
         if (context.isEmpty()) return null;
         return context.caliber().getRecoil(gunStack);
     }
 
     @Override
     public @NotNull Map<InaccuracyType, Float> getInaccuracy(ItemStack gunStack) {
-        AmmoInjector.AmmoContext context = CaliberSerializer.load(gunStack.getTag(),gunStack);
+        AmmoInjector.AmmoContext context = CaliberSerializer.load(gunStack.getTag(), gunStack);
         if (context.isEmpty()) return Map.of();
         return context.caliber().getInaccuracy(gunStack);
     }
