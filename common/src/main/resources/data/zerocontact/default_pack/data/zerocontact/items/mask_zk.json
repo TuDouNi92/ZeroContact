@@ -7,6 +7,7 @@
   "default_durability": 12,
   "texture": "textures/models/mask/mask_zelinsky_kummant_rubber.png",
   "model": "geo/mask/mask_zelinsky_kummant_rubber.geo.json",
+  "immune_effects": ["minecraft:blindness"],
   "hurt_modifier":
   {
     "ricochet_multiplier":0.35,

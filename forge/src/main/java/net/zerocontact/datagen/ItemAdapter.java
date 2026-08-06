@@ -1,7 +1,9 @@
 package net.zerocontact.datagen;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.ArmorItem;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.IAssetManager;
 import net.zerocontact.api.IEquipmentTypeTag;
@@ -136,7 +138,11 @@ public class ItemAdapter {
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerationRecord<>(id, new GenerateHelmetGeoImpl(id, ArmorItem.Type.HELMET, texture, model, animation, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, durabilityLossProvider, defaultDurability, IEquipmentTypeTag.EquipmentType.HELMET), tab));
+            List<MobEffect> immuneEffects = data.immuneEffects.stream()
+                    .map(s -> ForgeRegistries.MOB_EFFECTS.getValue(new ResourceLocation(s)))
+                    .filter(Objects::nonNull)
+                    .toList();
+            items.add(new GenerationRecord<>(id, new GenerateHelmetGeoImpl(id, ArmorItem.Type.HELMET, texture, model, animation, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, durabilityLossProvider, defaultDurability, IEquipmentTypeTag.EquipmentType.HELMET, immuneEffects), tab));
             return items;
         }
     }
@@ -157,7 +163,11 @@ public class ItemAdapter {
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerationRecord<>(id, new GenerateHelmetGeoImpl(id, ArmorItem.Type.HELMET, texture, model, animation, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, durabilityLossProvider, defaultDurability, IEquipmentTypeTag.EquipmentType.MASK), tab));
+            List<MobEffect> immuneEffects = data.immuneEffects.stream()
+                    .map(s -> ForgeRegistries.MOB_EFFECTS.getValue(new ResourceLocation(s)))
+                    .filter(Objects::nonNull)
+                    .toList();
+            items.add(new GenerationRecord<>(id, new GenerateHelmetGeoImpl(id, ArmorItem.Type.HELMET, texture, model, animation, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, durabilityLossProvider, defaultDurability, IEquipmentTypeTag.EquipmentType.MASK, immuneEffects), tab));
             return items;
         }
     }

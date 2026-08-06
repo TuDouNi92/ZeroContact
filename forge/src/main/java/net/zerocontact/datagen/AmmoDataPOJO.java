@@ -1,9 +1,18 @@
 package net.zerocontact.datagen;
 
+import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.caliber.CaliberVariantDamageHelper;
-import net.zerocontact.caliber.EventHook;
+import net.zerocontact.caliber.HookEventTrigger;
+import net.zerocontact.caliber.TargetSelector;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.Map;
 
 public class AmmoDataPOJO {
     @SerializedName("ammo_id")
@@ -25,7 +34,7 @@ public class AmmoDataPOJO {
     //Affects the ballistics
     public float gravity = 0.15f;
 
-    public float knockback;
+    public float knockback = 0;
 
     //Camera recoil multiplier
     @SerializedName("recoil_multiplier")
@@ -40,7 +49,7 @@ public class AmmoDataPOJO {
 
     @SerializedName("base_damage_factor")
     //Indicates a damage balancing factor on guns with the same caliber.
-    public float baseDamageFactor;
+    public float baseDamageFactor = 1;
 
     //The penetration against armors.
     @SerializedName("penetration_class")
@@ -107,4 +116,41 @@ public class AmmoDataPOJO {
     ) {
         public static final Ignite NONE = new Ignite(false, false, 0);
     }
+
+    public record EventHook(
+            HookEventTrigger trigger,
+            List<HookActionData> actions,
+            List<LuaHookData> scripts
+    ) {
+        public EventHook {
+            actions = actions == null ? List.of() : List.copyOf(actions);
+            scripts = scripts == null ? List.of() : List.copyOf(scripts);
+        }
+
+    }
+
+    public record HookActionData(
+            TargetSelector target,
+            String effect,
+            int duration,
+            int amplifier,
+            float chance,
+            float radius
+    ) {
+        public @Nullable MobEffect resolveEffect() {
+            return ForgeRegistries.MOB_EFFECTS.getValue(new ResourceLocation(effect));
+        }
+    }
+
+    public record LuaHookData(
+            String script,
+            String function,
+            Map<String, JsonElement> arguments
+    ) {
+        public LuaHookData {
+            function = function == null ? "run" : function;
+            arguments = arguments == null ? Map.of() : Map.copyOf(arguments);
+        }
+    }
+
 }

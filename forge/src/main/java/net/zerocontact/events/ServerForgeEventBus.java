@@ -7,6 +7,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.zerocontact.command.CommandManager;
+import net.zerocontact.effects.ZCEffect;
 import net.zerocontact.network.ModMessages;
 import net.zerocontact.network.NetworkHandler;
 import net.zerocontact.stamina.PlayerStamina;
@@ -29,6 +30,7 @@ public class ServerForgeEventBus {
     public static void regEvents() {
         ModMessages.register();
         TickEvent.PLAYER_PRE.register(PlayerStamina::staminaTick);
+        TickEvent.SERVER_LEVEL_POST.register(ZCEffect.Tick::serverTick);
         dev.architectury.event.events.common.EntityEvent.LIVING_HURT.register(PlateEntityHurtEvent::entityHurtRegister);
         dev.architectury.event.events.common.EntityEvent.LIVING_HURT.register(PlateDamageEvent::register);
     }

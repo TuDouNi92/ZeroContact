@@ -5,12 +5,17 @@ import com.google.common.collect.Multimap;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.api.*;
 import net.zerocontact.client.renderer.HelmetRender;
@@ -34,8 +39,10 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
     private final float durabilityLossProvider;
     private final ResourceLocation texture, model, animation;
     private final EquipmentType equipmentType;
+    private final List<MobEffect> immuneEffects;
+    private int effectTick;
 
-    public GenerateHelmetGeoImpl(String id, Type type, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, int defense, int absorb, float bluntDamage, float penetrateDamage, float ricochetDamage, float durabilityLossProvider, int defaultDurability, EquipmentType equipmentType) {
+    public GenerateHelmetGeoImpl(String id, Type type, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, int defense, int absorb, float bluntDamage, float penetrateDamage, float ricochetDamage, float durabilityLossProvider, int defaultDurability, EquipmentType equipmentType, List<MobEffect> immuneEffects) {
         super(type, id, defense, defaultDurability, absorb, bluntDamage, penetrateDamage, 0, texture, model, animation);
         this.absorb = absorb;
         this.bluntDamage = bluntDamage;
@@ -47,7 +54,9 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
         this.model = model;
         this.animation = animation;
         this.equipmentType = equipmentType;
+        this.immuneEffects = immuneEffects;
     }
+
 
     @Override
     public int getDefaultDurability() {
@@ -116,6 +125,33 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
     @Override
     public void curioTick(SlotContext slotContext, ItemStack stack) {
         ArmorUnEquippedHelper.onArmorUnequipped(slotContext, stack);
+        immuneEffectTick(slotContext.entity(), stack);
+    }
+
+    @Override
+    public void onInventoryTick(ItemStack stack, Level level, Player player, int slotIndex, int selectedIndex) {
+        super.onInventoryTick(stack, level, player, slotIndex, selectedIndex);
+        ItemStack helmetStack = player.getItemBySlot(EquipmentSlot.HEAD);
+        if (stack == helmetStack) {
+            immuneEffectTick(player, helmetStack);
+        }
+    }
+
+    private void immuneEffectTick(LivingEntity entity, ItemStack stack) {
+        if (entity.level().isClientSide) return;
+        if (effectTick % 40 == 0) {
+            effectTick = 0;
+        }
+        if (stack.getMaxDamage() - stack.getDamageValue() <= 1) return;
+        for (MobEffect immuneEffect : immuneEffects) {
+            if (!entity.hasEffect(immuneEffect)) continue;
+            boolean successRemoved = entity.removeEffect(immuneEffect);
+            if (effectTick == 0 && successRemoved) {
+                stack.hurtAndBreak(1, entity, lv -> {
+                });
+            }
+        }
+        effectTick++;
     }
 
     @Override

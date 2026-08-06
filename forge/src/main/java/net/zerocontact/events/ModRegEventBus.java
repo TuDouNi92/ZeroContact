@@ -9,6 +9,7 @@ import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -19,6 +20,7 @@ import net.zerocontact.client.gui.BackpackScreen;
 import net.zerocontact.client.gui.ConfigScreen;
 import net.zerocontact.client.gui.WorkbenchScreen;
 import net.zerocontact.client.interaction.KeyBindingHandler;
+import net.zerocontact.client.particle.PersistentSignalSmokeParticle;
 import net.zerocontact.client.tooltip.BallisticToolTipComponent;
 import net.zerocontact.client.tooltip.ClientBallisticToolTipComponent;
 import net.zerocontact.forge.ZeroContactForge;
@@ -26,6 +28,7 @@ import net.zerocontact.forge_registries.ModMenus;
 import net.zerocontact.client.renderer.AccessoriesRender;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.forge_registries.ModEntitiesReg;
+import net.zerocontact.forge_registries.ZCParticles;
 import net.zerocontact.client.renderer.ArmedRaiderRender;
 import net.zerocontact.item.block.Workbench;
 import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
@@ -67,6 +70,14 @@ public class ModRegEventBus {
         @SubscribeEvent
         public static void onRegisterMappings(RegisterKeyMappingsEvent event) {
             KeyBindingHandler.register(event);
+        }
+
+        @SubscribeEvent
+        public static void registerParticleProviders(RegisterParticleProvidersEvent event) {
+            event.registerSpriteSet(
+                    ZCParticles.PERSISTENT_SIGNAL_SMOKE.get(),
+                    PersistentSignalSmokeParticle.Provider::new
+            );
         }
 
         @SubscribeEvent

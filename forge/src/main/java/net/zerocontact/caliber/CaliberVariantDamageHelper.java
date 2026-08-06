@@ -26,67 +26,68 @@ import java.util.stream.Collectors;
 
 public enum CaliberVariantDamageHelper {
     CALIBER_762x39(
-            new Caliber("tacz:762x39", 3, 6, 5.5f)
+            new Caliber("tacz:762x39", 3, 6, 5.5f,.15f)
     ),
     CALIBER_556x45(
-            new Caliber("tacz:556x45", 2, 5, 4)
+            new Caliber("tacz:556x45", 2, 5, 4,.10f)
     ),
     CALIBER_580x42(
-            new Caliber("tacz:58x42", 3, 6, 6f)
+            new Caliber("tacz:58x42", 3, 6, 6f,.14f)
     ),
     CALIBER_308(
-            new Caliber("tacz:308", 4, 10, 8)
+            new Caliber("tacz:308", 4, 10, 8,.27f)
     ),
     CALIBER_50AE(
-            new Caliber("tacz:50ae", 2, 9, 6.2f)
+            new Caliber("tacz:50ae", 2, 9, 6.2f,.2f)
     ),
     CALIBER_9mm(
-            new Caliber("tacz:9mm", 1.5f, 4, 3.75f)
+            new Caliber("tacz:9mm", 1.5f, 4, 3.75f,1f)
     ),
     CALIBER_45ACP(
-            new Caliber("tacz:45acp", 1.25f, 5, 4)
+            new Caliber("tacz:45acp", 1.25f, 5, 4,.09f)
     ),
     CALIBER_762x25(
-            new Caliber("tacz:762x25", 1.5f, 3, 3f)
+            new Caliber("tacz:762x25", 1.5f, 3, 3f,.06f)
     ),
     CALIBER_762x54(
-            new Caliber("tacz:762x54", 4, 12, 8)
+            new Caliber("tacz:762x54", 4, 12, 8,.33f)
     ),
     CALIBER_338(
-            new Caliber("tacz:338", 3, 14, 15)
+            new Caliber("tacz:338", 3, 14, 15,.6f)
     ),
     CALIBER_68x51(
-            new Caliber("tacz:68x51fury", 2.5f, 7, 6)
+            new Caliber("tacz:68x51fury", 2.5f, 7, 6,.21f)
     ),
     CALIBER_50BMG(
-            new Caliber("tacz:50bmg", 4, 18, 18.5f)
+            new Caliber("tacz:50bmg", 4, 18, 18.5f,1)
     ),
     CALIBER_12G(
-            new Caliber("tacz:12g", 0.2f, 3, 1.25f)
+            new Caliber("tacz:12g", 0.2f, 3, 1.25f,.03f)
     ),
     CALIBER_22WMR(
-            new Caliber("tacz:22wmr", 1.5f, 5, 6)
+            new Caliber("tacz:22wmr", 1.5f, 5, 6,.33f)
     ),
     CALIBER_30_06(
-            new Caliber("tacz:30_06", 4, 8, 12)
+            new Caliber("tacz:30_06", 4, 8, 12,.25f)
     ),
     CALIBER_46x30(
-            new Caliber("tacz:46x30", 2f, 4, 5)
+            new Caliber("tacz:46x30", 2f, 4, 5,.21f)
     ),
     CALIBER_57x28(
-            new Caliber("tacz:57x28", 1.5f, 5, 6)
+            new Caliber("tacz:57x28", 1.5f, 5, 6,.31f)
     ),
     CALIBER_45_70(
-            new Caliber("tacz:45_70", 5f, 8, 10)
+            new Caliber("tacz:45_70", 5f, 8, 10,.22f)
     ),
     CALIBER_357MAG(
-            new Caliber("tacz:357mag", 2, 6, 7)
+            new Caliber("tacz:357mag", 2, 6, 7,.12f)
     ),
     CALIBER_500MAG(
-            new Caliber("tacz:500mag", 3, 7, 6)
+            new Caliber("tacz:500mag", 3, 7, 6,.24f)
     );
 
-    private final Caliber caliber;
+
+    public final Caliber caliber;
     private static final EnumSet<CaliberVariantDamageHelper> caliberVariantDamageHelperEnumSet = EnumSet.allOf(CaliberVariantDamageHelper.class);
     private static final String DEFAULT = "tacz:ammo";
 
@@ -123,18 +124,18 @@ public enum CaliberVariantDamageHelper {
             float armorDamage,
             int stackSize,
             int[] tracerColor,
-            EventHook[] hooks
+            AmmoDataPOJO.EventHook[] hooks
     ) implements ICartridgeType {
 
         public Caliber {
             explosion = Objects.requireNonNullElse(explosion, AmmoDataPOJO.Explosion.NONE);
             ignite = Objects.requireNonNullElse(ignite, AmmoDataPOJO.Ignite.NONE);
             tracerColor = tracerColor == null ? new int[]{255, 255, 255, 255} : tracerColor.clone();
-            hooks = hooks == null ? new EventHook[]{} : hooks;
+            hooks = hooks == null ? new AmmoDataPOJO.EventHook[]{} : hooks;
         }
 
         //This constructor is only for enums;
-        private Caliber(String id, float baseDamageFactor, int penetrationClass, float fleshDamage) {
+        private Caliber(String id, float baseDamageFactor, int penetrationClass, float fleshDamage, float armorDamage) {
             this(
                     id,
                     DEFAULT,
@@ -150,10 +151,10 @@ public enum CaliberVariantDamageHelper {
                     baseDamageFactor,
                     penetrationClass,
                     fleshDamage,
-                    0,
+                    armorDamage,
                     30,
                     new int[]{255, 255, 255, 255},
-                    new EventHook[]{}
+                    new AmmoDataPOJO.EventHook[]{}
             );
         }
 
@@ -162,6 +163,12 @@ public enum CaliberVariantDamageHelper {
             GunData gunData = TimelessAPI.getCommonGunIndex(gunId).map(CommonGunIndex::getGunData).orElse(null);
             if (gunData == null) return null;
             BulletData bulletData = gunData.getBulletData();
+            ExplosionData explosionData = bulletData.getExplosionData();
+            Ignite ignite = bulletData.getIgnite();
+            boolean explosive = false;
+            if (bulletData.getExplosionData() != null) {
+                explosive = bulletData.getExplosionData().isExplode();
+            }
             return new Caliber(
                     id,
                     DEFAULT,
@@ -172,15 +179,27 @@ public enum CaliberVariantDamageHelper {
                     bulletData.getKnockback(),
                     1,
                     1,
-                    AmmoDataPOJO.Explosion.NONE,
-                    AmmoDataPOJO.Ignite.NONE,
+                    explosionData == null || !explosive
+                            ? AmmoDataPOJO.Explosion.NONE
+                            : new AmmoDataPOJO.Explosion(
+                            explosionData.getRadius(),
+                            explosionData.getDamage(),
+                            explosionData.isDestroyBlock(),
+                            explosionData.isKnockback(),
+                            (int) explosionData.getDelay()
+                    ),
+                    new AmmoDataPOJO.Ignite(
+                            ignite.isIgniteBlock(),
+                            ignite.isIgniteEntity(),
+                            bulletData.getIgniteEntityTime()
+                    ),
                     0,
                     0,
                     0,
                     0,
                     30,
                     new int[]{255, 255, 255, 255},
-                    new EventHook[]{}
+                    new AmmoDataPOJO.EventHook[]{}
             );
         }
 

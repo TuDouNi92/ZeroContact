@@ -9,7 +9,22 @@ public record HookContext(
         ServerLevel level,
         @Nullable LivingEntity shooter,
         @Nullable LivingEntity victim,
+        @Nullable Vec3 prevPos,
         Vec3 positon,
         CaliberVariantDamageHelper.Caliber caliber
-        ) {
+) {
+    public HookContext(ServerLevel level,
+                @Nullable LivingEntity shooter,
+                @Nullable LivingEntity victim,
+                Vec3 positon,
+                CaliberVariantDamageHelper.Caliber caliber) {
+        this(
+                level,
+                shooter,
+                victim,
+                null,
+                positon,
+                caliber
+        );
+    }
 }

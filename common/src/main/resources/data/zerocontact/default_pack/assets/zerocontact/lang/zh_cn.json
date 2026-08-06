@@ -1,4 +1,10 @@
 {
   "itemGroup.zerocontact.default": "ZeroContact 默认包",
-  "tooltip.zerocontact.pack.default": "ZeroContact 默认包"
+  "tooltip.zerocontact.pack.default": "ZeroContact 默认包",
+
+  "item.zerocontact.40mm_incendiary": "40mm 燃烧弹",
+  "item.zerocontact.40mm_smoke": "40mm 烟雾弹",
+
+  "effect.zerocontact.ignition": "引燃",
+  "effect.zerocontact.smoke": "烟雾"
 }

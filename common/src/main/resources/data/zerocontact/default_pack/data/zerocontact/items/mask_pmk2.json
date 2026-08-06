@@ -7,6 +7,7 @@
   "default_durability": 12,
   "texture": "textures/models/mask/mask_pmk2_black.png",
   "model": "geo/mask/mask_pmk2_black.geo.json",
+  "immune_effects": ["minecraft:blindness"],
   "hurt_modifier":
   {
     "ricochet_multiplier":0.35,

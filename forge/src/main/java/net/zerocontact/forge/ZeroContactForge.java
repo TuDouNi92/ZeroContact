@@ -11,6 +11,9 @@ import net.zerocontact.datagen.Predicate;
 import net.zerocontact.events.*;
 import net.zerocontact.forge_registries.BlocksRegForge;
 import net.zerocontact.forge_registries.ModEntitiesReg;
+import net.zerocontact.forge_registries.ZCEffects;
+import net.zerocontact.forge_registries.ZCParticles;
+import net.zerocontact.lua.ZcLuaApiHelpers;
 import software.bernie.geckolib.GeckoLib;
 
 @Mod(ZeroContact.MOD_ID)
@@ -26,6 +29,9 @@ public class ZeroContactForge {
         ServerForgeEventBus.regEvents();
         ModEntitiesReg.register();
         BlocksRegForge.register(context.getModEventBus());
+        ZCParticles.register();
+        ZCEffects.register();
+        ZcLuaApiHelpers.register();
         Predicate.predicateCurios();
         EntityDeathDogTagEvent.register();
         regConfig(context);

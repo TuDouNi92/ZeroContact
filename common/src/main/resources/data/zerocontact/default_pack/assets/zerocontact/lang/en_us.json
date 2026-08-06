@@ -45,7 +45,12 @@
   "item.zerocontact.545x39bt": "5.45x39mm BT(7BT4) gzh",
   "item.zerocontact.545x39pp": "5.45x39mm PP(7N10) gzh",
   "item.zerocontact.545x39ps": "5.45x39mm BP(7N6) gzh",
-  "item.zerocontact.545x39t": "5.45x39mm T(7T3) gzh"
+  "item.zerocontact.545x39t": "5.45x39mm T(7T3) gzh",
 
+  "item.zerocontact.40mm_incendiary": "40mm incendiary shell",
+  "item.zerocontact.40mm_smoke": "40mm smoke shell",
+
+  "effect.zerocontact.ignition": "Ignition",
+  "effect.zerocontact.smoke": "Smoke"
 
 }

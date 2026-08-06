@@ -9,8 +9,10 @@
     "CameraSetupEventMixin",
     "ClientGunToolTipMixin",
     "EntityKineticBulletAccessor",
+    "EntityKineticBulletMixin",
     "GunHudOverlayMixin",
     "ItemStackMixin",
+    "MobEffectMixin",
     "ModernKineticGunScriptAPIMixin"
   ],
   "injectors": {
