@@ -12,7 +12,6 @@
     "EntityKineticBulletMixin",
     "GunHudOverlayMixin",
     "ItemStackMixin",
-    "MobEffectMixin",
     "ModernKineticGunScriptAPIMixin"
   ],
   "injectors": {

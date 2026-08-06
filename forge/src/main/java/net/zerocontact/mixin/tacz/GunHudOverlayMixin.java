@@ -61,7 +61,7 @@ public class GunHudOverlayMixin {
         });
     }
 
-    @Inject(method = "render", remap = false, at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;popPose()V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
+    @Inject(method = "render", remap = false, at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;popPose()V", shift = At.Shift.AFTER, remap = true), locals = LocalCapture.CAPTURE_FAILHARD)
     private void zeroContact$renderHud(ForgeGui gui, GuiGraphics graphics, float partialTick, int width, int height, CallbackInfo ci, Minecraft mc, LocalPlayer player, ItemStack stack, IGun iGun, ResourceLocation gunId, GunData gunData, GunDisplayInstance display, boolean useInventoryAmmo, boolean useDummyAmmo, boolean overheatLocked, int ammoCount, int ammoCountColor, int inventoryAmmoCountColor, String currentAmmoCountText, String inventoryAmmoCountText, PoseStack poseStack, Font font) {
         if (player == null) return;
         if (!ModConfigs.CLIENT.ammoTypeOverLay().get()) return;
