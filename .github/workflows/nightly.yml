@@ -28,26 +28,28 @@ jobs:
       - name: Build and Remap Jar
         run: ./gradlew :forge:remapJar
 
-      - name: Get short commit hash
+      - name: Get build metadata
         id: vars
-        run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          echo "SAFE_REF=$(printf '%s' "$GITHUB_REF_NAME" | sed 's#[^A-Za-z0-9._-]#-#g')" >> "$GITHUB_OUTPUT"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ZeroContact-${{ github.ref_name }}-build-${{ github.run_number }}-${{steps.vars.outputs.SHORT_SHA}}
+          name: ZeroContact-${{ steps.vars.outputs.SAFE_REF }}-build-${{ github.run_number }}-${{ steps.vars.outputs.SHORT_SHA }}
           path: forge/build/libs/zerocontact-*.*.*.jar
 
       - name: Rename file
         run: |
           mkdir -p nightly 
           original_jar=$(ls forge/build/libs/zerocontact-*.*.[0-9].jar) 
-          new_jar="ZeroContact-${{ github.ref_name }}-build-${{ github.run_number }}-${{steps.vars.outputs.SHORT_SHA}}.jar" 
+          new_jar="ZeroContact-${{ steps.vars.outputs.SAFE_REF }}-build-${{ github.run_number }}-${{ steps.vars.outputs.SHORT_SHA }}.jar" 
           cp "$original_jar" "nightly/$new_jar" 
 
       - name: Upload to Discord
         uses: tsickert/discord-webhook@v7.0.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEB_HOOK }}
-          filename: "nightly/ZeroContact-${{ github.ref_name }}-build-${{ github.run_number }}-${{steps.vars.outputs.SHORT_SHA}}.jar"
+          filename: "nightly/ZeroContact-${{ steps.vars.outputs.SAFE_REF }}-build-${{ github.run_number }}-${{ steps.vars.outputs.SHORT_SHA }}.jar"
 
