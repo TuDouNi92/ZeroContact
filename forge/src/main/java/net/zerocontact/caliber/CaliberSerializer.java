@@ -32,6 +32,6 @@ public class CaliberSerializer {
         String variant = ammoTag.getString(VARIANT);
         return CaliberRegistry.get(id, variant)
                 .map(AmmoInjector.AmmoContext::new)
-                .orElse(new AmmoInjector.AmmoContext(CaliberVariantDamageHelper.Caliber.createDefaultCaliberFromGun(id, gunStack)));
+                .orElse(new AmmoInjector.AmmoContext(CaliberVariantDamageHelper.Caliber.createDefaultCaliberFromStack(id, gunStack)));
     }
 }

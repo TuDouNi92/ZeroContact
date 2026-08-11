@@ -73,8 +73,7 @@ public abstract class MagazineItemMixin {
     @Inject(method = "overrideOtherStackedOnMe",
             at = @At(
                     value = "INVOKE",
-                    target = "Lcom/raiiiden/taczmagazines/item/MagazineItem;getAmmoId(Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/resources/ResourceLocation;",
-                    ordinal = 1,
+                    target = "Lcom/raiiiden/taczmagazines/item/MagazineItem;getMaxCapacity(Lnet/minecraft/world/item/ItemStack;)I",
                     remap = false),
             cancellable = true)
     public void overrideOtherStackedOnMeLoad(ItemStack magazine, ItemStack heldStack, Slot slot, ClickAction action, Player player, SlotAccess heldAccess, CallbackInfoReturnable<Boolean> cir) {

@@ -30,7 +30,12 @@ public class MagazinesCompat {
                 Item magItem = MagazineRegistrar.MAGAZINE.get();
                 stored = MagazineItem.createMagazineByFamily(magItem, familyId, MagazineFamilySystem.getCapacityForFamily(familyId));
             }
-            return stored.copy();
+            AmmoInjector.AmmoContext gunContext = AmmoInjector.read(gunStack);
+            if (!gunContext.isEmpty()) {
+                AmmoInjector.write(gunContext, stored);
+                cap.setStoredMagazine(stored);
+            }
+            return stored;
         }).orElse(ItemStack.EMPTY);
 
     }
