@@ -66,7 +66,7 @@ public class ModConfigs {
             ) {
         Client(ForgeConfigSpec.Builder builder) {
             this(
-                    getBuiltValue(builder, CLIENT_SIDE, "Bullet suppression", BULLET_SUPPRESSION, true),
+                    getBuiltValue(builder, CLIENT_SIDE, "Bullet suppression effect", BULLET_SUPPRESSION, true),
                     getBuiltValue(builder, CLIENT_SIDE, "Trajectory tooltip", TRAJECTORY_TOOLTIP, true),
                     getBuiltValue(builder, CLIENT_SIDE, "Ammo type overlay", AMMO_TYPE_OVERLAY, true),
                     getBuiltValue(builder, CLIENT_SIDE, "Ammo type tooltip", AMMO_TYPE_TOOLTIP, true)
@@ -79,7 +79,8 @@ public class ModConfigs {
         builder.push(side);
         value = builder
                 .comment(comment)
-                .define(path, true);
+                .define(path, defaultValue);
+        builder.pop();
         return value;
     }
 }
