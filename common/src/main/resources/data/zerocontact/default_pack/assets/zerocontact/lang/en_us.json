@@ -50,6 +50,8 @@
   "item.zerocontact.40mm_incendiary": "40mm incendiary shell",
   "item.zerocontact.40mm_smoke": "40mm smoke shell",
 
+  "item.zerocontact.50bmg_api_t": ".50 BMG API-T",
+
   "effect.zerocontact.ignition": "Ignition",
   "effect.zerocontact.smoke": "Smoke"
 
