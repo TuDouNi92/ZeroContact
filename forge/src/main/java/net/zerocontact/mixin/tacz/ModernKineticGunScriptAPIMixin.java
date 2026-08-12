@@ -92,6 +92,7 @@ public abstract class ModernKineticGunScriptAPIMixin {
 
     @Inject(method = "isReloadingNeedConsumeAmmo", at = @At("RETURN"), remap = false, cancellable = true)
     private void zeroContact$creativeConsumeFakeAmmo(CallbackInfoReturnable<Boolean> cir) {
+        if (abstractGunItem.useInventoryAmmo(itemStack)) return;
         cir.setReturnValue(true);
     }
 
