@@ -5,6 +5,7 @@ import com.tacz.guns.api.item.IAmmoBox;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.item.ModernKineticGunScriptAPI;
 import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -57,7 +58,7 @@ public abstract class ModernKineticGunScriptAPIMixin {
                     rigs.getCapability(ForgeCapabilities.ITEM_HANDLER, null).map(itemHandler -> zeroContact$extractSyncTag(neededAmount, cir, itemHandler, rigs));
                 }
             } else {
-                zeroContact$extractSyncTag(neededAmount, cir, zeroContact$getCreativeHandler(), null);
+                shooter.getCapability(ForgeCapabilities.ITEM_HANDLER, null).ifPresent(itemHandler -> zeroContact$extractSyncTag(neededAmount, cir, zeroContact$getCreativeHandler(itemHandler), null));
             }
             cir.cancel();
         }
@@ -98,7 +99,7 @@ public abstract class ModernKineticGunScriptAPIMixin {
 
 
     @Unique
-    private IItemHandler zeroContact$getCreativeHandler() {
+    private IItemHandler zeroContact$getCreativeHandler(IItemHandler rawHandler) {
         IItemHandler itemHandler = new ItemStackHandler(0);
         if (!(shooter instanceof ServerPlayer player)) return itemHandler;
         LinkedHashMap<ItemStack, Integer> ammoWrap = ServerAmmoSelector.getCreativeAmmoForHeldGun(player);
@@ -106,8 +107,7 @@ public abstract class ModernKineticGunScriptAPIMixin {
         if (stackNonNullList.isEmpty()) return itemHandler;
         itemHandler = new ItemStackHandler(stackNonNullList);
         if (MagazinesCompatHandler.get().getCompat().map(compat -> compat.isMagazineCompatibleWithGun(itemStack)).orElse(false)) {
-            itemHandler = new ItemStackHandler(2);
-            itemHandler.insertItem(0, ServerAmmoSelector.getCreativeMagForHeldGun(player), false);
+            return rawHandler;
         }
         return itemHandler;
     }
@@ -199,6 +199,7 @@ public abstract class ModernKineticGunScriptAPIMixin {
         ICartridgeHolder cap = itemStack.getCapability(CapabilityRegistries.CARTRIDGE).resolve().orElse(null);
         if (cap == null) return;
         cap.setAmmoVariantInGun(gunStack, selectedVariant);
+        zeroContact$remapSelectedMagazineSlot(gunStack, modifiedHandler);
         int extractedAmount = this.abstractGunItem.findAndExtractInventoryAmmo(modifiedHandler, itemStack, extractionAmount);
         int amountForCaller = extractedAmount;
         if (extractionAmount > requestedAmount) {
@@ -212,7 +213,7 @@ public abstract class ModernKineticGunScriptAPIMixin {
         }
         this.zeroContact$incrementalReload = false;
         this.zeroContact$replaceAmmoInBarrel = false;
-        ItemStack changedMagStack = ServerAmmoSelector.changedMagStack;
+        ItemStack changedMagStack = ((ServerAmmoSelector.MappedItemHandler) modifiedHandler).getAndClearExtractedMag();
         if (!changedMagStack.isEmpty()) {
             zeroContact$setVariantFromMag(changedMagStack, cap);
         }
@@ -222,4 +223,27 @@ public abstract class ModernKineticGunScriptAPIMixin {
         cir.setReturnValue(amountForCaller);
     }
 
+    @Unique
+    private static void zeroContact$remapSelectedMagazineSlot(
+            ItemStack gunStack,
+            IItemHandler handler
+    ) {
+        CompoundTag tag = gunStack.getTag();
+        if (tag == null || !tag.contains("TaCZMag_SelectedSlot", Tag.TAG_INT)) {
+            return;
+        }
+
+        if (!(handler instanceof ServerAmmoSelector.MappedItemHandler mapped)) {
+            return;
+        }
+
+        int rawSlot = tag.getInt("TaCZMag_SelectedSlot");
+        int filteredSlot = mapped.toFilteredSlot(rawSlot);
+
+        if (filteredSlot >= 0) {
+            tag.putInt("TaCZMag_SelectedSlot", filteredSlot);
+        } else {
+            tag.remove("TaCZMag_SelectedSlot");
+        }
+    }
 }

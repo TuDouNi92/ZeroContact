@@ -46,7 +46,12 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class ServerAmmoSelector {
-    public static ItemStack changedMagStack = ItemStack.EMPTY;
+
+    public interface MappedItemHandler extends IItemHandler {
+        int toFilteredSlot(int rawSlot);
+
+        ItemStack getAndClearExtractedMag();
+    }
 
     public static void handleMenu(NetworkHandler.OpenAmmoSelectorPacket msg, Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
@@ -117,16 +122,32 @@ public class ServerAmmoSelector {
             }
         }
         //Reserve 2 extra slots for the magazine mixin to return a magazine that differs from the ones in the inventory.
+        int emptyCounts = 0;
         for (int j = 0; j < raw.getSlots(); j++) {
             if (raw.getStackInSlot(j).isEmpty()) {
-                mappedSlots.add(j);
-                if(mappedSlots.size()>=2){
+                if (emptyCounts >= 2) {
                     break;
                 }
+                mappedSlots.add(j);
+                emptyCounts++;
             }
         }
 
-        return new IItemHandler() {
+        return new MappedItemHandler() {
+            private ItemStack extractedMagazine = ItemStack.EMPTY;
+
+            @Override
+            public int toFilteredSlot(int rawSlot) {
+                return mappedSlots.indexOf(rawSlot);
+            }
+
+            @Override
+            public ItemStack getAndClearExtractedMag() {
+                ItemStack result = extractedMagazine;
+                extractedMagazine = ItemStack.EMPTY;
+                return result;
+            }
+
             @Override
             public int getSlots() {
                 return mappedSlots.size();
@@ -145,11 +166,13 @@ public class ServerAmmoSelector {
             @Override
             public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
                 ItemStack stack = raw.extractItem(mappedSlots.get(slot), amount, simulate);
-                if (MagazinesCompatHandler
+                if (!simulate
+                        && !stack.isEmpty()
+                        && MagazinesCompatHandler
                         .get()
                         .getCompat()
                         .map(compat -> compat.instanceOfMagazine(stack.getItem())).orElse(false)) {
-                    changedMagStack = stack;
+                    extractedMagazine = stack;
                 }
                 return stack;
             }
@@ -218,15 +241,6 @@ public class ServerAmmoSelector {
         if (rigsHandler instanceof ItemStackHandler itemStackHandler && rigs != null) {
             rigs.getOrCreateTag().put("inventory", itemStackHandler.serializeNBT().getList("Items", Tag.TAG_COMPOUND));
         }
-    }
-
-    public static ItemStack getCreativeMagForHeldGun(ServerPlayer player) {
-        ItemStack finalItem = ItemStack.EMPTY;
-        ItemStack gunItem = player.getMainHandItem();
-        IGun igun = IGun.getIGunOrNull(gunItem);
-        if (igun == null) return finalItem;
-        finalItem = MagazinesCompatHandler.get().getCompat().map(compat -> compat.getCompatibleMag(gunItem)).orElse(finalItem);
-        return finalItem;
     }
 
     public static LinkedHashMap<ItemStack, Integer> getCreativeAmmoForHeldGun(ServerPlayer player) {

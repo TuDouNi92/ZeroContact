@@ -1,6 +1,9 @@
 package net.zerocontact.mixin.magazines;
 
+import com.raiiiden.taczmagazines.item.MagazineAmmoSource;
 import com.raiiiden.taczmagazines.item.MagazineItem;
+import com.raiiiden.taczmagazines.magazine.MagazineFamilySystem;
+import com.tacz.guns.api.DefaultAssets;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -21,28 +24,19 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
+
+import static com.raiiiden.taczmagazines.item.MagazineItem.getMagazineFamilyId;
 
 @Mixin(value = MagazineItem.class)
 public abstract class MagazineItemMixin {
     @Shadow(remap = false)
     public abstract int getAmmoCount(ItemStack magazine);
 
-    @Unique
-    private void zeroContact$updateCartridge(ItemStack mag, Slot slot, CallbackInfoReturnable<Boolean> cir) {
-        AmmoInjector.AmmoContext contextFromAmmo = AmmoInjector.read(slot.getItem());
-        if (getAmmoCount(mag) <= 0) {
-            AmmoInjector.write(contextFromAmmo, mag);
-            contextFromAmmo = AmmoInjector.read(slot.getItem());
-        }
-        AmmoInjector.AmmoContext contextFromMag = AmmoInjector.read(mag);
-        if (!contextFromAmmo.caliber().equals(contextFromMag.caliber())) {
-            cir.cancel();
-        }
-    }
 
     @Inject(method = "overrideStackedOnOther",
             at = @At(
@@ -53,21 +47,67 @@ public abstract class MagazineItemMixin {
     )
 
     //Called when holds the magazine and right-clicks on ammo
-    public void overrideStackedOnOther(ItemStack stack, Slot slot, ClickAction action, Player player, CallbackInfoReturnable<Boolean> cir) {
+    public void overrideStackedOnOtherLoad(ItemStack stack, Slot slot, ClickAction action, Player player, CallbackInfoReturnable<Boolean> cir) {
         zeroContact$updateCartridge(stack, slot, cir);
     }
 
     @Unique
-    private void zeroContact$updateCartridge(ItemStack mag, ItemStack ammoStack, CallbackInfoReturnable<Boolean> cir) {
-        AmmoInjector.AmmoContext contextFromAmmo = AmmoInjector.read(ammoStack);
+    private void zeroContact$updateCartridge(ItemStack mag, Slot slot, CallbackInfoReturnable<Boolean> cir) {
+
+        ItemStack other = slot.getItem();
+        String familyId = getMagazineFamilyId(mag);
+        ResourceLocation familyAmmo = MagazineFamilySystem.getAmmoTypeForFamily(familyId);
+        if (familyAmmo == null) {
+            cir.setReturnValue(false);
+            return;
+        }
+        ResourceLocation ammoId = MagazineAmmoSource.compatibleAmmoId(other, familyAmmo);
+        if (ammoId == null || ammoId.equals(DefaultAssets.EMPTY_AMMO_ID)) {
+            cir.setReturnValue(false);
+            return;
+        }
+
+        AmmoInjector.AmmoContext contextFromAmmo = AmmoInjector.read(slot.getItem());
         if (getAmmoCount(mag) <= 0) {
             AmmoInjector.write(contextFromAmmo, mag);
-            contextFromAmmo = AmmoInjector.read(ammoStack);
         }
         AmmoInjector.AmmoContext contextFromMag = AmmoInjector.read(mag);
         if (!contextFromAmmo.caliber().equals(contextFromMag.caliber())) {
             cir.cancel();
         }
+    }
+
+
+    @ModifyVariable(
+            method = "overrideOtherStackedOnMe",
+            at = @At("STORE"),
+            name = "heldAmmoId",
+            remap = false
+    )
+    private ResourceLocation useHeldAmmoId(
+            ResourceLocation heldAmmoId,
+            ItemStack magazine,
+            ItemStack heldStack,
+            Slot slot,
+            ClickAction action,
+            Player player,
+            SlotAccess heldAccess
+    ) {
+        if (!player.getAbilities().instabuild) {
+            return heldAmmoId;
+        }
+
+        String familyId = getMagazineFamilyId(magazine);
+        ResourceLocation familyAmmo =
+                MagazineFamilySystem.getAmmoTypeForFamily(familyId);
+
+        ResourceLocation actual =
+                MagazineAmmoSource.compatibleAmmoId(heldStack, familyAmmo);
+
+        return actual != null
+                && !actual.equals(DefaultAssets.EMPTY_AMMO_ID)
+                ? actual
+                : heldAmmoId;
     }
 
     @Inject(method = "overrideOtherStackedOnMe",
@@ -76,8 +116,34 @@ public abstract class MagazineItemMixin {
                     target = "Lcom/raiiiden/taczmagazines/item/MagazineItem;getMaxCapacity(Lnet/minecraft/world/item/ItemStack;)I",
                     remap = false),
             cancellable = true)
-    public void overrideOtherStackedOnMeLoad(ItemStack magazine, ItemStack heldStack, Slot slot, ClickAction action, Player player, SlotAccess heldAccess, CallbackInfoReturnable<Boolean> cir) {
+    public void overrideOtherStackedOnMeLeftLoad(ItemStack magazine, ItemStack heldStack, Slot slot, ClickAction action, Player player, SlotAccess heldAccess, CallbackInfoReturnable<Boolean> cir) {
         zeroContact$updateCartridge(magazine, heldStack, cir);
+    }
+
+    @Unique
+    private void zeroContact$updateCartridge(ItemStack mag, ItemStack ammoStack, CallbackInfoReturnable<Boolean> cir) {
+
+        String familyId = getMagazineFamilyId(mag);
+        ResourceLocation familyAmmo = MagazineFamilySystem.getAmmoTypeForFamily(familyId);
+        if (familyAmmo == null) {
+            cir.setReturnValue(false);
+            return;
+        }
+        ResourceLocation ammoId = MagazineAmmoSource.compatibleAmmoId(ammoStack, familyAmmo);
+        if (ammoId == null || ammoId.equals(DefaultAssets.EMPTY_AMMO_ID)) {
+            cir.setReturnValue(false);
+            return;
+        }
+
+
+        AmmoInjector.AmmoContext contextFromAmmo = AmmoInjector.read(ammoStack);
+        if (getAmmoCount(mag) <= 0) {
+            AmmoInjector.write(contextFromAmmo, mag);
+        }
+        AmmoInjector.AmmoContext contextFromMag = AmmoInjector.read(mag);
+        if (!contextFromAmmo.caliber().equals(contextFromMag.caliber())) {
+            cir.cancel();
+        }
     }
 
     @Inject(method = "appendHoverText",
