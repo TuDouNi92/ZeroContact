@@ -12,6 +12,7 @@
 | `variant` | `string` | 必填 | 新弹种名称，不带命名空间；运行时会注册为 `zerocontact:<variant>`。 | `"40mm_incendiary"` → `zerocontact:40mm_incendiary`。 |
 | `life` | `integer` | `30` | 弹体生命周期，单位为 tick。 | `100`：最长存在 5 秒（按 20 tick/s 计）。 |
 | `speed` | `number` | `1` | 弹速参数。源码已将其标记为可能废弃，非必要时保留默认值。 | `1`。 |
+| `bullet_amount` | `integer` | `1` | 单次射击生成的弹丸数量；装填该自定义弹药时，会覆盖枪械脚本原有的弹丸数量。大于 `1` 主要用于霰弹等多弹丸弹种。 | `8`：每次射击生成 8 个弹丸；普通单弹丸弹药使用 `1`。 |
 | `friction` | `number` | `0.015` | 空气阻力；影响弹体速度衰减。 | `0.05`：比默认值更快减速。 |
 | `gravity` | `number` | `0.15` | 重力参数；影响弹道下坠。 | `0.15`。 |
 | `knockback` | `number` | `0` | 弹体击退强度。 | `0`：不额外击退。 |

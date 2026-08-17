@@ -12,6 +12,7 @@ Place ammo definition files in the resource pack's `data/zerocontact/ammoDefinit
 | `variant` | `string` | Required | Name of the new ammo variant without a namespace. It is registered at runtime as `zerocontact:<variant>`. | `"40mm_incendiary"` becomes `zerocontact:40mm_incendiary`. |
 | `life` | `integer` | `30` | Projectile lifetime in ticks. | `100`: allows the projectile to exist for up to 5 seconds at 20 ticks per second. |
 | `speed` | `number` | `1` | Projectile speed parameter. The source marks this field as possibly deprecated, so keep the default unless an override is needed. | `1` |
+| `bullet_amount` | `integer` | `1` | Number of projectiles spawned per shot. While this custom ammo is loaded, it overrides the gun script's original projectile count. Values greater than `1` are mainly intended for shotgun-style multi-projectile ammo. | `8`: spawns 8 projectiles per shot; use `1` for ordinary single-projectile ammo. |
 | `friction` | `number` | `0.015` | Air friction; controls how quickly projectile velocity decreases. | `0.05`: slows the projectile more quickly than the default. |
 | `gravity` | `number` | `0.15` | Gravity parameter; affects projectile drop. | `0.15` |
 | `knockback` | `number` | `0` | Projectile knockback strength. | `0`: applies no additional knockback. |
