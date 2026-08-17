@@ -262,3 +262,20 @@ The weapon will then be able to use that ammunition type infinitely in Creative 
 - Fix the issue where damage reduction applies to non-armored entity or invulnerable to entity with plate-carrier installed.
 - Fix the issue where uniform no longer render in a specific situation.
 - Fix the issue where user can trigger infinite kit repairing when kit has low durability and equals to the target item's.
+
+## Beta 1.1.5
+
+- Effect declaring hook and Lua script support for custom ammo types.
+- Basic compatibility for TaCz:magazines 0.2.0-beta.
+- Add config to toggle applying flesh damage to unarmored entity.
+- Add Mask curios.
+- Advanced ammo stats for custom ammo types.
+- Fix ammo type indicator shifting with scaling.
+- Miscellaneous fixes.
+
+### New Builtin Ammo Types
+- 50BMG API-T.
+- 40mm incendiary shell, smoke shell.
+- 12g AP slug, Dragon-Breath shell, Flechette shell.
+- 5.7x28mm L191, SB193, SS190.
+- 5.8x42mm DBX95, DBP191, DVC12.
