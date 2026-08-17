@@ -1,0 +1,25 @@
+{
+  "ammo_id": "tacz:12g",
+
+  "variant": "12g_ap",
+
+  "life": 42,
+
+  "friction": 0.035,
+
+  "gravity": 0.11,
+
+  "recoil_multiplier": 1.12,
+
+  "inaccuracy_multiplier": 1.1,
+
+  "bullet_amount": 1,
+
+  "penetration_class": 7,
+
+  "armor_damage": 0.13,
+
+  "flesh_damage": 16,
+
+  "stack_size": 20
+}

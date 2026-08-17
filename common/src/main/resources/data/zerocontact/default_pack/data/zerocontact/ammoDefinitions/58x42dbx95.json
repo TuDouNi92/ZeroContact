@@ -1,0 +1,26 @@
+{
+  "ammo_id": "tacz:58x42",
+
+  "variant": "58x42dbx95",
+
+  "life": 64,
+
+  "friction": 0.015,
+
+  "gravity": 0.065,
+
+  "recoil_multiplier": 0.98,
+
+  "inaccuracy_multiplier": 0.98,
+
+
+  "penetration_class": 4,
+
+  "armor_damage": 0.15,
+
+  "flesh_damage": 5,
+
+  "stack_size": 60,
+
+  "tracer_color": [255,255,255]
+}

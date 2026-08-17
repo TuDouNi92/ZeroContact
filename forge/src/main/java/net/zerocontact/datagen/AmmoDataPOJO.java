@@ -28,6 +28,10 @@ public class AmmoDataPOJO {
     //Deprecated(?
     public float speed = 1;
 
+    //Bullet amount >1 for shotgun
+    @SerializedName("bullet_amount")
+    public int bulletAmount = 1;
+
     //Air friction, affects reduction of the velocity
     public float friction = 0.015f;
 
@@ -77,6 +81,7 @@ public class AmmoDataPOJO {
                 ZeroContact.MOD_ID + ":" + variant,
                 life,
                 speed,
+                bulletAmount,
                 friction,
                 gravity,
                 knockback,

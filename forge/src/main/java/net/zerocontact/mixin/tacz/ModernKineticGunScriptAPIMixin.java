@@ -18,6 +18,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.api.ICartridgeHolder;
+import net.zerocontact.caliber.AmmoInjector;
 import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.compat.MagazinesCompatHandler;
 import net.zerocontact.events.EventUtil;
@@ -28,6 +29,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.LinkedHashMap;
@@ -245,5 +247,23 @@ public abstract class ModernKineticGunScriptAPIMixin {
         } else {
             tag.remove("TaCZMag_SelectedSlot");
         }
+    }
+
+    @Redirect(
+            method = "shootOnce",
+            remap = false,
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lcom/tacz/guns/item/ModernKineticGunScriptAPI;modifyProperty(Ljava/lang/String;Ljava/lang/Class;Ljava/lang/Object;)Ljava/lang/Object;",
+                    remap = false,
+                    ordinal = 2
+            )
+    )
+    public Object overrideBulletAmount(ModernKineticGunScriptAPI instance, String id, Class<?> type, Object value) {
+        AmmoInjector.AmmoContext context = AmmoInjector.read(itemStack);
+        if (!context.isEmpty()) {
+            return context.caliber().bulletAmount();
+        }
+        return value;
     }
 }

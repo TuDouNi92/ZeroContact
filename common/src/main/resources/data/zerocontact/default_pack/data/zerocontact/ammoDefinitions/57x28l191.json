@@ -1,0 +1,26 @@
+{
+  "ammo_id": "tacz:57x28",
+
+  "variant": "57x28l191",
+
+  "life": 50,
+
+  "friction": 0.022,
+
+  "gravity": 0.12,
+
+  "recoil_multiplier": 0.98,
+
+  "inaccuracy_multiplier": 0.98,
+
+
+  "penetration_class": 4,
+
+  "armor_damage": 0.023,
+
+  "flesh_damage": 3,
+
+  "stack_size": 60,
+
+  "tracer_color": [255,255,255]
+}

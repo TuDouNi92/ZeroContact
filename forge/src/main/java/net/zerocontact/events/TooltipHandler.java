@@ -72,13 +72,17 @@ public class TooltipHandler {
                 Component ammoName = Component.literal("\uD83E\uDC35 ").append(Component.translatable(ammoStack.getDescriptionId())).withStyle(ChatFormatting.YELLOW);
                 Component ammoAdvancedInfo = Component.translatable(SHOW_BULLET_DATA_LABEL).withStyle(ChatFormatting.GRAY);
 
-                if (!(ammoStack.getItem() instanceof GenerateAmmo))
+                if (!(ammoStack.getItem() instanceof GenerateAmmo)) {
                     ammoName = Component.translatable("hud.zerocontact.ammo.default").withStyle(ChatFormatting.YELLOW);
-                ammoLabel.append(ammoName);
-                event.getToolTip().addAll(List.of(ammoLabel, ammoAdvancedInfo));
-                if (DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> Screen::hasShiftDown)) {
-                    List<Component> fullAmmoData = AdvancedAmmoInfoComponents.create(caliber,false);
-                    event.getToolTip().addAll(fullAmmoData);
+                    ammoLabel.append(ammoName);
+                    event.getToolTip().add(ammoLabel);
+                } else {
+                    ammoLabel.append(ammoName);
+                    event.getToolTip().addAll(List.of(ammoName, ammoAdvancedInfo));
+                    if (DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> Screen::hasShiftDown)) {
+                        List<Component> fullAmmoData = AdvancedAmmoInfoComponents.create(caliber, false);
+                        event.getToolTip().addAll(fullAmmoData);
+                    }
                 }
             });
         }

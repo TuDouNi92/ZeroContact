@@ -1,0 +1,26 @@
+{
+  "ammo_id": "tacz:12g",
+
+  "variant": "12g_flechette",
+
+  "life": 30,
+
+  "friction": 0.065,
+
+  "gravity": 0.16,
+
+  "recoil_multiplier": 1.05,
+
+  "inaccuracy_multiplier": 1.04,
+
+  "bullet_amount": 8,
+
+
+  "penetration_class": 5,
+
+  "armor_damage": 0.03,
+
+  "flesh_damage": 0.42,
+
+  "stack_size": 20
+}

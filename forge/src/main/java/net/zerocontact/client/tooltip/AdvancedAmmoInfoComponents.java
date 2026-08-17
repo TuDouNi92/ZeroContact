@@ -21,7 +21,7 @@ public class AdvancedAmmoInfoComponents {
         Function<Float, Component> decimalToPercentOff = (amount) -> {
             int result = Math.round((1 - amount) * 100);
             result = result < 0 ? Math.abs(result) : -result;
-            return Component.literal("+" + result).append("%");
+            return Component.literal((result >= 0 ? "+" : "") + result).append("%");
         };
         Function<Float, Component> decimalToPercent = (amount) -> Component.literal(String.valueOf(Math.round(amount * 100))).append("%");
         BiFunction<String, Component, Component> advancedAmmoInfoComponent = (path, value) -> Component.translatable(path).append(":").append(value).withStyle(ChatFormatting.DARK_GRAY);

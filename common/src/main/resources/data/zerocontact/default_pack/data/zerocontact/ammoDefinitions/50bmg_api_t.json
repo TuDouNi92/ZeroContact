@@ -1,27 +1,49 @@
 {
   "ammo_id": "tacz:50bmg",
+
   "variant": "50bmg_api_t",
+
+  "life": 110,
+
+  "friction": 0.009,
+
+  "gravity": 0.035,
+
+  "recoil_multiplier": 1.12,
+
+  "inaccuracy_multiplier": 1.08,
+
   "penetration_class": 10,
+
   "armor_damage": 0.44,
+
   "flesh_damage": 32,
+
   "stack_size": 8,
+
   "effects": [
     {
       "trigger": "HIT_ENTITY",
+
       "actions": [],
+
       "scripts": [
         {
           "script": "zerocontact:50cal_api_t_logic",
+
           "function": "on_hit_ignite"
         }
       ]
     },
     {
       "trigger": "BULLET_TICKING",
+
       "actions": [],
+
       "scripts": [
         {
           "script": "zerocontact:50cal_api_t_logic",
+
           "function": "on_fly_tracer"
         }
       ]

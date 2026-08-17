@@ -1,0 +1,73 @@
+{
+  "ammo_id": "tacz:12g",
+
+  "variant": "12g_db",
+
+  "life": 24,
+
+  "friction": 0.1,
+
+  "gravity": 0.21,
+
+  "recoil_multiplier": 0.96,
+
+  "inaccuracy_multiplier": 0.95,
+
+  "bullet_amount": 8,
+
+  "penetration_class": 2,
+
+  "armor_damage": 0.13,
+
+  "flesh_damage": 0.42,
+
+  "stack_size": 20,
+
+  "effects": [
+    {
+      "trigger": "HIT_BLOCK",
+
+      "actions": [
+        {
+          "target": "NEARBY",
+
+          "effect": "zerocontact:ignition",
+
+          "duration": 5,
+
+          "amplifier": 0,
+
+          "chance": 0.34,
+
+          "radius": 1.0
+        }
+      ]
+    },
+    {
+      "trigger": "HIT_ENTITY",
+
+      "actions": [],
+
+      "scripts": [
+        {
+          "script": "zerocontact:50cal_api_t_logic",
+
+          "function": "on_hit_ignite"
+        }
+      ]
+    },
+    {
+      "trigger": "BULLET_TICKING",
+
+      "actions": [],
+
+      "scripts": [
+        {
+          "script": "zerocontact:50cal_api_t_logic",
+
+          "function": "on_fly_tracer"
+        }
+      ]
+    }
+  ]
+}
