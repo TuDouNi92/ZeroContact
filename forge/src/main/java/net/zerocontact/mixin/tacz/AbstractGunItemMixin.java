@@ -8,11 +8,16 @@ import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.InaccuracyType;
 import com.tacz.guns.util.AttachmentDataUtils;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.items.IItemHandler;
+import net.zerocontact.caliber.AmmoInjector;
 import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.events.EventUtil;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,20 +40,75 @@ public class AbstractGunItemMixin {
         //Essential check since a NPE occurred here but in MinecraftOrRainbow client.
         if (rigsStack == null) return;
         zeroContact$grantVanillaFullAmmoReload(gunItem, cir);
+        if (rigsStack.isEmpty()) {
+            shooter.getCapability(ForgeCapabilities.ITEM_HANDLER, null).ifPresent(iItemHandler -> {
+                for (int i = 0; i < iItemHandler.getSlots(); i++) {
+                    if (zeroContact$sameOrSelectedCaliber(shooter, gunItem, cir, iItemHandler, i)) return;
+                }
+                zeroContact$sendFailMsg(shooter);
+            });
+            return;
+        }
         rigsStack.getCapability(ForgeCapabilities.ITEM_HANDLER, null).ifPresent(iItemHandler -> {
             for (int i = 0; i < iItemHandler.getSlots(); i++) {
-                ItemStack checkAmmoStack = iItemHandler.getStackInSlot(i);
-                if (checkAmmoStack.getItem() instanceof IAmmo iAmmo && iAmmo.isAmmoOfGun(gunItem, checkAmmoStack)) {
-                    cir.setReturnValue(true);
-                    return;
-                }
-                if (checkAmmoStack.getItem() instanceof IAmmoBox iAmmoBox && iAmmoBox.isAmmoBoxOfGun(gunItem, checkAmmoStack)) {
-
-                    cir.setReturnValue(true);
-                    return;
-                }
+                if (zeroContact$sameOrSelectedCaliber(shooter, gunItem, cir, iItemHandler, i)) return;
             }
+            zeroContact$sendFailMsg(shooter);
         });
+    }
+
+    @Unique
+    private static boolean zeroContact$sameOrSelectedCaliber(LivingEntity shooter, ItemStack gunItem, CallbackInfoReturnable<Boolean> cir, IItemHandler iItemHandler, int i) {
+        ItemStack checkAmmoStack = iItemHandler.getStackInSlot(i);
+        if (checkAmmoStack.getItem() instanceof IAmmo iAmmo && iAmmo.isAmmoOfGun(gunItem, checkAmmoStack)) {
+
+            AmmoInjector.AmmoContext gunCtx = AmmoInjector.read(gunItem);
+            AmmoInjector.AmmoContext ammoCtx = AmmoInjector.read(checkAmmoStack);
+            String selectedCaliber = gunItem.getCapability(CapabilityRegistries.CARTRIDGE).map(cap ->
+                    cap.getClientSelectedAmmoVariant(gunItem)).orElse("");
+
+            if (gunCtx.isEmpty()) return false;
+
+            boolean sameCaliber = gunCtx.caliber().equals(ammoCtx.caliber()) || selectedCaliber.equals(ammoCtx.caliber().variant());
+
+            if (!sameCaliber) {
+                cir.setReturnValue(false);
+                return false;
+            }
+            cir.setReturnValue(true);
+            return true;
+        }
+        if (checkAmmoStack.getItem() instanceof IAmmoBox iAmmoBox && iAmmoBox.isAmmoBoxOfGun(gunItem, checkAmmoStack)) {
+
+            AmmoInjector.AmmoContext gunCtx = AmmoInjector.read(gunItem);
+            AmmoInjector.AmmoContext ammoCtx = AmmoInjector.read(checkAmmoStack);
+            String selectedCaliber = gunItem.getCapability(CapabilityRegistries.CARTRIDGE).map(cap ->
+                    cap.getClientSelectedAmmoVariant(gunItem)).orElse("");
+
+            if (gunCtx.isEmpty()) return false;
+
+            boolean sameCaliber = gunCtx.caliber().equals(ammoCtx.caliber()) || selectedCaliber.equals(ammoCtx.caliber().variant());
+
+            if (!sameCaliber) {
+                cir.setReturnValue(false);
+                return false;
+            }
+            cir.setReturnValue(true);
+            return true;
+        }
+
+        return false;
+    }
+
+    @Unique
+    private static void zeroContact$sendFailMsg(LivingEntity shooter) {
+        if (shooter instanceof Player player) {
+            if (player.isCreative()) return;
+            player.displayClientMessage(
+                    Component.translatable("msg.zerocontact.no_matching_ammunition").withStyle(ChatFormatting.RED)
+                    , true
+            );
+        }
     }
 
     @Unique

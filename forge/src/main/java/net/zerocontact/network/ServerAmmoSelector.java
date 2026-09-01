@@ -84,7 +84,7 @@ public class ServerAmmoSelector {
             ResourceLocation selectedAmmoKey = ForgeRegistries.ITEMS.getKey(selectedAmmoStack.getItem());
             if (selectedAmmoKey == null) return;
             gunStack.getCapability(CapabilityRegistries.CARTRIDGE).ifPresent(cap -> cap.setClientSelectedAmmoVariant(gunStack, selectedAmmoKey.toString()));
-            ModMessages.sendToPlayer(new NetworkHandler.ClientAmmoReloadPacket(), player);
+            ModMessages.sendToPlayer(new NetworkHandler.ClientAmmoReloadPacket(player.getInventory().selected, selectedAmmoKey.toString()), player);
         });
     }
 

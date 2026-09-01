@@ -101,6 +101,8 @@
   "tooltip.zerocontact.bullet_inaccuracy": "Inaccuracy",
   "tooltip.zerocontact.bullet_knockback": "Knockback",
 
+  "msg.zerocontact.no_matching_ammunition": "== No Matching Ammunition! ==",
+
   "tooltip.zerocontact.ballistic_chart": "Nominal trajectory",
   "tootip.zerocontact.kit_armor": "[Right-click] over the equipment you want to repair",
   "tooltip.zerocontact.rig": "You cannot reload the gun directly from inventory once you equip the chest rig. Put your ammo in your chest rig.",

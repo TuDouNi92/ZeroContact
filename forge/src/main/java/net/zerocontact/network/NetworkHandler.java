@@ -1,12 +1,14 @@
 package net.zerocontact.network;
 
 import com.tacz.guns.api.client.gameplay.IClientPlayerGunOperator;
+import com.tacz.guns.api.item.IGun;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
@@ -14,6 +16,7 @@ import net.zerocontact.animation_data.AnimateData;
 import net.zerocontact.api.Toggleable;
 import net.zerocontact.client.ClientData;
 import net.zerocontact.client.animation.VisorTracker;
+import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.command.CommandManager;
 import net.zerocontact.item.backpack.BaseBackpack;
 import net.zerocontact.item.block.WorkBenchEntity;
@@ -222,24 +225,35 @@ public class NetworkHandler {
         }
     }
 
-    public record ClientAmmoReloadPacket() {
+    public record ClientAmmoReloadPacket(int gunSlot, String selectedAmmoKey) {
         public void encode(FriendlyByteBuf buf) {
+            buf.writeInt(gunSlot);
+            buf.writeUtf(selectedAmmoKey);
         }
 
         public static ClientAmmoReloadPacket decode(FriendlyByteBuf buf) {
-            return new ClientAmmoReloadPacket();
+            return new ClientAmmoReloadPacket(buf.readInt(), buf.readUtf());
         }
 
 
-        public static void handle(ClientAmmoReloadPacket __, Supplier<NetworkEvent.Context> supplier) {
+        public static void handle(ClientAmmoReloadPacket packet, Supplier<NetworkEvent.Context> supplier) {
             NetworkEvent.Context context = supplier.get();
             context.enqueueWork(() -> {
                 Minecraft mc = Minecraft.getInstance();
                 LocalPlayer player = mc.player;
-                IClientPlayerGunOperator operator = IClientPlayerGunOperator.fromLocalPlayer(player);
-                if (operator != null) {
-                    operator.reload();
-                }
+                if (player == null) return;
+                int gunSlot = packet.gunSlot;
+                Inventory inventory = player.getInventory();
+                if (gunSlot < 0 || gunSlot >= inventory.items.size()) return;
+                if (inventory.selected != gunSlot) return;
+                if (!IGun.mainHandHoldGun(player)) return;
+                ItemStack gunStack = player.getMainHandItem();
+                gunStack.getCapability(CapabilityRegistries.CARTRIDGE).ifPresent(cap -> {
+                            cap.setClientSelectedAmmoVariant(gunStack, packet.selectedAmmoKey());
+                            IClientPlayerGunOperator operator = IClientPlayerGunOperator.fromLocalPlayer(player);
+                            operator.reload();
+                        }
+                );
             });
         }
     }
