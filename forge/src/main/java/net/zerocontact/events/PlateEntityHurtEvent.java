@@ -4,18 +4,20 @@ import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
 import com.tacz.guns.api.event.common.GunDamageSourcePart;
 import com.tacz.guns.entity.EntityKineticBullet;
 import dev.architectury.event.EventResult;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.caliber.*;
-import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.compat.FirstAidCompatHandler;
+import net.zerocontact.datagen.MobRulesPOJO;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -69,26 +71,33 @@ public class PlateEntityHurtEvent {
         if (!isHeadShot) return;
         Optional<Entity> entity = Optional.ofNullable(event.getHurtEntity());
         DamageSource damageSource = event.getDamageSource(GunDamageSourcePart.ARMOR_PIERCING);
+        float amount = event.getBaseAmount();
         entity.ifPresent(e -> {
             if (e instanceof LivingEntity livingEntity) {
                 FirstAidCompatHandler firstAidCompat = FirstAidCompatHandler.create(livingEntity, damageSource);
                 ItemStack helmet = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
-                float amount = event.getBaseAmount();
-                Optional.of(helmet).ifPresent(stack -> {
-                    if (!(stack.getItem() instanceof HelmetInfoProvider && stack.getItem() instanceof ICombatArmorItem entityHurtProvider))
-                        return;
-                    int protectionClass = stack.getOrCreateTag().getInt("protection_class");
-                    float hurtAmount = getHurtAmount(livingEntity, damageSource, amount, null, entityHurtProvider, protectionClass);
-                    if (stack.getMaxDamage() - stack.getDamageValue() <= 1) {
-                        hurtAmount = getHurtAmount(livingEntity, damageSource, amount, null, null, protectionClass);
+                if (!(helmet.getItem() instanceof HelmetInfoProvider && helmet.getItem() instanceof ICombatArmorItem entityHurtProvider)) {
+                    EntityType<?> type = e.getType();
+                    ResourceLocation mobId = ForgeRegistries.ENTITY_TYPES.getKey(type);
+                    MobRulesPOJO.Pattern mobPattern = MobRuleRegistry.get(mobId);
+
+                    if (mobPattern != null) {
+                        eventPre.setBaseAmount(amount * Math.max(0,mobPattern.headshotMultiplier()));
                     }
-                    eventPre.setBaseAmount(hurtAmount);
-                    if (firstAidCompat != null && firstAidCompat.getHeadApplicable()) {
-                        eventPre.setHeadshotMultiplier(0.2f);
-                    } else {
-                        eventPre.setHeadshotMultiplier(1f);
-                    }
-                });
+                    return;
+                }
+                int protectionClass = helmet.getOrCreateTag().getInt("protection_class");
+                float hurtAmount = getHurtAmount(livingEntity, damageSource, amount, null, entityHurtProvider, protectionClass);
+                if (helmet.getMaxDamage() - helmet.getDamageValue() <= 1) {
+                    hurtAmount = getHurtAmount(livingEntity, damageSource, amount, null, null, protectionClass);
+                }
+                eventPre.setBaseAmount(hurtAmount);
+
+                if (firstAidCompat != null && firstAidCompat.getHeadApplicable()) {
+                    eventPre.setHeadshotMultiplier(0.2f);
+                } else {
+                    eventPre.setHeadshotMultiplier(1f);
+                }
             }
         });
     }

@@ -6,10 +6,8 @@ import net.zerocontact.api.IContentLoader;
 import net.zerocontact.caliber.CaliberRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.zerocontact.ZeroContactLogger;
-import net.zerocontact.datagen.AmmoDataPOJO;
-import net.zerocontact.datagen.GearRecipeData;
-import net.zerocontact.datagen.ItemGenData;
-import net.zerocontact.datagen.Zpack;
+import net.zerocontact.caliber.MobRuleRegistry;
+import net.zerocontact.datagen.*;
 import net.zerocontact.item.block.WorkBenchEntity;
 import net.zerocontact.lua.ZCLuaEngine;
 
@@ -30,13 +28,13 @@ public class ZContentLoader implements IContentLoader {
     private static final String AMMO_DEF_PATH = "data/" + MOD_ID + "/ammoDefinitions";
     private static final String AMMO_SCRIPT_PATH = "data/" + MOD_ID + "/scripts";
     private static final String RECIPES_PATH = "data/" + MOD_ID + "/gear_recipes";
+    private static final String MOB_RULES_PATH = "data/" + MOD_ID + "/rule/rules.json";
 
     public ZContentLoader(IAssetManager assetManager) {
         this.assetManager = assetManager;
     }
 
 
-    @Override
     public void loadItems(Set<Zpack> packs) {
         packs.forEach(pack -> {
             Path itemPath = pack.outerPack().resolve(ITEM_PATH);
@@ -51,7 +49,6 @@ public class ZContentLoader implements IContentLoader {
         });
     }
 
-    @Override
     public void loadBallistics(Set<Zpack> packs) {
         packs.forEach(pack -> {
             Path ballisticPath = pack.outerPack().resolve(AMMO_DEF_PATH);
@@ -74,7 +71,6 @@ public class ZContentLoader implements IContentLoader {
         });
     }
 
-    @Override
     public void loadScripts(Set<Zpack> packs) {
         ZCLuaEngine.ZcLuaInstance luaEngine = ZCLuaEngine.getInstance();
         Map<ResourceLocation, Path> loadedScripts = new HashMap<>();
@@ -155,7 +151,6 @@ public class ZContentLoader implements IContentLoader {
                 });
     }
 
-    @Override
     public void loadRecipes(Set<Zpack> packs) {
         Map<String, List<GearRecipeData.IngredientItems>> merged = new HashMap<>();
         for (Zpack pack : packs) {
@@ -188,5 +183,29 @@ public class ZContentLoader implements IContentLoader {
         WorkBenchEntity.recipeData = merged.entrySet().stream()
                 .map(e -> new GearRecipeData(e.getKey(), e.getValue()))
                 .toList();
+    }
+
+    public void loadMobRules(Set<Zpack> packs) {
+        for (Zpack pack : packs) {
+            Path mobRulesPath = pack.outerPack().resolve(MOB_RULES_PATH);
+            try {
+                assetManager.deserializeFromManifest(
+                        mobRulesPath,
+                        assetManager.getGson(),
+                        MobRulesPOJO.class,
+                        MobRuleRegistry::register);
+            } catch (JsonSyntaxException | IOException e) {
+                ZeroContactLogger.LOG.error(e);
+            }
+        }
+    }
+
+    @Override
+    public void load(Set<Zpack> packs) {
+        loadItems(packs);
+        loadBallistics(packs);
+        loadRecipes(packs);
+        loadScripts(packs);
+        loadMobRules(packs);
     }
 }

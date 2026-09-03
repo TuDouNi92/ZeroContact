@@ -27,24 +27,46 @@ public class HitIndicatorOverlay {
 
     static class HurtRecord {
         private final Vec3 targetPos;
+        private final int targetId;
         private final float amount;
+        private final int displaySlot;
         private int timer;
 
-        HurtRecord(LivingEntity target, float amount, int timer) {
+        HurtRecord(LivingEntity target, float amount, int timer, int displaySlot) {
             this.targetPos = target.position();
+            this.targetId = target.getId();
             this.amount = amount;
             this.timer = timer;
+            this.displaySlot = displaySlot;
         }
     }
 
     private static final ArrayList<HurtRecord> targetEntities = new ArrayList<>();
     private static final int RESIDENCE_TICKS = 90;
+    private static final int DISPLAY_COLUMNS = 3;
+    private static final int[] DISPLAY_COLUMN_OFFSETS = {0, -1, 1};
+    private static final float DISPLAY_COLUMN_SPACING = 36.0F;
+    private static final float DISPLAY_ROW_SPACING = 11.0F;
 
     @SubscribeEvent
     public static void livingHurt(LivingHurtEvent event) {
         DamageSource source = event.getSource();
         if (source.is(ZDamageTypes.ZC_DAMAGE) || source.is(ModDamageTypes.BULLETS_TAG)) {
-            targetEntities.add(new HurtRecord(event.getEntity(), event.getAmount(), 0));
+            LivingEntity target = event.getEntity();
+            targetEntities.add(new HurtRecord(target, event.getAmount(), 0, findAvailableDisplaySlot(target.getId())));
+        }
+    }
+
+    private static int findAvailableDisplaySlot(int targetId) {
+        int displaySlot = 0;
+        while (true) {
+            int candidate = displaySlot;
+            boolean occupied = targetEntities.stream()
+                    .anyMatch(record -> record.targetId == targetId && record.displaySlot == candidate);
+            if (!occupied) {
+                return displaySlot;
+            }
+            displaySlot++;
         }
     }
 
@@ -82,12 +104,16 @@ public class HitIndicatorOverlay {
             );
             MultiBufferSource.BufferSource buffer = mc.renderBuffers().bufferSource();
             String text = String.format("%.2f",record1.amount);
-            float textX = (float) -mc.font.width(text) / 2;
+            int column = record1.displaySlot % DISPLAY_COLUMNS;
+            int row = record1.displaySlot / DISPLAY_COLUMNS;
+            float textX = (float) -mc.font.width(text) / 2
+                    + DISPLAY_COLUMN_OFFSETS[column] * DISPLAY_COLUMN_SPACING;
+            float textY = -row * DISPLAY_ROW_SPACING;
             RenderSystem.disableDepthTest();
             mc.font.drawInBatch(
                     text,
                     textX,
-                    0,
+                    textY,
                     0xFFE135,
                     false,
                     poseStack.last().pose(),

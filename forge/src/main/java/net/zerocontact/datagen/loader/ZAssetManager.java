@@ -54,7 +54,9 @@ public class ZAssetManager implements IAssetManager {
                 T rawData = gson.fromJson(Files.newBufferedReader(itemJsonPath), targetBeanClazz);
                 data.accept(rawData, itemJsonPath);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to load path: ",e);
+            }catch (JsonSyntaxException jsonSyntaxException){
+                throw new RuntimeException("Failed to parse json: ",jsonSyntaxException);
             }
         });
     }
@@ -62,6 +64,7 @@ public class ZAssetManager implements IAssetManager {
     @Override
     public <T> void deserializeFromManifest(Path json, Gson gson, Class<T> targetBeanClazz, Consumer<T> data) throws IOException, JsonSyntaxException {
         if (Files.notExists(json)) return;
+        ZeroContactLogger.LOG.info("Try loading single JSON at；{}", json);
         T rawData = gson.fromJson(Files.newBufferedReader(json), targetBeanClazz);
         data.accept(rawData);
     }

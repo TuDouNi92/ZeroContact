@@ -2,14 +2,19 @@ package net.zerocontact.events;
 
 import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.init.ModDamageTypes;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.api.ICombatArmorItem;
+import net.zerocontact.caliber.MobRuleRegistry;
 import net.zerocontact.cofig.ModConfigs;
 import net.zerocontact.compat.FirstAidCompatHandler;
+import net.zerocontact.datagen.MobRulesPOJO;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,6 +34,7 @@ public class HurtPipeLine {
                 new Modifiers.BulletSourceFilter(),
                 new Modifiers.DamageSourceModifier(),
                 new Modifiers.DamageAmountModifier(),
+                new Modifiers.MobRule(),
                 new Modifiers.FirstAidCptCompat()
         ));
     }
@@ -161,6 +167,21 @@ public class HurtPipeLine {
                 }
 
                 return builder.finalAmount(finalHurtAmount);
+            }
+        }
+
+        public static class MobRule implements DamageModifier {
+
+            @Override
+            public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
+                LivingEntity target = context.target;
+                EntityType<?> type = target.getType();
+                ResourceLocation mobId = ForgeRegistries.ENTITY_TYPES.getKey(type);
+                MobRulesPOJO.Pattern mobPattern = MobRuleRegistry.get(mobId);
+                if (mobPattern == null) return current;
+                return current.finalAmount(
+                        current.finalAmount * Math.max(0,mobPattern.bodyshotMultiplier())
+                );
             }
         }
 

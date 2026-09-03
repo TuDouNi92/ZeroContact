@@ -53,6 +53,12 @@ public class PlateDamageEvent {
         if (!stackInSlot.isEmpty() && (damageSource.is(ModDamageTypes.BULLETS_TAG) || damageSource.is(ZDamageTypes.ZC_DAMAGE))) {
             if (stackInSlot.getItem() instanceof ICombatArmorItem armorProvider) {
                 if (!(damageSource.getDirectEntity() instanceof EntityKineticBullet bullet)) return;
+
+                EntityKineticBullet.EntityResult result = EventUtil.getHitResult(damageSource);
+                if (result != null && result.isHeadshot()) {
+                    return;
+                }
+
                 AmmoInjector.AmmoContext ammoContext = BulletBinder.getContext(bullet);
                 float caliberArmorDamage;
                 int hits = stackInSlot.getOrCreateTag().getInt("hits");
@@ -73,11 +79,6 @@ public class PlateDamageEvent {
 
                 hits++;
                 stackInSlot.getOrCreateTag().putInt("hits", hits);
-                EntityKineticBullet.EntityResult result = EventUtil.getHitResult(damageSource);
-
-                if (result != null && result.isHeadshot()) {
-                    return;
-                }
 
                 FirstAidCompatHandler firstAidCompatHandler = FirstAidCompatHandler.create(livingEntity, damageSource);
                 if (firstAidCompatHandler != null && firstAidCompatHandler.getLimbsApplicable()) return;
@@ -93,6 +94,7 @@ public class PlateDamageEvent {
     }
 
     public static void damageHelmet(EntityHurtByGunEvent event) {
+        if (!(event instanceof EntityHurtByGunEvent.Pre)) return;
         boolean isHeadshot = event.isHeadShot();
         if (!isHeadshot) return;
         Optional<Entity> entity = Optional.ofNullable(event.getHurtEntity());

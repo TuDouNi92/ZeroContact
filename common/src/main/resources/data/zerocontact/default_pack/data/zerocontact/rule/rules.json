@@ -1,0 +1,399 @@
+{
+  "mobs": [
+    {
+      "mob_id": "minecraft:allay",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:axolotl",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:bat",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:bee",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:blaze",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:camel",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:cat",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:cave_spider",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:chicken",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:cod",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:cow",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:creeper",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:dolphin",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:donkey",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:drowned",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:elder_guardian",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:ender_dragon",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:enderman",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:endermite",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:evoker",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:fox",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:frog",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:ghast",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:giant",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:glow_squid",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:goat",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:guardian",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:hoglin",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:horse",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:husk",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:illusioner",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:iron_golem",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:llama",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:magma_cube",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:mooshroom",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:mule",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:ocelot",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:panda",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:parrot",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:phantom",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:pig",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:piglin",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:piglin_brute",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:pillager",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:polar_bear",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:pufferfish",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:rabbit",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:ravager",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:salmon",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:sheep",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:shulker",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:silverfish",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:skeleton",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:skeleton_horse",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:slime",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:sniffer",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:snow_golem",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:spider",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:squid",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:stray",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:strider",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:tadpole",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:trader_llama",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:tropical_fish",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:turtle",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:vex",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:villager",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:vindicator",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:wandering_trader",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:warden",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:witch",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:wither",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:wither_skeleton",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:wolf",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:zoglin",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:zombie",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:zombie_horse",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:zombie_villager",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    },
+    {
+      "mob_id": "minecraft:zombified_piglin",
+      "headshot_multiplier": 1,
+      "bodyshot_multiplier": 1
+    }
+  ]
+}
