@@ -13,7 +13,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.zerocontact.client.gui.ConfigScreen;
-import net.zerocontact.cofig.ModConfigs;
+import net.zerocontact.config.ModConfigs;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2i;
 

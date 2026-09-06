@@ -1,6 +1,6 @@
 package net.zerocontact.api;
 
-import net.zerocontact.caliber.LuaHookContext;
+import net.zerocontact.caliber.extension.model.LuaHookContext;
 import org.luaj.vm2.LuaTable;
 
 @FunctionalInterface

@@ -9,8 +9,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.zerocontact.datagen.GearRecipeData;
-import net.zerocontact.network.NetworkHandler;
+import net.zerocontact.datagen.model.RecipePOJO;
+import net.zerocontact.network.c2s.BuyGearsPacket;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.*;
@@ -21,25 +21,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static net.zerocontact.forge_registries.BlocksRegForge.WORKBENCH_ENTITY;
+import static net.zerocontact.forge_registries.BlockRegistry.WORKBENCH_ENTITY;
 
 
 public class WorkBenchEntity extends BlockEntity implements GeoBlockEntity {
     public final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private static final RawAnimation OPEN = RawAnimation.begin().then("laptop_on", Animation.LoopType.HOLD_ON_LAST_FRAME);
     private static final RawAnimation CLOSED = RawAnimation.begin().then("laptop_off", Animation.LoopType.HOLD_ON_LAST_FRAME);
-    public static List<GearRecipeData> recipeData = new ArrayList<>();
+    public static List<RecipePOJO> recipeData = new ArrayList<>();
 
     public WorkBenchEntity(BlockPos pos, BlockState blockState) {
         super(WORKBENCH_ENTITY.get(), pos, blockState);
     }
 
-    public static void buy(NetworkHandler.BuyGearsPacket msg, ServerPlayer player) {
+    public static void buy(BuyGearsPacket msg, ServerPlayer player) {
         BlockEntity be = player.level().getBlockEntity(msg.pos());
         if (!(be instanceof WorkBenchEntity workBenchEntity)) return;
         ResourceLocation gearKey = ForgeRegistries.ITEMS.getKey(msg.gearItem());
         if (gearKey == null) return;
-        Optional<GearRecipeData> gearRecipeData = recipeData.stream().filter(data -> data.gearId.equals(gearKey.toString())).findFirst();
+        Optional<RecipePOJO> gearRecipeData = recipeData.stream().filter(data -> data.gearId.equals(gearKey.toString())).findFirst();
         if (gearRecipeData.isEmpty()) return;
         if (workBenchEntity.canTrade(gearRecipeData.get(), player)) {
             workBenchEntity.consumeItems(gearRecipeData.get(), player);
@@ -64,10 +64,10 @@ public class WorkBenchEntity extends BlockEntity implements GeoBlockEntity {
         return cache;
     }
 
-    public boolean canTrade(GearRecipeData data, ServerPlayer player) {
+    public boolean canTrade(RecipePOJO data, ServerPlayer player) {
         if (player.isCreative()) return true;
         Inventory inv = player.getInventory();
-        for (GearRecipeData.IngredientItems req : data.ingredientItems) {
+        for (RecipePOJO.IngredientItems req : data.ingredientItems) {
             Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(req.itemId));
             if (item == null) return false;
             int total = 0;
@@ -83,10 +83,10 @@ public class WorkBenchEntity extends BlockEntity implements GeoBlockEntity {
         return true;
     }
 
-    public void consumeItems(GearRecipeData data, ServerPlayer player) {
+    public void consumeItems(RecipePOJO data, ServerPlayer player) {
         if (player.isCreative()) return;
         Inventory inv = player.getInventory();
-        for (GearRecipeData.IngredientItems req : data.ingredientItems) {
+        for (RecipePOJO.IngredientItems req : data.ingredientItems) {
             Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(req.itemId));
             if (item == null) continue;
             int remaining = req.neededCount;

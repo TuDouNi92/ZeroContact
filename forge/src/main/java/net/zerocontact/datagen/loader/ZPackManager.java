@@ -13,7 +13,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.IPackManager;
-import net.zerocontact.datagen.*;
+import net.zerocontact.datagen.model.ManifestPOJO;
+import net.zerocontact.datagen.model.Zpack;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -104,7 +105,7 @@ public class ZPackManager implements IPackManager {
                         try {
                             assetManager.deserializeFromManifest(
                                     packPath.resolve(MANIFEST_PATH), assetManager.getGson(),
-                                    ManifestData.class,
+                                    ManifestPOJO.class,
                                     data -> outerPacks.add(
                                             new Zpack(
                                                     data.tabName(),

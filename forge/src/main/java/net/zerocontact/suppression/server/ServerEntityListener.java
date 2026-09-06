@@ -7,7 +7,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.zerocontact.network.AppendSuppressionPacket;
+import net.zerocontact.network.s2c.AppendSuppressionPacket;
 import net.zerocontact.network.ModMessages;
 import net.zerocontact.suppression.BulletSuppression;
 

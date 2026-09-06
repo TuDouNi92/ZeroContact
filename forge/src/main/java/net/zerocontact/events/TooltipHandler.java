@@ -16,9 +16,9 @@ import net.zerocontact.caliber.AmmoInjector;
 import net.zerocontact.caliber.CaliberVariantDamageHelper;
 import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.client.tooltip.AdvancedAmmoInfoComponents;
-import net.zerocontact.cofig.ModConfigs;
+import net.zerocontact.config.ModConfigs;
 import net.zerocontact.datagen.loader.ZPackManager;
-import net.zerocontact.forge_registries.ItemsRegForge;
+import net.zerocontact.forge_registries.ItemRegistry;
 import net.zerocontact.item.ammo.GenerateAmmo;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class TooltipHandler {
 
     private static void appendPackInfo(ItemTooltipEvent event) {
         Item item = event.getItemStack().getItem();
-        ItemsRegForge.ITEMS_REG_TAB.entrySet().stream()
+        ItemRegistry.ITEMS_REG_TAB.entrySet().stream()
                 .filter(entry -> entry.getKey().get().equals(item))
                 .findFirst()
                 .ifPresent(entry -> {

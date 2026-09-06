@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
@@ -23,7 +24,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.network.NetworkHooks;
 import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.api.Toggleable;
-import net.zerocontact.client.menu.BackpackContainerMenu;
+import net.zerocontact.menu.BackpackContainerMenu;
 import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,7 +34,6 @@ import top.theillusivec4.curios.api.SlotContext;
 import java.util.List;
 import java.util.Optional;
 
-import static net.zerocontact.events.EventUtil.getAllyPlayer;
 import static net.zerocontact.events.EventUtil.isLookAtTargetBack;
 
 public class BaseBackpack extends AbstractGenerateGeoCurioItemImpl implements IEquipmentTypeTag, Toggleable.Backpack {
@@ -121,9 +121,9 @@ public class BaseBackpack extends AbstractGenerateGeoCurioItemImpl implements IE
         return super.canEquipFromUse(slotContext, stack);
     }
 
-    public static void whetherOpenAllyScreen(Player player) {
+    public static void openAllysBackpack(Player player, Entity target) {
         if (player instanceof ServerPlayer serverPlayer) {
-            ServerPlayer targetEntity = getAllyPlayer(player);
+            if (!(target instanceof Player targetEntity)) return;
             if (isLookAtTargetBack(serverPlayer, targetEntity) && player.isCrouching()) {
                 CuriosApi.getCuriosInventory(targetEntity)
                         .ifPresent(itemHandler ->
@@ -139,6 +139,6 @@ public class BaseBackpack extends AbstractGenerateGeoCurioItemImpl implements IE
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
-        IEquipmentTypeTag.super.appendHoverText(stack,level,tooltipComponents,isAdvanced);
+        IEquipmentTypeTag.super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
     }
 }

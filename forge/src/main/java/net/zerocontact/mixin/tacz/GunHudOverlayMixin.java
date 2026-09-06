@@ -18,7 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.zerocontact.capability.CapabilityRegistries;
-import net.zerocontact.cofig.ModConfigs;
+import net.zerocontact.config.ModConfigs;
 import net.zerocontact.compat.MagazinesCompatHandler;
 import net.zerocontact.item.ammo.GenerateAmmo;
 import net.zerocontact.item.rigs.BaseRigs;

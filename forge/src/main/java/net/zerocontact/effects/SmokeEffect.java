@@ -11,10 +11,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.zerocontact.caliber.HookContext;
-import net.zerocontact.caliber.HookEffectInvocation;
-import net.zerocontact.datagen.AmmoDataPOJO;
-import net.zerocontact.forge_registries.ZCParticles;
+import net.zerocontact.caliber.extension.model.HookContext;
+import net.zerocontact.caliber.extension.model.HookEffectInvocation;
+import net.zerocontact.datagen.model.AmmoDataPOJO;
+import net.zerocontact.forge_registries.ParticleRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,7 +118,7 @@ public class SmokeEffect extends MobEffect implements ZCEffect {
             int particlesAtSample = Math.min(PARTICLES_PER_SAMPLE, particleCount - i * PARTICLES_PER_SAMPLE);
 
             level.sendParticles(
-                    ZCParticles.PERSISTENT_SIGNAL_SMOKE.get(),
+                    ParticleRegistry.PERSISTENT_SIGNAL_SMOKE.get(),
                     center.x + x,
                     centerY + y * distance,
                     center.z + z,

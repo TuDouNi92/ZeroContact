@@ -6,8 +6,8 @@ import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
-import net.zerocontact.datagen.GenerationRecord;
-import net.zerocontact.datagen.ItemGenData;
+import net.zerocontact.datagen.model.GenerationRecord;
+import net.zerocontact.datagen.model.ItemPOJO;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.io.IOException;
@@ -47,11 +47,11 @@ public interface IAssetManager {
     }
 
     interface GeneratableItem {
-        default <T extends ItemGenData.Armor> LinkedHashSet<GenerationRecord<?>> deserializeItems(T data, String tab) {
+        default <T extends ItemPOJO.Armor> LinkedHashSet<GenerationRecord<?>> deserializeItems(T data, String tab) {
             return new LinkedHashSet<>();
         }
 
-        default <T extends ItemGenData.Plate> LinkedHashSet<GenerationRecord<?>> deserializeItems(T data, String tab) {
+        default <T extends ItemPOJO.Plate> LinkedHashSet<GenerationRecord<?>> deserializeItems(T data, String tab) {
             return new LinkedHashSet<>();
         }
 

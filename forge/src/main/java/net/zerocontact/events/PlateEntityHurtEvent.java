@@ -16,8 +16,12 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.caliber.*;
+import net.zerocontact.caliber.extension.HookDispatcher;
+import net.zerocontact.caliber.extension.HookEventTrigger;
+import net.zerocontact.caliber.extension.model.HookContext;
+import net.zerocontact.caliber.registry.MobRuleRegistry;
 import net.zerocontact.compat.FirstAidCompatHandler;
-import net.zerocontact.datagen.MobRulesPOJO;
+import net.zerocontact.datagen.model.MobRulesPOJO;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -32,8 +36,8 @@ public class PlateEntityHurtEvent {
             armorStack = hitStacks[1];
             plateStack = hitStacks[0];
         }
-        HurtPipeLine pipeLine = new HurtPipeLine();
-        HurtPipeLine.DamageResult result = pipeLine.process(new HurtPipeLine.DamageContext(lv, source, amount, plateStack, armorStack));
+        DamagePipeLine pipeLine = new DamagePipeLine();
+        DamagePipeLine.DamageResult result = pipeLine.process(new DamagePipeLine.DamageContext(lv, source, amount, plateStack, armorStack));
         return pipeLine.execute(result, () -> {
             lv.hurt(result.finalSource(), result.finalAmount());
             EntityKineticBullet bullet = (EntityKineticBullet) source.getDirectEntity();

@@ -2,6 +2,7 @@ package net.zerocontact.caliber;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
+import net.zerocontact.caliber.registry.CaliberRegistry;
 import org.jetbrains.annotations.Nullable;
 
 public class CaliberSerializer {

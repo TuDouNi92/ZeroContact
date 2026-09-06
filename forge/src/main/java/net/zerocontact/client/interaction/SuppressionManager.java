@@ -4,7 +4,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.zerocontact.cofig.ModConfigs;
+import net.zerocontact.config.ModConfigs;
 
 public class SuppressionManager {
     public static float suppressionLevel = 0;

@@ -9,7 +9,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.IAssetManager;
-import net.zerocontact.datagen.*;
+import net.zerocontact.datagen.adapter.ItemAdapter;
+import net.zerocontact.datagen.adapter.RuntimeTypeAdapterFactory;
+import net.zerocontact.datagen.model.AmmoDataPOJO;
+import net.zerocontact.datagen.model.GenerationRecord;
+import net.zerocontact.datagen.model.ItemPOJO;
 import net.zerocontact.registries.ItemsReg;
 
 import java.io.IOException;
@@ -22,15 +26,15 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static net.zerocontact.forge_registries.ItemsRegForge.ITEMS_REG_TAB;
+import static net.zerocontact.forge_registries.ItemRegistry.ITEMS_REG_TAB;
 
 public class ZAssetManager implements IAssetManager {
-    private final RuntimeTypeAdapterFactory<ItemGenData> typeAdapterFactory =
+    private final RuntimeTypeAdapterFactory<ItemPOJO> typeAdapterFactory =
             RuntimeTypeAdapterFactory
-                    .of(ItemGenData.class, "type")
-                    .registerSubtype(ItemGenData.Plate.class, "plate")
-                    .registerSubtype(ItemGenData.Armor.class, "armor")
-                    .registerSubtype(ItemGenData.Loadout.class,"loadout");
+                    .of(ItemPOJO.class, "type")
+                    .registerSubtype(ItemPOJO.Plate.class, "plate")
+                    .registerSubtype(ItemPOJO.Armor.class, "armor")
+                    .registerSubtype(ItemPOJO.Loadout.class,"loadout");
     private final Gson gson = new GsonBuilder().registerTypeAdapterFactory(typeAdapterFactory).create();
 
     @Override
@@ -83,11 +87,11 @@ public class ZAssetManager implements IAssetManager {
     @Override
     public void register() {
         ZContentLoader.itemGenData.forEach((data, tab) -> ItemAdapter.ADAPTERS.forEach(adapter -> {
-            if (data instanceof ItemGenData.Armor armor) {
+            if (data instanceof ItemPOJO.Armor armor) {
                 LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(armor, tab);
                 if (records.isEmpty()) return;
                 this.registerItems(ITEMS_REG_TAB, ItemsReg.ITEMS, new IAssetManager.WearableType(records, "ARMOR_LIKE"));
-            } else if (data instanceof ItemGenData.Plate plate) {
+            } else if (data instanceof ItemPOJO.Plate plate) {
                 LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(plate, tab);
                 if (records.isEmpty()) return;
                 this.registerItems(ITEMS_REG_TAB, ItemsReg.ITEMS, new IAssetManager.WearableType(records, "PLATE_LIKE"));
@@ -96,7 +100,7 @@ public class ZAssetManager implements IAssetManager {
                 if(records.isEmpty())return;
                 this.registerItems(ITEMS_REG_TAB,ItemsReg.ITEMS, new IAssetManager.WearableType(records,"AMMO"));
             }
-            else if(data instanceof ItemGenData.Loadout loadout){
+            else if(data instanceof ItemPOJO.Loadout loadout){
                 LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(loadout, tab);
                 if(records.isEmpty())return;
                 this.registerItems(ITEMS_REG_TAB,ItemsReg.ITEMS, new IAssetManager.WearableType(records,"LOADOUT"));

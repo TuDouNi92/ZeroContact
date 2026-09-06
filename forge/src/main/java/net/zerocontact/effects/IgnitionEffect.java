@@ -11,9 +11,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.zerocontact.caliber.HookContext;
-import net.zerocontact.caliber.HookEffectInvocation;
-import net.zerocontact.datagen.AmmoDataPOJO;
+import net.zerocontact.caliber.extension.model.HookContext;
+import net.zerocontact.caliber.extension.model.HookEffectInvocation;
+import net.zerocontact.datagen.model.AmmoDataPOJO;
 
 import java.util.ArrayList;
 import java.util.List;

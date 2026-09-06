@@ -14,7 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.client.gui.WorkbenchScreen;
-import net.zerocontact.datagen.GearRecipeData;
+import net.zerocontact.datagen.model.RecipePOJO;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
@@ -42,13 +42,13 @@ public class ScrollList extends AbstractSelectionList<ScrollList.GearEntry> {
         private final Font font = Minecraft.getInstance().font;
         private final ScrollList parent;
         public final int recipeIndex;
-        public GearEntry(GearRecipeData gearRecipeData, ScrollList parent, int recipeIndex) {
+        public GearEntry(RecipePOJO gearRecipeData, ScrollList parent, int recipeIndex) {
             this.parent = parent;
             this.gearItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(gearRecipeData.gearId));
             this.recipeIndex = recipeIndex;
             if (this.gearItem != null) {
                 this.gearName = Component.translatable(this.gearItem.getDescriptionId()).getString();
-                for (GearRecipeData.IngredientItems ingredientItems : gearRecipeData.ingredientItems) {
+                for (RecipePOJO.IngredientItems ingredientItems : gearRecipeData.ingredientItems) {
                     Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(ingredientItems.itemId));
                     if (item == null) continue;
                     recipes.put(new ItemStack(item), ingredientItems.neededCount);

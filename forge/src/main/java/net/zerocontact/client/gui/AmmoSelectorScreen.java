@@ -10,9 +10,9 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.client.interaction.KeyBindingHandler;
-import net.zerocontact.client.menu.AmmoSelectorMenu;
+import net.zerocontact.menu.AmmoSelectorMenu;
 import net.zerocontact.network.ModMessages;
-import net.zerocontact.network.NetworkHandler;
+import net.zerocontact.network.c2s.SelectAmmoPacket;
 import net.zerocontact.registries.ModSoundEventsReg;
 import org.jetbrains.annotations.NotNull;
 
@@ -101,7 +101,7 @@ public class AmmoSelectorScreen extends AbstractContainerScreen<AmmoSelectorMenu
             int ammoIndex = AmmoSelectorRenderUtil.getHoveredSegment(mouseX, mouseY, ring);
             if (ammoIndex == -1) return true;
             ItemStack ammoItem = menu.ammo.get(ammoIndex).getKey();
-            ModMessages.sendToServer(new NetworkHandler.SelectAmmoPacket(ammoItem));
+            ModMessages.sendToServer(new SelectAmmoPacket(ammoItem));
             return true;
         }
         return false;

@@ -25,7 +25,7 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.*;
 import net.minecraftforge.network.NetworkHooks;
-import net.zerocontact.client.menu.WorkbenchMenu;
+import net.zerocontact.menu.WorkbenchMenu;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

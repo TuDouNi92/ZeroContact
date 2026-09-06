@@ -10,7 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.command.CommandManager;
 import net.zerocontact.network.ModMessages;
-import net.zerocontact.network.NetworkHandler;
+import net.zerocontact.network.s2c.SyncStaminaPacket;
 
 import java.util.UUID;
 
@@ -83,7 +83,7 @@ public class PlayerStamina {
                 playerStamina.cooldownTicks = Math.max(0, --playerStamina.cooldownTicks);
                 ZeroContactLogger.LOG.debug(playerStamina.cooldownTicks);
             }
-            ModMessages.sendToPlayer(new NetworkHandler.SyncStaminaPacket(playerStamina.getStamina(), CommandManager.CommandSavedData.get(serverLevel).staminaState), (ServerPlayer) player);
+            ModMessages.sendToPlayer(new SyncStaminaPacket(playerStamina.getStamina(), CommandManager.CommandSavedData.get(serverLevel).staminaState), (ServerPlayer) player);
         });
     }
 }

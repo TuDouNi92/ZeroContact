@@ -3,7 +3,7 @@ package net.zerocontact.item.armor.forge;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.zerocontact.api.IEquipmentTypeTag;
-import net.zerocontact.datagen.GenerationRecord;
+import net.zerocontact.datagen.model.GenerationRecord;
 import net.zerocontact.registries.ModSoundEventsReg;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;

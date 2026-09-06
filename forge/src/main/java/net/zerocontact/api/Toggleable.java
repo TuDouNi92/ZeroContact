@@ -9,7 +9,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.zerocontact.animation_data.AnimateData;
 import net.zerocontact.network.ModMessages;
-import net.zerocontact.network.NetworkHandler;
+import net.zerocontact.network.s2c.ToggleVisorResultPacket;
 
 public interface Toggleable {
     ResourceLocation getVisorTexture();
@@ -55,7 +55,7 @@ public interface Toggleable {
             ItemStack newGear = equipmentChangeEvent.getTo();
             EquipmentSlot slot = equipmentChangeEvent.getSlot();
             if (slot == EquipmentSlot.HEAD && (newGear.getItem() instanceof Toggleable helmet)) {
-                ModMessages.sendToPlayer(new NetworkHandler.ToggleVisorResultPacket(helmet.readAnimData(newGear)), player);
+                ModMessages.sendToPlayer(new ToggleVisorResultPacket(helmet.readAnimData(newGear)), player);
             }
         }
     }

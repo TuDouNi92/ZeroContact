@@ -1,6 +1,6 @@
 package net.zerocontact.api;
 
-import net.zerocontact.datagen.Zpack;
+import net.zerocontact.datagen.model.Zpack;
 
 import java.util.Set;
 

@@ -14,11 +14,11 @@ import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.client.gui.components.ScrollList;
-import net.zerocontact.client.menu.WorkbenchMenu;
-import net.zerocontact.datagen.GearRecipeData;
+import net.zerocontact.menu.WorkbenchMenu;
+import net.zerocontact.datagen.model.RecipePOJO;
 import net.zerocontact.item.block.WorkBenchEntity;
 import net.zerocontact.network.ModMessages;
-import net.zerocontact.network.NetworkHandler;
+import net.zerocontact.network.c2s.BuyGearsPacket;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -30,7 +30,7 @@ public class WorkbenchScreen extends AbstractContainerScreen<WorkbenchMenu> {
     private int guiHeightMax;
     private Button submitButton;
     private ScrollList scrollList;
-    private final Set<GearRecipeData> currentData = new HashSet<>();
+    private final Set<RecipePOJO> currentData = new HashSet<>();
 
     public WorkbenchScreen(WorkbenchMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -70,14 +70,14 @@ public class WorkbenchScreen extends AbstractContainerScreen<WorkbenchMenu> {
         addRenderableWidget(scrollList);
     }
 
-    private void replaceData(Tab tab, BiConsumer<IEquipmentTypeTag.EquipmentType, List<GearRecipeData>> dataConsumer) {
+    private void replaceData(Tab tab, BiConsumer<IEquipmentTypeTag.EquipmentType, List<RecipePOJO>> dataConsumer) {
         tab.equipmentTypes.forEach(type -> dataConsumer.accept(type, WorkBenchEntity.recipeData));
     }
 
     private void setCurrentTab(Tab tab) {
-        LinkedHashSet<GearRecipeData> recipes = new LinkedHashSet<>();
+        LinkedHashSet<RecipePOJO> recipes = new LinkedHashSet<>();
         replaceData(tab, (type, data) -> {
-            LinkedHashSet<GearRecipeData> filteredRecipes = data.stream().filter(e -> {
+            LinkedHashSet<RecipePOJO> filteredRecipes = data.stream().filter(e -> {
                 Item gearItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(e.gearId));
                 if (gearItem == null) return false;
                 return gearItem instanceof IEquipmentTypeTag tag && tag.getArmorType().equals(type);
@@ -108,7 +108,7 @@ public class WorkbenchScreen extends AbstractContainerScreen<WorkbenchMenu> {
         scrollList.children().clear();
         scrollList.setScrollAmount(0);
         int recipeIndex = 0;
-        for (GearRecipeData data : currentData) {
+        for (RecipePOJO data : currentData) {
             scrollList.addGearEntry(new ScrollList.GearEntry(data, scrollList, recipeIndex));
             recipeIndex++;
         }
@@ -119,7 +119,7 @@ public class WorkbenchScreen extends AbstractContainerScreen<WorkbenchMenu> {
         ScrollList.GearEntry entry = scrollList.getSelected();
         if (menu.blockEntity != null) {
             if (entry != null) {
-                ModMessages.sendToServer(new NetworkHandler.BuyGearsPacket(menu.blockEntity.getBlockPos(), entry.gearItem));
+                ModMessages.sendToServer(new BuyGearsPacket(menu.blockEntity.getBlockPos(), entry.gearItem));
             }
         }
     }

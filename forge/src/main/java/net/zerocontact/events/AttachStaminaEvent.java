@@ -13,7 +13,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.zerocontact.command.CommandManager;
 import net.zerocontact.network.ModMessages;
-import net.zerocontact.network.NetworkHandler;
+import net.zerocontact.network.s2c.SyncStaminaPacket;
 import net.zerocontact.stamina.PlayerStamina;
 import net.zerocontact.stamina.PlayerStaminaProvider;
 
@@ -52,7 +52,7 @@ public class AttachStaminaEvent {
             if (event.getEntity() instanceof ServerPlayer player && player.level() instanceof ServerLevel serverLevel) {
                 player.getCapability(PlayerStaminaProvider.PLAYER_STAMINA).ifPresent(playerStamina -> {
                     ModMessages.sendToPlayer(
-                            new NetworkHandler.SyncStaminaPacket(
+                            new SyncStaminaPacket(
                                     playerStamina.getStamina(),
                                     CommandManager.CommandSavedData.get(serverLevel).staminaState
                             ),

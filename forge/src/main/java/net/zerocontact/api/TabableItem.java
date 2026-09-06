@@ -6,7 +6,7 @@ import net.minecraft.world.level.ItemLike;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import static net.zerocontact.forge_registries.ItemsRegForge.DEFAULT_TAB;
+import static net.zerocontact.forge_registries.ItemRegistry.DEFAULT_TAB;
 
 public interface TabableItem {
     List<RegistrySupplier<? extends ItemLike>> getItems();

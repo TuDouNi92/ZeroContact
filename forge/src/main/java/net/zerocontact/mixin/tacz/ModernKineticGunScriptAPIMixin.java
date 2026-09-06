@@ -22,7 +22,7 @@ import net.zerocontact.caliber.AmmoInjector;
 import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.compat.MagazinesCompatHandler;
 import net.zerocontact.events.EventUtil;
-import net.zerocontact.network.ServerAmmoSelector;
+import net.zerocontact.caliber.ServerAmmoSelector;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

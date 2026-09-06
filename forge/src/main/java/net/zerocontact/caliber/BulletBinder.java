@@ -11,7 +11,10 @@ import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.zerocontact.datagen.AmmoDataPOJO;
+import net.zerocontact.caliber.extension.HookDispatcher;
+import net.zerocontact.caliber.extension.HookEventTrigger;
+import net.zerocontact.caliber.extension.model.HookContext;
+import net.zerocontact.datagen.model.AmmoDataPOJO;
 import net.zerocontact.mixin.tacz.EntityKineticBulletAccessor;
 import org.jetbrains.annotations.Nullable;
 
