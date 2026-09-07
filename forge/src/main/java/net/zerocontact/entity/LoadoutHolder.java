@@ -12,6 +12,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.caliber.AmmoInjector;
+import net.zerocontact.caliber.CaliberHelper;
 import net.zerocontact.compat.MagazinesCompatHandler;
 import net.zerocontact.item.ammo.GenerateAmmo;
 import org.jetbrains.annotations.NotNull;
@@ -115,7 +116,7 @@ class LoadoutHolder {
                     this.ammoStack = ammoStack;
                     MagazinesCompatHandler.get().getCompat().ifPresent(magazinesCompat -> {
                         if (magazinesCompat.isMagazineCompatibleWithGun(gunStack)) {
-                            net.zerocontact.caliber.CaliberVariantDamageHelper.Caliber caliber = generateAmmo.getDefualtCaliber();
+                            CaliberHelper.Caliber caliber = generateAmmo.getDefualtCaliber();
                             this.ammoStack = magazinesCompat.getCompatibleMag(gunStack);
                             AmmoInjector.write(new AmmoInjector.AmmoContext(caliber), this.ammoStack);
                         }

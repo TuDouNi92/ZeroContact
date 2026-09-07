@@ -6,7 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.ZeroContact;
-import net.zerocontact.caliber.CaliberVariantDamageHelper;
+import net.zerocontact.caliber.CaliberHelper;
 import net.zerocontact.caliber.extension.HookEventTrigger;
 import net.zerocontact.caliber.extension.model.TargetSelector;
 import org.jetbrains.annotations.Nullable;
@@ -75,8 +75,8 @@ public class AmmoDataPOJO {
 
     public EventHook[] effects = new EventHook[]{};
 
-    public CaliberVariantDamageHelper.Caliber toCaliber() {
-        return new CaliberVariantDamageHelper.Caliber(
+    public CaliberHelper.Caliber toCaliber() {
+        return new CaliberHelper.Caliber(
                 ammoId,
                 ZeroContact.MOD_ID + ":" + variant,
                 life,

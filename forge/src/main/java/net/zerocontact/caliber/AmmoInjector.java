@@ -20,7 +20,7 @@ import static net.zerocontact.caliber.CaliberSerializer.*;
 
 public class AmmoInjector {
 
-    public record AmmoContext(CaliberVariantDamageHelper.Caliber caliber) {
+    public record AmmoContext(CaliberHelper.Caliber caliber) {
         public boolean isEmpty() {
             return caliber == null || caliber.id().isEmpty() || caliber.variant().isEmpty();
         }
@@ -39,7 +39,7 @@ public class AmmoInjector {
     }
 
     //Sync tags when change cartridge;
-    public static void copyTags(CaliberVariantDamageHelper.Caliber defaultCaliber, ItemStack gun) {
+    public static void copyTags(CaliberHelper.Caliber defaultCaliber, ItemStack gun) {
         gun.getOrCreateTag().merge(CaliberSerializer.save(new AmmoContext(defaultCaliber)));
     }
 
@@ -83,7 +83,7 @@ public class AmmoInjector {
             copyTags(context.caliber(), gunStack);
             return;
         }
-        CaliberVariantDamageHelper.Caliber caliber = ammo.getDefualtCaliber();
+        CaliberHelper.Caliber caliber = ammo.getDefualtCaliber();
         copyTags(caliber, gunStack);
     }
 

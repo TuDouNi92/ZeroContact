@@ -13,7 +13,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.zerocontact.caliber.AmmoInjector;
-import net.zerocontact.caliber.CaliberVariantDamageHelper;
+import net.zerocontact.caliber.CaliberHelper;
 import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.client.tooltip.AdvancedAmmoInfoComponents;
 import net.zerocontact.config.ModConfigs;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
-public class TooltipHandler {
+public class TooltipHandlerEvent {
     public static final String SHOW_BULLET_DATA_LABEL = "tooltip.zerocontact.bullet_data";
 
     @SubscribeEvent
@@ -66,7 +66,7 @@ public class TooltipHandler {
         if (IGun.getIGunOrNull(checkStack) != null) {
             checkStack.getCapability(CapabilityRegistries.CARTRIDGE).ifPresent(cap -> {
                 String ammoVariantId = cap.getAmmoVariantInGun(checkStack);
-                CaliberVariantDamageHelper.Caliber caliber = AmmoInjector.read(checkStack).caliber();
+                CaliberHelper.Caliber caliber = AmmoInjector.read(checkStack).caliber();
                 MutableComponent ammoLabel = Component.translatable("tooltip.zerocontact.gun.ammoVariant").withStyle(ChatFormatting.GOLD).append(":");
                 ItemStack ammoStack = cap.getDefaultStack(ammoVariantId);
                 Component ammoName = Component.literal("\uD83E\uDC35 ").append(Component.translatable(ammoStack.getDescriptionId())).withStyle(ChatFormatting.YELLOW);

@@ -15,7 +15,9 @@ import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.caliber.AmmoInjector;
 import net.zerocontact.caliber.BulletBinder;
-import net.zerocontact.caliber.CaliberVariantDamageHelper;
+import net.zerocontact.caliber.CaliberHelper;
+import net.zerocontact.caliber.damage.HitUtil;
+import net.zerocontact.caliber.damage.ZDamageTypes;
 import net.zerocontact.compat.FirstAidCompatHandler;
 import net.zerocontact.registries.ModSoundEventsReg;
 
@@ -54,7 +56,7 @@ public class PlateDamageEvent {
             if (stackInSlot.getItem() instanceof ICombatArmorItem armorProvider) {
                 if (!(damageSource.getDirectEntity() instanceof EntityKineticBullet bullet)) return;
 
-                EntityKineticBullet.EntityResult result = EventUtil.getHitResult(damageSource);
+                EntityKineticBullet.EntityResult result = HitUtil.getHitResult(damageSource);
                 if (result != null && result.isHeadshot()) {
                     return;
                 }
@@ -63,7 +65,7 @@ public class PlateDamageEvent {
                 float caliberArmorDamage;
                 int hits = stackInSlot.getOrCreateTag().getInt("hits");
                 if (ammoContext != null) {
-                    CaliberVariantDamageHelper.Caliber caliber = ammoContext.caliber();
+                    CaliberHelper.Caliber caliber = ammoContext.caliber();
                     if (caliber.armorDamage() != 0) {
                         caliberArmorDamage = getArmorDamage(caliber, armorProvider, caliber.armorDamage());
                     } else {
@@ -87,7 +89,7 @@ public class PlateDamageEvent {
         }
     }
 
-    private static float getArmorDamage(CaliberVariantDamageHelper.Caliber caliber, ICombatArmorItem provider, float baseDamage) {
+    private static float getArmorDamage(CaliberHelper.Caliber caliber, ICombatArmorItem provider, float baseDamage) {
         int absorb = provider.getAbsorb() == 0 ? 1 : provider.getAbsorb();
         baseDamage = baseDamage <= 0 ? (float) 0.01 : baseDamage;
         return caliber.penetrationClass() * baseDamage * ((float) caliber.penetrationClass() / absorb);
@@ -115,6 +117,6 @@ public class PlateDamageEvent {
     }
 
     public static EventResult register(LivingEntity entity, DamageSource damageSource, float amount) {
-        return modify(entity, damageSource, amount, EventUtil.getHitBodyPartStack(entity, damageSource)) ? EventResult.interruptFalse() : EventResult.pass();
+        return modify(entity, damageSource, amount, HitUtil.getHitBodyPartStack(entity, damageSource)) ? EventResult.interruptFalse() : EventResult.pass();
     }
 }

@@ -2,7 +2,7 @@ package net.zerocontact.client.tooltip;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.zerocontact.caliber.CaliberVariantDamageHelper;
+import net.zerocontact.caliber.CaliberHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ public class AdvancedAmmoInfoComponents {
     public static final String BULLET_INACCURACY = "tooltip.zerocontact.bullet_inaccuracy";
     public static final String BULLET_KNOCK_BACK = "tooltip.zerocontact.bullet_knockback";
 
-    public static List<Component> create(CaliberVariantDamageHelper.Caliber caliber, boolean fromAmmo) {
+    public static List<Component> create(CaliberHelper.Caliber caliber, boolean fromAmmo) {
         Function<Float, Component> decimalToPercentOff = (amount) -> {
             int result = Math.round((1 - amount) * 100);
             result = result < 0 ? Math.abs(result) : -result;

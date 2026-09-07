@@ -1,7 +1,7 @@
 package net.zerocontact.caliber.registry;
 
 import net.zerocontact.ZeroContactLogger;
-import net.zerocontact.caliber.CaliberVariantDamageHelper;
+import net.zerocontact.caliber.CaliberHelper;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,30 +9,30 @@ import java.util.Map;
 import java.util.Optional;
 
 public final class CaliberRegistry {
-    private static final Map<CaliberKey, CaliberVariantDamageHelper.Caliber> CALIBERS = new HashMap<>();
+    private static final Map<CaliberKey, CaliberHelper.Caliber> CALIBERS = new HashMap<>();
 
     static {
-        Arrays.stream(CaliberVariantDamageHelper.values()).forEach(helper -> register(helper.caliber));
+        Arrays.stream(CaliberHelper.values()).forEach(helper -> register(helper.caliber));
     }
 
-    public static void register(CaliberVariantDamageHelper.Caliber caliber) {
+    public static void register(CaliberHelper.Caliber caliber) {
         CaliberKey key = new CaliberKey(
                 caliber.id(),
                 caliber.variant()
         );
-        CaliberVariantDamageHelper.Caliber previous = CALIBERS.put(key, caliber);
+        CaliberHelper.Caliber previous = CALIBERS.put(key, caliber);
         if (previous != null) {
             ZeroContactLogger.LOG.warn("Duplicated caliber registration!! Replacing {}", key);
         }
     }
 
-    public static Optional<CaliberVariantDamageHelper.Caliber> get(String ammoId, String variantId) {
+    public static Optional<CaliberHelper.Caliber> get(String ammoId, String variantId) {
         return Optional.ofNullable(
                 CALIBERS.get(new CaliberKey(ammoId, variantId))
         );
     }
 
-    public static Map<CaliberKey, CaliberVariantDamageHelper.Caliber> calibers() {
+    public static Map<CaliberKey, CaliberHelper.Caliber> calibers() {
         return CALIBERS;
     }
 

@@ -15,7 +15,7 @@ public class CaliberSerializer {
 
 
     public static CompoundTag save(AmmoInjector.AmmoContext context) {
-        CaliberVariantDamageHelper.Caliber caliber = context.caliber();
+        CaliberHelper.Caliber caliber = context.caliber();
         CompoundTag ammoTag = new CompoundTag();
         ammoTag.putString(AI_AMMO_ID, caliber.id());
         ammoTag.putString(VARIANT, caliber.variant());
@@ -33,6 +33,6 @@ public class CaliberSerializer {
         String variant = ammoTag.getString(VARIANT);
         return CaliberRegistry.get(id, variant)
                 .map(AmmoInjector.AmmoContext::new)
-                .orElse(new AmmoInjector.AmmoContext(CaliberVariantDamageHelper.Caliber.createDefaultCaliberFromStack(id, gunStack)));
+                .orElse(new AmmoInjector.AmmoContext(CaliberHelper.Caliber.createDefaultCaliberFromStack(id, gunStack)));
     }
 }

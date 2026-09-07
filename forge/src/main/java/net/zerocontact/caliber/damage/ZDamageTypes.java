@@ -1,4 +1,4 @@
-package net.zerocontact.events;
+package net.zerocontact.caliber.damage;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;

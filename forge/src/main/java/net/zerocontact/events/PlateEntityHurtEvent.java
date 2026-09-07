@@ -16,13 +16,17 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.api.ICombatArmorItem;
 import net.zerocontact.api.HelmetInfoProvider;
 import net.zerocontact.caliber.*;
+import net.zerocontact.caliber.damage.DamagePipeLine;
+import net.zerocontact.caliber.damage.DamageProcessor;
+import net.zerocontact.caliber.damage.HitUtil;
+import net.zerocontact.caliber.damage.model.DamageContext;
+import net.zerocontact.caliber.damage.model.DamageResult;
 import net.zerocontact.caliber.extension.HookDispatcher;
 import net.zerocontact.caliber.extension.HookEventTrigger;
 import net.zerocontact.caliber.extension.model.HookContext;
 import net.zerocontact.caliber.registry.MobRuleRegistry;
 import net.zerocontact.compat.FirstAidCompatHandler;
 import net.zerocontact.datagen.model.MobRulesPOJO;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -37,7 +41,7 @@ public class PlateEntityHurtEvent {
             plateStack = hitStacks[0];
         }
         DamagePipeLine pipeLine = new DamagePipeLine();
-        DamagePipeLine.DamageResult result = pipeLine.process(new DamagePipeLine.DamageContext(lv, source, amount, plateStack, armorStack));
+        DamageResult result = pipeLine.process(new DamageContext(lv, source, amount, plateStack, armorStack));
         return pipeLine.execute(result, () -> {
             lv.hurt(result.finalSource(), result.finalAmount());
             EntityKineticBullet bullet = (EntityKineticBullet) source.getDirectEntity();
@@ -51,25 +55,7 @@ public class PlateEntityHurtEvent {
     }
 
 
-    public static float getHurtAmount(LivingEntity lv, DamageSource source, float amount, @Nullable ICombatArmorItem plateProvider, @Nullable ICombatArmorItem armorProvider, int hurtCanHold) {
-        float hurtAmount;
-        float generateCaliberDamageAmount;
-        if (plateProvider != null && armorProvider != null) {
-            generateCaliberDamageAmount = CaliberVariantDamageHelper.generateDamageAmount(amount, source, hurtCanHold, plateProvider);
-        } else if (armorProvider != null) {
-            generateCaliberDamageAmount = CaliberVariantDamageHelper.generateDamageAmount(amount, source, hurtCanHold, armorProvider);
-        } else {
-            generateCaliberDamageAmount = CaliberVariantDamageHelper.generateDamageAmount(amount, source, hurtCanHold, null);
-        }
-        if (armorProvider != null && EventUtil.isIncidentAngleValid(lv, source)) {
-            hurtAmount = armorProvider.generateRicochet() * generateCaliberDamageAmount;
-        } else {
-            hurtAmount = generateCaliberDamageAmount;
-        }
-        return hurtAmount;
-    }
-
-    public static void entityHurtByGunHeadShot(EntityHurtByGunEvent event) {
+    public static void modifyEventIfHeadshot(EntityHurtByGunEvent event) {
         if (!(event instanceof EntityHurtByGunEvent.Pre eventPre)) return;
         boolean isHeadShot = event.isHeadShot();
         if (!isHeadShot) return;
@@ -91,9 +77,9 @@ public class PlateEntityHurtEvent {
                     return;
                 }
                 int protectionClass = helmet.getOrCreateTag().getInt("protection_class");
-                float hurtAmount = getHurtAmount(livingEntity, damageSource, amount, null, entityHurtProvider, protectionClass);
+                float hurtAmount = DamageProcessor.getHurtAmount(livingEntity, damageSource, amount, null, entityHurtProvider, protectionClass);
                 if (helmet.getMaxDamage() - helmet.getDamageValue() <= 1) {
-                    hurtAmount = getHurtAmount(livingEntity, damageSource, amount, null, null, protectionClass);
+                    hurtAmount = DamageProcessor.getHurtAmount(livingEntity, damageSource, amount, null, null, protectionClass);
                 }
                 eventPre.setBaseAmount(hurtAmount);
 
@@ -108,7 +94,7 @@ public class PlateEntityHurtEvent {
 
 
     public static EventResult entityHurtRegister(LivingEntity lv, DamageSource source, float amount) {
-        if (PlateEntityHurtEvent.modifyDamage(lv, source, amount, EventUtil.getHitBodyPartStack(lv, source))) {
+        if (PlateEntityHurtEvent.modifyDamage(lv, source, amount, HitUtil.getHitBodyPartStack(lv, source))) {
             return EventResult.interruptFalse();
         }
         return EventResult.pass();

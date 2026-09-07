@@ -15,7 +15,7 @@ import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.zerocontact.events.ZDamageTypes;
+import net.zerocontact.caliber.damage.ZDamageTypes;
 import net.zerocontact.forge.EnvHelper;
 
 import java.util.ArrayList;

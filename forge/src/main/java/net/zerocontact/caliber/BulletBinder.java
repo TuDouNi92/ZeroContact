@@ -33,7 +33,7 @@ public class BulletBinder {
         mapping.put(bullet.getUUID(), context);
     }
 
-    private static void setAccessorData(EntityKineticBulletAccessor accessor, CaliberVariantDamageHelper.Caliber caliber) {
+    private static void setAccessorData(EntityKineticBulletAccessor accessor, CaliberHelper.Caliber caliber) {
         accessor.life(caliber.life());
         accessor.speed(caliber.speed());
         accessor.friction(caliber.friction());

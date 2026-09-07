@@ -10,7 +10,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.zerocontact.caliber.CaliberVariantDamageHelper;
+import net.zerocontact.caliber.CaliberHelper;
 import net.zerocontact.config.ModConfigs;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +31,7 @@ public class ClientBallisticToolTipComponent implements ClientTooltipComponent {
     private static final int LABEL_COLOR = 0xFFB8B8B8;
     private static final int DEFAULT_CURVE_COLOR = 0xFFFFC247;
 
-    private final CaliberVariantDamageHelper.Caliber caliber;
+    private final CaliberHelper.Caliber caliber;
     private @Nullable BallisticTrajectory trajectory = null;
 
     public ClientBallisticToolTipComponent(BallisticToolTipComponent data) {

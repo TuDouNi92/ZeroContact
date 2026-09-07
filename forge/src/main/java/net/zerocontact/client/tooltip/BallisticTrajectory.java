@@ -4,7 +4,7 @@ import com.tacz.guns.api.GunProperties;
 import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.config.common.AmmoConfig;
 import com.tacz.guns.resource.modifier.AttachmentCacheProperty;
-import net.zerocontact.caliber.CaliberVariantDamageHelper;
+import net.zerocontact.caliber.CaliberHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ final class BallisticTrajectory {
         this.maxDrop = maxDrop;
     }
 
-    static BallisticTrajectory simulate(CaliberVariantDamageHelper.Caliber caliber, IGunOperator iGunOperator) {
+    static BallisticTrajectory simulate(CaliberHelper.Caliber caliber, IGunOperator iGunOperator) {
         AttachmentCacheProperty property = iGunOperator.getCacheProperty();
         double ammoSpeed = 0.0;
         if (property != null) {

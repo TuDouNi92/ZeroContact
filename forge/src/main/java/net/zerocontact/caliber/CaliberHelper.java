@@ -1,6 +1,5 @@
 package net.zerocontact.caliber;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.entity.EntityKineticBullet;
@@ -8,24 +7,18 @@ import com.tacz.guns.init.ModDamageTypes;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.api.ICartridgeType;
-import net.zerocontact.api.ICombatArmorItem;
-import net.zerocontact.caliber.registry.CaliberRegistry;
-import net.zerocontact.command.CommandManager;
 import net.zerocontact.datagen.model.AmmoDataPOJO;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
-public enum CaliberVariantDamageHelper {
+public enum CaliberHelper {
     CALIBER_762x39(
             new Caliber("tacz:762x39", 1, 3, 6, 5.5f, .15f)
     ),
@@ -89,10 +82,10 @@ public enum CaliberVariantDamageHelper {
 
 
     public final Caliber caliber;
-    private static final EnumSet<CaliberVariantDamageHelper> caliberVariantDamageHelperEnumSet = EnumSet.allOf(CaliberVariantDamageHelper.class);
+    public static final EnumSet<CaliberHelper> CALIBER_HELPER_ENUM_SET = EnumSet.allOf(CaliberHelper.class);
     private static final String DEFAULT = "tacz:ammo";
 
-    CaliberVariantDamageHelper(Caliber caliber) {
+    CaliberHelper(Caliber caliber) {
         this.caliber = caliber;
     }
 
@@ -292,14 +285,14 @@ public enum CaliberVariantDamageHelper {
      * @param <E>    The enum set type
      * @return Return the caliber that matched with damage source
      */
-    private static <E> Optional<Caliber> getMatchedCaliber(DamageSource source, Set<E> set) {
+    public static <E> Optional<Caliber> getMatchedCaliber(DamageSource source, Set<E> set) {
         AtomicReference<Optional<Caliber>> result = new AtomicReference<>(Optional.empty());
         if (!(source.getDirectEntity() instanceof EntityKineticBullet bullet)) return result.get();
         @Nullable AmmoInjector.AmmoContext ammoContext = BulletBinder.getContext(bullet);
         if (!source.is(ModDamageTypes.BULLETS_TAG) || ammoContext == null) return result.get();
 
         for (E caliberData : set) {
-            if (caliberData instanceof CaliberVariantDamageHelper caliberEnum) {
+            if (caliberData instanceof CaliberHelper caliberEnum) {
                 if (caliberEnum.caliber.id.equals(bullet.getAmmoId().toString())) {
                     result.set(Optional.of(caliberEnum.caliber));
                     break;
@@ -318,75 +311,4 @@ public enum CaliberVariantDamageHelper {
         return result.get();
     }
 
-    /**
-     * <p>This method is meant to generate damages under the effect of protections</p>
-     *
-     * @param original    The original bullet damage
-     * @param source      The Minecraft damage source
-     * @param hurtCanHold The damage that armor/plate can withstand
-     * @param provider    Interface implementation that provides the situation of getting hit by bullets
-     * @return The generated damage amount
-     */
-    public static float generateDamageAmount(float original, DamageSource source, int hurtCanHold, @Nullable ICombatArmorItem provider) {
-        AtomicDouble output = new AtomicDouble(original);
-        Optional.ofNullable(source.getDirectEntity()).ifPresent(bullet -> {
-            if (bullet.level() instanceof ServerLevel serverLevel) {
-                if (CommandManager.CommandSavedData.get(serverLevel).experimentalBallistic) {
-                    Set<Caliber> mergedCaliberSet = caliberVariantDamageHelperEnumSet.stream().map(a -> a.caliber).collect(Collectors.toSet());
-                    mergedCaliberSet.removeAll(CaliberRegistry.calibers().values());
-                    mergedCaliberSet.addAll(CaliberRegistry.calibers().values());
-                    getMatchedCaliber(source, mergedCaliberSet).ifPresent(caliber -> {
-                        double penetratedDamage = getPenetratedDamage(caliber, hurtCanHold);
-                        setOutput(provider, caliber, penetratedDamage, output);
-                    });
-                } else {
-                    getMatchedCaliber(source, caliberVariantDamageHelperEnumSet).ifPresent(caliber -> {
-                        double penetratedDamage = getPenetratedDamage(caliber, hurtCanHold);
-                        setOutput(provider, caliber, penetratedDamage, output);
-                    });
-                }
-            }
-
-        });
-        return (float) output.get();
-    }
-
-    private static void setOutput(@Nullable ICombatArmorItem provider, Caliber caliber, double penetratedDamage, AtomicDouble output) {
-        if (penetratedDamage > 0) {
-            if (provider == null) {
-                output.set(penetratedDamage);
-            } else {
-                output.set(penetratedDamage * provider.generatePenetrated());
-            }
-        } else {
-            if (provider == null) {
-                output.set(caliber.fleshDamage);
-            } else {
-                output.set(caliber.penetrationClass * 0.3 * provider.generateBlunt());
-            }
-        }
-    }
-
-    /**
-     * This method generates the damage once armor get penetrated
-     *
-     * @param caliber     Caliber class
-     * @param hurtCanHold The damage that armor/plate can withstand
-     * @return Determine and returns the flesh damage
-     */
-    private static double getPenetratedDamage(@NotNull Caliber caliber, int hurtCanHold) {
-        RandomSource randomSource = RandomSource.create();
-        if (hurtCanHold >= caliber.penetrationClass) {
-            double preOdds = 0.42139
-                    + 2.00643 * caliber.penetrationClass
-                    - 1.80617 * hurtCanHold;
-            double penetrateOdds = 1.0 / (1.0 + Math.exp(-preOdds));
-            if (randomSource.nextFloat() < penetrateOdds) {
-                return caliber.fleshDamage;
-            }
-            return 0.0;
-        } else {
-            return caliber.fleshDamage;
-        }
-    }
 }

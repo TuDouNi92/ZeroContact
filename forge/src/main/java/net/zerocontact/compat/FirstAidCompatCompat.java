@@ -5,7 +5,7 @@ import ichttt.mods.firstaid.api.enums.EnumPlayerPart;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.phys.Vec3;
-import net.zerocontact.events.EventUtil;
+import net.zerocontact.caliber.damage.HitUtil;
 import org.jetbrains.annotations.Nullable;
 import ru.ranazy.tacz_firstaid_compat.compat.firstaid.BodypartHitbox;
 import ru.ranazy.tacz_firstaid_compat.compat.firstaid.CoordinateTransform;
@@ -13,7 +13,7 @@ import ru.ranazy.tacz_firstaid_compat.compat.firstaid.CoordinateTransform;
 public class FirstAidCompatCompat {
 
     private static @Nullable EnumPlayerPart getPart(DamageSource source, ServerPlayer player) {
-        EntityKineticBullet.@Nullable EntityResult hitResult = EventUtil.getHitResult(source);
+        EntityKineticBullet.@Nullable EntityResult hitResult = HitUtil.getHitResult(source);
         if (hitResult == null) return null;
         Vec3 localHit = CoordinateTransform.worldToLocal(hitResult.getHitPos(), player);
         EnumPlayerPart part = BodypartHitbox.getHitPart(localHit);

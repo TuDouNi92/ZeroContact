@@ -14,7 +14,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.zerocontact.api.IEquipmentTypeTag;
 import net.zerocontact.caliber.AmmoInjector;
-import net.zerocontact.caliber.CaliberVariantDamageHelper;
+import net.zerocontact.caliber.CaliberHelper;
 import net.zerocontact.client.tooltip.AdvancedAmmoInfoComponents;
 import net.zerocontact.client.tooltip.BallisticToolTipComponent;
 import org.jetbrains.annotations.NotNull;
@@ -24,12 +24,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static net.zerocontact.events.TooltipHandler.SHOW_BULLET_DATA_LABEL;
+import static net.zerocontact.events.TooltipHandlerEvent.SHOW_BULLET_DATA_LABEL;
 
 public class GenerateAmmo extends Item implements AmmoItemDataAccessor, IEquipmentTypeTag {
-    private final CaliberVariantDamageHelper.Caliber caliber;
+    private final CaliberHelper.Caliber caliber;
 
-    public GenerateAmmo(CaliberVariantDamageHelper.Caliber caliber) {
+    public GenerateAmmo(CaliberHelper.Caliber caliber) {
         super(new Item.Properties().stacksTo(caliber.stackSize()));
         this.caliber = caliber;
     }
@@ -40,7 +40,7 @@ public class GenerateAmmo extends Item implements AmmoItemDataAccessor, IEquipme
         return new ResourceLocation(caliber.id());
     }
 
-    public CaliberVariantDamageHelper.Caliber getDefualtCaliber() {
+    public CaliberHelper.Caliber getDefualtCaliber() {
         return caliber;
     }
 

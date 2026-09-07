@@ -1,4 +1,4 @@
-package net.zerocontact.events;
+package net.zerocontact.caliber.damage;
 
 import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.init.ModDamageTypes;
@@ -11,17 +11,17 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.api.ICombatArmorItem;
+import net.zerocontact.caliber.damage.model.DamageContext;
+import net.zerocontact.caliber.damage.model.DamageResult;
 import net.zerocontact.caliber.registry.MobRuleRegistry;
 import net.zerocontact.config.ModConfigs;
 import net.zerocontact.compat.FirstAidCompatHandler;
 import net.zerocontact.datagen.model.MobRulesPOJO;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.zerocontact.events.PlateEntityHurtEvent.getHurtAmount;
+import static net.zerocontact.caliber.damage.DamageProcessor.getHurtAmount;
 
 public class DamagePipeLine {
     private final List<DamageModifier> plugins = new ArrayList<>();
@@ -58,7 +58,7 @@ public class DamagePipeLine {
             @Override
             public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
                 DamageResultBuilder builder = current;
-                if (context.target instanceof ServerPlayer player && player.isCreative()) {
+                if (context.target() instanceof ServerPlayer player && player.isCreative()) {
                     builder = current.stopExecute(true);
                 }
                 return builder;
@@ -68,7 +68,7 @@ public class DamagePipeLine {
         public static class HeadShotProvider implements DamageModifier {
             @Override
             public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
-                EntityKineticBullet.EntityResult result = EventUtil.getHitResult(context.source);
+                EntityKineticBullet.EntityResult result = HitUtil.getHitResult(context.source());
                 return current.withHeadshot(result != null && result.isHeadshot());
             }
         }
@@ -77,10 +77,10 @@ public class DamagePipeLine {
             @Override
             public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
                 DamageSource source = ZDamageTypes.create(
-                        context.target.level(),
-                        context.source.getDirectEntity(),
-                        context.source.getEntity(),
-                        context.source.getSourcePosition());
+                        context.target().level(),
+                        context.source().getDirectEntity(),
+                        context.source().getEntity(),
+                        context.source().getSourcePosition());
                 return current.finalSource(source);
             }
         }
@@ -89,9 +89,9 @@ public class DamagePipeLine {
         public static class BulletProvider implements DamageModifier {
             @Override
             public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
-                if (!context.source.is(ModDamageTypes.BULLETS_TAG)) {
+                if (!context.source().is(ModDamageTypes.BULLETS_TAG)) {
                     return current.stopExecute(true);
-                } else if (!context.armor.isEmpty() || !context.plate.isEmpty()) {
+                } else if (!context.armor().isEmpty() || !context.plate().isEmpty()) {
                     return current.withBullet(true).shouldCancelEvent(true);
                 } else if (ModConfigs.SERVER.enableUniversalFleshDamage().get()) {
                     return current.withBullet(true).shouldCancelEvent(true);
@@ -105,8 +105,8 @@ public class DamagePipeLine {
             public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
 
                 //Intercepting bypass armor damage for proper damage generation and leave the general source
-                if (context.source.is(ModDamageTypes.BULLET_IGNORE_ARMOR) && context.source.typeHolder().containsTag(DamageTypeTags.BYPASSES_ARMOR)) {
-                    if (!context.armor.isEmpty() || !context.plate.isEmpty()) {
+                if (context.source().is(ModDamageTypes.BULLET_IGNORE_ARMOR) && context.source().typeHolder().containsTag(DamageTypeTags.BYPASSES_ARMOR)) {
+                    if (!context.armor().isEmpty() || !context.plate().isEmpty()) {
                         return current.shouldCancelEvent(true).stopExecute(true);
                     }
 
@@ -125,13 +125,13 @@ public class DamagePipeLine {
         public static class DamageAmountModifier implements DamageModifier {
             @Override
             public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
-                ItemStack armor = context.armor;
-                ItemStack plate = context.plate;
-                float finalHurtAmount = context.originalAmount;
+                ItemStack armor = context.armor();
+                ItemStack plate = context.plate();
+                float finalHurtAmount = context.originalAmount();
 
                 //Generate damage for unarmored entity
                 if (ModConfigs.SERVER.enableUniversalFleshDamage().get()) {
-                    finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, null, null, 0);
+                    finalHurtAmount = getHurtAmount(context.target(), context.source(), context.originalAmount(), null, null, 0);
                 }
 
                 DamageResultBuilder builder = current;
@@ -140,28 +140,28 @@ public class DamagePipeLine {
                     if (!armor.isEmpty() && !plate.isEmpty()) {
                         if (armor.getItem() instanceof ICombatArmorItem armorProvider && plate.getItem() instanceof ICombatArmorItem plateProvider) {
                             if (armor.getMaxDamage() - armor.getDamageValue() <= 1) {
-                                finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, plateProvider, armorProvider, plateProvider.getAbsorb()) * (1 + armorProvider.generateBlunt());
+                                finalHurtAmount = getHurtAmount(context.target(), context.source(), context.originalAmount(), plateProvider, armorProvider, plateProvider.getAbsorb()) * (1 + armorProvider.generateBlunt());
                                 return builder.shouldCancelEvent(true).finalAmount(finalHurtAmount);
                             }
                             builder = builder.withPlateProvider(plateProvider);
-                            finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, plateProvider, armorProvider, plateProvider.getAbsorb());
+                            finalHurtAmount = getHurtAmount(context.target(), context.source(), context.originalAmount(), plateProvider, armorProvider, plateProvider.getAbsorb());
                         }
                     }
                     //Generate damage for body armor
                     else if (!armor.isEmpty()) {
                         if (armor.getItem() instanceof ICombatArmorItem armorProvider) {
                             if (armor.getMaxDamage() - armor.getDamageValue() <= 1) {
-                                finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, null, armorProvider, 0);
+                                finalHurtAmount = getHurtAmount(context.target(), context.source(), context.originalAmount(), null, armorProvider, 0);
                                 return builder.shouldCancelEvent(true).finalAmount(finalHurtAmount);
                             }
                             builder = builder.withArmorProvider(armorProvider);
                             int protectionLevel = armor.getOrCreateTag().getInt("protection_class");
-                            finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, null, armorProvider, protectionLevel);
+                            finalHurtAmount = getHurtAmount(context.target(), context.source(), context.originalAmount(), null, armorProvider, protectionLevel);
                         }
                     }
                     //Illegal state, only plates equipped
                     else {
-                        finalHurtAmount = getHurtAmount(context.target, context.source, context.originalAmount, null, null, 0);
+                        finalHurtAmount = getHurtAmount(context.target(), context.source(), context.originalAmount(), null, null, 0);
                     }
                     builder = builder.shouldCancelEvent(true);
                 }
@@ -174,7 +174,7 @@ public class DamagePipeLine {
 
             @Override
             public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
-                LivingEntity target = context.target;
+                LivingEntity target = context.target();
                 EntityType<?> type = target.getType();
                 ResourceLocation mobId = ForgeRegistries.ENTITY_TYPES.getKey(type);
                 MobRulesPOJO.Pattern mobPattern = MobRuleRegistry.get(mobId);
@@ -188,117 +188,21 @@ public class DamagePipeLine {
         public static class FirstAidCptCompat implements DamageModifier {
             @Override
             public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
-                FirstAidCompatHandler firstAidCompatHandler = FirstAidCompatHandler.create(context.target, current.finalSource);
+                FirstAidCompatHandler firstAidCompatHandler = FirstAidCompatHandler.create(context.target(), current.finalSource);
                 if (firstAidCompatHandler == null) return current;
                 if (!firstAidCompatHandler.getLimbsApplicable()) return current;
                 float limbsScale = 0.25f;
                 return current
                         .finalAmount(
                                 getHurtAmount(
-                                        context.target,
-                                        context.source,
+                                        context.target(),
+                                        context.source(),
                                         current.finalAmount,
                                         null,
                                         null,
                                         0) * limbsScale
                         );
             }
-        }
-
-    }
-
-    public record DamageContext(
-            LivingEntity target,
-            DamageSource source,
-            float originalAmount,
-            @NotNull ItemStack plate,
-            @NotNull ItemStack armor
-    ) {
-    }
-
-    public record DamageResult(
-            boolean isBullet,
-            boolean isHeadshot,
-            float finalAmount,
-            DamageSource finalSource,
-            @Nullable ICombatArmorItem armorProvider,
-            @Nullable ICombatArmorItem plateProvider,
-            boolean shouldCancelEvent,
-            boolean shouldStopExecute
-    ) {
-    }
-
-    public static class DamageResultBuilder {
-        boolean isBullet;
-        boolean isHeadshot;
-        float finalAmount;
-        DamageSource finalSource;
-        boolean shouldCancelEvent;
-        boolean stopExecute;
-        @Nullable ICombatArmorItem armorProvider;
-        @Nullable ICombatArmorItem plateProvider;
-
-        public static DamageResultBuilder create() {
-            return new DamageResultBuilder();
-        }
-
-        public DamageResultBuilder fromContext(DamageContext context) {
-            this.finalAmount = context.originalAmount;
-            this.finalSource = context.source;
-            return this;
-        }
-
-        public DamageResultBuilder withBullet(boolean isBullet) {
-            this.isBullet = isBullet;
-            return this;
-        }
-
-        public DamageResultBuilder withHeadshot(boolean isHeadshot) {
-            this.isHeadshot = isHeadshot;
-            return this;
-        }
-
-        public DamageResultBuilder finalAmount(float finalAmount) {
-            this.finalAmount = finalAmount;
-            return this;
-        }
-
-        public DamageResultBuilder finalSource(DamageSource source) {
-            this.finalSource = source;
-            return this;
-        }
-
-        public DamageResultBuilder shouldCancelEvent(boolean shouldCancelEvent) {
-            this.shouldCancelEvent = shouldCancelEvent;
-            return this;
-        }
-
-        public DamageResultBuilder withArmorProvider(ICombatArmorItem armorProvider) {
-            this.armorProvider = armorProvider;
-            return this;
-        }
-
-        public DamageResultBuilder withPlateProvider(ICombatArmorItem plateProvider) {
-            this.plateProvider = plateProvider;
-            return this;
-        }
-
-        public DamageResultBuilder stopExecute(boolean stop) {
-            this.stopExecute = stop;
-            return this;
-        }
-
-        public DamageResult build() {
-            return new DamageResult(
-                    isBullet,
-                    isHeadshot,
-                    finalAmount,
-                    finalSource,
-                    armorProvider,
-                    plateProvider,
-                    shouldCancelEvent,
-                    stopExecute
-            );
         }
 
     }

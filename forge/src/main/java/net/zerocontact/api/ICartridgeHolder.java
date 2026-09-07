@@ -5,14 +5,14 @@ import com.tacz.guns.resource.pojo.data.gun.InaccuracyType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.caliber.AmmoInjector;
-import net.zerocontact.caliber.CaliberVariantDamageHelper;
+import net.zerocontact.caliber.CaliberHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
 public interface ICartridgeHolder {
-    void copyTags(CaliberVariantDamageHelper.Caliber defaultCaliber, ItemStack gun);
+    void copyTags(CaliberHelper.Caliber defaultCaliber, ItemStack gun);
 
     //Get cartridge for held gun
     String getAmmoVariantInGun(ItemStack gunStack);

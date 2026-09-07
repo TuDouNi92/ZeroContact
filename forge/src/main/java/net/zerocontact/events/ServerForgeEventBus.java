@@ -32,7 +32,7 @@ public class ServerForgeEventBus {
 
     @SubscribeEvent
     public static void entityHurtByGunEvent(EntityHurtByGunEvent event) {
-        PlateEntityHurtEvent.entityHurtByGunHeadShot(event);
+        PlateEntityHurtEvent.modifyEventIfHeadshot(event);
         PlateDamageEvent.damageHelmet(event);
     }
 

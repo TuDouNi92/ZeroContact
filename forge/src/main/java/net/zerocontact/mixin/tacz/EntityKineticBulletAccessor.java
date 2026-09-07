@@ -1,9 +1,7 @@
 package net.zerocontact.mixin.tacz;
 
 import com.tacz.guns.entity.EntityKineticBullet;
-import net.zerocontact.caliber.CaliberVariantDamageHelper;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(value = EntityKineticBullet.class, remap = false)

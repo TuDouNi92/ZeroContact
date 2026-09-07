@@ -10,7 +10,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.api.ICartridgeHolder;
 import net.zerocontact.caliber.AmmoInjector;
 import net.zerocontact.caliber.CaliberSerializer;
-import net.zerocontact.caliber.CaliberVariantDamageHelper;
+import net.zerocontact.caliber.CaliberHelper;
 import net.zerocontact.item.ammo.GenerateAmmo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +21,7 @@ import static net.zerocontact.caliber.CaliberSerializer.*;
 
 public class GunCartridgeTypeCap implements ICartridgeHolder {
     //Sync tags when change cartridge;
-    public void copyTags(CaliberVariantDamageHelper.Caliber defaultCaliber, ItemStack gun) {
+    public void copyTags(CaliberHelper.Caliber defaultCaliber, ItemStack gun) {
         AmmoInjector.copyTags(defaultCaliber, gun);
     }
 
