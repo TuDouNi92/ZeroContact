@@ -12,7 +12,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
-import net.zerocontact.api.IEquipmentTypeTag;
+import net.zerocontact.api.armor.IEquipmentTypeTag;
 import net.zerocontact.caliber.AmmoInjector;
 import net.zerocontact.caliber.CaliberHelper;
 import net.zerocontact.client.tooltip.AdvancedAmmoInfoComponents;

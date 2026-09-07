@@ -2,8 +2,8 @@ package net.zerocontact.datagen;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
-import net.zerocontact.api.PlateInfoProvider;
-import net.zerocontact.api.IEquipmentTypeTag;
+import net.zerocontact.api.armor.PlateInfoProvider;
+import net.zerocontact.api.armor.IEquipmentTypeTag;
 import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.Objects;

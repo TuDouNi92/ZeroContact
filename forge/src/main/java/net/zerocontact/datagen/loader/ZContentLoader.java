@@ -1,8 +1,8 @@
 package net.zerocontact.datagen.loader;
 
 import com.google.gson.JsonSyntaxException;
-import net.zerocontact.api.IAssetManager;
-import net.zerocontact.api.IContentLoader;
+import net.zerocontact.api.datagen.IAssetManager;
+import net.zerocontact.api.datagen.IContentLoader;
 import net.zerocontact.caliber.registry.CaliberRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.zerocontact.ZeroContactLogger;

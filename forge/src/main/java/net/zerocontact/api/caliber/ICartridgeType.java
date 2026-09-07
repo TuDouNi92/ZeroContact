@@ -1,4 +1,4 @@
-package net.zerocontact.api;
+package net.zerocontact.api.caliber;
 
 import com.tacz.guns.resource.pojo.data.gun.GunRecoil;
 import com.tacz.guns.resource.pojo.data.gun.InaccuracyType;

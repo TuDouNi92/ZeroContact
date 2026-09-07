@@ -7,8 +7,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
-import net.zerocontact.api.ICombatArmorItem;
-import net.zerocontact.api.PlateInfoProvider;
+import net.zerocontact.api.armor.PlateInfoProvider;
 import net.zerocontact.item.SapiIV;
 import org.jetbrains.annotations.NotNull;
 @Deprecated

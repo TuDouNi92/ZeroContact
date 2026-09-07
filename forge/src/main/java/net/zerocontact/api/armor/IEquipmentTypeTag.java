@@ -1,15 +1,16 @@
-package net.zerocontact.api;
+package net.zerocontact.api.armor;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-
+@ApiStatus.Internal
 public interface IEquipmentTypeTag {
     enum EquipmentType {
         PLATE_CARRIER("PLATE_CARRIER"),

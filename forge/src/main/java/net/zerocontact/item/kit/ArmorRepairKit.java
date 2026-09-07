@@ -25,7 +25,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.zerocontact.api.ICombatArmorItem;
+import net.zerocontact.api.armor.ICombatArmorItem;
 import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.capability.RepairKitCap;
 import net.zerocontact.client.renderer.ItemRender;

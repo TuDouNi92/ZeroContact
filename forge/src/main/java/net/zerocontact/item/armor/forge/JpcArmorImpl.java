@@ -1,7 +1,7 @@
 package net.zerocontact.item.armor.forge;
 
 import net.minecraft.resources.ResourceLocation;
-import net.zerocontact.api.IEquipmentTypeTag;
+import net.zerocontact.api.armor.IEquipmentTypeTag;
 import org.jetbrains.annotations.NotNull;
 
 import static net.zerocontact.ZeroContact.MOD_ID;

@@ -8,7 +8,7 @@ import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.zerocontact.ZeroContactLogger;
-import net.zerocontact.api.IAssetManager;
+import net.zerocontact.api.datagen.IAssetManager;
 import net.zerocontact.datagen.adapter.ItemAdapter;
 import net.zerocontact.datagen.adapter.RuntimeTypeAdapterFactory;
 import net.zerocontact.datagen.model.AmmoDataPOJO;

@@ -10,7 +10,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.zerocontact.api.ICombatArmorItem;
+import net.zerocontact.api.armor.ICombatArmorItem;
 import net.zerocontact.caliber.damage.model.DamageContext;
 import net.zerocontact.caliber.damage.model.DamageResult;
 import net.zerocontact.caliber.registry.MobRuleRegistry;

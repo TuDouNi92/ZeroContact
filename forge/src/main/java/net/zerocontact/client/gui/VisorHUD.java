@@ -1,6 +1,5 @@
 package net.zerocontact.client.gui;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -14,7 +13,7 @@ import net.minecraftforge.client.event.RenderGuiEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.zerocontact.animation_data.AnimateData;
-import net.zerocontact.api.Toggleable;
+import net.zerocontact.api.armor.Toggleable;
 
 import java.util.Optional;
 

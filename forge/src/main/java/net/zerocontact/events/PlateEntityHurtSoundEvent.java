@@ -12,7 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.zerocontact.api.ICombatArmorItem;
+import net.zerocontact.api.armor.ICombatArmorItem;
 import net.zerocontact.caliber.damage.HitUtil;
 import net.zerocontact.caliber.damage.ZDamageTypes;
 import net.zerocontact.registries.ModSoundEventsReg;

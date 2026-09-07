@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.item.ItemStack;
-import net.zerocontact.api.ICartridgeType;
+import net.zerocontact.api.caliber.ICartridgeType;
 import net.zerocontact.datagen.model.AmmoDataPOJO;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

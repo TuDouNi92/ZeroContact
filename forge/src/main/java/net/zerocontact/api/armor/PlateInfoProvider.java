@@ -1,4 +1,4 @@
-package net.zerocontact.api;
+package net.zerocontact.api.armor;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;

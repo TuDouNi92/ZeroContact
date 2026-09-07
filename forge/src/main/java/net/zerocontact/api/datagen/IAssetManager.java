@@ -1,4 +1,4 @@
-package net.zerocontact.api;
+package net.zerocontact.api.datagen;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;

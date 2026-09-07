@@ -1,6 +1,5 @@
 package net.zerocontact.api;
 
-import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.entity.ai.controller.GlobalStateController;
 
 public interface IPhaseContext{

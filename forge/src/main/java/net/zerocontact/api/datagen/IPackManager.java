@@ -1,4 +1,4 @@
-package net.zerocontact.api;
+package net.zerocontact.api.datagen;
 
 import org.jetbrains.annotations.ApiStatus;
 

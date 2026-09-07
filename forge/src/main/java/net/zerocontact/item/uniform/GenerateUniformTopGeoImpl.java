@@ -2,8 +2,8 @@ package net.zerocontact.item.uniform;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ArmorItem;
-import net.zerocontact.api.IAssetManager;
-import net.zerocontact.api.IEquipmentTypeTag;
+import net.zerocontact.api.datagen.IAssetManager;
+import net.zerocontact.api.armor.IEquipmentTypeTag;
 import net.zerocontact.datagen.model.GenerationRecord;
 import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
 import org.jetbrains.annotations.NotNull;

@@ -1,7 +1,7 @@
 package net.zerocontact.item.rigs;
 
 import net.minecraft.resources.ResourceLocation;
-import net.zerocontact.api.IEquipmentTypeTag;
+import net.zerocontact.api.armor.IEquipmentTypeTag;
 import net.zerocontact.item.backpack.BaseBackpack;
 import org.jetbrains.annotations.NotNull;
 

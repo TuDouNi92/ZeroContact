@@ -1,4 +1,4 @@
-package net.zerocontact.api;
+package net.zerocontact.api.caliber.lua;
 
 import net.minecraft.resources.ResourceLocation;
 import net.zerocontact.caliber.extension.model.LuaHookContext;

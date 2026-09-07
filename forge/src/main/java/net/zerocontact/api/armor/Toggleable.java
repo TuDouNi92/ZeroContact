@@ -1,4 +1,4 @@
-package net.zerocontact.api;
+package net.zerocontact.api.armor;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -10,7 +10,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.zerocontact.animation_data.AnimateData;
 import net.zerocontact.network.ModMessages;
 import net.zerocontact.network.s2c.ToggleVisorResultPacket;
+import org.jetbrains.annotations.ApiStatus;
 
+@ApiStatus.Internal
 public interface Toggleable {
     ResourceLocation getVisorTexture();
 

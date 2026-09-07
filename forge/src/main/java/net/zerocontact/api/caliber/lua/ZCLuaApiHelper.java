@@ -1,4 +1,4 @@
-package net.zerocontact.api;
+package net.zerocontact.api.caliber.lua;
 
 import net.zerocontact.caliber.extension.model.LuaHookContext;
 import org.luaj.vm2.LuaTable;

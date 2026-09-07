@@ -17,7 +17,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.zerocontact.api.ICartridgeHolder;
+import net.zerocontact.api.caliber.ICartridgeHolder;
 import net.zerocontact.caliber.AmmoInjector;
 import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.compat.MagazinesCompatHandler;

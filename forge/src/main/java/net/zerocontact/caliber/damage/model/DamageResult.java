@@ -1,7 +1,7 @@
 package net.zerocontact.caliber.damage.model;
 
 import net.minecraft.world.damagesource.DamageSource;
-import net.zerocontact.api.ICombatArmorItem;
+import net.zerocontact.api.armor.ICombatArmorItem;
 import org.jetbrains.annotations.Nullable;
 
 public record DamageResult(

@@ -11,7 +11,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.ZeroContactLogger;
-import net.zerocontact.api.ZCLuaApi;
+import net.zerocontact.api.caliber.lua.ZCLuaApi;
 import net.zerocontact.caliber.extension.HookActionExecutor;
 import net.zerocontact.caliber.extension.model.TargetSelector;
 import net.zerocontact.datagen.model.AmmoDataPOJO;

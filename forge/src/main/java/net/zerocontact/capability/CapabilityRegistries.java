@@ -3,7 +3,7 @@ package net.zerocontact.capability;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.zerocontact.api.ICartridgeHolder;
+import net.zerocontact.api.caliber.ICartridgeHolder;
 import net.zerocontact.api.IRepairKit;
 
 public class CapabilityRegistries {

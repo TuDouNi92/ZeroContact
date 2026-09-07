@@ -26,7 +26,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.zerocontact.api.ICartridgeHolder;
+import net.zerocontact.api.caliber.ICartridgeHolder;
 import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.menu.AmmoSelectorMenu;
 import net.zerocontact.command.CommandManager;

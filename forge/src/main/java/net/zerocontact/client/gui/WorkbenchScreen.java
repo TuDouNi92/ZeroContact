@@ -12,7 +12,7 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.zerocontact.api.IEquipmentTypeTag;
+import net.zerocontact.api.armor.IEquipmentTypeTag;
 import net.zerocontact.client.gui.components.ScrollList;
 import net.zerocontact.menu.WorkbenchMenu;
 import net.zerocontact.datagen.model.RecipePOJO;

@@ -12,7 +12,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.ZeroContactLogger;
-import net.zerocontact.api.IPackManager;
+import net.zerocontact.api.datagen.IPackManager;
 import net.zerocontact.datagen.model.ManifestPOJO;
 import net.zerocontact.datagen.model.Zpack;
 

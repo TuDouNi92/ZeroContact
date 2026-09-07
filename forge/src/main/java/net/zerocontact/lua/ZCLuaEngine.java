@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 import net.zerocontact.ZeroContactLogger;
-import net.zerocontact.api.ZCLuaApi;
+import net.zerocontact.api.caliber.lua.ZCLuaApi;
 import net.zerocontact.caliber.extension.model.HookContext;
 import net.zerocontact.caliber.extension.HookEventTrigger;
 import net.zerocontact.caliber.extension.model.LuaHookContext;

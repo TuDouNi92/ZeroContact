@@ -5,7 +5,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
-import net.zerocontact.api.Toggleable;
+import net.zerocontact.api.armor.Toggleable;
 import net.zerocontact.network.ModMessages;
 import net.zerocontact.network.s2c.ToggleVisorResultPacket;
 
