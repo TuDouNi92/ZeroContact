@@ -3,13 +3,21 @@ package net.zerocontact.command;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.zerocontact.armor.modular.service.ModuleMountService;
+import net.zerocontact.armor.modular.service.ModuleSyncService;
+import net.zerocontact.armor.modular.client.menu.EquipmentMenu;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -22,6 +30,9 @@ public class CommandManager {
     private static final String DOGTAG_MSG = "Enable Dogtag drop:";
     private static final String EXP_BALLISTIC_COMMAND = "experimentalBallistic";
     private static final String EXP_BALLISTIC_MSG = "Enable ExperimentalBallistic feature:";
+
+    private static final String MODULAR_EQUIP_COMMAND = "modular";
+    private static final String MODULAR_EQUIP_MSG = "Equipped module: ";
 
     public static class CommandSavedData extends SavedData {
         private static final String STAMINA_STATE = "staminaState";
@@ -76,6 +87,13 @@ public class CommandManager {
     }
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        dispatcher.register(Commands.literal("zerocontact")
+                .then(Commands.literal("equipment")
+                        .executes(context -> {
+                            EquipmentMenu.open(context.getSource().getPlayerOrException(),
+                                    Component.translatable("screen.zerocontact.equipment.title"));
+                            return Command.SINGLE_SUCCESS;
+                        })));
         dispatcher.register(Commands.literal(STAMINA_COMMAND)
                 .requires(commandSourceStack -> Optional.ofNullable(commandSourceStack.getPlayer()).isPresent() && commandSourceStack.hasPermission(2))
                 .then(Commands.argument("boolean", BoolArgumentType.bool())
@@ -131,6 +149,30 @@ public class CommandManager {
                             context.getSource().sendSuccess(() -> message, true);
                             return Command.SINGLE_SUCCESS;
                         }))
+        );
+        dispatcher.register(Commands.literal(MODULAR_EQUIP_COMMAND)
+                .requires(commandSourceStack ->
+                        Optional.ofNullable(commandSourceStack.getPlayer()).isPresent() && commandSourceStack.hasPermission(2))
+                .then(Commands.argument("mount_id", StringArgumentType.string())
+                        .executes(context -> {
+                            ServerPlayer player = context.getSource().getPlayer();
+                            if (player == null) return Command.SINGLE_SUCCESS;
+                            ItemStack mainHandItem = player.getMainHandItem();
+                            ItemStack armor = player.getItemBySlot(EquipmentSlot.CHEST);
+                            boolean result = ModuleMountService.mount(
+                                    armor,
+                                    ResourceLocation.tryParse(context.getArgument("mount_id", String.class)),
+                                    mainHandItem
+                            );
+                            if (!result) {
+                                context.getSource().sendFailure(Component.literal("Failed to mount module"));
+                                return 0;
+                            }
+                            ModuleSyncService.sync(player, EquipmentSlot.CHEST);
+                            context.getSource().sendSuccess(() -> Component.literal(MODULAR_EQUIP_MSG + "true"), true);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                )
         );
     }
 }

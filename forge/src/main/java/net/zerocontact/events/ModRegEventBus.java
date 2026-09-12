@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.zerocontact.client.gui.AmmoSelectorScreen;
+import net.zerocontact.armor.modular.client.screen.EquipmentScreen;
 import net.zerocontact.client.gui.BackpackScreen;
 import net.zerocontact.client.gui.ConfigScreen;
 import net.zerocontact.client.gui.WorkbenchScreen;
@@ -58,6 +59,7 @@ public class ModRegEventBus {
             MenuScreens.register(MenuRegistry.BACKPACK_CONTAINER.get(), BackpackScreen::new);
             MenuScreens.register(MenuRegistry.WORKBENCH_MENU.get(), WorkbenchScreen::new);
             MenuScreens.register(MenuRegistry.AMMO_SELECTOR.get(), AmmoSelectorScreen::new);
+            MenuScreens.register(MenuRegistry.EQUIPMENT_MENU.get(), EquipmentScreen::new);
             RegCurioGeoItemRender();
             regConfigScreen(ZeroContactForge.getFmlJavaModLoadingContext());
         }

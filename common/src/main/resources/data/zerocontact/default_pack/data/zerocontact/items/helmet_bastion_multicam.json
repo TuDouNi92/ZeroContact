@@ -7,6 +7,14 @@
   "default_durability": 48,
   "texture": "textures/models/helmet/helmet_bastion_multicam.png",
   "model": "geo/helmet/helmet_bastion_multicam.geo.json",
+  "attachments": [
+    {
+      "mount_id": "nvg_mount",
+      "mount_type": "helmet_front",
+      "mount_bone": "nvg_fix",
+      "accept_categories": ["night_vision"]
+    }
+  ],
   "hurt_modifier":
   {
     "ricochet_multiplier":0.35,

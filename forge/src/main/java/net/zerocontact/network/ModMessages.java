@@ -2,14 +2,22 @@ package net.zerocontact.network;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
+import net.zerocontact.armor.modular.client.network.c2s.OpenModularMenuPacket;
+import net.zerocontact.armor.modular.client.network.c2s.ModuleActionPacket;
+import net.zerocontact.armor.modular.client.network.c2s.MountPacket;
+import net.zerocontact.armor.modular.client.network.c2s.UnMountPacket;
 import net.zerocontact.network.c2s.*;
 import net.zerocontact.network.s2c.AppendSuppressionPacket;
 import net.zerocontact.network.s2c.ClientAmmoReloadPacket;
 import net.zerocontact.network.s2c.SyncStaminaPacket;
+import net.zerocontact.armor.modular.client.network.s2c.SyncModulesPacket;
+import net.zerocontact.armor.modular.client.network.s2c.SyncEquipmentCandidatesPacket;
+import net.zerocontact.armor.modular.client.network.c2s.SelectEquipmentMountPacket;
 import net.zerocontact.network.s2c.ToggleVisorResultPacket;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
@@ -81,6 +89,45 @@ public class ModMessages {
                 .encoder(AppendSuppressionPacket::encode)
                 .consumerMainThread(AppendSuppressionPacket::handle)
                 .add();
+        net.messageBuilder(SyncModulesPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SyncModulesPacket::decode)
+                .encoder(SyncModulesPacket::encode)
+                .consumerMainThread(SyncModulesPacket::handle)
+                .add();
+        net.messageBuilder(SelectEquipmentMountPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(SelectEquipmentMountPacket::decode)
+                .encoder(SelectEquipmentMountPacket::encode)
+                .consumerMainThread(SelectEquipmentMountPacket::handle)
+                .add();
+        net.messageBuilder(SyncEquipmentCandidatesPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SyncEquipmentCandidatesPacket::decode)
+                .encoder(SyncEquipmentCandidatesPacket::encode)
+                .consumerMainThread(SyncEquipmentCandidatesPacket::handle)
+                .add();
+        net.messageBuilder(OpenModularMenuPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(OpenModularMenuPacket::decode)
+                .encoder(OpenModularMenuPacket::encode)
+                .consumerMainThread(OpenModularMenuPacket::handle)
+                .add();
+        net.messageBuilder(MountPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(MountPacket::decode)
+                .encoder(MountPacket::encode)
+                .consumerMainThread(MountPacket::handle)
+                .add();
+        net.messageBuilder(UnMountPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(UnMountPacket::decode)
+                .encoder(UnMountPacket::encode)
+                .consumerMainThread(UnMountPacket::handle)
+                .add();
+        net.messageBuilder(ModuleActionPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(ModuleActionPacket::decode)
+                .encoder(ModuleActionPacket::encode)
+                .consumerMainThread(ModuleActionPacket::handle)
+                .add();
+    }
+
+    public static <MSG> void sendToTrackingAndSelf(MSG msg, Entity entity) {
+        INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), msg);
     }
 
     public static <MSG> void sendToServer(MSG msg) {

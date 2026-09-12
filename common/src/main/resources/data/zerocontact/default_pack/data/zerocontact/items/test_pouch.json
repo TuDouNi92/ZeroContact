@@ -1,0 +1,9 @@
+{
+  "type": "module",
+  "id": "test_pouch",
+  "mount_type": "POUCH",
+  "module_trait": "pouch",
+  "durability": 32,
+  "texture": "textures/models/pouch/test_pouch.png",
+  "model": "geo/pouch/jpcv2_test_pouch.geo.json"
+}

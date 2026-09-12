@@ -20,7 +20,7 @@ public interface IEquipmentTypeTag {
         UNIFORM_TOP("UNIFORM_TOP"),
         UNIFORM_PANTS("UNIFORM_PANTS"),
         ARMBAND("ARMBAND"),
-        HEADSET("HEADSET"),
+        MODULE("MODULE"),
         BACKPACK("BACKPACK"),
         RIGS("RIGS"),
         PLATE("PLATE"),

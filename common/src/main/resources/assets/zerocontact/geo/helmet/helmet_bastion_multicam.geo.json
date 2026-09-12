@@ -428,6 +428,11 @@
 							}
 						}
 					]
+				},
+				{
+					"name": "nvg_fix",
+					"parent": "armorHead",
+					"pivot": [0, 30, -5.125]
 				}
 			]
 		}

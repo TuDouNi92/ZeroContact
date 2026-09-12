@@ -5,6 +5,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.zerocontact.ZeroContact;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.zerocontact.armor.modular.registry.ModuleRegistry;
 import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.config.ModConfigs;
 import net.zerocontact.datagen.Predicate;
@@ -33,6 +34,7 @@ public class ZeroContactForge {
         EntityDeathDogTagEvent.register();
         regConfig(context);
         CapabilityRegistries.register();
+        ModuleRegistry.registerTrait();
     }
 
     private static void regConfig(FMLJavaModLoadingContext context) {

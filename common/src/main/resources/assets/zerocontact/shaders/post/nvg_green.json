@@ -1,0 +1,24 @@
+{
+  "targets": [
+    "swap"
+  ],
+  "passes": [
+    {
+      "name": "zerocontact:nvg_green",
+      "intarget": "minecraft:main",
+      "outtarget": "swap",
+      "uniforms": [
+        { "name": "Gain", "values": [12.0] },
+        { "name": "Gamma", "values": [2.85] },
+        { "name": "NoiseStrength", "values": [0.725] },
+        { "name": "VignetteStrength", "values": [0.75] },
+        { "name": "PhosphorColor", "values": [0.18, 1.0, 0.28] }
+      ]
+    },
+    {
+      "name": "blit",
+      "intarget": "swap",
+      "outtarget": "minecraft:main"
+    }
+  ]
+}

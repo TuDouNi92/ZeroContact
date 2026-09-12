@@ -1,0 +1,70 @@
+{
+  "blend": {
+    "func": "add",
+    "srcrgb": "one",
+    "dstrgb": "zero"
+  },
+  "vertex": "blit",
+  "fragment": "zerocontact:nvg_green",
+  "attributes": [
+    "Position"
+  ],
+  "samplers": [
+    { "name": "DiffuseSampler" }
+  ],
+  "uniforms": [
+    {
+      "name": "ProjMat",
+      "type": "matrix4x4",
+      "count": 16,
+      "values": [
+        1.0, 0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0
+      ]
+    },
+    {
+      "name": "OutSize",
+      "type": "float",
+      "count": 2,
+      "values": [1.0, 1.0]
+    },
+    {
+      "name": "Time",
+      "type": "float",
+      "count": 1,
+      "values": [0.0]
+    },
+    {
+      "name": "Gain",
+      "type": "float",
+      "count": 1,
+      "values": [4.0]
+    },
+    {
+      "name": "Gamma",
+      "type": "float",
+      "count": 1,
+      "values": [0.75]
+    },
+    {
+      "name": "NoiseStrength",
+      "type": "float",
+      "count": 1,
+      "values": [0.025]
+    },
+    {
+      "name": "VignetteStrength",
+      "type": "float",
+      "count": 1,
+      "values": [0.45]
+    },
+    {
+      "name": "PhosphorColor",
+      "type": "float",
+      "count": 3,
+      "values": [0.18, 1.0, 0.28]
+    }
+  ]
+}

@@ -9,12 +9,13 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.zerocontact.api.armor.modular.ModularEquipment;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Function;
 
-public interface ICombatArmorItem {
+public interface ICombatArmorItem extends ModularEquipment {
 
     static int generateLossDefault(float damageAmount, float durabilityLossFactor, int hits) {
         return (int) Math.round(0.4 * Math.pow(damageAmount * durabilityLossFactor, 1.5) * (1 + hits * 0.1f));

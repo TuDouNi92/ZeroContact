@@ -3,17 +3,22 @@ package net.zerocontact.datagen.adapter;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.datagen.IAssetManager;
 import net.zerocontact.api.armor.IEquipmentTypeTag;
+import net.zerocontact.armor.modular.model.MountCategory;
+import net.zerocontact.armor.modular.registry.ModuleRegistry;
 import net.zerocontact.datagen.model.ItemPOJO;
 import net.zerocontact.datagen.model.AmmoDataPOJO;
 import net.zerocontact.datagen.model.GenerationRecord;
+import net.zerocontact.datagen.model.ModularPOJO;
 import net.zerocontact.item.ammo.GenerateAmmo;
 import net.zerocontact.item.armband.GenerateUniformArmbandGeoImpl;
 import net.zerocontact.item.armor.forge.GenerateArmorGeoImpl;
 import net.zerocontact.item.armor.forge.GenerateCarrierGeoImpl;
+import net.zerocontact.item.armor.forge.GenerateModuleGeoImpl;
 import net.zerocontact.item.backpack.BaseBackpack;
 import net.zerocontact.item.helmet.GenerateHelmetGeoImpl;
 import net.zerocontact.item.plate.BasePlate;
@@ -56,7 +61,8 @@ public class ItemAdapter {
             new UniformPantsAdapter(),
             new AmmoAdapter(),
             new BackpackAdapter(),
-            new RigsAdapter()
+            new RigsAdapter(),
+            new ModuleAdapter()
     );
 
     public static class ArmorAdapter implements IAssetManager.GeneratableItem {
@@ -75,7 +81,28 @@ public class ItemAdapter {
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerationRecord<>(id, new GenerateArmorGeoImpl(ArmorItem.Type.CHESTPLATE, id, defense, defaultDurability, absorb, mass, texture, model, animation, bluntFactor, penetratedFactor, ricochetFactor), tab));
+            List<ItemPOJO.Armor.Attachments> attachments = data.attachments;
+            items.add(
+                    new GenerationRecord<>(
+                            id,
+                            new GenerateArmorGeoImpl(
+                                    ArmorItem.Type.CHESTPLATE,
+                                    id,
+                                    defense,
+                                    defaultDurability,
+                                    absorb,
+                                    mass,
+                                    texture,
+                                    model,
+                                    animation,
+                                    bluntFactor,
+                                    penetratedFactor,
+                                    ricochetFactor,
+                                    attachments
+                            ),
+                            tab
+                    )
+            );
             return items;
         }
     }
@@ -120,7 +147,20 @@ public class ItemAdapter {
             ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
-            items.add(new GenerationRecord<>(id, new GenerateCarrierGeoImpl(ArmorItem.Type.CHESTPLATE, id, defense, defaultDurability, absorb, bluntReduction, penetrateReduction, ricochetReduction, mass, texture, model, animation), tab));
+            List<ItemPOJO.Armor.Attachments> attachments = data.attachments;
+            items.add(
+                    new GenerationRecord<>(
+                            id,
+                            new GenerateCarrierGeoImpl(
+                                    ArmorItem.Type.CHESTPLATE,
+                                    id, defense,
+                                    defaultDurability, absorb,
+                                    bluntReduction,
+                                    penetrateReduction,
+                                    ricochetReduction,
+                                    mass, texture, model, animation,
+                                    attachments
+                            ), tab));
             return items;
         }
     }
@@ -145,7 +185,27 @@ public class ItemAdapter {
                     .map(s -> ForgeRegistries.MOB_EFFECTS.getValue(new ResourceLocation(s)))
                     .filter(Objects::nonNull)
                     .toList();
-            items.add(new GenerationRecord<>(id, new GenerateHelmetGeoImpl(id, ArmorItem.Type.HELMET, texture, model, animation, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, durabilityLossProvider, defaultDurability, IEquipmentTypeTag.EquipmentType.HELMET, immuneEffects), tab));
+            List<ItemPOJO.Armor.Attachments> attachments = data.attachments;
+            items.add(
+                    new GenerationRecord<>(
+                            id,
+                            new GenerateHelmetGeoImpl(
+                                    id,
+                                    ArmorItem.Type.HELMET,
+                                    texture,
+                                    model,
+                                    animation,
+                                    defense,
+                                    absorb,
+                                    bluntDamage,
+                                    penetrateDamage,
+                                    ricochetDamage,
+                                    durabilityLossProvider,
+                                    defaultDurability,
+                                    IEquipmentTypeTag.EquipmentType.HELMET,
+                                    immuneEffects,
+                                    attachments
+                            ), tab));
             return items;
         }
     }
@@ -170,7 +230,27 @@ public class ItemAdapter {
                     .map(s -> ForgeRegistries.MOB_EFFECTS.getValue(new ResourceLocation(s)))
                     .filter(Objects::nonNull)
                     .toList();
-            items.add(new GenerationRecord<>(id, new GenerateHelmetGeoImpl(id, ArmorItem.Type.HELMET, texture, model, animation, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, durabilityLossProvider, defaultDurability, IEquipmentTypeTag.EquipmentType.MASK, immuneEffects), tab));
+            List<ItemPOJO.Armor.Attachments> attachments = data.attachments;
+            items.add(
+                    new GenerationRecord<>(
+                            id,
+                            new GenerateHelmetGeoImpl(
+                                    id,
+                                    ArmorItem.Type.HELMET,
+                                    texture,
+                                    model,
+                                    animation,
+                                    defense,
+                                    absorb,
+                                    bluntDamage,
+                                    penetrateDamage,
+                                    ricochetDamage,
+                                    durabilityLossProvider,
+                                    defaultDurability,
+                                    IEquipmentTypeTag.EquipmentType.MASK,
+                                    immuneEffects,
+                                    attachments
+                            ), tab));
             return items;
         }
     }
@@ -261,6 +341,36 @@ public class ItemAdapter {
             ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, loadout.model);
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, loadout.animation);
             items.add(new GenerationRecord<>(id, new BaseRigs(texture, model, animation, containerSize), tab));
+            return items;
+        }
+    }
+
+    public static class ModuleAdapter implements IAssetManager.GeneratableItem {
+        @Override
+        public <T> LinkedHashSet<GenerationRecord<?>> deserializeItems(T data, String tab) {
+            LinkedHashSet<GenerationRecord<?>> items = new LinkedHashSet<>();
+            if (!(data instanceof ModularPOJO modular)) return items;
+            ResourceLocation id = new ResourceLocation(ZeroContact.MOD_ID, modular.id);
+            int durability = modular.durability;
+            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, modular.texture);
+            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, modular.model);
+            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, modular.animation);
+            MountCategory moduleType = modular.getMountCategory();
+            ResourceLocation trait = modular.getTrait();
+            items.add(
+                    new GenerationRecord<Item>(
+                            modular.id,
+                            new GenerateModuleGeoImpl(
+                                    durability,
+                                    trait,
+                                    texture,
+                                    model,
+                                    animation
+                            ),
+                            tab
+                    )
+            );
+            ModuleRegistry.registerCategory(id, moduleType);
             return items;
         }
     }

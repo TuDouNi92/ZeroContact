@@ -14,6 +14,7 @@ import net.zerocontact.datagen.adapter.RuntimeTypeAdapterFactory;
 import net.zerocontact.datagen.model.AmmoDataPOJO;
 import net.zerocontact.datagen.model.GenerationRecord;
 import net.zerocontact.datagen.model.ItemPOJO;
+import net.zerocontact.datagen.model.ModularPOJO;
 import net.zerocontact.registries.ItemsReg;
 
 import java.io.IOException;
@@ -34,7 +35,8 @@ public class ZAssetManager implements IAssetManager {
                     .of(ItemPOJO.class, "type")
                     .registerSubtype(ItemPOJO.Plate.class, "plate")
                     .registerSubtype(ItemPOJO.Armor.class, "armor")
-                    .registerSubtype(ItemPOJO.Loadout.class,"loadout");
+                    .registerSubtype(ItemPOJO.Loadout.class,"loadout")
+                    .registerSubtype(ModularPOJO.class, "module");
     private final Gson gson = new GsonBuilder().registerTypeAdapterFactory(typeAdapterFactory).create();
 
     @Override
@@ -104,6 +106,11 @@ public class ZAssetManager implements IAssetManager {
                 LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(loadout, tab);
                 if(records.isEmpty())return;
                 this.registerItems(ITEMS_REG_TAB,ItemsReg.ITEMS, new IAssetManager.WearableType(records,"LOADOUT"));
+            }
+            else if(data instanceof ModularPOJO modular){
+                LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(modular, tab);
+                if(records.isEmpty())return;
+                this.registerItems(ITEMS_REG_TAB,ItemsReg.ITEMS, new IAssetManager.WearableType(records,"MODULE"));
             }
         }));
     }

@@ -1,8 +1,11 @@
 package net.zerocontact.datagen.model;
 
 import com.google.gson.annotations.SerializedName;
+import net.zerocontact.armor.modular.model.MountCategory;
+import net.zerocontact.armor.modular.model.MountType;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ItemPOJO {
     public static class Plate extends ItemPOJO {
@@ -61,6 +64,7 @@ public class ItemPOJO {
 
         @SerializedName("immune_effects")
         public List<String> immuneEffects = List.of();
+
         @SerializedName("hurt_modifier")
         public Armor.HurtModifier hurtModifier = new HurtModifier();
 
@@ -73,8 +77,50 @@ public class ItemPOJO {
             public Float bluntMultiplier = 0.1f;
         }
 
+        public List<Attachments> attachments = new ArrayList<>();
+
+        public static class Attachments {
+
+            @SerializedName("mount_id")
+            public String mountId;
+
+            @SerializedName("mount_type")
+            public String mountType;
+
+            @SerializedName("mount_bone")
+            public String mountBone;
+
+            @SerializedName("accept_categories")
+            public List<String> acceptCategories;
+
+            public MountType getMountType() {
+                return Arrays.stream(MountType.values())
+                        .filter(e -> e.name().equals(mountType.toUpperCase()))
+                        .findFirst()
+                        .orElse(MountType.UNDEFINED);
+            }
+
+            public Set<MountCategory> getAcceptCategories() {
+                HashSet<MountCategory> moduleCategories = new HashSet<>();
+                if (acceptCategories.isEmpty()) {
+                    moduleCategories.add(MountCategory.UNDEFINED);
+                } else {
+                    moduleCategories = acceptCategories.stream()
+                            .map(str -> Arrays.stream(MountCategory.values())
+                                    .filter(category -> category.name().equals(str.toUpperCase()))
+                                    .findFirst()
+                                    .orElse(MountCategory.UNDEFINED)
+                            )
+                            .collect(Collectors.toCollection(HashSet::new));
+                }
+                return moduleCategories;
+            }
+
+        }
+
         public Armor() {
             immuneEffects = immuneEffects == null ? List.of() : immuneEffects;
+            attachments = attachments == null ? List.of() : attachments;
         }
     }
 

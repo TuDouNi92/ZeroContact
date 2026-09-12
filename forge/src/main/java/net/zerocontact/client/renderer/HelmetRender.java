@@ -5,6 +5,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.zerocontact.armor.modular.client.renderer.AttachmentRenderLayer;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.model.GeoModel;
@@ -15,6 +16,7 @@ public class HelmetRender {
     public static class HelmetArmorRender<TItem extends Item & GeoAnimatable & GeoItem> extends GeoArmorRenderer<TItem> {
         public HelmetArmorRender(GeoModel<TItem> model) {
             super(model);
+            this.addRenderLayer(new AttachmentRenderLayer<>(this));
         }
 
         @Override
@@ -23,6 +25,7 @@ public class HelmetRender {
             super.prepForRender(entity, stack, slot, baseModel);
         }
     }
+
     public static class HelmetItemRender<TItem extends Item & GeoAnimatable & GeoItem> extends GeoItemRenderer<TItem> {
         public HelmetItemRender(GeoModel<TItem> model) {
             super(model);
