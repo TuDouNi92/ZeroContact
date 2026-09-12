@@ -51,6 +51,7 @@ public class EquipmentCard extends AbstractButton {
                 -8,
                 -8
         );
+        guiGraphics.renderItemDecorations(Minecraft.getInstance().font, renderStack, -8, 3);
         pose.popPose();
         int padding = 4;
 
