@@ -11,6 +11,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkHooks;
 import net.zerocontact.api.armor.modular.ModularEquipment;
+import net.zerocontact.armor.modular.client.network.ItemStackCodec;
 import net.zerocontact.armor.modular.model.MountCategory;
 import net.zerocontact.armor.modular.model.EquipmentTarget;
 import net.zerocontact.armor.modular.registry.ModuleRegistry;
@@ -57,7 +58,7 @@ public class EquipmentMenu extends AbstractContainerMenu {
     public EquipmentMenu(int containerId, Inventory playerInv, FriendlyByteBuf buf) {
         this(containerId, playerInv, buf.readItem(), buf.readResourceLocation(),
                 EquipmentTarget.read(buf),
-                buf.readList(buffer -> new Candidate(buffer.readVarInt(), buffer.readItem())));
+                buf.readList(buffer -> new Candidate(buffer.readVarInt(), ItemStackCodec.read(buf))));
     }
 
     private EquipmentMenu(int containerId, Inventory playerInv, ItemStack equipment,
@@ -134,7 +135,7 @@ public class EquipmentMenu extends AbstractContainerMenu {
                     target.write(buf);
                     buf.writeCollection(candidates, (buffer, candidate) -> {
                         buffer.writeVarInt(candidate.inventorySlot());
-                        buffer.writeItem(candidate.stack());
+                        ItemStackCodec.write(buf, candidate.stack);
                     });
                 });
     }

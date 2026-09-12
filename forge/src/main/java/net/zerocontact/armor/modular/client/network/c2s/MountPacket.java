@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 import net.zerocontact.armor.modular.client.menu.EquipmentMenu;
+import net.zerocontact.armor.modular.client.network.ItemStackCodec;
 import net.zerocontact.armor.modular.model.EquipmentTarget;
 
 import java.util.function.Supplier;
@@ -14,12 +15,13 @@ public record MountPacket(int containerId, EquipmentTarget target, ResourceLocat
     public MountPacket {
         moduleStack = moduleStack.copy();
     }
+
     public void encode(FriendlyByteBuf buf) {
         buf.writeVarInt(containerId);
         target.write(buf);
         buf.writeResourceLocation(mountId);
         buf.writeVarInt(inventorySlot);
-        buf.writeItem(moduleStack);
+        ItemStackCodec.write(buf, moduleStack);
     }
 
     public static MountPacket decode(FriendlyByteBuf buf) {
@@ -28,7 +30,7 @@ public record MountPacket(int containerId, EquipmentTarget target, ResourceLocat
                 EquipmentTarget.read(buf),
                 buf.readResourceLocation(),
                 buf.readVarInt(),
-                buf.readItem()
+                ItemStackCodec.read(buf)
         );
     }
 
