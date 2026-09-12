@@ -14,6 +14,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.armor.modular.module.nvg.api.INvg;
 import net.zerocontact.armor.modular.module.nvg.client.ClientInteractionManger;
+import net.zerocontact.mixin.minecraft.GameRendererAccessor;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -32,10 +34,6 @@ public final class ClientNvgTickHandler {
         public static void register(RegisterClientReloadListenersEvent event) {
             event.registerReloadListener((ResourceManagerReloadListener) resources -> reloadPending = true);
         }
-    }
-
-    public static boolean isShaderReady() {
-        return ownedEffect != null && Minecraft.getInstance().gameRenderer.currentEffect() == ownedEffect;
     }
 
     @SubscribeEvent
@@ -62,6 +60,12 @@ public final class ClientNvgTickHandler {
         if (!Objects.equals(desired, loadedEffect)) release(renderer);
         if (desired == null) {
             failedEffect = null;
+            return;
+        }
+        if (ownedEffect != null && renderer.currentEffect() == ownedEffect) {
+            if(!((GameRendererAccessor) renderer).isEffectActive()){
+                renderer.togglePostEffect();
+            }
             return;
         }
         if (ownedEffect != null || renderer.currentEffect() != null) return;

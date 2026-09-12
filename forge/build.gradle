@@ -11,7 +11,11 @@ loom {
     forge {
         convertAccessWideners = true
         extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
-        mixinConfig("zerocontact.forge.tacz.mixins.json", "zerocontact.forge.magazines.mixins.json")
+        mixinConfig(
+                "zerocontact.forge.tacz.mixins.json",
+                "zerocontact.forge.magazines.mixins.json",
+                "zerocontact.forge.minecraft.mixins.json"
+        )
     }
 }
 
