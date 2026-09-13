@@ -10,9 +10,9 @@
       "uniforms": [
         { "name": "Gain", "values": [12.0] },
         { "name": "Gamma", "values": [2.85] },
-        { "name": "NoiseStrength", "values": [0.725] },
+        { "name": "NoiseStrength", "values": [0.425] },
         { "name": "VignetteStrength", "values": [0.75] },
-        { "name": "PhosphorColor", "values": [0.32, 0.82, 0.38] }
+        { "name": "PhosphorColor", "values": [0.52, 0.74, 0.82] }
       ]
     },
     {

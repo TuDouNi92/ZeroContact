@@ -3,11 +3,13 @@ package net.zerocontact.armor.modular.module.nvg.client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.armor.modular.module.nvg.api.INvg;
 import net.zerocontact.capability.CapabilityRegistries;
+import net.zerocontact.registries.ModSoundEventsReg;
 import software.bernie.geckolib.animatable.GeoItem;
 
 import java.util.Map;
@@ -95,6 +97,17 @@ public final class ClientInteractionManger {
             state.tick(capability.outOfPower());
             // Set a stable pose even if the view model was not rendered during the transition.
             if (previousPhase != state.phase()) {
+                switch (state.phase()){
+                    case ON ->{
+                        minecraft.player.playNotifySound(ModSoundEventsReg.NVG_BUZZ, SoundSource.PLAYERS,1,1);
+                        minecraft.player.playNotifySound(ModSoundEventsReg.NVG_CLICK, SoundSource.PLAYERS,1,1);
+                    }
+                    case OFF -> {
+                        minecraft.player.playNotifySound(ModSoundEventsReg.NVG_BUZZ, SoundSource.PLAYERS,1,0.7f);
+                        minecraft.player.playNotifySound(ModSoundEventsReg.NVG_CLICK, SoundSource.PLAYERS,1,0.7f);
+                    }
+                }
+
                 trigger(minecraft, state.phase() == NvgEffectState.Phase.ON ? "on_pose" : "off_pose");
             }
         }

@@ -14,6 +14,7 @@ import net.minecraftforge.registries.RegisterEvent;
 import net.zerocontact.api.datagen.IAssetManager;
 import net.zerocontact.api.TabableItem;
 import net.zerocontact.armor.modular.module.nvg.item.PVS31;
+import net.zerocontact.armor.modular.module.nvg.item.PVS31A;
 import net.zerocontact.datagen.loader.ZPackManager;
 import net.zerocontact.forge_registries.item.*;
 import net.zerocontact.item.kit.ArmorRepairKit;
@@ -48,6 +49,7 @@ public class ItemRegistry {
         RegistrySupplier<ForgeSpawnEggItem> RAIDER_EGG = ItemsReg.ITEMS.register("raider_egg", () -> new ForgeSpawnEggItem(EntitiyRegistry.ARMED_RAIDER, 0x3d6145, 0xcfc08a, new Item.Properties()));
         RegistrySupplier<ArmorRepairKit> ARMOR_KIT = ItemsReg.ITEMS.register("kit_armor", ArmorRepairKit::new);
         RegistrySupplier<PVS31> NVG_PVS31 = ItemsReg.ITEMS.register("nvg_pvs31", PVS31::new);
+        RegistrySupplier<PVS31A> NVG_PVS31A = ItemsReg.ITEMS.register("nvg_pvs31a", PVS31A::new);
         List<TabableItem> onGoingRegItems = List.of(
                 new Plates(),
                 new Helmets(),
@@ -60,7 +62,8 @@ public class ItemRegistry {
         List<RegistrySupplier<? extends ItemLike>> items = List.of(
                 ARMOR_KIT,
                 RAIDER_EGG,
-                NVG_PVS31
+                NVG_PVS31,
+                NVG_PVS31A
         );
         items.forEach(item -> ITEMS_REG_TAB.put(item, DEFAULT_TAB));
         ZPackManager packManager = ZPackManager.getInstance();

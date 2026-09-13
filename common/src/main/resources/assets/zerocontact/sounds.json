@@ -145,5 +145,21 @@
         "type": "file"
       }
     ]
+  },
+  "nvg/buzz_out": {
+    "sounds": [
+      {
+        "name": "zerocontact:nvg/buzz_out",
+        "type": "file"
+      }
+    ]
+  },
+  "nvg/nvg_click": {
+    "sounds": [
+      {
+        "name": "zerocontact:nvg/nvg_click",
+        "type": "file"
+      }
+    ]
   }
 }

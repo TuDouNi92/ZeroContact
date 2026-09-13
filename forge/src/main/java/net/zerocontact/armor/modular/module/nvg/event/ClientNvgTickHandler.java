@@ -22,7 +22,9 @@ import java.util.Objects;
 @Mod.EventBusSubscriber(modid = ZeroContact.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public final class ClientNvgTickHandler {
     private static final Map<INvg.Type, ResourceLocation> TYPE_EFFECTS = Map.of(
-            INvg.Type.GREEN, new ResourceLocation(ZeroContact.MOD_ID, "shaders/post/nvg_green.json"));
+            INvg.Type.GREEN, new ResourceLocation(ZeroContact.MOD_ID, "shaders/post/nvg_green.json"),
+            INvg.Type.WHITE, new ResourceLocation(ZeroContact.MOD_ID, "shaders/post/nvg_white.json")
+    );
     private static ResourceLocation loadedEffect;
     private static ResourceLocation failedEffect;
     private static PostChain ownedEffect;
@@ -44,7 +46,10 @@ public final class ClientNvgTickHandler {
         var effect = ClientInteractionManger.get();
         if (!minecraft.isPaused()) effect.tick(minecraft);
         GameRenderer renderer = minecraft.gameRenderer;
-        ResourceLocation desired = effect.wantsShader() && effect.module().getItem() instanceof INvg nvg
+        ResourceLocation desired =
+                effect.wantsShader()
+                && effect.module().getItem() instanceof INvg nvg
+                && minecraft.options.getCameraType().isFirstPerson()
                 ? TYPE_EFFECTS.get(nvg.getNVGType()) : null;
 
         if (reloadPending) {

@@ -14,7 +14,7 @@ public interface INvg {
 
     enum Type {
         GREEN,
-        BLUE,
+        WHITE,
         THERMAL,
         THERMAL_COLOR
     }

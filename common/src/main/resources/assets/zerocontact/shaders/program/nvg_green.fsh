@@ -22,7 +22,17 @@ void main() {
     vec3 source = texture(DiffuseSampler, texCoord).rgb;
 
     // 1. 提取画面亮度，去掉原来的色彩。
-    float luminance = dot(source, vec3(0.2126, 0.7152, 0.0722));
+    float perceptualLum =
+    dot(source, vec3(0.2126, 0.7152, 0.0722));
+
+    float peakLum =
+    max(source.r, max(source.g, source.b));
+
+    float luminance = mix(
+            perceptualLum,
+            peakLum,
+            0.35
+    );
 
     // 2. 放大弱光信号。
     // 指数曲线让高亮部分平滑接近 1，避免直接乘法截断。
@@ -32,7 +42,6 @@ void main() {
     signal = pow(max(signal, 0.0), max(Gamma, 0.01));
 
     // 3. 动态颗粒：暗部稍多，亮部稍少。
-    // 1.20.1 的 PostChain Time 不是直接以秒为单位；
     // 此处仅把它当作随时间变化的噪声种子。
     float phase = floor(Time * 24000.0);
     float noise = hash21(
@@ -42,9 +51,17 @@ void main() {
     float noiseAmount = NoiseStrength * mix(1.0, 0.35, signal);
     signal = clamp(signal + noise * noiseAmount, 0.0, 1.0);
 
-    // 4. 单色绿磷映射，加一点很弱的管底辉光。
     float phosphor = 0.004 + signal * 0.996;
+
     vec3 color = phosphor * PhosphorColor;
+
+    // 强光逐渐失去磷色偏并趋向白
+    float highlight = smoothstep(0.70, 0.97, signal);
+    color = mix(
+            color,
+            vec3(phosphor),
+            highlight * 0.8
+    );
 
     // 5. 柔和的椭圆暗角，模拟边缘亮度下降。
     vec2 centered = texCoord * 2.0 - 1.0;
