@@ -13,6 +13,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.RegisterEvent;
 import net.zerocontact.api.datagen.IAssetManager;
 import net.zerocontact.api.TabableItem;
+import net.zerocontact.armor.modular.module.battery.item.Battery;
+import net.zerocontact.armor.modular.module.beacon.item.Beacon;
 import net.zerocontact.armor.modular.module.nvg.item.PVS31;
 import net.zerocontact.armor.modular.module.nvg.item.PVS31A;
 import net.zerocontact.datagen.loader.ZPackManager;
@@ -50,6 +52,8 @@ public class ItemRegistry {
         RegistrySupplier<ArmorRepairKit> ARMOR_KIT = ItemsReg.ITEMS.register("kit_armor", ArmorRepairKit::new);
         RegistrySupplier<PVS31> NVG_PVS31 = ItemsReg.ITEMS.register("nvg_pvs31", PVS31::new);
         RegistrySupplier<PVS31A> NVG_PVS31A = ItemsReg.ITEMS.register("nvg_pvs31a", PVS31A::new);
+        RegistrySupplier<Battery> BATTERY = ItemsReg.ITEMS.register("battery", Battery::new);
+        RegistrySupplier<Beacon> BEACON = ItemsReg.ITEMS.register("beacon",Beacon::new);
         List<TabableItem> onGoingRegItems = List.of(
                 new Plates(),
                 new Helmets(),
@@ -63,7 +67,9 @@ public class ItemRegistry {
                 ARMOR_KIT,
                 RAIDER_EGG,
                 NVG_PVS31,
-                NVG_PVS31A
+                NVG_PVS31A,
+                BATTERY,
+                BEACON
         );
         items.forEach(item -> ITEMS_REG_TAB.put(item, DEFAULT_TAB));
         ZPackManager packManager = ZPackManager.getInstance();

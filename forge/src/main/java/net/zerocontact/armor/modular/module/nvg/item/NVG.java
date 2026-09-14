@@ -39,7 +39,11 @@ public abstract class NVG extends AbstractGenerateGeoCurioItemImpl implements Eq
     public void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entity, int slotId, boolean isSelected) {
         super.inventoryTick(stack, level, entity, slotId, isSelected);
         if(level.isClientSide)return;
-        stack.getCapability(CapabilityRegistries.NVG).ifPresent(nvg -> this.setDamage(stack, (int) (nvg.getDefaultBattery() - nvg.getBattery())));
+        stack.getCapability(CapabilityRegistries.NVG).ifPresent(nvg -> {
+            // Loose inventory modules have no external supply; discard an old mounted snapshot.
+            nvg.refreshPowerStatus(0, 0);
+            this.setDamage(stack, (int) (nvg.getMaxBattery() - nvg.getBattery()));
+        });
     }
 
 

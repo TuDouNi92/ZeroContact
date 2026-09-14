@@ -2,6 +2,8 @@
   "key.zerocontact.module_hud": "Toggle Module Quick Menu",
   "key.zerocontact.module_activate": "Activate Selected Module",
   "hud.zerocontact.modules.empty": "No controllable modules",
+  "state.zerocontact.beacon.on": "On",
+  "state.zerocontact.beacon.off": "Off",
   "state.zerocontact.nvg.on": "On",
   "state.zerocontact.nvg.off": "Off",
   "state.zerocontact.nvg.no_power": "No power",

@@ -13,6 +13,18 @@
       "mount_type": "helmet_front",
       "mount_bone": "nvg_fix",
       "accept_categories": ["night_vision"]
+    },
+    {
+      "mount_id": "battery_mount",
+      "mount_type": "helmet_back",
+      "mount_bone": "battery_fix",
+      "accept_categories": ["battery"]
+    },
+    {
+      "mount_id": "beacon_mount",
+      "mount_type": "helmet_top",
+      "mount_bone": "beacon_fix",
+      "accept_categories": ["beacon"]
     }
   ],
   "hurt_modifier":

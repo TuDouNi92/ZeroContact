@@ -6,6 +6,8 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.zerocontact.api.armor.modular.ModuleContainer;
 import net.zerocontact.api.caliber.ICartridgeHolder;
 import net.zerocontact.api.IRepairKit;
+import net.zerocontact.armor.modular.module.battery.container.BatteryContainer;
+import net.zerocontact.armor.modular.module.beacon.container.BeaconContainer;
 import net.zerocontact.armor.modular.module.nvg.container.NvgContainer;
 import net.zerocontact.armor.modular.module.pouch.container.PouchContainer;
 
@@ -15,6 +17,8 @@ public class CapabilityRegistries {
     public static Capability<ModuleContainer> MODULAR_EQUIPMENT;
     public static Capability<PouchContainer> POUCH;
     public static Capability<NvgContainer> NVG;
+    public static Capability<BatteryContainer> BATTERY;
+    public static Capability<BeaconContainer> BEACON;
 
     public static void register() {
         CARTRIDGE = CapabilityManager.get(new CapabilityToken<>() {
@@ -26,6 +30,10 @@ public class CapabilityRegistries {
         POUCH = CapabilityManager.get(new CapabilityToken<>() {
         });
         NVG = CapabilityManager.get(new CapabilityToken<>() {
+        });
+        BATTERY = CapabilityManager.get(new CapabilityToken<>() {
+        });
+        BEACON = CapabilityManager.get(new CapabilityToken<>() {
         });
     }
 

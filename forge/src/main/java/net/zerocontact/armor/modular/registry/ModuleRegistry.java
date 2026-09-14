@@ -8,6 +8,9 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.armor.modular.ModuleController;
+import net.zerocontact.armor.modular.module.battery.capability.BatteryProvider;
+import net.zerocontact.armor.modular.module.beacon.capability.BeaconProvider;
+import net.zerocontact.armor.modular.module.beacon.service.BeaconController;
 import net.zerocontact.armor.modular.module.nvg.capability.NvgProvider;
 import net.zerocontact.armor.modular.module.nvg.service.NvgController;
 import net.zerocontact.armor.modular.module.pouch.capability.PouchProvider;
@@ -50,7 +53,11 @@ public final class ModuleRegistry {
                         new ResourceLocation(ZeroContact.MOD_ID, "pouch"),
                         new CapabilityEntry(CapabilityRegistries.POUCH, Optional.empty(), PouchProvider::new),
                         new ResourceLocation(ZeroContact.MOD_ID, "nvg"),
-                        new CapabilityEntry(CapabilityRegistries.NVG, Optional.of(new NvgController()), NvgProvider::new)
+                        new CapabilityEntry(CapabilityRegistries.NVG, Optional.of(new NvgController()), NvgProvider::new),
+                        new ResourceLocation(ZeroContact.MOD_ID, "battery"),
+                        new CapabilityEntry(CapabilityRegistries.BATTERY, Optional.empty(), BatteryProvider::new),
+                        new ResourceLocation(ZeroContact.MOD_ID, "beacon"),
+                        new CapabilityEntry(CapabilityRegistries.BEACON, Optional.of(new BeaconController()), BeaconProvider::new)
                 )
         );
     }
