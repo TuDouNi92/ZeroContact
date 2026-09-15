@@ -6,6 +6,11 @@
   "mixins": [
     "GameRendererAccessor"
   ],
+  "client": [
+    "CompositeRenderTypeAccessor",
+    "CompositeStateAccessor",
+    "PlayerRenderMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

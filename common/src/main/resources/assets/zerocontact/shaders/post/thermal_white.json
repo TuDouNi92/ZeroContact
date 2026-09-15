@@ -1,0 +1,32 @@
+{
+  "targets": [
+    "heat",
+    "swap"
+  ],
+  "passes": [
+    {
+      "name": "zerocontact:thermal",
+      "intarget": "minecraft:main",
+      "outtarget": "swap",
+      "auxtargets": [
+        {
+          "name": "HeatSampler",
+          "id": "heat"
+        }
+      ],
+      "uniforms": [
+        {
+          "name": "ColorMode",
+          "values": [
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "blit",
+      "intarget": "swap",
+      "outtarget": "minecraft:main"
+    }
+  ]
+}

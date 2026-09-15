@@ -18,6 +18,7 @@ import net.minecraftforge.client.event.RenderArmEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.zerocontact.events.EventUtil;
+import net.zerocontact.armor.modular.module.nvg.event.ThermalRenderHandler;
 import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
@@ -56,6 +57,10 @@ public class UniformArmRenderer {
         poseStack.mulPose(Axis.XP.rotationDegrees(0));
         renderer.prepForRender(player, uniformStack, EquipmentSlot.CHEST, playerRenderer.getModel());
         renderBoneAndChildren(poseStack, armBone, bufferSource.getBuffer(renderType), packedLight, 1, 1, 1);
+        // This event cancels PlayerRenderer.renderHand, so its thermal mixin never runs.
+        // Reuse the same prepared bone and live pose, including TaCZ's hand animation.
+        ThermalRenderHandler.renderHandHeat(heatBuffers ->
+                renderBoneAndChildren(poseStack, armBone, heatBuffers.getBuffer(renderType), packedLight, 1, 1, 1));
         poseStack.popPose();
         event.setCanceled(true);
     }

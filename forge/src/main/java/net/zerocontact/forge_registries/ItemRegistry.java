@@ -17,6 +17,7 @@ import net.zerocontact.armor.modular.module.battery.item.Battery;
 import net.zerocontact.armor.modular.module.beacon.item.Beacon;
 import net.zerocontact.armor.modular.module.nvg.item.PVS31;
 import net.zerocontact.armor.modular.module.nvg.item.PVS31A;
+import net.zerocontact.armor.modular.module.nvg.item.T7;
 import net.zerocontact.datagen.loader.ZPackManager;
 import net.zerocontact.forge_registries.item.*;
 import net.zerocontact.item.kit.ArmorRepairKit;
@@ -54,6 +55,7 @@ public class ItemRegistry {
         RegistrySupplier<PVS31A> NVG_PVS31A = ItemsReg.ITEMS.register("nvg_pvs31a", PVS31A::new);
         RegistrySupplier<Battery> BATTERY = ItemsReg.ITEMS.register("battery", Battery::new);
         RegistrySupplier<Beacon> BEACON = ItemsReg.ITEMS.register("beacon",Beacon::new);
+        RegistrySupplier<T7> NVG_T7 = ItemsReg.ITEMS.register("t7",T7::new);
         List<TabableItem> onGoingRegItems = List.of(
                 new Plates(),
                 new Helmets(),
@@ -68,6 +70,7 @@ public class ItemRegistry {
                 RAIDER_EGG,
                 NVG_PVS31,
                 NVG_PVS31A,
+                NVG_T7,
                 BATTERY,
                 BEACON
         );

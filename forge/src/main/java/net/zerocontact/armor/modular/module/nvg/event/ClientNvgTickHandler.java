@@ -1,5 +1,6 @@
 package net.zerocontact.armor.modular.module.nvg.event;
 
+import com.mojang.blaze3d.pipeline.RenderTarget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.renderer.GameRenderer;
@@ -16,6 +17,8 @@ import net.zerocontact.armor.modular.module.nvg.api.INvg;
 import net.zerocontact.armor.modular.module.nvg.client.ClientInteractionManger;
 import net.zerocontact.mixin.minecraft.GameRendererAccessor;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -23,7 +26,9 @@ import java.util.Objects;
 public final class ClientNvgTickHandler {
     private static final Map<INvg.Type, ResourceLocation> TYPE_EFFECTS = Map.of(
             INvg.Type.GREEN, new ResourceLocation(ZeroContact.MOD_ID, "shaders/post/nvg_green.json"),
-            INvg.Type.WHITE, new ResourceLocation(ZeroContact.MOD_ID, "shaders/post/nvg_white.json")
+            INvg.Type.WHITE, new ResourceLocation(ZeroContact.MOD_ID, "shaders/post/nvg_white.json"),
+            INvg.Type.THERMAL, new ResourceLocation(ZeroContact.MOD_ID, "shaders/post/thermal_white.json"),
+            INvg.Type.THERMAL_COLOR, new ResourceLocation(ZeroContact.MOD_ID, "shaders/post/thermal_color.json")
     );
     private static ResourceLocation loadedEffect;
     private static ResourceLocation failedEffect;
@@ -82,6 +87,18 @@ public final class ClientNvgTickHandler {
             loadedEffect = desired;
             failedEffect = null;
         }
+    }
+
+    /** Only expose a target owned by the currently active thermal chain. */
+    @Nullable
+    static RenderTarget getThermalTarget() {
+        Minecraft minecraft = Minecraft.getInstance();
+        GameRenderer renderer = minecraft.gameRenderer;
+        if (ownedEffect == null || renderer.currentEffect() != ownedEffect
+                || !((GameRendererAccessor) renderer).isEffectActive()) return null;
+        if (!Objects.equals(loadedEffect, TYPE_EFFECTS.get(INvg.Type.THERMAL))
+                && !Objects.equals(loadedEffect, TYPE_EFFECTS.get(INvg.Type.THERMAL_COLOR))) return null;
+        return ownedEffect.getTempTarget("heat");
     }
 
     private static void release(GameRenderer renderer) {
