@@ -11,6 +11,8 @@ import net.zerocontact.api.armor.modular.ModuleController;
 import net.zerocontact.armor.modular.module.battery.capability.BatteryProvider;
 import net.zerocontact.armor.modular.module.beacon.capability.BeaconProvider;
 import net.zerocontact.armor.modular.module.beacon.service.BeaconController;
+import net.zerocontact.armor.modular.module.headset.capability.HeadsetProvider;
+import net.zerocontact.armor.modular.module.headset.service.HeadsetController;
 import net.zerocontact.armor.modular.module.nvg.capability.NvgProvider;
 import net.zerocontact.armor.modular.module.nvg.service.NvgController;
 import net.zerocontact.armor.modular.module.pouch.capability.PouchProvider;
@@ -57,7 +59,9 @@ public final class ModuleRegistry {
                         new ResourceLocation(ZeroContact.MOD_ID, "battery"),
                         new CapabilityEntry(CapabilityRegistries.BATTERY, Optional.empty(), BatteryProvider::new),
                         new ResourceLocation(ZeroContact.MOD_ID, "beacon"),
-                        new CapabilityEntry(CapabilityRegistries.BEACON, Optional.of(new BeaconController()), BeaconProvider::new)
+                        new CapabilityEntry(CapabilityRegistries.BEACON, Optional.of(new BeaconController()), BeaconProvider::new),
+                        new ResourceLocation(ZeroContact.MOD_ID, "headset"),
+                        new CapabilityEntry(CapabilityRegistries.HEADSET, Optional.of(new HeadsetController()), HeadsetProvider::new)
                 )
         );
     }

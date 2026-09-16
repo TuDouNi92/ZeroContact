@@ -8,7 +8,7 @@
       "intarget": "minecraft:main",
       "outtarget": "swap",
       "uniforms": [
-        { "name": "Gain", "values": [20.0] },
+        { "name": "Gain", "values": [12.0] },
         { "name": "Gamma", "values": [2.25] },
         { "name": "NoiseStrength", "values": [0.725] },
         { "name": "VignetteStrength", "values": [0.75] },

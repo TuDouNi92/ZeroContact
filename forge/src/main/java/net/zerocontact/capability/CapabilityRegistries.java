@@ -8,6 +8,7 @@ import net.zerocontact.api.caliber.ICartridgeHolder;
 import net.zerocontact.api.IRepairKit;
 import net.zerocontact.armor.modular.module.battery.container.BatteryContainer;
 import net.zerocontact.armor.modular.module.beacon.container.BeaconContainer;
+import net.zerocontact.armor.modular.module.headset.container.HeadsetContainer;
 import net.zerocontact.armor.modular.module.nvg.container.NvgContainer;
 import net.zerocontact.armor.modular.module.pouch.container.PouchContainer;
 
@@ -19,6 +20,7 @@ public class CapabilityRegistries {
     public static Capability<NvgContainer> NVG;
     public static Capability<BatteryContainer> BATTERY;
     public static Capability<BeaconContainer> BEACON;
+    public static Capability<HeadsetContainer> HEADSET;
 
     public static void register() {
         CARTRIDGE = CapabilityManager.get(new CapabilityToken<>() {
@@ -34,6 +36,8 @@ public class CapabilityRegistries {
         BATTERY = CapabilityManager.get(new CapabilityToken<>() {
         });
         BEACON = CapabilityManager.get(new CapabilityToken<>() {
+        });
+        HEADSET = CapabilityManager.get(new CapabilityToken<>() {
         });
     }
 

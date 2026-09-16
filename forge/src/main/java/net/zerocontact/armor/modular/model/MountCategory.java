@@ -7,5 +7,6 @@ public enum MountCategory {
     POUCH(),
     BATTERY(),
     BEACON(),
+    HEADSET(),
     UNDEFINED();
 }

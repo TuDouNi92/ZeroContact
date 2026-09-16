@@ -12,9 +12,13 @@
     "EntityKineticBulletMixin",
     "GunHudOverlayMixin",
     "ItemStackMixin",
-    "ModernKineticGunScriptAPIMixin"
+    "ModernKineticGunScriptAPIMixin",
+    "SoundManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "client": [
+    "GunSoundInstanceMixin"
+  ]
 }

@@ -443,6 +443,11 @@
 					"name": "beacon_fix",
 					"parent": "armorHead",
 					"pivot": [0, 32.75, 2.125]
+				},
+				{
+					"name": "headset_fix",
+					"parent": "armorHead",
+					"pivot": [0, 30.375, 0]
 				}
 			]
 		}

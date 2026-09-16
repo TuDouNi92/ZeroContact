@@ -25,6 +25,12 @@
       "mount_type": "helmet_top",
       "mount_bone": "beacon_fix",
       "accept_categories": ["beacon"]
+    },
+    {
+      "mount_id": "headset_mount",
+      "mount_type": "helmet_top",
+      "mount_bone": "headset_fix",
+      "accept_categories": ["headset"]
     }
   ],
   "hurt_modifier":

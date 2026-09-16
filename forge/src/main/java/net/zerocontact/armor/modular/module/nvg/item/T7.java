@@ -14,7 +14,7 @@ public class T7 extends NVG {
 
     public T7() {
         super("t7", 12000, texture, model, animation, ArmorItem.Type.HELMET);
-        ModuleRegistry.registerCategory(new ResourceLocation(ZeroContact.MOD_ID, "t7"), MountCategory.NIGHT_VISION);
+        ModuleRegistry.registerCategory(new ResourceLocation(ZeroContact.MOD_ID, "nvg_t7"), MountCategory.NIGHT_VISION);
     }
 
     @Override

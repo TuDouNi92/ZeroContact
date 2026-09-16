@@ -15,6 +15,9 @@ import net.zerocontact.api.datagen.IAssetManager;
 import net.zerocontact.api.TabableItem;
 import net.zerocontact.armor.modular.module.battery.item.Battery;
 import net.zerocontact.armor.modular.module.beacon.item.Beacon;
+import net.zerocontact.armor.modular.module.headset.item.ComtacII;
+import net.zerocontact.armor.modular.module.headset.item.Headset;
+import net.zerocontact.armor.modular.module.nvg.item.GPNVG;
 import net.zerocontact.armor.modular.module.nvg.item.PVS31;
 import net.zerocontact.armor.modular.module.nvg.item.PVS31A;
 import net.zerocontact.armor.modular.module.nvg.item.T7;
@@ -54,8 +57,10 @@ public class ItemRegistry {
         RegistrySupplier<PVS31> NVG_PVS31 = ItemsReg.ITEMS.register("nvg_pvs31", PVS31::new);
         RegistrySupplier<PVS31A> NVG_PVS31A = ItemsReg.ITEMS.register("nvg_pvs31a", PVS31A::new);
         RegistrySupplier<Battery> BATTERY = ItemsReg.ITEMS.register("battery", Battery::new);
-        RegistrySupplier<Beacon> BEACON = ItemsReg.ITEMS.register("beacon",Beacon::new);
-        RegistrySupplier<T7> NVG_T7 = ItemsReg.ITEMS.register("t7",T7::new);
+        RegistrySupplier<Beacon> BEACON = ItemsReg.ITEMS.register("beacon", Beacon::new);
+        RegistrySupplier<T7> NVG_T7 = ItemsReg.ITEMS.register("nvg_t7", T7::new);
+        RegistrySupplier<GPNVG> NVG_GPNVG = ItemsReg.ITEMS.register("nvg_gpnvg", GPNVG::new);
+        RegistrySupplier<Headset> COMTAC_II = ItemsReg.ITEMS.register("headset_comtac2", ComtacII::new);
         List<TabableItem> onGoingRegItems = List.of(
                 new Plates(),
                 new Helmets(),
@@ -67,12 +72,14 @@ public class ItemRegistry {
         onGoingRegItems.forEach(reg -> reg.attach(ITEMS_REG_TAB));
         List<RegistrySupplier<? extends ItemLike>> items = List.of(
                 ARMOR_KIT,
-                RAIDER_EGG,
                 NVG_PVS31,
                 NVG_PVS31A,
                 NVG_T7,
+                NVG_GPNVG,
                 BATTERY,
-                BEACON
+                BEACON,
+                COMTAC_II,
+                RAIDER_EGG
         );
         items.forEach(item -> ITEMS_REG_TAB.put(item, DEFAULT_TAB));
         ZPackManager packManager = ZPackManager.getInstance();
