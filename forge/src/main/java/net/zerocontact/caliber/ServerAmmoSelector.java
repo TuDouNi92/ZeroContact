@@ -52,8 +52,6 @@ public class ServerAmmoSelector {
 
     public interface MappedItemHandler extends IItemHandler {
         int toFilteredSlot(int rawSlot);
-
-        ItemStack getAndClearExtractedMag();
     }
 
     public static void handleMenu(OpenAmmoSelectorPacket msg, Supplier<NetworkEvent.Context> supplier) {
@@ -137,19 +135,12 @@ public class ServerAmmoSelector {
         }
 
         return new MappedItemHandler() {
-            private ItemStack extractedMagazine = ItemStack.EMPTY;
 
             @Override
             public int toFilteredSlot(int rawSlot) {
                 return mappedSlots.indexOf(rawSlot);
             }
 
-            @Override
-            public ItemStack getAndClearExtractedMag() {
-                ItemStack result = extractedMagazine;
-                extractedMagazine = ItemStack.EMPTY;
-                return result;
-            }
 
             @Override
             public int getSlots() {
@@ -175,7 +166,6 @@ public class ServerAmmoSelector {
                         .get()
                         .getCompat()
                         .map(compat -> compat.instanceOfMagazine(stack.getItem())).orElse(false)) {
-                    extractedMagazine = stack;
                 }
                 return stack;
             }

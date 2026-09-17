@@ -15,11 +15,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.zerocontact.caliber.AmmoInjector;
+import net.zerocontact.caliber.compat.ReloadManager;
 import net.zerocontact.capability.CapabilityRegistries;
-import net.zerocontact.events.EventUtil;
+import net.zerocontact.compat.MagazinesCompatHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,31 +30,36 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractGunItem.class)
 public class AbstractGunItemMixin {
+
     @Unique
     private LivingEntity zeroContact$shooter;
 
     @Inject(method = "canReload", at = @At("HEAD"), remap = false, cancellable = true)
     public void zeroContact$canReload(LivingEntity shooter, ItemStack gunItem, CallbackInfoReturnable<Boolean> cir) {
         this.zeroContact$shooter = shooter;
-        ItemStack rigsStack = EventUtil.getCuriosStackFirst(shooter, "rigs");
-        //Essential check since a NPE occurred here but in MinecraftOrRainbow client.
-        if (rigsStack == null) return;
-        zeroContact$grantVanillaFullAmmoReload(gunItem, cir);
-        if (rigsStack.isEmpty()) {
-            shooter.getCapability(ForgeCapabilities.ITEM_HANDLER, null).ifPresent(iItemHandler -> {
-                for (int i = 0; i < iItemHandler.getSlots(); i++) {
-                    if (zeroContact$sameOrSelectedCaliber(shooter, gunItem, cir, iItemHandler, i)) return;
+        ReloadManager.ReloadInventory zeroContact$reloadInventory = ReloadManager.resolveReloadInv(shooter);
+        boolean magazineLoaded = MagazinesCompatHandler.get().isModLoaded();
+        boolean hasMagazine = MagazinesCompatHandler.get().getCompat().map(compat ->
+                compat.hasUsableMagazine(zeroContact$reloadInventory.rawHandler(), gunItem)
+        ).orElse(false);
+
+        if (hasMagazine) {
+            cir.setReturnValue(true);
+        } else {
+            for (int i = 0; i < zeroContact$reloadInventory.rawHandler().getSlots(); i++) {
+                if (zeroContact$sameOrSelectedCaliber(shooter, gunItem, cir, zeroContact$reloadInventory.rawHandler(), i)) {
+                    if (magazineLoaded) {
+                        cir.setReturnValue(false);
+                        zeroContact$sendFailMsg(shooter);
+                    } else {
+                        cir.setReturnValue(true);
+                    }
+                    return;
                 }
-                zeroContact$sendFailMsg(shooter);
-            });
-            return;
-        }
-        rigsStack.getCapability(ForgeCapabilities.ITEM_HANDLER, null).ifPresent(iItemHandler -> {
-            for (int i = 0; i < iItemHandler.getSlots(); i++) {
-                if (zeroContact$sameOrSelectedCaliber(shooter, gunItem, cir, iItemHandler, i)) return;
             }
+            cir.setReturnValue(false);
             zeroContact$sendFailMsg(shooter);
-        });
+        }
     }
 
     @Unique

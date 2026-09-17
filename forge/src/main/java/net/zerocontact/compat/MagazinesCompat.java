@@ -1,10 +1,12 @@
 package net.zerocontact.compat;
 
+import com.raiiiden.taczmagazines.capability.GunMagazineCapability;
 import com.raiiiden.taczmagazines.capability.GunMagazineProvider;
 import com.raiiiden.taczmagazines.config.MechanicsConfig;
 import com.raiiiden.taczmagazines.item.AmmoBoxMagazineStorage;
 import com.raiiiden.taczmagazines.item.MagazineItem;
 import com.raiiiden.taczmagazines.item.MagazineRegistrar;
+import com.raiiiden.taczmagazines.item.MagazineReloadSource;
 import com.raiiiden.taczmagazines.magazine.MagazineFamilySystem;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.IAmmo;
@@ -16,6 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.items.IItemHandler;
 import net.zerocontact.api.caliber.ICartridgeHolder;
 import net.zerocontact.caliber.AmmoInjector;
 
@@ -27,6 +30,10 @@ public class MagazinesCompat {
 
     public boolean instanceOfMagazine(Item object) {
         return object instanceof MagazineItem;
+    }
+
+    public boolean hasUsableMagazine(IItemHandler handler, ItemStack gun) {
+        return MagazineReloadSource.hasUsableMagazine(handler, gun);
     }
 
     public ItemStack getCompatibleMag(ItemStack gunStack) {
@@ -62,6 +69,10 @@ public class MagazinesCompat {
         ResourceLocation gunId = gun.getGunId(gunStack);
         String familyId = MagazineFamilySystem.getFamilyForGun(gunId);
         return familyId != null && !familyId.isEmpty();
+    }
+
+    public ItemStack getMag(ItemStack gunStack) {
+        return gunStack.getCapability(GunMagazineProvider.GUN_MAGAZINE).map(GunMagazineCapability::getStoredMagazine).orElse(ItemStack.EMPTY);
     }
 
     public void setVariantFromMag(ItemStack gunStack, ItemStack magStack, ICartridgeHolder cap) {
@@ -116,5 +127,19 @@ public class MagazinesCompat {
             }
         }
         return result;
+    }
+
+    public boolean isAmmoBoxOfGun(ItemStack stack, ItemStack slot) {
+        if (stack.getItem() instanceof MagazineItem magazineItem) {
+            return magazineItem.isAmmoBoxOfGun(stack, slot);
+        }
+        return false;
+    }
+
+    public int getAmmoCount(ItemStack slot) {
+        if (slot.getItem() instanceof MagazineItem magazineItem) {
+            return magazineItem.getAmmoCount(slot);
+        }
+        return 0;
     }
 }

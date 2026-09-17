@@ -1,11 +1,15 @@
 package net.zerocontact.mixin.tacz;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.raiiiden.taczmagazines.item.MagazineItem;
+import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.IAmmo;
 import com.tacz.guns.api.item.IAmmoBox;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.client.gui.overlay.GunHudOverlay;
 import com.tacz.guns.client.resource.GunDisplayInstance;
+import com.tacz.guns.resource.index.CommonGunIndex;
+import com.tacz.guns.resource.pojo.data.gun.FeedType;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -14,51 +18,82 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.items.IItemHandler;
+import net.zerocontact.caliber.compat.ReloadManager;
 import net.zerocontact.capability.CapabilityRegistries;
-import net.zerocontact.config.ModConfigs;
 import net.zerocontact.compat.MagazinesCompatHandler;
+import net.zerocontact.config.ModConfigs;
 import net.zerocontact.item.ammo.GenerateAmmo;
-import net.zerocontact.item.rigs.BaseRigs;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-import top.theillusivec4.curios.api.CuriosApi;
 
-@Mixin(GunHudOverlay.class)
+import java.util.function.Supplier;
+
+@Mixin(value = GunHudOverlay.class, priority = 999)
 public class GunHudOverlayMixin {
     @Shadow(remap = false)
     private static int cacheInventoryAmmoCount;
 
-    @Inject(method = "handleInventoryAmmo", at = @At("HEAD"), remap = false)
+    @Inject(method = "handleInventoryAmmo", at = @At("HEAD"), remap = false, cancellable = true)
     private static void zeroContact$handleInventoryAmmo(ItemStack stack, Inventory inventory, CallbackInfo ci) {
-        CuriosApi.getCuriosInventory(inventory.player).ifPresent(curioHandler -> {
-            curioHandler.getStacksHandler("rigs").ifPresent(stacksHandler -> {
-                ItemStack rigsStack = stacksHandler.getStacks().getStackInSlot(0);
-                if (rigsStack.getItem() instanceof BaseRigs) {
-                    rigsStack.getCapability(ForgeCapabilities.ITEM_HANDLER, null).ifPresent(itemHandler -> {
-                        for (int i = 0; i < itemHandler.getSlots(); ++i) {
-                            ItemStack inventoryAmmo = itemHandler.getStackInSlot(i);
-                            if (inventoryAmmo.getItem() instanceof IAmmo iAmmo) {
-                                if (!MagazinesCompatHandler.get().isModLoaded()) {
-                                    if (iAmmo.isAmmoOfGun(stack, inventoryAmmo)) {
-                                        cacheInventoryAmmoCount += inventoryAmmo.getCount();
-                                    }
-                                }
-                            }
-                            if (inventoryAmmo.getItem() instanceof IAmmoBox iAmmoBox && iAmmoBox.isAmmoBoxOfGun(stack, inventoryAmmo)) {
-                                cacheInventoryAmmoCount += iAmmoBox.getAmmoCount(inventoryAmmo);
+        Item checkItem = stack.getItem();
+        if (checkItem instanceof IGun iGun) {
+            ResourceLocation gunId = iGun.getGunId(stack);
+            CommonGunIndex gunIndex = TimelessAPI.getCommonGunIndex(gunId).orElse(null);
+            if (gunIndex != null) {
+                FeedType feedType = gunIndex.getGunData().getReloadData().getType();
+                ReloadManager.ReloadInventory reloadInventory = ReloadManager.resolveReloadInv(inventory.player);
+                IItemHandler itemHandler = reloadInventory.rawHandler();
+                Supplier<Integer> countAmmo = () -> {
+                    int count = 0;
+                    for (int i = 0; i < itemHandler.getSlots(); ++i) {
+                        ItemStack inventoryAmmo = itemHandler.getStackInSlot(i);
+                        if (inventoryAmmo.getItem() instanceof IAmmo iAmmo) {
+                            if (iAmmo.isAmmoOfGun(stack, inventoryAmmo)) {
+                                count += inventoryAmmo.getCount();
                             }
                         }
-                    });
-                }
-            });
-        });
+                        if (inventoryAmmo.getItem() instanceof IAmmoBox iAmmoBox && iAmmoBox.isAmmoBoxOfGun(stack, inventoryAmmo)) {
+                            count += iAmmoBox.getAmmoCount(inventoryAmmo);
+                        }
+                    }
+                    return count;
+                };
+                MagazinesCompatHandler.get().getCompat().ifPresentOrElse(compat -> {
+                            if (feedType.equals(FeedType.MAGAZINE)) {
+                                int total = 0;
+                                for (int i = 0; i < itemHandler.getSlots(); ++i) {
+                                    ItemStack slot = itemHandler.getStackInSlot(i);
+                                    if (compat.instanceOfMagazine(slot.getItem())) {
+                                        if (compat.isAmmoBoxOfGun(stack, slot)) {
+                                            int ammoPerMag = compat.getAmmoCount(slot);
+                                            if (ammoPerMag > 0) {
+                                                total += ammoPerMag * slot.getCount();
+                                            }
+                                        }
+                                    }
+                                }
+                                cacheInventoryAmmoCount = total;
+                            } else {
+                                cacheInventoryAmmoCount = countAmmo.get();
+                            }
+                        }
+                        , () -> {
+                            cacheInventoryAmmoCount = countAmmo.get();
+
+                        }
+                );
+                ci.cancel();
+            }
+        }
+
     }
 
     @Inject(method = "render", remap = false, at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;popPose()V", shift = At.Shift.AFTER, remap = true), locals = LocalCapture.CAPTURE_FAILHARD)

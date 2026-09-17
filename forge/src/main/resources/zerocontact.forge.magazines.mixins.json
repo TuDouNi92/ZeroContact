@@ -5,9 +5,11 @@
   "minVersion": "0.8",
   "mixins": [
     "BulletTransferPacketMixin",
+    "ClientReloadKeyHandlerMixin",
     "LoadOneFromHandPacketMixin",
     "MagazineItemMixin",
     "MagazineReloadSourceMixin",
+    "MagazineSelectorOverlayMixin",
     "UnloadOneFromHandPacketMixin"
   ],
   "plugin": "net.zerocontact.mixin.magazines.MagazineMixinConfigPlugin",
@@ -15,7 +17,7 @@
     "defaultRequire": 1
   },
   "client": [
-    "MagazineTooltipRendererMixin",
-    "MagazineLoadingHandlerMixin"
+    "MagazineLoadingHandlerMixin",
+    "MagazineTooltipRendererMixin"
   ]
 }

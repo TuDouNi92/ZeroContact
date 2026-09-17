@@ -12,16 +12,15 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.api.caliber.ICartridgeHolder;
 import net.zerocontact.caliber.AmmoInjector;
+import net.zerocontact.caliber.compat.ReloadManager;
 import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.compat.MagazinesCompatHandler;
-import net.zerocontact.events.EventUtil;
 import net.zerocontact.caliber.ServerAmmoSelector;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -45,22 +44,24 @@ public abstract class ModernKineticGunScriptAPIMixin {
     private ItemStack itemStack;
 
     @Unique
+    private ReloadManager.ReloadInventory zeroContact$reloadInventory;
+
+    @Unique
     private boolean zeroContact$incrementalReload;
     @Unique
     private boolean zeroContact$replaceAmmoInBarrel;
 
     @Inject(method = "consumeAmmoFromPlayer", at = @At("HEAD"), remap = false, cancellable = true)
     public void zeroContact$consumeAmmoFromPlayerRigs(int neededAmount, CallbackInfoReturnable<Integer> cir) {
-        ItemStack rigs = EventUtil.getCuriosStackFirst(shooter, "rigs");
         if (shooter instanceof ServerPlayer player) {
+            zeroContact$reloadInventory = ReloadManager.resolveReloadInv(shooter);
             if (!player.isCreative()) {
-                if (rigs.isEmpty()) {
-                    shooter.getCapability(ForgeCapabilities.ITEM_HANDLER, null).ifPresent(itemHandler -> zeroContact$extractSyncTag(neededAmount, cir, itemHandler, null));
-                } else {
-                    rigs.getCapability(ForgeCapabilities.ITEM_HANDLER, null).map(itemHandler -> zeroContact$extractSyncTag(neededAmount, cir, itemHandler, rigs));
+                switch (zeroContact$reloadInventory.source()){
+                    case RIGS -> zeroContact$extractSyncTag(neededAmount,cir,zeroContact$reloadInventory.rawHandler(),zeroContact$reloadInventory.containerStack());
+                    case VANILLA -> zeroContact$extractSyncTag(neededAmount,cir,zeroContact$reloadInventory.rawHandler(),null);
                 }
             } else {
-                shooter.getCapability(ForgeCapabilities.ITEM_HANDLER, null).ifPresent(itemHandler -> zeroContact$extractSyncTag(neededAmount, cir, zeroContact$getCreativeHandler(itemHandler), null));
+                zeroContact$extractSyncTag(neededAmount,cir,zeroContact$getCreativeHandler(zeroContact$reloadInventory.rawHandler()),null);
             }
             cir.cancel();
         }
@@ -77,15 +78,12 @@ public abstract class ModernKineticGunScriptAPIMixin {
             cir.setReturnValue(this.abstractGunItem.getDummyAmmoAmount(this.itemStack) > 0);
         } else {
             LazyOptional<ICartridgeHolder> gunCartridgeHolder = itemStack.getCapability(CapabilityRegistries.CARTRIDGE);
-            LazyOptional<IItemHandler> playerInv = shooter.getCapability(ForgeCapabilities.ITEM_HANDLER);
             String selectedVariant = gunCartridgeHolder.map(cap -> cap.getClientSelectedAmmoVariant(itemStack)).orElse("");
-            ItemStack rigs = EventUtil.getCuriosStackFirst(shooter, "rigs");
-            IItemHandler filteredHandler = ServerAmmoSelector.filteredAmmoHandler(playerInv.resolve().orElse(new ItemStackHandler()), selectedVariant, itemStack);
+            IItemHandler filteredHandler = ServerAmmoSelector.filteredAmmoHandler(zeroContact$reloadInventory.rawHandler(), selectedVariant, itemStack);
             int foundCount = zeroContact$getAmmoCount(filteredHandler, 0, null);
-            if (!rigs.isEmpty()) {
-                LazyOptional<IItemHandler> rigInv = rigs.getCapability(ForgeCapabilities.ITEM_HANDLER);
-                filteredHandler = ServerAmmoSelector.filteredAmmoHandler(rigInv.resolve().orElse(new ItemStackHandler()), selectedVariant, itemStack);
-                foundCount = zeroContact$getAmmoCount(filteredHandler, 0, rigs);
+            if (zeroContact$reloadInventory.source() == ReloadManager.ReloadSource.RIGS) {
+                filteredHandler = ServerAmmoSelector.filteredAmmoHandler(zeroContact$reloadInventory.rawHandler(), selectedVariant, itemStack);
+                foundCount = zeroContact$getAmmoCount(filteredHandler, 0, zeroContact$reloadInventory.containerStack());
             }
             boolean hasSelectedAmmo = foundCount > 0;
             this.zeroContact$incrementalReload = hasSelectedAmmo;
@@ -215,12 +213,12 @@ public abstract class ModernKineticGunScriptAPIMixin {
         }
         this.zeroContact$incrementalReload = false;
         this.zeroContact$replaceAmmoInBarrel = false;
-        ItemStack changedMagStack = ((ServerAmmoSelector.MappedItemHandler) modifiedHandler).getAndClearExtractedMag();
+        ItemStack changedMagStack = MagazinesCompatHandler.get().getCompat().map(mag->mag.getMag(gunStack)).orElse(ItemStack.EMPTY);
         if (!changedMagStack.isEmpty()) {
             zeroContact$setVariantFromMag(changedMagStack, cap);
         }
-        if (itemHandler instanceof ItemStackHandler itemStackHandler && rigs != null) {
-            rigs.getOrCreateTag().put("inventory", itemStackHandler.serializeNBT().getList("Items", Tag.TAG_COMPOUND));
+        if (zeroContact$reloadInventory.source() == ReloadManager.ReloadSource.RIGS && rigs!=null) {
+            zeroContact$reloadInventory.save().run();
         }
         cir.setReturnValue(amountForCaller);
     }
