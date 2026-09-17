@@ -12,7 +12,8 @@
     "CompositeRenderTypeAccessor",
     "CompositeStateAccessor",
     "PlayerRenderMixin",
-    "SoundBufferMixin"
+    "SoundBufferMixin",
+    "SoundEngineMixin"
   ],
   "injectors": {
     "defaultRequire": 1

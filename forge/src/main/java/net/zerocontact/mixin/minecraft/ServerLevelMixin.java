@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.zerocontact.armor.modular.module.headset.client.audio.AudioBehaviorManager;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,7 +28,7 @@ public class ServerLevelMixin {
             double originalRadius,
             ResourceKey<Level> dimension,
             Packet<?> packet) {
-        return originalRadius * 2;
+        return AudioBehaviorManager.getAudioBehaviorCalc().expandSoundRadius(originalRadius);
     }
     @ModifyArg(
             method = "playSeededSound(Lnet/minecraft/world/entity/player/Player;DDDLnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V",
@@ -43,6 +44,6 @@ public class ServerLevelMixin {
             double originalRadius,
             ResourceKey<Level> dimension,
             Packet<?> packet) {
-        return originalRadius * 2;
+        return AudioBehaviorManager.getAudioBehaviorCalc().expandSoundRadius(originalRadius);
     }
 }

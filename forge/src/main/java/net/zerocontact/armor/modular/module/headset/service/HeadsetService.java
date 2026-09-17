@@ -5,7 +5,7 @@ import net.zerocontact.armor.modular.ModuleQuery;
 import net.zerocontact.armor.modular.module.headset.container.HeadsetContainer;
 import net.zerocontact.capability.CapabilityRegistries;
 
-public final class HeadsetManager {
+public final class HeadsetService {
     /** Must run on the player's owning game thread; audio code must use ClientHeadsetState. */
     public static boolean isActive(Player player) {
         if (player == null) return false;

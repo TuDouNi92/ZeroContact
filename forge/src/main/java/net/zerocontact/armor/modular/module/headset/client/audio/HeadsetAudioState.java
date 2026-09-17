@@ -7,14 +7,14 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.zerocontact.ZeroContact;
-import net.zerocontact.armor.modular.module.headset.service.HeadsetManager;
+import net.zerocontact.armor.modular.module.headset.service.HeadsetService;
 
 /** Publishes the client-thread equipment state to the sound thread. */
 @Mod.EventBusSubscriber(modid = ZeroContact.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
-public final class ClientHeadsetState {
+public final class HeadsetAudioState {
     private static volatile boolean active;
 
-    private ClientHeadsetState() {
+    private HeadsetAudioState() {
     }
 
     /** Safe on the sound thread: never accesses the player or equipment capabilities. */
@@ -26,7 +26,7 @@ public final class ClientHeadsetState {
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         Minecraft minecraft = Minecraft.getInstance();
-        active = minecraft.level != null && HeadsetManager.isActive(minecraft.player);
+        active = minecraft.level != null && HeadsetService.isActive(minecraft.player);
     }
 
     @SubscribeEvent

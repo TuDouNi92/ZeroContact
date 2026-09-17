@@ -90,7 +90,8 @@
   "item.zerocontact.nvg_pvs31a": "PVS-31A Night Vison Goggle (White phosphor)",
   "item.zerocontact.nvg_t7": "T7 Thermal goggle",
   "item.zerocontact.nvg_gpnvg": "GPNVG-18 Night Vison Goggle (White phosphor)",
-  "item.zerocontact.headset_comtac2": "ComTac II Headset",
+  "item.zerocontact.headset_comtac2": "ComTac II Headset (OD)",
+  "item.zerocontact.headset_comtac2_brown": "ComTac II Headset (CB)",
   "item.zerocontact.beacon": "Helmet Mounted Beacon",
   "item.zerocontact.battery": "AA Battery Pouch",
 

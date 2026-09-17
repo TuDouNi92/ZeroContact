@@ -60,7 +60,8 @@ public class ItemRegistry {
         RegistrySupplier<Beacon> BEACON = ItemsReg.ITEMS.register("beacon", Beacon::new);
         RegistrySupplier<T7> NVG_T7 = ItemsReg.ITEMS.register("nvg_t7", T7::new);
         RegistrySupplier<GPNVG> NVG_GPNVG = ItemsReg.ITEMS.register("nvg_gpnvg", GPNVG::new);
-        RegistrySupplier<Headset> COMTAC_II = ItemsReg.ITEMS.register("headset_comtac2", ComtacII::new);
+        RegistrySupplier<Headset> COMTAC_II = ItemsReg.ITEMS.register("headset_comtac2", ()->new ComtacII("headset_comtac2",ComtacII.Color.OD));
+        RegistrySupplier<Headset> COMTAC_II_BROWN = ItemsReg.ITEMS.register("headset_comtac2_brown", ()->new ComtacII("headset_comtac2_brown",ComtacII.Color.CB));
         List<TabableItem> onGoingRegItems = List.of(
                 new Plates(),
                 new Helmets(),
@@ -79,6 +80,7 @@ public class ItemRegistry {
                 BATTERY,
                 BEACON,
                 COMTAC_II,
+                COMTAC_II_BROWN,
                 RAIDER_EGG
         );
         items.forEach(item -> ITEMS_REG_TAB.put(item, DEFAULT_TAB));
