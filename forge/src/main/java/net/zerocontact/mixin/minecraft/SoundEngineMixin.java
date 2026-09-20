@@ -29,7 +29,7 @@ public class SoundEngineMixin {
     private SoundBuffer zeroContact$processStaticBuffer(SoundBuffer original, SoundBuffer arg,
                                                         SoundInstance soundinstance, Channel arg2) {
         return AudioBehaviorManager.getAudioBehaviorCalc().shouldAttachToPCM(soundinstance)
-                ? ((StaticSoundBufferSource) original).zeroContact$forPlayback(HeadsetAudioState.isActive())
+                ? ((StaticSoundBufferSource) original).zeroContact$forPlayback(HeadsetAudioState.isActive(),HeadsetAudioState.getProfile())
                 : original;
     }
 }

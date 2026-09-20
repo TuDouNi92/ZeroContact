@@ -1,5 +1,8 @@
 package net.zerocontact.armor.modular.module.headset.client.audio;
 
+import net.zerocontact.armor.modular.module.headset.item.Headset;
+import org.jetbrains.annotations.Nullable;
+
 import javax.sound.sampled.AudioFormat;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -20,37 +23,44 @@ public final class StaticPcmProcessor {
                 && format.getSampleRate() > 0;
     }
 
-    public static ByteBuffer copyAndProcess(ByteBuffer original, AudioFormat format, boolean process) {
-        return copyAndProcess(original, format, process, true, true, true);
+    public static ByteBuffer copyAndProcess(ByteBuffer original, AudioFormat format, boolean process, @Nullable Headset.AudioProfile profile) {
+        return copyAndProcess(original, format, process, true, true, true,profile);
     }
 
-    /** The headset preset and the two effect switches are independent. */
+    /** Order: EQ, transient shaping, optional saturation, linked compression, final peak protection. */
     public static ByteBuffer copyAndProcess(ByteBuffer original, AudioFormat format,
-                                          boolean process, boolean enableTransient,
-                                          boolean enableCompressor) {
-        return copyAndProcess(original, format, process, enableTransient, enableCompressor, false);
-    }
+                                          boolean headsetActive, boolean enableTransient,
+                                          boolean enableCompressor, boolean enableSoftClip,
+                                            @Nullable Headset.AudioProfile profile
+    ) {
+        Headset.AudioProfile defaultProfile = new Headset.AudioProfile(
+                0,
+                6,
+                5,
+                16,
+                Headset.AudioProfile.defaultEqBands()
+        );
 
-    /** Order: transient shaping, optional saturation, linked compression, final peak protection. */
-    public static ByteBuffer copyAndProcess(ByteBuffer original, AudioFormat format,
-                                          boolean process, boolean enableTransient,
-                                          boolean enableCompressor, boolean enableSoftClip) {
         if (!supports(format) || original.remaining() % format.getFrameSize() != 0) {
             throw new IllegalArgumentException("Expected complete signed 16-bit PCM frames");
         }
         ByteBuffer copy = ByteBuffer.allocateDirect(original.remaining())
                 .order(format.isBigEndian() ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN);
         copy.put(original.duplicate()).flip();
+        Headset.AudioProfile eqProfile = headsetActive && profile != null ? profile : defaultProfile;
+        MultiBandEqualizer equalizer = new MultiBandEqualizer(
+                format.getSampleRate(), format.getChannels(), eqProfile.equalizerBands());
         AudioProcessor.TransientShaper transientShaper = null;
         if (enableTransient) {
-            if (!process) {
-                transientShaper = new AudioProcessor.TransientShaper(format.getSampleRate(), 12, -3);
+            if (!headsetActive) {
+                transientShaper = new AudioProcessor.TransientShaper(format.getSampleRate(), defaultProfile.transientAttackDb(), defaultProfile.transientSustainDb());
             } else {
-                transientShaper = new AudioProcessor.TransientShaper(format.getSampleRate());
+                if(profile==null)return original;
+                transientShaper = new AudioProcessor.TransientShaper(format.getSampleRate(),profile.transientAttackDb(),profile.transientSustainDb());
             }
         }
         AudioProcessor.Compressor compressor = enableCompressor
-                ? new AudioProcessor.Compressor(format.getSampleRate()) : null;
+                ? new AudioProcessor.Compressor(format.getSampleRate(),profile==null?1:profile.compressorRatio()) : null;
         // Keep intermediate samples as floats: saturation must precede any PCM ceiling.
         float[] samples = new float[format.getChannels()];
 
@@ -58,13 +68,14 @@ public final class StaticPcmProcessor {
         for (int frame = 0; frame < copy.limit(); frame += format.getFrameSize()) {
             float peak = 0;
             for (int channel = 0; channel < format.getChannels(); channel++) {
-                peak = Math.max(peak, Math.abs(copy.getShort(frame + channel * Short.BYTES) / 32768.0F));
+                samples[channel] = equalizer.process(
+                        copy.getShort(frame + channel * Short.BYTES) / 32768.0F, channel);
+                peak = Math.max(peak, Math.abs(samples[channel]));
             }
             float transientGain = calculateTransientGain(peak, transientShaper);
             float compressorInputPeak = 0;
             for (int channel = 0; channel < samples.length; channel++) {
-                int offset = frame + channel * Short.BYTES;
-                float shaped = copy.getShort(offset) / 32768.0F * transientGain;
+                float shaped = samples[channel] * transientGain;
                 samples[channel] = enableSoftClip
                         ? AudioProcessor.TransientShaper.softClip(
                                 shaped, SOFT_CLIP_DRIVE, SOFT_CLIP_CEILING)
@@ -73,7 +84,7 @@ public final class StaticPcmProcessor {
             }
             float compressorGain = calculateCompressorGain(compressorInputPeak, compressor);
             // Linked peak ceiling prevents boosted transients wrapping signed 16-bit PCM.
-            if ((enableTransient || enableCompressor || enableSoftClip) && compressorInputPeak > 0) {
+            if ((equalizer.isActive() || enableTransient || enableCompressor || enableSoftClip) && compressorInputPeak > 0) {
                 compressorGain = Math.min(compressorGain, (32767.0F / 32768.0F) / compressorInputPeak);
             }
             for (int channel = 0; channel < format.getChannels(); channel++) {

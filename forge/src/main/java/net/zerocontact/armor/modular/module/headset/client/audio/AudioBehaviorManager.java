@@ -4,6 +4,7 @@ import com.tacz.guns.client.sound.GunSoundInstance;
 import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.resources.ResourceLocation;
+import net.zerocontact.armor.modular.module.headset.item.Headset;
 
 public final class AudioBehaviorManager {
     private static AudioBehaviorCalc audioBehaviorCalc;
@@ -21,7 +22,11 @@ public final class AudioBehaviorManager {
             if (!HeadsetAudioState.isActive()) {
                 return originalAttenuation;
             }
-            return originalAttenuation * 2;
+            Headset.AudioProfile profile = HeadsetAudioState.getProfile();
+            if(profile!=null){
+                return profile.pickUpAttenuation();
+            }
+            return originalAttenuation;
         }
 
         public float overrideGunSoundMinuend() {
@@ -33,9 +38,7 @@ public final class AudioBehaviorManager {
         }
 
         public boolean shouldAttachToPCM(SoundInstance instance){
-            Sound sound = instance.getSound();
-            ResourceLocation soundLocation = sound.getLocation();
-            return instance instanceof GunSoundInstance || soundLocation.getPath().endsWith(".step");
+            return true;
         }
     }
 }

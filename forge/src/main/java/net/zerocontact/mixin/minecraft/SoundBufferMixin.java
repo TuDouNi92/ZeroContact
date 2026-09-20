@@ -3,6 +3,8 @@ package net.zerocontact.mixin.minecraft;
 import com.mojang.blaze3d.audio.SoundBuffer;
 import net.zerocontact.armor.modular.module.headset.client.audio.StaticPcmProcessor;
 import net.zerocontact.armor.modular.module.headset.client.audio.StaticSoundBufferSource;
+import net.zerocontact.armor.modular.module.headset.item.Headset;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -15,6 +17,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import javax.sound.sampled.AudioFormat;
 import java.nio.ByteBuffer;
 import java.util.OptionalInt;
+import java.util.HashMap;
+import java.util.Map;
 
 @Mixin(SoundBuffer.class)
 public abstract class SoundBufferMixin implements StaticSoundBufferSource {
@@ -27,10 +31,10 @@ public abstract class SoundBufferMixin implements StaticSoundBufferSource {
     @Unique
     private ByteBuffer zeroContact$originalPcm;
     @Unique
-    private SoundBuffer zeroContact$processedActivatedBuffer;
+    private final Map<Headset.AudioProfile, SoundBuffer> zeroContact$processedActivatedBuffers = new HashMap<>();
 
     @Unique
-    private SoundBuffer zeroContact$processedDeactivatedBuffer;
+    private final Map<Headset.AudioProfile, SoundBuffer> zeroContact$processedDeactivatedBuffers = new HashMap<>();
 
     @Unique
     private void zeroContact$retainOriginalPcm() {
@@ -45,7 +49,7 @@ public abstract class SoundBufferMixin implements StaticSoundBufferSource {
         zeroContact$retainOriginalPcm();
     }
     @Override
-    public SoundBuffer zeroContact$forPlayback(boolean process) {
+    public SoundBuffer zeroContact$forPlayback(boolean process, @Nullable Headset.AudioProfile profile) {
         SoundBuffer original = (SoundBuffer) (Object) this;
         if (!StaticPcmProcessor.supports(format)) {
             return original;
@@ -56,39 +60,30 @@ public abstract class SoundBufferMixin implements StaticSoundBufferSource {
             return original;
         }
         // Static channels may share this buffer: playback state belongs to the channel.
-        // Shaping/compression parameters are fixed, so processing the same PCM again is unnecessary.
-
-
-        if (process) {
-            if (zeroContact$processedActivatedBuffer == null) {
-                zeroContact$processedActivatedBuffer = new SoundBuffer(
-                        StaticPcmProcessor.copyAndProcess(zeroContact$originalPcm, format, process,true,true,false), format);
-            }
-        } else {
-            if (zeroContact$processedDeactivatedBuffer == null) {
-                zeroContact$processedDeactivatedBuffer = new SoundBuffer(
-                        StaticPcmProcessor.copyAndProcess(zeroContact$originalPcm, format, process), format);
-            }
+        // EQ parameters are supplied by the immutable profile; do not reuse another profile's PCM.
+        Map<Headset.AudioProfile, SoundBuffer> buffers = process
+                ? zeroContact$processedActivatedBuffers : zeroContact$processedDeactivatedBuffers;
+        SoundBuffer processed = buffers.get(profile);
+        if (processed == null) {
+            processed = new SoundBuffer(
+                    StaticPcmProcessor.copyAndProcess(zeroContact$originalPcm, format, process, profile), format);
+            buffers.put(profile, processed);
         }
-
-        return process ? zeroContact$processedActivatedBuffer : zeroContact$processedDeactivatedBuffer;
+        return processed;
     }
 
     @Inject(method = "discardAlBuffer", at = @At("RETURN"))
     private void zeroContact$discardProcessedBuffer(CallbackInfo ci) {
         // Follow the original cache's lifecycle, not an individual channel's lifetime.
         // Also runs when only the processed version was uploaded to OpenAL.
-        if (zeroContact$processedActivatedBuffer != null) {
-            zeroContact$processedActivatedBuffer.discardAlBuffer();
-            zeroContact$processedActivatedBuffer = null;
+        for (SoundBuffer buffer : zeroContact$processedActivatedBuffers.values()) {
+            buffer.discardAlBuffer();
         }
-
-        if (zeroContact$processedDeactivatedBuffer != null) {
-            zeroContact$processedDeactivatedBuffer.discardAlBuffer();
-            zeroContact$processedDeactivatedBuffer = null;
+        zeroContact$processedActivatedBuffers.clear();
+        for (SoundBuffer buffer : zeroContact$processedDeactivatedBuffers.values()) {
+            buffer.discardAlBuffer();
         }
-
-
+        zeroContact$processedDeactivatedBuffers.clear();
         zeroContact$originalPcm = null;
     }
 }

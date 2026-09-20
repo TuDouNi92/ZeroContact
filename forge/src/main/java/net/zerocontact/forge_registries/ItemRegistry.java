@@ -15,6 +15,7 @@ import net.zerocontact.api.datagen.IAssetManager;
 import net.zerocontact.api.TabableItem;
 import net.zerocontact.armor.modular.module.battery.item.Battery;
 import net.zerocontact.armor.modular.module.beacon.item.Beacon;
+import net.zerocontact.armor.modular.module.headset.item.Amp;
 import net.zerocontact.armor.modular.module.headset.item.ComtacII;
 import net.zerocontact.armor.modular.module.headset.item.Headset;
 import net.zerocontact.armor.modular.module.nvg.item.GPNVG;
@@ -62,6 +63,9 @@ public class ItemRegistry {
         RegistrySupplier<GPNVG> NVG_GPNVG = ItemsReg.ITEMS.register("nvg_gpnvg", GPNVG::new);
         RegistrySupplier<Headset> COMTAC_II = ItemsReg.ITEMS.register("headset_comtac2", ()->new ComtacII("headset_comtac2",ComtacII.Color.OD));
         RegistrySupplier<Headset> COMTAC_II_BROWN = ItemsReg.ITEMS.register("headset_comtac2_brown", ()->new ComtacII("headset_comtac2_brown",ComtacII.Color.CB));
+        RegistrySupplier<Headset> AMP = ItemsReg.ITEMS.register("headset_amp", ()->new Amp("headset_amp", Amp.Color.TAN));
+        RegistrySupplier<Headset> AMP_BLACK = ItemsReg.ITEMS.register("headset_amp_black", ()->new Amp("headset_amp_black", Amp.Color.BLACK));
+
         List<TabableItem> onGoingRegItems = List.of(
                 new Plates(),
                 new Helmets(),
@@ -79,6 +83,8 @@ public class ItemRegistry {
                 NVG_GPNVG,
                 BATTERY,
                 BEACON,
+                AMP,
+                AMP_BLACK,
                 COMTAC_II,
                 COMTAC_II_BROWN,
                 RAIDER_EGG

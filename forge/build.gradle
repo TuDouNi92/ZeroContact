@@ -55,7 +55,7 @@ dependencies {
     modLocalRuntime files('libs/oculus-mc1.20.1-1.8.0 (1).jar')
 //    modLocalRuntime('curse.maven:sound-physics-remastered-535489:7032235')
     modCompileOnly("curse.maven:${magazine_version}")
-    modLocalRuntime("curse.maven:${magazine_version}")
+//    modLocalRuntime("curse.maven:${magazine_version}")
     modLocalRuntime('curse.maven:tacz-simple-enemy-1471691:8289695')
     modLocalRuntime("curse.maven:shoulder-surfing-reloaded-243190:8725611")
 }

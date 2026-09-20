@@ -76,15 +76,15 @@ public final class AudioProcessor {
     public static class Compressor {
         private float envelope = 0.0F;
 
-        private  float threshold = 0.20F;
-        private  float ratio = 6.0F;
+        private final float ratio;
 
         private final float attackCoeff;
         private final float releaseCoeff;
 
-        public Compressor(float sampleRate) {
+        public Compressor(float sampleRate, float ratio) {
             float attackMs = 5.0F;
             float releaseMs = 80.0F;
+            this.ratio = Math.max(1,ratio);
 
             attackCoeff = (float) Math.exp(
                     -1.0 /
@@ -113,6 +113,7 @@ public final class AudioProcessor {
 
             float gain = 1.0F;
 
+            float threshold = 0.20F;
             if (envelope > threshold) {
 
                 float compressed =
@@ -123,22 +124,6 @@ public final class AudioProcessor {
             }
 
             return input * gain;
-        }
-
-        public static float simpleVolumeRecompress(float input) {
-            float gain = 2.0F;
-            float threshold = 0.35F;
-            float ratio = 4.0F;
-
-            // 先做耳机增益
-            float x = input * gain;
-
-            // 超过阈值后压缩
-            if (x > threshold) {
-                x = threshold + (x - threshold) / ratio;
-            }
-
-            return Math.min(x, 1.0F);
         }
 
     }
