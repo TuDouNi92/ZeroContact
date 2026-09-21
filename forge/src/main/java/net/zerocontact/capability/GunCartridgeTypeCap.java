@@ -20,6 +20,8 @@ import java.util.Map;
 import static net.zerocontact.caliber.CaliberSerializer.*;
 
 public class GunCartridgeTypeCap implements ICartridgeHolder {
+    private boolean creativeHandling = false;
+
     //Sync tags when change cartridge;
     public void copyTags(CaliberHelper.Caliber defaultCaliber, ItemStack gun) {
         AmmoInjector.copyTags(defaultCaliber, gun);
@@ -75,5 +77,17 @@ public class GunCartridgeTypeCap implements ICartridgeHolder {
         AmmoInjector.AmmoContext context = CaliberSerializer.load(gunStack.getTag(), gunStack);
         if (context.isEmpty()) return Map.of();
         return context.caliber().getInaccuracy(gunStack);
+    }
+
+    @Override
+    public void setCreativeHandling(boolean creative) {
+        creativeHandling = creative;
+    }
+
+    @Override
+    public boolean getCreativeHandling() {
+        boolean result = creativeHandling;
+        creativeHandling = false;
+        return result;
     }
 }

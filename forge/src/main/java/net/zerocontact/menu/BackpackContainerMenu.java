@@ -1,18 +1,16 @@
 package net.zerocontact.menu;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.zerocontact.container.IndexSimpleContainer;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.zerocontact.forge_registries.MenuRegistry;
 import net.zerocontact.item.backpack.BaseBackpack;
 import net.zerocontact.item.rigs.BaseRigs;
@@ -20,11 +18,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.CuriosApi;
 
-import java.util.Optional;
-
 public class BackpackContainerMenu extends AbstractContainerMenu {
-    private IndexSimpleContainer backpackContainer = new IndexSimpleContainer(0);
-    private IndexSimpleContainer rigsContainer = new IndexSimpleContainer(0);
+    private Container backpackContainer = new SimpleContainer(0);
+    private Container rigsContainer = new SimpleContainer(0);
     private final TriggerSource triggerSource;
     public int minSlotX = Integer.MAX_VALUE;
     public int maxSlotX = Integer.MIN_VALUE;
@@ -53,38 +49,30 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
         this.triggerSource = source;
         if (triggerSource == TriggerSource.USE) {
             backpackRenderStack = getHandStack(playerInv.player);
-            if (backpackRenderStack.getItem() instanceof BaseRigs baseRigs) {
-                rigsContainer = new IndexSimpleContainer(baseRigs.containerSize);
-            } else if (backpackRenderStack.getItem() instanceof BaseBackpack backpack) {
-                backpackContainer = new IndexSimpleContainer(backpack.containerSize);
-            }
-            readInvfromTag(backpackRenderStack);
+            bindInventory(backpackRenderStack);
         } else if (source == TriggerSource.KEY) {
             CuriosApi.getCuriosInventory(playerInv.player).ifPresent(inventoryHandler -> {
                 inventoryHandler.getStacksHandler("backpack").ifPresent(stacksHandler -> {
                     ItemStack backpackStack = stacksHandler.getStacks().getStackInSlot(0);
-                    if (backpackStack.getItem() instanceof BaseBackpack backpack) {
-                        backpackContainer = new IndexSimpleContainer(backpack.containerSize);
+                    if (backpackStack.getItem() instanceof BaseBackpack) {
                         backpackRenderStack = backpackStack;
-                        readInvfromTag(backpackStack);
+                        bindInventory(backpackStack);
                     }
                 });
                 inventoryHandler.getStacksHandler("rigs").ifPresent(stacksHandler -> {
                     ItemStack rigsStack = stacksHandler.getStacks().getStackInSlot(0);
-                    if (rigsStack.getItem() instanceof BaseRigs baseRigs) {
-                        rigsContainer = new IndexSimpleContainer(baseRigs.containerSize);
+                    if (rigsStack.getItem() instanceof BaseRigs) {
                         rigsRenderStack = rigsStack;
-                        readInvfromTag(rigsStack);
+                        bindInventory(rigsStack);
                     }
                 });
             });
 
         } else if (source == TriggerSource.ALLY) {
-            if (allyStack != null && allyStack.getItem() instanceof BaseBackpack backpack) {
+            if (allyStack != null && allyStack.getItem() instanceof BaseBackpack) {
                 this.allyStack = allyStack;
-                backpackContainer = new IndexSimpleContainer(backpack.containerSize);
                 backpackRenderStack = allyStack;
-                readInvfromTag(allyStack);
+                bindInventory(allyStack);
             }
         }
 
@@ -105,22 +93,15 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
         }
     }
 
-    private void readInvfromTag(ItemStack backpackStack) {
-        if (backpackStack.getItem() instanceof BaseRigs) {
-            Optional<CompoundTag> inventoryTag = Optional.ofNullable(backpackStack.getTag());
-            inventoryTag.ifPresent(inventoryTag1 -> {
-                ListTag listTag = inventoryTag1.getList("inventory", Tag.TAG_COMPOUND);
-                rigsContainer.fromIndexTag(listTag);
-            });
-        } else {
-            if (backpackStack.getItem() instanceof BaseBackpack) {
-                Optional<CompoundTag> inventoryTag = Optional.ofNullable(backpackStack.getTag());
-                inventoryTag.ifPresent(inventoryTag1 -> {
-                    ListTag listTag = inventoryTag1.getList("inventory", Tag.TAG_COMPOUND);
-                    backpackContainer.fromIndexTag(listTag);
-                });
+    private void bindInventory(ItemStack stack) {
+        stack.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(handler -> {
+            if (!(handler instanceof Container container)) return;
+            if (stack.getItem() instanceof BaseRigs) {
+                rigsContainer = container;
+            } else if (stack.getItem() instanceof BaseBackpack) {
+                backpackContainer = container;
             }
-        }
+        });
     }
 
     @Override
@@ -248,34 +229,4 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
         }
     }
 
-    @Override
-    public void removed(@NotNull Player player) {
-        if (triggerSource == TriggerSource.USE
-                && player instanceof ServerPlayer serverPlayer
-        ) {
-            writeInvToTag(getHandStack(serverPlayer));
-        } else if (triggerSource == TriggerSource.KEY) {
-            CuriosApi.getCuriosInventory(player).ifPresent(inventoryHandler -> inventoryHandler.getStacksHandler("backpack").ifPresent(stacksHandler -> {
-                ItemStack backpackStack = stacksHandler.getStacks().getStackInSlot(0);
-                writeInvToTag(backpackStack);
-            }));
-            CuriosApi.getCuriosInventory(player).ifPresent(inventoryHandler -> inventoryHandler.getStacksHandler("rigs").ifPresent(stacksHandler -> {
-                ItemStack rigsStack = stacksHandler.getStacks().getStackInSlot(0);
-                writeInvToTag(rigsStack);
-            }));
-        } else if (triggerSource == TriggerSource.ALLY && !allyStack.isEmpty()) {
-            writeInvToTag(allyStack);
-        }
-        super.removed(player);
-    }
-
-    private void writeInvToTag(ItemStack backpackStack) {
-        if (backpackStack.getItem() instanceof BaseRigs) {
-            backpackStack.getOrCreateTag().put("inventory", rigsContainer.createIndexTag());
-        } else {
-            if (backpackStack.getItem() instanceof BaseBackpack) {
-                backpackStack.getOrCreateTag().put("inventory", backpackContainer.createIndexTag());
-            }
-        }
-    }
 }

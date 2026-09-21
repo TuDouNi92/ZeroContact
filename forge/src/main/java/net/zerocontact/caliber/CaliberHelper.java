@@ -154,57 +154,83 @@ public enum CaliberHelper {
             );
         }
 
-        public static Caliber createDefaultCaliberFromStack(String id, ItemStack checkStack) {
-            ResourceLocation gunId = Optional.ofNullable(IGun.getIGunOrNull(checkStack)).map(ig -> ig.getGunId(checkStack)).orElse(new ResourceLocation(""));
-            GunData gunData = TimelessAPI.getCommonGunIndex(gunId).map(CommonGunIndex::getGunData).orElse(null);
-            if (gunData == null) return new Caliber(
-                    id,
-                    1,
-                    1,
-                    1,
-                    1,
-                    0.1f
-            );
-            BulletData bulletData = gunData.getBulletData();
-            ExplosionData explosionData = bulletData.getExplosionData();
-            Ignite ignite = bulletData.getIgnite();
-            boolean explosive = false;
-            if (bulletData.getExplosionData() != null) {
-                explosive = bulletData.getExplosionData().isExplode();
+        public static Caliber createDefaultCaliberFromStack(String ammoId, ItemStack checkStack) {
+            boolean isGun = Optional.ofNullable(IGun.getIGunOrNull(checkStack)).isPresent();
+
+            if (isGun) {
+                ResourceLocation gunId = Optional.ofNullable(IGun.getIGunOrNull(checkStack)).map(ig -> ig.getGunId(checkStack)).orElse(new ResourceLocation(""));
+                GunData gunData = TimelessAPI.getCommonGunIndex(gunId).map(CommonGunIndex::getGunData).orElse(null);
+                if (gunData == null) return new Caliber(
+                        ammoId,
+                        1,
+                        1,
+                        1,
+                        1,
+                        0.1f
+                );
+                String finalId = ammoId;
+
+                if (ammoId.isEmpty()) {
+                    finalId = gunData.getAmmoId().toString();
+                }
+
+                BulletData bulletData = gunData.getBulletData();
+                ExplosionData explosionData = bulletData.getExplosionData();
+                Ignite ignite = bulletData.getIgnite();
+                boolean explosive = false;
+                if (bulletData.getExplosionData() != null) {
+                    explosive = bulletData.getExplosionData().isExplode();
+                }
+                return new Caliber(
+                        finalId,
+                        DEFAULT,
+                        Math.round(bulletData.getLifeSecond() * 20),
+                        bulletData.getSpeed(),
+                        bulletData.getBulletAmount(),
+                        bulletData.getFriction(),
+                        bulletData.getGravity(),
+                        bulletData.getKnockback(),
+                        1,
+                        1,
+                        explosionData == null || !explosive
+                                ? AmmoDataPOJO.Explosion.NONE
+                                : new AmmoDataPOJO.Explosion(
+                                explosionData.getRadius(),
+                                explosionData.getDamage(),
+                                explosionData.isDestroyBlock(),
+                                explosionData.isKnockback(),
+                                // TaCZ stores delay in seconds; the bullet counts ticks.
+                                explosionData.getDelay() < 0
+                                        ? Integer.MAX_VALUE
+                                        : Math.max((int) (explosionData.getDelay() * 20), 1)
+                        ),
+                        new AmmoDataPOJO.Ignite(
+                                ignite.isIgniteBlock(),
+                                ignite.isIgniteEntity(),
+                                bulletData.getIgniteEntityTime()
+                        ),
+                        0,
+                        0,
+                        0,
+                        0,
+                        30,
+                        new int[]{255, 255, 255, 255},
+                        new AmmoDataPOJO.EventHook[]{}
+                );
+            } else {
+                String finalAmmoId = ammoId;
+                if (ammoId.isEmpty() && checkStack.getTag() != null) {
+                    finalAmmoId = checkStack.getTag().getString("AmmoId");
+                }
+                return new Caliber(
+                        finalAmmoId,
+                        1,
+                        1,
+                        1,
+                        1,
+                        .1f
+                );
             }
-            return new Caliber(
-                    id,
-                    DEFAULT,
-                    Math.round(bulletData.getLifeSecond() * 20),
-                    bulletData.getSpeed(),
-                    bulletData.getBulletAmount(),
-                    bulletData.getFriction(),
-                    bulletData.getGravity(),
-                    bulletData.getKnockback(),
-                    1,
-                    1,
-                    explosionData == null || !explosive
-                            ? AmmoDataPOJO.Explosion.NONE
-                            : new AmmoDataPOJO.Explosion(
-                            explosionData.getRadius(),
-                            explosionData.getDamage(),
-                            explosionData.isDestroyBlock(),
-                            explosionData.isKnockback(),
-                            (int) explosionData.getDelay()
-                    ),
-                    new AmmoDataPOJO.Ignite(
-                            ignite.isIgniteBlock(),
-                            ignite.isIgniteEntity(),
-                            bulletData.getIgniteEntityTime()
-                    ),
-                    0,
-                    0,
-                    0,
-                    0,
-                    30,
-                    new int[]{255, 255, 255, 255},
-                    new AmmoDataPOJO.EventHook[]{}
-            );
         }
 
         @Override

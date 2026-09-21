@@ -35,4 +35,8 @@ public interface ICartridgeHolder {
     @Nullable GunRecoil getRecoil(ItemStack gunStack);
 
     @NotNull Map<InaccuracyType, Float> getInaccuracy(ItemStack gunStack);
+
+    void setCreativeHandling(boolean creative);
+
+    boolean getCreativeHandling();
 }

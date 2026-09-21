@@ -42,7 +42,9 @@ public class BulletBinder {
         accessor.explosion(caliber.explosion() != AmmoDataPOJO.Explosion.NONE);
         accessor.explosionKnockback(caliber.explosion().knockback());
         accessor.explosionDamage(caliber.explosion().damage());
-        accessor.explosionDelayCount(caliber.explosion().delayCount());
+        // Match TaCZ: negative disables timed detonation; allow collision checks before detonation.
+        int delayTicks = caliber.explosion().delayCount();
+        accessor.explosionDelayCount(delayTicks < 0 ? Integer.MAX_VALUE : Math.max(delayTicks, 1));
         accessor.explosionDestroyBlock(caliber.explosion().destroyBlock());
         accessor.explosionRadius(caliber.explosion().radius());
         accessor.igniteEntity(caliber.ignite() != AmmoDataPOJO.Ignite.NONE);

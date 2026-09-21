@@ -33,6 +33,11 @@ dependencies {
     modApi "dev.architectury:architectury-forge:${architectury_version}"
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
+
+    compileOnly("io.github.llamalad7:mixinextras-common:0.4.1")
+    annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1")
+    implementation(include("io.github.llamalad7:mixinextras-forge:0.4.1"))
+
     forgeRuntimeLibrary('com.github.FiguraMC.luaj:luaj-jse:3.0.8-figura')
     compileOnly('com.github.FiguraMC.luaj:luaj-jse:3.0.8-figura')
     forgeRuntimeLibrary('org.apache.commons:commons-math3:3.6.1')
@@ -58,6 +63,7 @@ dependencies {
 //    modLocalRuntime("curse.maven:${magazine_version}")
     modLocalRuntime('curse.maven:tacz-simple-enemy-1471691:8289695')
     modLocalRuntime("curse.maven:shoulder-surfing-reloaded-243190:8725611")
+    modLocalRuntime("curse.maven:tacz-gunshot-reverb-1690954:8923504")
 }
 
 processResources {

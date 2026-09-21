@@ -27,11 +27,11 @@ import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.api.caliber.ICartridgeHolder;
+import net.zerocontact.caliber.compat.ReloadManager;
 import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.menu.AmmoSelectorMenu;
 import net.zerocontact.command.CommandManager;
 import net.zerocontact.compat.MagazinesCompatHandler;
-import net.zerocontact.events.EventUtil;
 import net.zerocontact.item.ammo.GenerateAmmo;
 import net.zerocontact.network.ModMessages;
 import net.zerocontact.network.c2s.OpenAmmoSelectorPacket;
@@ -65,7 +65,7 @@ public class ServerAmmoSelector {
                 MagazinesCompatHandler handler = MagazinesCompatHandler.get();
                 if (handler.getCompat().map(compat -> compat.isMagazineCompatibleWithGun(gunStack)).orElse(false))
                     return;
-                LinkedHashMap<ItemStack, Integer> ammoMap = ServerAmmoSelector.getCreativeAmmoForHeldGun(player);
+                LinkedHashMap<ItemStack, Integer> ammoMap = ServerAmmoSelector.getCandidates(player);
                 NetworkHooks.openScreen(
                         player,
                         new SimpleMenuProvider((id, inv, __) -> new AmmoSelectorMenu(id, ammoMap, inv), Component.translatable("")),
@@ -159,15 +159,7 @@ public class ServerAmmoSelector {
 
             @Override
             public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
-                ItemStack stack = raw.extractItem(mappedSlots.get(slot), amount, simulate);
-                if (!simulate
-                        && !stack.isEmpty()
-                        && MagazinesCompatHandler
-                        .get()
-                        .getCompat()
-                        .map(compat -> compat.instanceOfMagazine(stack.getItem())).orElse(false)) {
-                }
-                return stack;
+                return raw.extractItem(mappedSlots.get(slot), amount, simulate);
             }
 
             @Override
@@ -236,7 +228,7 @@ public class ServerAmmoSelector {
         }
     }
 
-    public static LinkedHashMap<ItemStack, Integer> getCreativeAmmoForHeldGun(ServerPlayer player) {
+    public static LinkedHashMap<ItemStack, Integer> getCandidates(ServerPlayer player) {
         Inventory vanillaInv = player.getInventory();
         ItemStack gunItem = player.getMainHandItem();
         LinkedHashMap<ItemWrapper, Integer> items = new LinkedHashMap<>();
@@ -262,33 +254,19 @@ public class ServerAmmoSelector {
                         ));
             }
         } else {
-            for (ItemStack ammoStack : vanillaInv.items) {
-                if (ammoStack.getItem() instanceof IAmmo ammo
-                        && ammo.isAmmoOfGun(gunItem, ammoStack)) {
+            ReloadManager.ReloadInventory inventory = ReloadManager.resolveReloadInv(player);
+            IItemHandler handler = inventory.rawHandler();
+            for (int i = 0; i < handler.getSlots(); i++) {
+                ItemStack currentStack = handler.getStackInSlot(i);
+                if (currentStack.getItem() instanceof IAmmo ammo
+                        && ammo.isAmmoOfGun(gunItem, currentStack)) {
                     items.merge(
-                            new ItemWrapper(ammoStack.getItem(), ammo.getAmmoId(ammoStack).toString()),
-                            ammoStack.getCount(),
+                            new ItemWrapper(currentStack.getItem(), ammo.getAmmoId(currentStack).toString()),
+                            currentStack.getCount(),
                             Integer::sum
                     );
                 }
             }
-            ItemStack rigs = EventUtil.getCuriosStackFirst(player, "rigs");
-            rigs.getCapability(
-                    ForgeCapabilities.ITEM_HANDLER,
-                    null
-            ).ifPresent(cap -> {
-                for (int i = 0; i < cap.getSlots(); i++) {
-                    ItemStack ammoStack = cap.getStackInSlot(i);
-                    if (ammoStack.getItem() instanceof IAmmo ammo
-                            && ammo.isAmmoOfGun(gunItem, ammoStack)) {
-                        items.merge(
-                                new ItemWrapper(ammoStack.getItem(), ammo.getAmmoId(ammoStack).toString()),
-                                ammoStack.getCount(),
-                                Integer::sum
-                        );
-                    }
-                }
-            });
         }
         finalItems.putAll((Map<? extends ItemStack, ? extends Integer>) items.entrySet()
                 .stream()
