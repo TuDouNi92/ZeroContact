@@ -27,11 +27,19 @@ public final class ModuleHudState {
     private boolean opened;
     private List<Entry> entries = List.of();
     private int selected;
+    private Address lastSelection;
     private ModuleHudState() {}
     public boolean isOpened() { return opened; }
     public List<Entry> entries() { return entries; }
     public int selectedIndex() { return selected; }
-    public void close() { opened = false; entries = List.of(); selected = 0; }
+    public void close() {
+        // close() may run every tick while another screen is open.
+        if (!entries.isEmpty()) lastSelection = entries.get(selected).address();
+        if (Minecraft.getInstance().player == null) lastSelection = null;
+        opened = false;
+        entries = List.of();
+        selected = 0;
+    }
     public void toggle() {
         if (opened) close();
         else { opened = true; refresh(); }
@@ -39,7 +47,7 @@ public final class ModuleHudState {
     public void refresh() {
         var player = Minecraft.getInstance().player;
         if (player == null) { close(); return; }
-        Address previous = entries.isEmpty() ? null : entries.get(selected).address();
+        Address previous = entries.isEmpty() ? lastSelection : entries.get(selected).address();
         List<Entry> next = new ArrayList<>();
         ModuleQuery.streamMounted(player)
                 .sorted(Comparator.comparing((ModuleQuery.MountedModuleRef ref) -> ref.equipmentTarget().slot())

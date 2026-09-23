@@ -1,0 +1,9 @@
+{
+  "type": "module",
+  "id": "tmc_admin_pouch",
+  "mount_type": "admin_pouch",
+  "module_trait": "admin_pouch",
+  "durability": 32,
+  "texture": "textures/models/pouch/tmc_admin_pouch.png",
+  "model": "geo/pouch/tmc_admin_pouch.geo.json"
+}

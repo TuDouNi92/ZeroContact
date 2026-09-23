@@ -161,5 +161,33 @@
         "type": "file"
       }
     ]
+  },
+  "pouch/map": {
+    "sounds": [
+      {
+        "name": "zerocontact:pouch/velcro",
+        "type": "file"
+      },
+      {
+        "name": "zerocontact:pouch/map_fold",
+        "type": "file"
+      }
+    ]
+  },
+  "beacon/switch": {
+    "sounds": [
+      {
+        "name": "zerocontact:beacon/button_click",
+        "type": "file"
+      }
+    ]
+  },
+  "navboard/switch": {
+    "sounds": [
+      {
+        "name": "zerocontact:pouch/iphone_lock",
+        "type": "file"
+      }
+    ]
   }
 }

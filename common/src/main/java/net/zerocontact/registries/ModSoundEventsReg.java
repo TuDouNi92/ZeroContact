@@ -29,6 +29,9 @@ public class ModSoundEventsReg {
     public static final SoundEvent GUI_SELECTOR = SoundEvent.createVariableRangeEvent(new ResourceLocation(MOD_ID, "gui/selector"));
     public static final SoundEvent NVG_BUZZ = SoundEvent.createVariableRangeEvent(new ResourceLocation(MOD_ID, "nvg/buzz_out"));
     public static final SoundEvent NVG_CLICK = SoundEvent.createVariableRangeEvent(new ResourceLocation(MOD_ID, "nvg/nvg_click"));
+    public static final SoundEvent POUCH_MAP = SoundEvent.createVariableRangeEvent(new ResourceLocation(MOD_ID, "pouch/map"));
+    public static final SoundEvent BEACON_SWITCH = SoundEvent.createVariableRangeEvent(new ResourceLocation(MOD_ID, "beacon/switch"));
+    public static final SoundEvent NAV_BOARD = SoundEvent.createVariableRangeEvent(new ResourceLocation(MOD_ID, "navboard/switch"));
     public static final Random random = new Random();
 
     public static SoundEvent randomSound(Set<SoundEvent> soundSet) {

@@ -19,6 +19,7 @@ import net.zerocontact.armor.modular.client.network.s2c.SyncModulesPacket;
 import net.zerocontact.armor.modular.client.network.s2c.SyncEquipmentCandidatesPacket;
 import net.zerocontact.armor.modular.client.network.c2s.SelectEquipmentMountPacket;
 import net.zerocontact.network.s2c.ToggleVisorResultPacket;
+import net.zerocontact.armor.modular.client.network.s2c.UpdateNavBoardPacket;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
 
@@ -123,6 +124,11 @@ public class ModMessages {
                 .decoder(ModuleActionPacket::decode)
                 .encoder(ModuleActionPacket::encode)
                 .consumerMainThread(ModuleActionPacket::handle)
+                .add();
+        net.messageBuilder(UpdateNavBoardPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(UpdateNavBoardPacket::decode)
+                .encoder(UpdateNavBoardPacket::encode)
+                .consumerMainThread(UpdateNavBoardPacket::handle)
                 .add();
     }
 

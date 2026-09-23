@@ -889,7 +889,7 @@
 				{
 					"name": "command_pouch_fix",
 					"parent": "jpc2.0sc",
-					"pivot": [0, 20.25, -2.625]
+					"pivot": [0, 22.3375, -2.625]
 				}
 			]
 		}

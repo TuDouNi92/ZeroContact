@@ -1,0 +1,10 @@
+{
+  "type": "module",
+  "id": "ss_navboard",
+  "mount_type": "admin_pouch",
+  "module_trait": "navboard",
+  "durability": 32,
+  "texture": "textures/models/pouch/ss_navboard.png",
+  "model": "geo/pouch/ss_navboard.geo.json",
+  "animation": "animations/ss_navboard.animation.json"
+}

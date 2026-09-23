@@ -9,6 +9,10 @@
   "state.zerocontact.nvg.no_power": "No power",
   "state.zerocontact.headset.on": "On",
   "state.zerocontact.headset.off": "Off",
+
+  "state.zerocontact.admin_p.has_map": "Get map",
+  "state.zerocontact.admin_p.no_map": "Put map",
+
   "screen.zerocontact.equipment.title": "Equipment modules",
   "screen.zerocontact.equipment.unmount": "Unmount module",
   "screen.zerocontact.equipment.select_anchor": "Select an equipment anchor",

@@ -20,7 +20,7 @@
       "mount_id": "command_pouch",
       "mount_type": "armor_pouch",
       "mount_bone": "command_pouch_fix",
-      "accept_categories": ["pouch"]
+      "accept_categories": ["admin_pouch"]
     }
   ],
 

@@ -2,11 +2,13 @@ package net.zerocontact.armor.modular.module.beacon.service;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.armor.modular.ModuleController;
 import net.zerocontact.armor.modular.model.*;
 import net.zerocontact.armor.modular.module.beacon.container.BeaconContainer;
 import net.zerocontact.capability.CapabilityRegistries;
+import net.zerocontact.registries.ModSoundEventsReg;
 
 import java.util.List;
 import java.util.Optional;
@@ -72,7 +74,7 @@ public class BeaconController implements ModuleController {
     public ActionResult execute(ModuleContext context, ModuleAction action) {
         return context.module().getCapability(CapabilityRegistries.BEACON)
                 .map(cap -> {
-
+                    context.wearer().playNotifySound(ModSoundEventsReg.BEACON_SWITCH, SoundSource.PLAYERS,1.0f,1.0f);
                     if (action.id().equals(DISABLE_ACTION)) {
                         if (!cap.getMode().equals(BeaconContainer.Mode.OFF)) {
                             cap.setMode(BeaconContainer.Mode.OFF);

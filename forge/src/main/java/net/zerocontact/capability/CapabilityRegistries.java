@@ -10,12 +10,16 @@ import net.zerocontact.armor.modular.module.battery.container.BatteryContainer;
 import net.zerocontact.armor.modular.module.beacon.container.BeaconContainer;
 import net.zerocontact.armor.modular.module.headset.container.HeadsetContainer;
 import net.zerocontact.armor.modular.module.nvg.container.NvgContainer;
+import net.zerocontact.armor.modular.module.pouch.container.AdminPouchContainer;
+import net.zerocontact.armor.modular.module.pouch.container.navboard.NavBoardContainer;
 import net.zerocontact.armor.modular.module.pouch.container.PouchContainer;
 
 public class CapabilityRegistries {
     public static Capability<ICartridgeHolder> CARTRIDGE;
     public static Capability<IRepairKit> REPAIR_KIT;
     public static Capability<ModuleContainer> MODULAR_EQUIPMENT;
+    public static Capability<AdminPouchContainer> ADMIN_POUCH;
+    public static Capability<NavBoardContainer> NAV_BOARD;
     public static Capability<PouchContainer> POUCH;
     public static Capability<NvgContainer> NVG;
     public static Capability<BatteryContainer> BATTERY;
@@ -29,7 +33,11 @@ public class CapabilityRegistries {
         });
         MODULAR_EQUIPMENT = CapabilityManager.get(new CapabilityToken<>() {
         });
+        ADMIN_POUCH = CapabilityManager.get(new CapabilityToken<>() {
+        });
         POUCH = CapabilityManager.get(new CapabilityToken<>() {
+        });
+        NAV_BOARD = CapabilityManager.get(new CapabilityToken<>() {
         });
         NVG = CapabilityManager.get(new CapabilityToken<>() {
         });

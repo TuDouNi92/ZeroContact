@@ -8,6 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.client.model.HumanoidModel;
 import net.zerocontact.armor.modular.client.renderer.AttachmentRenderLayer;
 import net.zerocontact.armor.modular.module.beacon.client.renderer.EmissiveBeaconRenderLayer;
+import net.zerocontact.armor.modular.module.pouch.client.NavBoardScreenLayer;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.model.GeoModel;
@@ -38,6 +39,7 @@ public class ArmorRender<T extends Item & GeoItem & GeoAnimatable> extends GeoAr
             super(model);
             this.addRenderLayer(new AttachmentRenderLayer<>(this));
             addRenderLayer(new EmissiveBeaconRenderLayer<>(this));
+            addRenderLayer(new NavBoardScreenLayer<>(this));
         }
     }
 

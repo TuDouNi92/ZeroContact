@@ -14,7 +14,7 @@ public class PouchProvider implements ICapabilityProvider {
     private final PouchContainer container =
             new PouchContainer();
 
-    private final LazyOptional<ModuleContainer> optional =
+    private final LazyOptional<PouchContainer> optional =
             LazyOptional.of(() -> container);
 
     @Override

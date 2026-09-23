@@ -4,6 +4,7 @@ public enum MountCategory {
     NIGHT_VISION(),
     FLASH_LIGHT(),
     VISOR(),
+    ADMIN_POUCH(),
     POUCH(),
     BATTERY(),
     BEACON(),

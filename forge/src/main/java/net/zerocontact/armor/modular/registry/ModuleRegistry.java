@@ -8,6 +8,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.armor.modular.ModuleController;
+import net.zerocontact.api.armor.modular.ModuleUseHandler;
 import net.zerocontact.armor.modular.module.battery.capability.BatteryProvider;
 import net.zerocontact.armor.modular.module.beacon.capability.BeaconProvider;
 import net.zerocontact.armor.modular.module.beacon.service.BeaconController;
@@ -15,10 +16,15 @@ import net.zerocontact.armor.modular.module.headset.capability.HeadsetProvider;
 import net.zerocontact.armor.modular.module.headset.service.HeadsetController;
 import net.zerocontact.armor.modular.module.nvg.capability.NvgProvider;
 import net.zerocontact.armor.modular.module.nvg.service.NvgController;
+import net.zerocontact.armor.modular.module.pouch.capability.AdminPouchProvider;
 import net.zerocontact.armor.modular.module.pouch.capability.PouchProvider;
 import net.zerocontact.armor.modular.model.MountCategory;
 import net.zerocontact.armor.modular.model.MountDefinition;
+import net.zerocontact.armor.modular.module.pouch.service.AdminPouchController;
+import net.zerocontact.armor.modular.module.pouch.service.NavBoardController;
+import net.zerocontact.armor.modular.module.pouch.capability.NavBoardProvider;
 import net.zerocontact.capability.CapabilityRegistries;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,15 +38,23 @@ public final class ModuleRegistry {
             return Optional.empty();
         }
         CapabilityEntry trait = getTrait(module.getModuleTrait());
-        return trait == null ? Optional.empty() : trait.controller();
+        return trait == null ? Optional.empty() : Optional.ofNullable(trait.controller());
     }
 
     public record CapabilityEntry(
             Capability<?> capability,
-            Optional<ModuleController> controller,
-            Supplier<? extends ICapabilityProvider> providerFactory
+            ModuleController controller,
+            Supplier<? extends ICapabilityProvider> providerFactory,
+            Optional<ModuleUseHandler> useHandler
     ) {
+        public CapabilityEntry(Capability<?> capability, @Nullable ModuleController controller,
+                               Supplier<? extends ICapabilityProvider> providerFactory) {
+            this(capability, controller, providerFactory, Optional.empty());
+        }
 
+        public CapabilityEntry withUse(ModuleUseHandler handler) {
+            return new CapabilityEntry(capability, controller, providerFactory, Optional.of(handler));
+        }
     }
 
     //<ModuleResource,ModuleCategory>
@@ -53,15 +67,19 @@ public final class ModuleRegistry {
         traits.putAll(
                 Map.of(
                         new ResourceLocation(ZeroContact.MOD_ID, "pouch"),
-                        new CapabilityEntry(CapabilityRegistries.POUCH, Optional.empty(), PouchProvider::new),
+                        new CapabilityEntry(CapabilityRegistries.POUCH, null, PouchProvider::new),
+                        new ResourceLocation(ZeroContact.MOD_ID, "admin_pouch"),
+                        new CapabilityEntry(CapabilityRegistries.ADMIN_POUCH, new AdminPouchController(), AdminPouchProvider::new),
+                        new ResourceLocation(ZeroContact.MOD_ID, "navboard"),
+                        new CapabilityEntry(CapabilityRegistries.NAV_BOARD, new NavBoardController(), NavBoardProvider::new),
                         new ResourceLocation(ZeroContact.MOD_ID, "nvg"),
-                        new CapabilityEntry(CapabilityRegistries.NVG, Optional.of(new NvgController()), NvgProvider::new),
+                        new CapabilityEntry(CapabilityRegistries.NVG, new NvgController(), NvgProvider::new),
                         new ResourceLocation(ZeroContact.MOD_ID, "battery"),
-                        new CapabilityEntry(CapabilityRegistries.BATTERY, Optional.empty(), BatteryProvider::new),
+                        new CapabilityEntry(CapabilityRegistries.BATTERY, null, BatteryProvider::new),
                         new ResourceLocation(ZeroContact.MOD_ID, "beacon"),
-                        new CapabilityEntry(CapabilityRegistries.BEACON, Optional.of(new BeaconController()), BeaconProvider::new),
+                        new CapabilityEntry(CapabilityRegistries.BEACON, new BeaconController(), BeaconProvider::new),
                         new ResourceLocation(ZeroContact.MOD_ID, "headset"),
-                        new CapabilityEntry(CapabilityRegistries.HEADSET, Optional.of(new HeadsetController()), HeadsetProvider::new)
+                        new CapabilityEntry(CapabilityRegistries.HEADSET, new HeadsetController(), HeadsetProvider::new)
                 )
         );
     }

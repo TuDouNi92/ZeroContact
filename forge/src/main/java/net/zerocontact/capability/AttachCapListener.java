@@ -31,10 +31,12 @@ public class AttachCapListener {
 
         if (event.getObject().getItem() instanceof EquipmentModule module) {
             ModuleRegistry.CapabilityEntry trait = ModuleRegistry.getTrait(module.getModuleTrait());
-            event.addCapability(
-                    module.getModuleTrait(),
-                    trait.providerFactory().get()
-            );
+            if (trait != null) {
+                event.addCapability(
+                        module.getModuleTrait(),
+                        trait.providerFactory().get()
+                );
+            }
         }
     }
 }
