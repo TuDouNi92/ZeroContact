@@ -12,9 +12,9 @@ in vec2 texCoord;
 out vec4 fragColor;
 
 vec3 thermalPalette(float temperature) {
-    vec3 cold = vec3(0.04, 0.015, 0.10);
-    vec3 purple = vec3(0.32, 0.025, 0.48);
-    vec3 red = vec3(0.85, 0.055, 0.045);
+    vec3 cold = vec3(0.08, 0.05, 0.18);
+    vec3 purple = vec3(0.48, 0.14, 0.62);
+    vec3 red = vec3(0.92, 0.16, 0.07);
     vec3 yellow = vec3(1.0, 0.72, 0.08);
     vec3 white = vec3(1.0, 0.98, 0.85);
     if (temperature < 0.25) return mix(cold, purple, temperature * 4.0);
@@ -28,7 +28,7 @@ void main() {
     vec4 heat = texture(HeatSampler, texCoord);
     float luminance = dot(scene, vec3(0.2126, 0.7152, 0.0722));
     // Scene brightness is only an artistic cold background, not a temperature estimate.
-    float background = 0.24 + sqrt(max(luminance, 0.0)) * BackgroundGain;
+    float background = min(0.32 + pow(max(luminance, 0.0), 0.65) * BackgroundGain, 0.68);
     float temperature = mix(background, heat.r, clamp(heat.a, 0.0, 1.0));
     float noise = fract(sin(dot(gl_FragCoord.xy + vec2(Time * 173.0),
             vec2(12.9898, 78.233))) * 43758.5453) - 0.5;
