@@ -1,0 +1,36 @@
+{
+  "type": "armor",
+  "id": "armor_lv119_wedge",
+  "defense": 5,
+  "protection_class": 4,
+  "equipment_slot": "PLATE_CARRIER",
+  "movement_fix": -0.05,
+  "default_durability": 128,
+  "texture": "textures/models/armorrig/lv119_wedge.png",
+  "model": "geo/armorrig/lv119_wedge.geo.json",
+  "hurt_modifier": {
+    "ricochet_multiplier": 0.15,
+    "penetrate_multiplier": 0.85,
+    "blunt_multiplier": 0.38
+  },
+  "durability_loss_modifier": 1,
+
+  "attachments": [
+    {
+      "mount_id": "command_pouch",
+      "mount_type": "armor_pouch",
+      "mount_bone": "command_pouch_fix",
+      "accept_categories": [
+        "admin_pouch"
+      ]
+    },
+    {
+      "mount_id": "radio_pouch",
+      "mount_type": "armor_pouch",
+      "mount_bone": "radio_pouch_fix",
+      "accept_categories": [
+        "pouch"
+      ]
+    }
+  ]
+}

@@ -37,6 +37,8 @@ public class ItemRegistry {
     public static final LinkedHashMap<RegistrySupplier<? extends ItemLike>, String> ITEMS_REG_TAB = new LinkedHashMap<>();
     private static final LinkedHashMap<RegistrySupplier<CreativeModeTab>, String> TABS = new LinkedHashMap<>();
     public static final String DEFAULT_TAB = "zero_contact";
+    public static final String MODULE_TAB = "zero_contact_module";
+
 
     @SubscribeEvent
     public static void attachToTabs(BuildCreativeModeTabContentsEvent event) {
@@ -77,6 +79,9 @@ public class ItemRegistry {
         onGoingRegItems.forEach(reg -> reg.attach(ITEMS_REG_TAB));
         List<RegistrySupplier<? extends ItemLike>> items = List.of(
                 ARMOR_KIT,
+                RAIDER_EGG
+        );
+        List<RegistrySupplier<? extends ItemLike>> moduleItems = List.of(
                 NVG_PVS31,
                 NVG_PVS31A,
                 NVG_T7,
@@ -86,10 +91,10 @@ public class ItemRegistry {
                 AMP,
                 AMP_BLACK,
                 COMTAC_II,
-                COMTAC_II_BROWN,
-                RAIDER_EGG
+                COMTAC_II_BROWN
         );
         items.forEach(item -> ITEMS_REG_TAB.put(item, DEFAULT_TAB));
+        moduleItems.forEach(item -> ITEMS_REG_TAB.put(item, MODULE_TAB));
         ZPackManager packManager = ZPackManager.getInstance();
         packManager.init();
         IAssetManager assetManager = packManager.getAssetManager();

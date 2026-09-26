@@ -29,6 +29,7 @@ public class HelmetRender {
     public static class HelmetItemRender<TItem extends Item & GeoAnimatable & GeoItem> extends GeoItemRenderer<TItem> {
         public HelmetItemRender(GeoModel<TItem> model) {
             super(model);
+            this.addRenderLayer(new AttachmentRenderLayer<>(this));
         }
     }
 }

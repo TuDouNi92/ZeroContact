@@ -1,6 +1,6 @@
 {
-  "itemGroup.zerocontact.default": "ZeroContact Default Pack",
-  "tooltip.zerocontact.pack.default": "ZeroContact Default Pack",
+  "itemGroup.zerocontact.zero_contact_ammo": "ZeroContact Default Ammo Pack",
+  "tooltip.zerocontact.pack.zero_contact_ammo": "ZeroContact Default Ammo Pack",
 
   "item.zerocontact.12g_ap": "12 Gauge AP slug",
   "item.zerocontact.12g_db": "12 Gauge Dragon-Breath shell",

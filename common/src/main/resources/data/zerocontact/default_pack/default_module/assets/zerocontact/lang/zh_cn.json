@@ -1,0 +1,8 @@
+{
+  "itemGroup.zerocontact.zero_contact_module": "ZeroContact 模块包",
+  "tooltip.zerocontact.pack.zero_contact_module": "ZeroContact 模块包",
+
+  "state.zerocontact.nvg.on": "已开启",
+  "state.zerocontact.nvg.off": "已关闭",
+  "state.zerocontact.nvg.no_power": "电量耗尽"
+}

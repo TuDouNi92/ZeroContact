@@ -890,6 +890,11 @@
 					"name": "command_pouch_fix",
 					"parent": "jpc2.0sc",
 					"pivot": [0, 22.3375, -2.625]
+				},
+				{
+					"name": "radio_pouch_fix",
+					"parent": "jpc2.0sc",
+					"pivot": [3.6515, 19.6094, -2.4843]
 				}
 			]
 		}

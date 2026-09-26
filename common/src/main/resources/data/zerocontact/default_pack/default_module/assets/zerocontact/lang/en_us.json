@@ -1,0 +1,33 @@
+{
+  "itemGroup.zerocontact.zero_contact_module": "ZeroContact Default Module Pack",
+  "tooltip.zerocontact.pack.zero_contact_module": "ZeroContact Default Module Pack",
+
+  "state.zerocontact.beacon.on": "On",
+  "state.zerocontact.beacon.off": "Off",
+  "state.zerocontact.nvg.on": "On",
+  "state.zerocontact.nvg.off": "Off",
+  "state.zerocontact.nvg.no_power": "No power",
+  "state.zerocontact.headset.on": "On",
+  "state.zerocontact.headset.off": "Off",
+  "state.zerocontact.admin_p.has_map": "Get map",
+  "state.zerocontact.admin_p.no_map": "Put map",
+  "state.zerocontact.navboard.on": "On",
+  "state.zerocontact.navboard.off": "Off",
+
+  "item.zerocontact.nvg_pvs31": "PVS-31 Night Vison Goggle (GP)",
+  "item.zerocontact.nvg_pvs31a": "PVS-31A Night Vison Goggle (WP)",
+  "item.zerocontact.nvg_t7": "T7 Thermal goggle",
+  "item.zerocontact.nvg_gpnvg": "GPNVG-18 Night Vison Goggle (WP)",
+  "item.zerocontact.headset_comtac2": "ComTac II Headset (OD)",
+  "item.zerocontact.headset_comtac2_brown": "ComTac II Headset (CB)",
+  "item.zerocontact.headset_amp": "Ops-Core AMP Headset (TAN)",
+  "item.zerocontact.headset_amp_black": "Ops-Core AMP Headset (BLACK)",
+
+  "item.zerocontact.ss_navboard": "S&S Navboard FlipLite (TAN)",
+  "item.zerocontact.tmc_admin_pouch": "TMC Admin pouch (MC)",
+  "item.zerocontact.prc_148": "AN/PRC-148 MBITR",
+
+
+  "item.zerocontact.beacon": "Helmet Mounted Beacon",
+  "item.zerocontact.battery": "AA Battery Pouch"
+}

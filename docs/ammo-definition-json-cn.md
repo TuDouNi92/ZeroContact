@@ -1,6 +1,6 @@
 # 弹药定义 JSON 用法表
 
-本文档说明 [`AmmoDataPOJO`](../forge/src/main/java/net/zerocontact/datagen/AmmoDataPOJO.java) 对应的弹药定义 JSON。完整配置可参考 [`40mm_incendiary.json`](../common/src/main/resources/data/zerocontact/default_pack/data/zerocontact/ammoDefinitions/40mm_incendiary.json)。
+本文档说明 [`AmmoDataPOJO`](../forge/src/main/java/net/zerocontact/datagen/AmmoDataPOJO.java) 对应的弹药定义 JSON。完整配置可参考 [`40mm_incendiary.json`](../common/src/main/resources/data/zerocontact/default_pack/default_ammo/data/zerocontact/ammoDefinitions/40mm_incendiary.json)。
 
 弹药定义文件放在资源包的 `data/zerocontact/ammoDefinitions` 目录中。表内“默认值”来自 POJO 的字段初始化值；标为“必填”的字段虽然没有显式校验，但缺失时无法形成有效的弹药注册信息。
 

@@ -1,6 +1,6 @@
 # Ammo Definition JSON Usage Table
 
-This document describes the ammo definition JSON represented by [`AmmoDataPOJO`](../forge/src/main/java/net/zerocontact/datagen/AmmoDataPOJO.java). For a complete configuration, see [`40mm_incendiary.json`](../common/src/main/resources/data/zerocontact/default_pack/data/zerocontact/ammoDefinitions/40mm_incendiary.json).
+This document describes the ammo definition JSON represented by [`AmmoDataPOJO`](../forge/src/main/java/net/zerocontact/datagen/AmmoDataPOJO.java). For a complete configuration, see [`40mm_incendiary.json`](../common/src/main/resources/data/zerocontact/default_pack/default_ammo/data/zerocontact/ammoDefinitions/40mm_incendiary.json).
 
 Place ammo definition files in the resource pack's `data/zerocontact/ammoDefinitions` directory. Defaults in the tables come from the POJO field initializers. Fields marked as required have no explicit validation, but omitting them prevents the definition from producing valid ammo registration data.
 

@@ -28,13 +28,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class ZPackManager implements IPackManager {
-    private static final Path defaultPath = Paths.get("config/zerocontact/packs");
+    private static final Path LOCAL_PACK_ROOT = Paths.get("config/zerocontact/packs");
     public final Set<Zpack> outerPacks = new HashSet<>();
     private static final Set<Pack> vanillaPacks = new HashSet<>();
     private final ZAssetManager assetManager;
     private final ZContentLoader contentLoader;
     private static final String DEFAULT_PACK_LOCATION = "/data/zerocontact/default_pack.zip";
-    private static final String DEFAULT_PACK_NAME = "default_pack";
     private static final String MANIFEST_PATH = "manifest.json";
     private static final String CONFIG_PATH = "config/zerocontact/override.toml";
     private static final String CONFIG_NODE = "pack.default_pack_override";
@@ -81,12 +80,15 @@ public class ZPackManager implements IPackManager {
                 try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
                     ZipEntry entry;
                     while ((entry = zipInputStream.getNextEntry()) != null) {
-                        Path target = defaultPath.resolve(DEFAULT_PACK_NAME).resolve(entry.getName());
+
+                        String name = entry.getName();
+                        Path localPack = LOCAL_PACK_ROOT.resolve(name);
+                        
                         if (entry.isDirectory()) {
-                            Files.createDirectories(target);
+                            Files.createDirectories(localPack);
                         } else {
-                            Files.createDirectories(target.getParent());
-                            Files.copy(zipInputStream, target, StandardCopyOption.REPLACE_EXISTING);
+                            Files.createDirectories(localPack.getParent());
+                            Files.copy(zipInputStream, localPack, StandardCopyOption.REPLACE_EXISTING);
                         }
                     }
                 }
@@ -97,10 +99,10 @@ public class ZPackManager implements IPackManager {
     }
 
     public void findOuterPacks() throws IOException {
-        try (Stream<Path> stream = Files.walk(defaultPath, 1)) {
+        try (Stream<Path> stream = Files.walk(LOCAL_PACK_ROOT, 1)) {
             stream
                     .filter(Files::isDirectory)
-                    .filter(path -> !path.equals(defaultPath))
+                    .filter(path -> !path.equals(LOCAL_PACK_ROOT))
                     .forEach(packPath -> {
                         try {
                             assetManager.deserializeFromManifest(
@@ -150,8 +152,8 @@ public class ZPackManager implements IPackManager {
     @Override
     public void init() {
         try {
-            if (Files.notExists(defaultPath)) {
-                Files.createDirectories(defaultPath);
+            if (Files.notExists(LOCAL_PACK_ROOT)) {
+                Files.createDirectories(LOCAL_PACK_ROOT);
             }
             createDefaultPack();
             findOuterPacks();
