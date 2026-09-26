@@ -88,7 +88,10 @@ public abstract class ModernKineticGunScriptAPIMixin {
         String selectedVariant = gunCartridgeHolder.map(cap -> cap.getClientSelectedAmmoVariant(itemStack)).orElse("");
         IItemHandler filteredHandler = ServerAmmoSelector.filteredAmmoHandler(
                 zeroContact$reloadInventory.get().rawHandler(), selectedVariant, itemStack);
-        boolean hasSelectedAmmo = zeroContact$getAmmoCount(filteredHandler) > 0;
+        boolean hasSelectedAmmo = zeroContact$getAmmoCount(filteredHandler) > 0
+                || MagazinesCompatHandler.get().getCompat()
+                .map(compat -> compat.hasUsableMagazine(filteredHandler, itemStack))
+                .orElse(false);
         this.zeroContact$hasSelectedAmmoForReload = hasSelectedAmmo;
         cir.setReturnValue(hasSelectedAmmo);
     }
@@ -98,6 +101,7 @@ public abstract class ModernKineticGunScriptAPIMixin {
         if (abstractGunItem.useInventoryAmmo(itemStack)) return;
         cir.setReturnValue(true);
     }
+
 
 
     @Unique

@@ -23,10 +23,7 @@ import net.zerocontact.compat.MagazinesCompatHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractGunItem.class)
@@ -43,9 +40,9 @@ public abstract class AbstractGunItemMixin implements IGun {
         if (gunIndex == null) return;
 
         ReloadManager.ReloadInventory zeroContact$reloadInventory = ReloadManager.resolveReloadInv(shooter);
-        boolean magazineLoaded = MagazinesCompatHandler.get().isModLoaded();
+        boolean magazineCompat = MagazinesCompatHandler.get().getCompat().map(compat->compat.isMagazineCompatibleWithGun(gunItem)).orElse(false);
 
-        if (!magazineLoaded) {
+        if (!magazineCompat) {
 
             if (this.useInventoryAmmo(gunItem) || gunIndex.getGunData().getReloadData().isInfinite() || this.useDummyAmmo(gunItem)) {
                 return;
@@ -60,6 +57,28 @@ public abstract class AbstractGunItemMixin implements IGun {
             cir.setReturnValue(false);
             zeroContact$sendFailMsg(shooter);
         }
+    }
+
+    @Inject(method = "hasInventoryAmmo", remap = false, at = @At("HEAD"), cancellable = true)
+    private void replaceAmmoCheck(LivingEntity shooter, ItemStack gun, boolean needCheckAmmo, CallbackInfoReturnable<Boolean> cir) {
+        if (!this.useInventoryAmmo(gun)) {
+            cir.setReturnValue(false);
+        } else if (!needCheckAmmo) {
+            cir.setReturnValue(true);
+        } else if (this.useDummyAmmo(gun)) {
+            cir.setReturnValue(this.getDummyAmmoAmount(gun) > 0);
+        } else {
+            ReloadManager.ReloadInventory reloadInv = ReloadManager.resolveReloadInv(shooter);
+            for (int i = 0; i < reloadInv.rawHandler().getSlots(); i++) {
+                if (zeroContact$sameOrSelectedCaliber(shooter, gun, reloadInv.rawHandler(), i)) {
+                    cir.setReturnValue(true);
+                    return;
+                }
+            }
+            zeroContact$sendFailMsg(shooter);
+            cir.setReturnValue(false);
+        }
+        cir.cancel();
     }
 
     @Unique
@@ -82,9 +101,8 @@ public abstract class AbstractGunItemMixin implements IGun {
             AmmoInjector.AmmoContext ammoCtx = AmmoInjector.read(checkAmmoStack);
             String selectedCaliber = gunItem.getCapability(CapabilityRegistries.CARTRIDGE).map(cap ->
                     cap.getClientSelectedAmmoVariant(gunItem)).orElse("");
-
             if (gunCtx.isEmpty()) return false;
-
+            if (iAmmoBox.isAllTypeCreative(checkAmmoStack)) return true;
             return gunCtx.caliber().equals(ammoCtx.caliber()) || selectedCaliber.equals(ammoCtx.caliber().variant());
         }
         return false;

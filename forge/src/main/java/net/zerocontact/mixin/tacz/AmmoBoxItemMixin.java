@@ -8,12 +8,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.caliber.AmmoInjector;
-import org.jetbrains.annotations.Nullable;
+import net.zerocontact.item.ammo.GenerateAmmo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,13 +20,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Optional;
-
 @Mixin(value = AmmoBoxItem.class, remap = false)
 public class AmmoBoxItemMixin {
-    @Unique
-    @Nullable
-    private ItemStack zeroContact$ammoBox;
 
     @Unique
     private boolean zeroContact$updateCartridge(ItemStack ammoBoxStack, Slot slot) {
@@ -64,48 +58,33 @@ public class AmmoBoxItemMixin {
         if (shouldCancel) cir.cancel();
     }
 
-    @Inject(method = "overrideStackedOnOther", at = @At("HEAD"), remap = true)
-    public void overrideStackedOnOther(ItemStack ammoBox, Slot slot, ClickAction action, Player player, CallbackInfoReturnable<Boolean> cir) {
-        zeroContact$ammoBox = ammoBox;
-    }
 
     @ModifyVariable(method = "lambda$overrideStackedOnOther$0", at = @At("STORE"), name = "takeAmmo")
-    private ItemStack replaceBullet(ItemStack ammoStack) {
-        AmmoInjector.AmmoContext context = null;
-        if (zeroContact$ammoBox != null) {
-            context = AmmoInjector.read(zeroContact$ammoBox);
-        }
+    private ItemStack replaceBullet(ItemStack takeAmmo, int boxAmmoCount, ResourceLocation boxAmmoId,
+                                    Slot slot, ItemStack ammoBox, Player player, CommonAmmoIndex index) {
+        AmmoInjector.AmmoContext context = AmmoInjector.read(ammoBox);
         if (context != null && !context.isEmpty()) {
             Item ammoItem = AmmoInjector.getAmmoVariantItem(context);
             if (ammoItem != null) {
-                ItemStack finalStack = ammoItem.getDefaultInstance();
-                finalStack.setCount(ammoStack.getCount());
+                ItemStack finalStack = ammoItem instanceof GenerateAmmo ? ammoItem.getDefaultInstance() : takeAmmo;
+                finalStack.setCount(takeAmmo.getCount());
                 return finalStack;
             }
         }
-        return ammoStack;
-    }
-
-    @Inject(method = "getTooltipImage", at = @At("HEAD"), remap = true)
-    public void getTooltipImage(ItemStack stack, CallbackInfoReturnable<Optional<TooltipComponent>> cir) {
-        if (stack.getItem() instanceof IAmmoBox) {
-            zeroContact$ammoBox = stack;
-        }
-
+        return takeAmmo;
     }
 
     @ModifyVariable(method = "getTooltipImage",
             at = @At("STORE"),
             name = "ammoStack", remap = true)
-    public ItemStack replaceAmmoStack(ItemStack stack) {
-        if (zeroContact$ammoBox == null) return stack;
-        AmmoInjector.AmmoContext context = AmmoInjector.read(zeroContact$ammoBox);
+    public ItemStack replaceAmmoStack(ItemStack ammoStack, ItemStack stack) {
+        AmmoInjector.AmmoContext context = AmmoInjector.read(stack);
         if (!context.isEmpty()) {
             String variantId = context.caliber().variant();
             Item ammoItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(variantId));
-            if (ammoItem == null) return stack;
-            return ammoItem.getDefaultInstance();
+            if (ammoItem == null) return ammoStack;
+            return ammoItem instanceof GenerateAmmo ? ammoItem.getDefaultInstance() : ammoStack;
         }
-        return stack;
+        return ammoStack;
     }
 }

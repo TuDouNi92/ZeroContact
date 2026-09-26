@@ -10,6 +10,7 @@
     "ClientGunToolTipMixin",
     "EntityKineticBulletAccessor",
     "EntityKineticBulletMixin",
+    "GunAnimationStateContextMixin",
     "GunHudOverlayMixin",
     "ItemStackMixin",
     "ModernKineticGunScriptAPIMixin",

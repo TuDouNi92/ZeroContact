@@ -66,6 +66,7 @@ public class ServerAmmoSelector {
                 if (handler.getCompat().map(compat -> compat.isMagazineCompatibleWithGun(gunStack)).orElse(false))
                     return;
                 LinkedHashMap<ItemStack, Integer> ammoMap = ServerAmmoSelector.getCandidates(player);
+                if(ammoMap.isEmpty())return;
                 NetworkHooks.openScreen(
                         player,
                         new SimpleMenuProvider((id, inv, __) -> new AmmoSelectorMenu(id, ammoMap, inv), Component.translatable("")),
@@ -103,7 +104,15 @@ public class ServerAmmoSelector {
                         mappedSlots.add(i);
                     }
                 }
-            } else if (checkAmmoStack.getItem() instanceof IAmmoBox iAmmoBox && iAmmoBox.isAmmoBoxOfGun(gunStack, checkAmmoStack)) {
+            } else if (checkAmmoStack.getItem() instanceof IAmmoBox iAmmoBox) {
+                boolean boxedMagazine = MagazinesCompatHandler.get().getCompat()
+                        .map(compat -> compat.hasCompatibleMagazineInBox(checkAmmoStack, gunStack))
+                        .orElse(false);
+                if (boxedMagazine) {
+                    mappedSlots.add(i);
+                    continue;
+                }
+                if (!iAmmoBox.isAmmoBoxOfGun(gunStack, checkAmmoStack)) continue;
                 AmmoInjector.AmmoContext contextFromBox = AmmoInjector.read(checkAmmoStack);
                 String stackKey = contextFromBox.caliber().variant();
                 if (checkAmmoStack.getItem() instanceof AmmoBoxItem) {
@@ -186,6 +195,7 @@ public class ServerAmmoSelector {
         CompoundTag gunTag = gunStack.getTag();
         IGun gun = IGun.getIGunOrNull(gunStack);
         if (gun == null) return neededAmount;
+        if(gun.useInventoryAmmo(gunStack))return neededAmount;
         if (gunTag == null) return neededAmount;
         ICartridgeHolder cap = gunStack.getCapability(CapabilityRegistries.CARTRIDGE).resolve().orElse(null);
         if (cap == null) return neededAmount;
@@ -229,7 +239,6 @@ public class ServerAmmoSelector {
     }
 
     public static LinkedHashMap<ItemStack, Integer> getCandidates(ServerPlayer player) {
-        Inventory vanillaInv = player.getInventory();
         ItemStack gunItem = player.getMainHandItem();
         LinkedHashMap<ItemWrapper, Integer> items = new LinkedHashMap<>();
         LinkedHashMap<ItemStack, Integer> finalItems = new LinkedHashMap<>();

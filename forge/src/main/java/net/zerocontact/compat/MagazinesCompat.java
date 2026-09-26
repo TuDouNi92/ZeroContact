@@ -36,6 +36,10 @@ public class MagazinesCompat {
         return MagazineReloadSource.hasUsableMagazine(handler, gun);
     }
 
+    public boolean hasCompatibleMagazineInBox(ItemStack box, ItemStack gun) {
+        return !AmmoBoxMagazineStorage.peekBestCompatible(box, gun).isEmpty();
+    }
+
     public ItemStack getCompatibleMag(ItemStack gunStack) {
         ItemStack magStack = ItemStack.EMPTY;
         IGun gun = IGun.getIGunOrNull(gunStack);
@@ -49,16 +53,13 @@ public class MagazinesCompat {
         if (familyId == null) return magStack;
         String familyIdWithExt = extFamilies.stream().filter(s -> MagazineFamilySystem.getExtLevelForFamily(s) == extLevel).findAny().orElse("");
         return gunStack.getCapability(GunMagazineProvider.GUN_MAGAZINE).map(cap -> {
-            ItemStack stored = cap.getStoredMagazine();
             Item magItem = MagazineRegistrar.MAGAZINE.get();
-            if (stored.isEmpty()) {
-                String id = familyId;
-                if (!familyIdWithExt.isEmpty()) {
-                    id = familyIdWithExt;
-                }
-                stored = MagazineItem.createMagazineByFamily(magItem, id, MagazineFamilySystem.getCapacityForFamily(id), gunData.getAmmoId());
+            String id = familyId;
+            if (!familyIdWithExt.isEmpty()) {
+                id = familyIdWithExt;
             }
-            return stored;
+            return MagazineItem.createMagazineByFamily(magItem, id, MagazineFamilySystem.getCapacityForFamily(id), gunData.getAmmoId());
+
         }).orElse(ItemStack.EMPTY);
 
     }

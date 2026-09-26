@@ -6,6 +6,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 import net.zerocontact.caliber.AmmoInjector;
+import net.zerocontact.item.ammo.GenerateAmmo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -27,7 +28,7 @@ public class UnloadOneFromHandPacketMixin {
         if (!context.isEmpty()) {
             Item ammoItem = AmmoInjector.getAmmoVariantItem(context);
             if (ammoItem != null) {
-                return ammoItem.getDefaultInstance();
+                return ammoItem instanceof GenerateAmmo ? ammoItem.getDefaultInstance() : bullet;
             }
         }
         return bullet;

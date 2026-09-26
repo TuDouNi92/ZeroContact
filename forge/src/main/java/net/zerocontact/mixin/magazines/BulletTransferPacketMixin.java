@@ -7,6 +7,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.caliber.AmmoInjector;
+import net.zerocontact.item.ammo.GenerateAmmo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -51,7 +52,7 @@ public class BulletTransferPacketMixin {
         if (!context.isEmpty()) {
             Item ammoItem = AmmoInjector.getAmmoVariantItem(context);
             if (ammoItem != null) {
-                return ammoItem.getDefaultInstance();
+                return ammoItem instanceof GenerateAmmo ? ammoItem.getDefaultInstance() : bullet;
             }
         }
         return bullet;

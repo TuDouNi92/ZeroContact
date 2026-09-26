@@ -1,7 +1,6 @@
 package net.zerocontact.mixin.tacz;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.raiiiden.taczmagazines.item.MagazineItem;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.IAmmo;
 import com.tacz.guns.api.item.IAmmoBox;
@@ -9,7 +8,6 @@ import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.client.gui.overlay.GunHudOverlay;
 import com.tacz.guns.client.resource.GunDisplayInstance;
 import com.tacz.guns.resource.index.CommonGunIndex;
-import com.tacz.guns.resource.pojo.data.gun.FeedType;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -48,7 +46,6 @@ public class GunHudOverlayMixin {
             ResourceLocation gunId = iGun.getGunId(stack);
             CommonGunIndex gunIndex = TimelessAPI.getCommonGunIndex(gunId).orElse(null);
             if (gunIndex != null) {
-                FeedType feedType = gunIndex.getGunData().getReloadData().getType();
                 ReloadManager.ReloadInventory reloadInventory = ReloadManager.resolveReloadInv(inventory.player);
                 IItemHandler itemHandler = reloadInventory.rawHandler();
                 Supplier<Integer> countAmmo = () -> {
@@ -61,13 +58,17 @@ public class GunHudOverlayMixin {
                             }
                         }
                         if (inventoryAmmo.getItem() instanceof IAmmoBox iAmmoBox && iAmmoBox.isAmmoBoxOfGun(stack, inventoryAmmo)) {
+                            if (iAmmoBox.isAllTypeCreative(inventoryAmmo) || iAmmoBox.isCreative(inventoryAmmo)) {
+                                count = 9999;
+                                return count;
+                            }
                             count += iAmmoBox.getAmmoCount(inventoryAmmo);
                         }
                     }
                     return count;
                 };
                 MagazinesCompatHandler.get().getCompat().ifPresentOrElse(compat -> {
-                            if (feedType.equals(FeedType.MAGAZINE)) {
+                            if (compat.isMagazineCompatibleWithGun(stack)) {
                                 int total = 0;
                                 for (int i = 0; i < itemHandler.getSlots(); ++i) {
                                     ItemStack slot = itemHandler.getStackInSlot(i);

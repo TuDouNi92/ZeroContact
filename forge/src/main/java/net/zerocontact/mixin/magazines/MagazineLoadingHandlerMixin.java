@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.caliber.AmmoInjector;
+import net.zerocontact.item.ammo.GenerateAmmo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -42,7 +43,7 @@ public class MagazineLoadingHandlerMixin {
             return bullet;
         }
 
-        ItemStack replacement = item.getDefaultInstance();
+        ItemStack replacement = item instanceof GenerateAmmo ? item.getDefaultInstance() : bullet;
         replacement.setCount(bullet.getCount());
         return replacement;
     }
@@ -69,7 +70,7 @@ public class MagazineLoadingHandlerMixin {
             return bullet;
         }
 
-        ItemStack replacement = item.getDefaultInstance();
+        ItemStack replacement = item instanceof GenerateAmmo ? item.getDefaultInstance() : bullet;
         replacement.setCount(bullet.getCount());
         return replacement;
     }

@@ -7,6 +7,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.caliber.AmmoInjector;
+import net.zerocontact.item.ammo.GenerateAmmo;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -38,7 +39,7 @@ public class MagazineTooltipRendererMixin {
                 String id = context.caliber().variant();
                 Item ammoItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(id));
                 if (ammoItem != null) {
-                    return ammoItem.getDefaultInstance();
+                    return ammoItem instanceof GenerateAmmo ? ammoItem.getDefaultInstance() : stack;
                 }
             }
         }

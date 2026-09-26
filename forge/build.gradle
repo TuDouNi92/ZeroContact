@@ -59,11 +59,11 @@ dependencies {
     modLocalRuntime files('libs/embeddium-0.3.31+mc1.20.1 (1).jar')
     modLocalRuntime files('libs/oculus-mc1.20.1-1.8.0 (1).jar')
 //    modLocalRuntime('curse.maven:sound-physics-remastered-535489:7032235')
-    modCompileOnly("curse.maven:${magazine_version}")
-//    modLocalRuntime("curse.maven:${magazine_version}")
+    modCompileOnly("curse.maven:tacz-magazines-1504588:${magazine_version}")
+    modLocalRuntime("curse.maven:tacz-magazines-1504588:${magazine_version}")
     modLocalRuntime('curse.maven:tacz-simple-enemy-1471691:8289695')
     modLocalRuntime("curse.maven:shoulder-surfing-reloaded-243190:8725611")
-    modLocalRuntime("curse.maven:tacz-gunshot-reverb-1690954:8923504")
+//    modLocalRuntime("curse.maven:tacz-gunshot-reverb-1690954:8923504")
 }
 
 processResources {
@@ -93,7 +93,7 @@ sourcesJar {
     from commonSources.archiveFile.map { zipTree(it) }
 }
 
-tasks.register('buildBuiltinResourceZip', Zip) {
+tasks.register('buildBuiltinResourceZip', Zip) {zip->
     archiveFileName = "default_pack.zip"
     destinationDirectory = project(":common").file('src/main/resources/data/zerocontact')
     from(project(":common").file('src/main/resources/data/zerocontact/default_pack'))
