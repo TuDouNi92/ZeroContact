@@ -9,6 +9,7 @@ import net.minecraft.world.level.Level;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.armor.modular.EquipmentModule;
 import net.zerocontact.armor.modular.module.nvg.api.INvg;
+import net.zerocontact.armor.modular.module.nvg.container.NvgContainer;
 import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
 import org.jetbrains.annotations.NotNull;
@@ -38,7 +39,7 @@ public abstract class NVG extends AbstractGenerateGeoCurioItemImpl implements Eq
     @Override
     public void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entity, int slotId, boolean isSelected) {
         super.inventoryTick(stack, level, entity, slotId, isSelected);
-        if(level.isClientSide)return;
+        if (level.isClientSide) return;
         stack.getCapability(CapabilityRegistries.NVG).ifPresent(nvg -> {
             // Loose inventory modules have no external supply; discard an old mounted snapshot.
             nvg.refreshPowerStatus(0, 0);
@@ -74,6 +75,10 @@ public abstract class NVG extends AbstractGenerateGeoCurioItemImpl implements Eq
                                     if (state.getData(DataTickets.ITEM_RENDER_PERSPECTIVE) == ItemDisplayContext.GUI) {
                                         return PlayState.STOP;
                                     }
+                                    ItemStack stack = state.getData(DataTickets.ITEMSTACK);
+                                    if (stack == null) return PlayState.STOP;
+                                    boolean enabled = stack.getCapability(CapabilityRegistries.NVG).map(NvgContainer::getEnabled).orElse(false);
+                                    state.getController().setAnimation(enabled ? ACTIVATE : DEACTIVATE);
                                     return PlayState.CONTINUE;
                                 })
                                 // The local manager installs an instance-scoped handler before triggering.

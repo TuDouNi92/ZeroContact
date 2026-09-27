@@ -11,10 +11,7 @@ import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.datagen.IAssetManager;
 import net.zerocontact.datagen.adapter.ItemAdapter;
 import net.zerocontact.datagen.adapter.RuntimeTypeAdapterFactory;
-import net.zerocontact.datagen.model.AmmoDataPOJO;
-import net.zerocontact.datagen.model.GenerationRecord;
-import net.zerocontact.datagen.model.ItemPOJO;
-import net.zerocontact.datagen.model.ModularPOJO;
+import net.zerocontact.datagen.model.*;
 import net.zerocontact.registries.ItemsReg;
 
 import java.io.IOException;
@@ -35,8 +32,9 @@ public class ZAssetManager implements IAssetManager {
                     .of(ItemPOJO.class, "type")
                     .registerSubtype(ItemPOJO.Plate.class, "plate")
                     .registerSubtype(ItemPOJO.Armor.class, "armor")
-                    .registerSubtype(ItemPOJO.Loadout.class,"loadout")
-                    .registerSubtype(ModularPOJO.class, "module");
+                    .registerSubtype(ItemPOJO.Loadout.class, "loadout")
+                    .registerSubtype(ModularPOJO.class, "module")
+                    .registerSubtype(ModularNVGPOJO.class, "module_nvg");
     private final Gson gson = new GsonBuilder().registerTypeAdapterFactory(typeAdapterFactory).create();
 
     @Override
@@ -60,9 +58,9 @@ public class ZAssetManager implements IAssetManager {
                 T rawData = gson.fromJson(Files.newBufferedReader(itemJsonPath), targetBeanClazz);
                 data.accept(rawData, itemJsonPath);
             } catch (IOException e) {
-                throw new RuntimeException("Failed to load path: ",e);
-            }catch (JsonSyntaxException jsonSyntaxException){
-                throw new RuntimeException("Failed to parse json: ",jsonSyntaxException);
+                throw new RuntimeException("Failed to load path: ", e);
+            } catch (JsonSyntaxException jsonSyntaxException) {
+                throw new RuntimeException("Failed to parse json: ", jsonSyntaxException);
             }
         });
     }
@@ -88,30 +86,6 @@ public class ZAssetManager implements IAssetManager {
 
     @Override
     public void register() {
-        ZContentLoader.itemGenData.forEach((data, tab) -> ItemAdapter.ADAPTERS.forEach(adapter -> {
-            if (data instanceof ItemPOJO.Armor armor) {
-                LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(armor, tab);
-                if (records.isEmpty()) return;
-                this.registerItems(ITEMS_REG_TAB, ItemsReg.ITEMS, new IAssetManager.WearableType(records, "ARMOR_LIKE"));
-            } else if (data instanceof ItemPOJO.Plate plate) {
-                LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(plate, tab);
-                if (records.isEmpty()) return;
-                this.registerItems(ITEMS_REG_TAB, ItemsReg.ITEMS, new IAssetManager.WearableType(records, "PLATE_LIKE"));
-            } else if(data instanceof AmmoDataPOJO ammo){
-                LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(ammo, tab);
-                if(records.isEmpty())return;
-                this.registerItems(ITEMS_REG_TAB,ItemsReg.ITEMS, new IAssetManager.WearableType(records,"AMMO"));
-            }
-            else if(data instanceof ItemPOJO.Loadout loadout){
-                LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(loadout, tab);
-                if(records.isEmpty())return;
-                this.registerItems(ITEMS_REG_TAB,ItemsReg.ITEMS, new IAssetManager.WearableType(records,"LOADOUT"));
-            }
-            else if(data instanceof ModularPOJO modular){
-                LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(modular, tab);
-                if(records.isEmpty())return;
-                this.registerItems(ITEMS_REG_TAB,ItemsReg.ITEMS, new IAssetManager.WearableType(records,"MODULE"));
-            }
-        }));
+        ItemAdapter.register(this);
     }
 }

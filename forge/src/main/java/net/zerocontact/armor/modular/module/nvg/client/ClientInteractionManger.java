@@ -91,41 +91,24 @@ public final class ClientInteractionManger {
             if (changedModule || desired != state.desiredEnabled()) {
                 if (changedModule && !desired) state.reset();
                 else state.request(desired);
-                trigger(minecraft, changedModule && !desired ? "off_pose" : desired ? "activate" : "deactivate");
             }
             var previousPhase = state.phase();
             state.tick(capability.outOfPower());
             // Set a stable pose even if the view model was not rendered during the transition.
             if (previousPhase != state.phase()) {
-                switch (state.phase()){
-                    case ON ->{
-                        minecraft.player.playNotifySound(ModSoundEventsReg.NVG_BUZZ, SoundSource.PLAYERS,1,1);
-                        minecraft.player.playNotifySound(ModSoundEventsReg.NVG_CLICK, SoundSource.PLAYERS,1,1);
+                switch (state.phase()) {
+                    case ON -> {
+                        minecraft.player.playNotifySound(ModSoundEventsReg.NVG_BUZZ, SoundSource.PLAYERS, 1, 1);
+                        minecraft.player.playNotifySound(ModSoundEventsReg.NVG_CLICK, SoundSource.PLAYERS, 1, 1);
                     }
                     case OFF -> {
-                        minecraft.player.playNotifySound(ModSoundEventsReg.NVG_BUZZ, SoundSource.PLAYERS,1,0.7f);
-                        minecraft.player.playNotifySound(ModSoundEventsReg.NVG_CLICK, SoundSource.PLAYERS,1,0.7f);
+                        minecraft.player.playNotifySound(ModSoundEventsReg.NVG_BUZZ, SoundSource.PLAYERS, 1, 0.7f);
+                        minecraft.player.playNotifySound(ModSoundEventsReg.NVG_CLICK, SoundSource.PLAYERS, 1, 0.7f);
                     }
                 }
 
-                trigger(minecraft, state.phase() == NvgEffectState.Phase.ON ? "on_pose" : "off_pose");
-            }
-        }
 
-        private void trigger(Minecraft minecraft, String animation) {
-            GeoItem animatable = (GeoItem) module.getItem();
-            long id = identity.animationId();
-            long transition = ++generation;
-            var controller = animatable.getAnimatableInstanceCache().getManagerForId(id)
-                    .getAnimationControllers().get("controller");
-            if (controller == null) return;
-            // Bind before triggering; callbacks from previews and old transitions cannot change effects.
-            controller.setCustomInstructionKeyframeHandler(event -> {
-                if (rendering && generation == transition)
-                    state.marker(event.getKeyframeData().getInstructions());
-            });
-            animatable.stopTriggeredAnim(minecraft.player, id, "controller", null);
-            animatable.triggerAnim(minecraft.player, id, "controller", animation);
+            }
         }
 
         public ItemStack module() {

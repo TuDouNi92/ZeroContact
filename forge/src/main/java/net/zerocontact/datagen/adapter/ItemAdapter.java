@@ -12,10 +12,9 @@ import net.zerocontact.armor.modular.model.MountCategory;
 import net.zerocontact.armor.modular.module.nvg.api.INvg;
 import net.zerocontact.armor.modular.module.nvg.item.NVG;
 import net.zerocontact.armor.modular.registry.ModuleRegistry;
-import net.zerocontact.datagen.model.ItemPOJO;
-import net.zerocontact.datagen.model.AmmoDataPOJO;
-import net.zerocontact.datagen.model.GenerationRecord;
-import net.zerocontact.datagen.model.ModularPOJO;
+import net.zerocontact.datagen.loader.ZAssetManager;
+import net.zerocontact.datagen.loader.ZContentLoader;
+import net.zerocontact.datagen.model.*;
 import net.zerocontact.item.ammo.GenerateAmmo;
 import net.zerocontact.item.armband.GenerateUniformArmbandGeoImpl;
 import net.zerocontact.item.armor.forge.GenerateArmorGeoImpl;
@@ -27,9 +26,12 @@ import net.zerocontact.item.plate.BasePlate;
 import net.zerocontact.item.rigs.BaseRigs;
 import net.zerocontact.item.uniform.GenerateUniformPantsGeoImpl;
 import net.zerocontact.item.uniform.GenerateUniformTopGeoImpl;
+import net.zerocontact.registries.ItemsReg;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static net.zerocontact.forge_registries.ItemRegistry.ITEMS_REG_TAB;
 
 public class ItemAdapter {
     public record Mapper<T>(T data, IEquipmentTypeTag.EquipmentType type) {
@@ -66,6 +68,39 @@ public class ItemAdapter {
             new RigsAdapter(),
             new ModuleAdapter()
     );
+
+    public static void register(ZAssetManager zAssetManager){
+        ZContentLoader.itemGenData.forEach((data, tab) -> ItemAdapter.ADAPTERS.forEach(adapter -> {
+            if (data instanceof ItemPOJO.Armor armor) {
+                LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(armor, tab);
+                if (records.isEmpty()) return;
+                zAssetManager.registerItems(ITEMS_REG_TAB, ItemsReg.ITEMS, new IAssetManager.WearableType(records, "ARMOR_LIKE"));
+            } else if (data instanceof ItemPOJO.Plate plate) {
+                LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(plate, tab);
+                if (records.isEmpty()) return;
+                zAssetManager.registerItems(ITEMS_REG_TAB, ItemsReg.ITEMS, new IAssetManager.WearableType(records, "PLATE_LIKE"));
+            } else if(data instanceof AmmoDataPOJO ammo){
+                LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(ammo, tab);
+                if(records.isEmpty())return;
+                zAssetManager.registerItems(ITEMS_REG_TAB,ItemsReg.ITEMS, new IAssetManager.WearableType(records,"AMMO"));
+            }
+            else if(data instanceof ItemPOJO.Loadout loadout){
+                LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(loadout, tab);
+                if(records.isEmpty())return;
+                zAssetManager.registerItems(ITEMS_REG_TAB,ItemsReg.ITEMS, new IAssetManager.WearableType(records,"LOADOUT"));
+            }
+            else if(data instanceof ModularNVGPOJO modularNVGPOJO){
+                LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(modularNVGPOJO, tab);
+                if(records.isEmpty())return;
+                zAssetManager.registerItems(ITEMS_REG_TAB,ItemsReg.ITEMS, new IAssetManager.WearableType(records,"NVG"));
+            }
+            else if(data instanceof ModularPOJO modular){
+                LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(modular, tab);
+                if(records.isEmpty())return;
+                zAssetManager.registerItems(ITEMS_REG_TAB,ItemsReg.ITEMS, new IAssetManager.WearableType(records,"MODULE"));
+            }
+        }));
+    }
 
     public static class ArmorAdapter implements IAssetManager.GeneratableItem {
         @Override
@@ -359,38 +394,47 @@ public class ItemAdapter {
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, modular.animation);
             MountCategory moduleType = modular.getMountCategory();
             ResourceLocation trait = modular.getTrait();
-            switch (moduleType){
-                case NIGHT_VISION -> {
-                    items.add(
-                            new GenerationRecord<Item>(
-                                    modular.id,
-                                    new NVG(
-                                            durability,
-                                            texture,
-                                            model,
-                                            animation
-                                    ) {
-                                    },
-                                    tab
-                            )
-                    );
-                }
-                default -> {
-                    items.add(
-                            new GenerationRecord<Item>(
-                                    modular.id,
-                                    new GenerateModuleGeoImpl(
-                                            durability,
-                                            trait,
-                                            texture,
-                                            model,
-                                            animation
-                                    ),
-                                    tab
-                            )
-                    );
-                }
+            if (data instanceof ModularNVGPOJO modularNVGPOJO) {
+                ResourceLocation vignette = new ResourceLocation(ZeroContact.MOD_ID, modularNVGPOJO.vignette);
+                INvg.Type nvgType = Arrays.stream(INvg.Type.values()).filter(t -> t.name().equals(modularNVGPOJO.color.toUpperCase())).findAny().orElse(INvg.Type.GREEN);
+                items.add(
+                        new GenerationRecord<Item>(
+                                modular.id,
+                                new NVG(
+                                        durability,
+                                        texture,
+                                        model,
+                                        animation
+                                ) {
+                                    @Override
+                                    public ResourceLocation getVignette() {
+                                        return vignette;
+                                    }
+
+                                    @Override
+                                    public INvg.Type getNVGType() {
+                                        return nvgType;
+                                    }
+                                },
+                                tab
+                        )
+                );
+            } else {
+                items.add(
+                        new GenerationRecord<Item>(
+                                modular.id,
+                                new GenerateModuleGeoImpl(
+                                        durability,
+                                        trait,
+                                        texture,
+                                        model,
+                                        animation
+                                ),
+                                tab
+                        )
+                );
             }
+
             ModuleRegistry.registerCategory(id, moduleType);
             return items;
         }

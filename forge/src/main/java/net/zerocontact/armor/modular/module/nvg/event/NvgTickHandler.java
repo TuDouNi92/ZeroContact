@@ -33,7 +33,7 @@ public class NvgTickHandler {
                 if (supply.isPresent()) {
                     var external = supply.get();
                     external.battery().tick();
-                    if (external.battery().outOfPower() || serverPlayer.tickCount % 20 == 0) {
+                    if (external.battery().outOfPower()) {
                         dirty.add(external.module().equipmentTarget());
                     }
                 } else {
@@ -57,7 +57,7 @@ public class NvgTickHandler {
                     dirty.add(ref.equipmentTarget());
                 }
                 if (previous.source() != current.source() || previous.powered() != current.powered()
-                        || previous.capacity() != current.capacity() || serverPlayer.tickCount % 20 == 0) {
+                        || previous.capacity() != current.capacity()) {
                     // Include disabled NVGs: attaching a battery can make Enable available.
                     dirty.add(ref.equipmentTarget());
                 }
