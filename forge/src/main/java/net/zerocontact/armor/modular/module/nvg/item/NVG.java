@@ -27,11 +27,11 @@ public abstract class NVG extends AbstractGenerateGeoCurioItemImpl implements Eq
     protected static final RawAnimation ACTIVATE = RawAnimation.begin().then("activate", Animation.LoopType.HOLD_ON_LAST_FRAME);
     protected static final RawAnimation DEACTIVATE = RawAnimation.begin().then("deactivate", Animation.LoopType.HOLD_ON_LAST_FRAME);
 
-    private static final ResourceLocation vignette = new ResourceLocation("");
+    private static final ResourceLocation vignette = new ResourceLocation(ZeroContact.MOD_ID, "textures/gui/bino_nvg.png");
     private static final ResourceLocation trait = new ResourceLocation(ZeroContact.MOD_ID, "nvg");
 
-    public NVG(String id, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, ArmorItem.Type armorType) {
-        super(id, defaultDurability, texture, model, animation, armorType);
+    public NVG(int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+        super("nvg", defaultDurability, texture, model, animation, ArmorItem.Type.HELMET);
         SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
 

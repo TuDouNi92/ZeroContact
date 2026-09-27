@@ -1,0 +1,10 @@
+{
+  "type": "module",
+  "id": "sb_pvs31a",
+  "mount_type": "night_vision",
+  "module_trait": "nvg",
+  "durability": 12000,
+  "texture": "textures/models/nvg/sb_pvs31a.png",
+  "model": "geo/nvg/sb_nvg_pvs31a.geo.json",
+  "animation": "animations/nvg_pvs31.animation.json"
+}

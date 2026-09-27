@@ -14,5 +14,19 @@
     "penetrate_multiplier":0.95,
     "blunt_multiplier":0.25
   },
-  "durability_loss_modifier":1
+  "durability_loss_modifier":1,
+  "attachments": [
+    {
+      "mount_id": "command_pouch",
+      "mount_type": "armor_pouch",
+      "mount_bone": "command_pouch_fix",
+      "accept_categories": ["admin_pouch"]
+    },
+    {
+      "mount_id": "radio_pouch",
+      "mount_type": "armor_pouch",
+      "mount_bone": "radio_pouch_fix",
+      "accept_categories": ["pouch"]
+    }
+  ]
 }

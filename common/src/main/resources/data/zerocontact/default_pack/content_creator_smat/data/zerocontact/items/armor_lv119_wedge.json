@@ -4,7 +4,7 @@
   "defense": 5,
   "protection_class": 4,
   "equipment_slot": "PLATE_CARRIER",
-  "movement_fix": -0.05,
+  "movement_fix": 0.05,
   "default_durability": 128,
   "texture": "textures/models/armorrig/lv119_wedge.png",
   "model": "geo/armorrig/lv119_wedge.geo.json",

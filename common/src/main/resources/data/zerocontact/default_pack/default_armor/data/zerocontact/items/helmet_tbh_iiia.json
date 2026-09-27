@@ -13,5 +13,25 @@
     "penetrate_multiplier":0.8,
     "blunt_multiplier":0.4
   },
-  "durability_loss_modifier":1
+  "durability_loss_modifier":1,
+  "attachments": [
+    {
+      "mount_id": "nvg_mount",
+      "mount_type": "helmet_front",
+      "mount_bone": "nvg_fix",
+      "accept_categories": ["night_vision"]
+    },
+    {
+      "mount_id": "battery_mount",
+      "mount_type": "helmet_back",
+      "mount_bone": "battery_fix",
+      "accept_categories": ["battery"]
+    },
+    {
+      "mount_id": "beacon_mount",
+      "mount_type": "helmet_top",
+      "mount_bone": "beacon_fix",
+      "accept_categories": ["beacon"]
+    }
+  ]
 }

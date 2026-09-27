@@ -13,7 +13,7 @@ public class T7 extends NVG {
     private static final ResourceLocation vignette = new ResourceLocation(ZeroContact.MOD_ID, "textures/gui/bino_nvg.png");
 
     public T7() {
-        super("t7", 12000, texture, model, animation, ArmorItem.Type.HELMET);
+        super( 12000, texture, model, animation);
         ModuleRegistry.registerCategory(new ResourceLocation(ZeroContact.MOD_ID, "nvg_t7"), MountCategory.NIGHT_VISION);
     }
 

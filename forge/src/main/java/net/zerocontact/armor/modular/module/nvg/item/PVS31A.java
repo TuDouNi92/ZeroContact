@@ -12,7 +12,7 @@ public class PVS31A extends NVG {
     private static final ResourceLocation vignette = new ResourceLocation(ZeroContact.MOD_ID, "textures/gui/bino_nvg.png");
 
     public PVS31A() {
-        super("pvs31a", 12000, texture, model, animation, ArmorItem.Type.HELMET);
+        super(12000, texture, model, animation);
         ModuleRegistry.registerCategory(new ResourceLocation(ZeroContact.MOD_ID, "nvg_pvs31a"), MountCategory.NIGHT_VISION);
     }
 

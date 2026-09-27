@@ -1,9 +1,15 @@
 {
+  "itemGroup.zerocontact.zero_contact_smat": "SMAT Content Creator Pack",
+  "tooltip.zerocontact.pack.zero_contact_smat": "§6§nSMAT Content Creator Pack",
 
   "item.zerocontact.armor_fcpc_v5": "FCPC V5 (MC)",
   "item.zerocontact.armor_lv119_wedge": "SS Lv119 (Icebreaker)",
 
   "item.zerocontact.uniform_g3pro_top": "CP G3 Pro Combat uniform (Shirt)",
-  "item.zerocontact.uniform_g3pro_pants": "CP G3 Pro Combat uniform (Pants)"
+  "item.zerocontact.uniform_g3pro_pants": "CP G3 Pro Combat uniform (Pants)",
 
+  "item.zerocontact.uniform_wedge_top": "The Wedge (Jacket)",
+  "item.zerocontact.uniform_wedge_pants": "The Wedge (Pants)",
+  "item.zerocontact.sb_pvs31a": "PVS-31A Night Vison Goggle",
+  "item.zerocontact.bastion_cover_black": "Bastion Helmet Cover (Black) "
 }

@@ -448,6 +448,11 @@
 					"name": "headset_fix",
 					"parent": "armorHead",
 					"pivot": [0, 30.375, 0]
+				},
+				{
+					"name": "cover_fix",
+					"parent": "armorHead",
+					"pivot": [0, 31.675, 0]
 				}
 			]
 		}

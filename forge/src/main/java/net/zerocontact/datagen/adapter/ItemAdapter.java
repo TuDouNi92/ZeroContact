@@ -9,6 +9,8 @@ import net.zerocontact.ZeroContact;
 import net.zerocontact.api.datagen.IAssetManager;
 import net.zerocontact.api.armor.IEquipmentTypeTag;
 import net.zerocontact.armor.modular.model.MountCategory;
+import net.zerocontact.armor.modular.module.nvg.api.INvg;
+import net.zerocontact.armor.modular.module.nvg.item.NVG;
 import net.zerocontact.armor.modular.registry.ModuleRegistry;
 import net.zerocontact.datagen.model.ItemPOJO;
 import net.zerocontact.datagen.model.AmmoDataPOJO;
@@ -357,19 +359,38 @@ public class ItemAdapter {
             ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, modular.animation);
             MountCategory moduleType = modular.getMountCategory();
             ResourceLocation trait = modular.getTrait();
-            items.add(
-                    new GenerationRecord<Item>(
-                            modular.id,
-                            new GenerateModuleGeoImpl(
-                                    durability,
-                                    trait,
-                                    texture,
-                                    model,
-                                    animation
-                            ),
-                            tab
-                    )
-            );
+            switch (moduleType){
+                case NIGHT_VISION -> {
+                    items.add(
+                            new GenerationRecord<Item>(
+                                    modular.id,
+                                    new NVG(
+                                            durability,
+                                            texture,
+                                            model,
+                                            animation
+                                    ) {
+                                    },
+                                    tab
+                            )
+                    );
+                }
+                default -> {
+                    items.add(
+                            new GenerationRecord<Item>(
+                                    modular.id,
+                                    new GenerateModuleGeoImpl(
+                                            durability,
+                                            trait,
+                                            texture,
+                                            model,
+                                            animation
+                                    ),
+                                    tab
+                            )
+                    );
+                }
+            }
             ModuleRegistry.registerCategory(id, moduleType);
             return items;
         }

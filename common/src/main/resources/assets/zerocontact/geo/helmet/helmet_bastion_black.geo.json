@@ -428,6 +428,31 @@
 							}
 						}
 					]
+				},
+				{
+					"name": "nvg_fix",
+					"parent": "armorHead",
+					"pivot": [0, 30, -5.125]
+				},
+				{
+					"name": "battery_fix",
+					"parent": "armorHead",
+					"pivot": [0, 28, 4.625]
+				},
+				{
+					"name": "beacon_fix",
+					"parent": "armorHead",
+					"pivot": [0, 32.75, 2.125]
+				},
+				{
+					"name": "headset_fix",
+					"parent": "armorHead",
+					"pivot": [0, 30.375, 0]
+				},
+				{
+					"name": "cover_fix",
+					"parent": "armorHead",
+					"pivot": [0, 31.675, 0]
 				}
 			]
 		}

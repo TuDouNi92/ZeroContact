@@ -1,0 +1,10 @@
+{
+  "type": "module",
+  "id": "bastion_cover_black",
+  "mount_type": "helmet_cover",
+  "module_trait": "pouch",
+  "durability": 0,
+  "texture": "textures/bastion_cover_black.png",
+  "model": "geo/bastion_cover_black.geo.json",
+  "animation": ""
+}

@@ -14,7 +14,7 @@ public class GPNVG extends NVG {
     private static final ResourceLocation vignette = new ResourceLocation(ZeroContact.MOD_ID, "textures/gui/gpnvg.png");
 
     public GPNVG() {
-        super("gpnvg", 12000, texture, model, animation, ArmorItem.Type.HELMET);
+        super(12000, texture, model, animation);
         ModuleRegistry.registerCategory(new ResourceLocation(ZeroContact.MOD_ID, "nvg_gpnvg"), MountCategory.NIGHT_VISION);
     }
 

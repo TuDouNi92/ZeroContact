@@ -931,6 +931,16 @@
 							}
 						}
 					]
+				},
+				{
+					"name": "command_pouch_fix",
+					"parent": "jpc2.0",
+					"pivot": [0, 21.8375, -2.625]
+				},
+				{
+					"name": "radio_pouch_fix",
+					"parent": "jpc2.0",
+					"pivot": [3.6515, 19.3094, -2.4843]
 				}
 			]
 		}

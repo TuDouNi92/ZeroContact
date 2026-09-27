@@ -1,0 +1,12 @@
+{
+  "type":"armor",
+  "id": "uniform_wedge_pants",
+  "defense": 1,
+  "protection_class":0,
+  "equipment_slot": "UNIFORM_PANTS",
+  "movement_fix": 0,
+  "default_durability": 0,
+  "texture": "textures/models/uniform/wedge_top.png",
+  "model": "geo/uniform/wedge_pants.geo.json",
+  "durability_loss_modifier":1
+}
