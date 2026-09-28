@@ -78,7 +78,7 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMen
         drawSlotBg(menu, guiGraphics);
         drawEquipmentLabel(guiGraphics);
         Optional.ofNullable(Minecraft.getInstance().player).ifPresent(
-                player -> InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, getGuiLeft() + 12, getGuiTop() + 88, 20, getGuiLeft() + 20 - mouseX, getGuiTop() + 58 - mouseY, player));
+                player -> InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, getGuiLeft() -48, guiHeightYMax, 64, getGuiLeft() + 20 - mouseX, getGuiTop() + 58 - mouseY, player));
     }
 
     private void drawEquipmentLabel(@NotNull GuiGraphics guiGraphics) {

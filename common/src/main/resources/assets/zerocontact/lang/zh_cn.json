@@ -73,6 +73,7 @@
   "gui.zerocontact.workbench.loadouts": "负载",
   "gui.zerocontact.workbench.ammo": "子弹",
   "gui.zerocontact.workbench.accessories": "配饰",
+  "gui.zerocontact.workbench.module": "模块",
   "key.categories.zerocontact": "ZeroContact",
   "key.open_backpack": "打开背包",
   "key.open_selector": "打开弹种轮盘",

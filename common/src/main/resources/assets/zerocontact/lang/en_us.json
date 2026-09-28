@@ -75,6 +75,8 @@
   "gui.zerocontact.workbench.loadouts": "Loadout",
   "gui.zerocontact.workbench.ammo": "Ammo",
   "gui.zerocontact.workbench.accessories": "Accessories",
+  "gui.zerocontact.workbench.module": "Module",
+
   "key.categories.zerocontact": "ZeroContact",
   "key.open_backpack": "Open Backpack",
   "key.open_selector": "Open Ammo selector",

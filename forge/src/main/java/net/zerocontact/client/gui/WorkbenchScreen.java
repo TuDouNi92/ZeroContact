@@ -26,6 +26,12 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 public class WorkbenchScreen extends AbstractContainerScreen<WorkbenchMenu> {
+    private static final int MIN_GUI_WIDTH = 176;
+    private static final int TAB_WIDTH = 36;
+    private static final int LIST_INSET = 12;
+    public static final int BG_BASE_COLOR = 0x88000000;
+    public static final int LABEL_TEXT_COLOR = 0x1bd60f;
+    public static final int OUTLINE_COLOR = 0x33888888;
     private int guiWidthMax;
     private int guiHeightMax;
     private Button submitButton;
@@ -40,6 +46,7 @@ public class WorkbenchScreen extends AbstractContainerScreen<WorkbenchMenu> {
         ARMOR(IEquipmentTypeTag.EquipmentType.ARMOR, IEquipmentTypeTag.EquipmentType.PLATE_CARRIER, IEquipmentTypeTag.EquipmentType.HELMET),
         PLATE(IEquipmentTypeTag.EquipmentType.PLATE),
         LOADOUTS(IEquipmentTypeTag.EquipmentType.BACKPACK, IEquipmentTypeTag.EquipmentType.RIGS),
+        MODULE(IEquipmentTypeTag.EquipmentType.MODULE),
         AMMO(IEquipmentTypeTag.EquipmentType.AMMO),
         ACCESSORIES(IEquipmentTypeTag.EquipmentType.ARMBAND, IEquipmentTypeTag.EquipmentType.UNIFORM_TOP, IEquipmentTypeTag.EquipmentType.UNIFORM_PANTS);
         private final LinkedHashSet<IEquipmentTypeTag.EquipmentType> equipmentTypes;
@@ -51,6 +58,7 @@ public class WorkbenchScreen extends AbstractContainerScreen<WorkbenchMenu> {
 
     @Override
     protected void init() {
+        this.imageWidth = Math.max(MIN_GUI_WIDTH, Tab.values().length * TAB_WIDTH);
         super.init();
         this.guiWidthMax = this.getGuiLeft() + imageWidth;
         this.guiHeightMax = this.getGuiTop() + imageHeight;
@@ -62,9 +70,10 @@ public class WorkbenchScreen extends AbstractContainerScreen<WorkbenchMenu> {
 
         submitButton.setAlpha(0);
         submitButton.active = false;
-        submitButton.setFGColor(0x1bd60f);
-        this.scrollList = new ScrollList(Minecraft.getInstance(), 152, 166, getGuiTop() + 22, getGuiTop() + 150, 36, this);
-        scrollList.setLeftPos(getGuiLeft() + 12);
+        submitButton.setFGColor(LABEL_TEXT_COLOR);
+        this.scrollList = new ScrollList(Minecraft.getInstance(), imageWidth - LIST_INSET * 2, imageHeight,
+                getGuiTop() + 22, getGuiTop() + 150, 36, this);
+        scrollList.setLeftPos(getGuiLeft() + LIST_INSET);
         buildTabButtons();
         addRenderableWidget(submitButton);
         addRenderableWidget(scrollList);
@@ -90,18 +99,20 @@ public class WorkbenchScreen extends AbstractContainerScreen<WorkbenchMenu> {
     }
 
     private void buildTabButtons() {
-        final int[] startX = {this.getGuiLeft()-2};
-        final int startY = this.getGuiTop() -14;
-        Arrays.stream(Tab.values()).toList().forEach(tab -> {
+        Tab[] tabs = Tab.values();
+        int startX = getGuiLeft() + (imageWidth - tabs.length * TAB_WIDTH) / 2;
+        final int startY = this.getGuiTop() - 14;
+        for (Tab tab : tabs) {
             MutableComponent mutableComponent = Component.translatable("gui.zerocontact.workbench." + tab.name().toLowerCase());
             Button button = Button.builder(mutableComponent, (btn) -> setCurrentTab(tab))
-                    .bounds(startX[0], startY, 36, 12)
+                    .bounds(startX, startY, TAB_WIDTH, 12)
                     .build();
 
-            button.setFGColor(0x1bd60f);
+            button.setFGColor(LABEL_TEXT_COLOR);
+            button.setAlpha(0);
             addRenderableWidget(button);
-            startX[0] += 36;
-        });
+            startX += TAB_WIDTH;
+        }
     }
 
     private void addEntryToList() {
@@ -138,23 +149,23 @@ public class WorkbenchScreen extends AbstractContainerScreen<WorkbenchMenu> {
         FormattedCharSequence sequence = title.getVisualOrderText();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().scale(0.7f, 0.7f, 0.7f);
-        guiGraphics.drawString(font, sequence, 12, 12, 0x1bd60f);
+        guiGraphics.drawString(font, sequence, 12, 12, LABEL_TEXT_COLOR);
         guiGraphics.pose().popPose();
     }
 
     @Override
     protected void renderBg(@NotNull GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        guiGraphics.fill(0, 0, width, height, -1, 0x88000000);
-        guiGraphics.fill(getGuiLeft(), getGuiTop(), guiWidthMax, guiHeightMax, 0x88000000);
-        guiGraphics.fill(getGuiLeft() + 12, getGuiTop() + 22, guiWidthMax - 12, guiHeightMax - 16, 0x88000000);
+        guiGraphics.fill(0, 0, width, height, -1, BG_BASE_COLOR);
+        guiGraphics.fill(getGuiLeft(), getGuiTop(), guiWidthMax, guiHeightMax, BG_BASE_COLOR);
+        guiGraphics.fill(getGuiLeft() + 12, getGuiTop() + 22, guiWidthMax - 12, guiHeightMax - 16, BG_BASE_COLOR);
         drawBgOutline(guiGraphics, guiWidthMax, guiHeightMax);
     }
 
     private void drawBgOutline(@NotNull GuiGraphics guiGraphics, int guiWidthMax, int guiHeightMax) {
-        guiGraphics.fill(getGuiLeft(), getGuiTop(), guiWidthMax, getGuiTop() - 1, 0xbb888888);
-        guiGraphics.fill(getGuiLeft(), guiHeightMax, guiWidthMax, guiHeightMax + 1, 0xbb888888);
-        guiGraphics.fill(getGuiLeft(), getGuiTop(), getGuiLeft() - 1, guiHeightMax, 0xbb888888);
-        guiGraphics.fill(guiWidthMax, getGuiTop(), guiWidthMax + 1, guiHeightMax, 0xbb888888);
+        guiGraphics.fill(getGuiLeft(), getGuiTop(), guiWidthMax, getGuiTop() - 1, OUTLINE_COLOR);
+        guiGraphics.fill(getGuiLeft(), guiHeightMax, guiWidthMax, guiHeightMax + 1, OUTLINE_COLOR);
+        guiGraphics.fill(getGuiLeft(), getGuiTop(), getGuiLeft() - 1, guiHeightMax, OUTLINE_COLOR);
+        guiGraphics.fill(guiWidthMax, getGuiTop(), guiWidthMax + 1, guiHeightMax, OUTLINE_COLOR);
     }
 
     @Override
