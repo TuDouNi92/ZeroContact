@@ -1,0 +1,114 @@
+{
+  "recipes": [
+    {
+      "gear_id": "zerocontact:rigs_thunderbolt_gray",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:gray_wool",
+          "count": 24
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:rigs_alice_olive",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:green_wool",
+          "count": 14
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:rigs_cr498_desert",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:brown_wool",
+          "count": 14
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:rigs_fast_tac",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:green_wool",
+          "count": 32
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:sop_mr_desert",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:brown_wool",
+          "count": 16
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:backpack_t20_multicam",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:green_wool",
+          "count": 32
+        },
+        {
+          "itemId": "minecraft:iron_block",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:backpack_t20_umbra",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:yellow_wool",
+          "count": 32
+        },
+        {
+          "itemId": "minecraft:iron_block",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:backpack_british23_red",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:gray_wool",
+          "count": 24
+        },
+        {
+          "itemId": "minecraft:iron_block",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:backpack_vkbo_olive",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:green_wool",
+          "count": 16
+        },
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:backpack_6sh118",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:green_wool",
+          "count": 56
+        },
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 8
+        }
+      ]
+    }
+  ]
+}

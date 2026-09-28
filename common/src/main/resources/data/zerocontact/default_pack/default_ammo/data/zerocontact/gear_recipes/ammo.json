@@ -1,11 +1,945 @@
 {
   "recipes": [
     {
+      "gear_id": "zerocontact:12g_ap",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 15
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 6
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:12g_db",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 15
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 5
+        },
+        {
+          "itemId": "minecraft:blaze_rod",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:12g_flechette",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 15
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 4
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:308_m62",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 27
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 8
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:308_m80",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 27
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 8
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:308_m80a1",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 27
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 8
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:308_m993",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 27
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 8
+        },
+        {
+          "itemId": "minecraft:emerald",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:308_sp",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 27
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 8
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:308_un",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 27
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 8
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:338_ap",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 22
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 8
+        },
+        {
+          "itemId": "minecraft:emerald",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:338_fmj",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 22
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 8
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:338_tacx",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 22
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 8
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:338_ucw",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 22
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 8
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:40mm_incendiary",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 3
+        },
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 12
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 12
+        },
+        {
+          "itemId": "minecraft:blaze_rod",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:40mm_smoke",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 3
+        },
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 9
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 9
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:45acp_ap",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 10
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:45acp_fmj",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 10
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:45acp_hs",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 10
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:45acp_rip",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 10
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:50bmg_api_t",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 30
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 12
+        },
+        {
+          "itemId": "minecraft:blaze_rod",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:545x39bp",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 15
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 5
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:545x39bs",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 15
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 5
+        },
+        {
+          "itemId": "minecraft:emerald",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:545x39bt",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 15
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 5
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:545x39pp",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 15
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 5
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:545x39ps",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 15
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 5
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:545x39t",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 15
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 5
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:556x45ap",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 17
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 6
+        },
+        {
+          "itemId": "minecraft:emerald",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:556x45hp",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 17
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 6
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:556x45m855",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 17
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 6
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:556x45m855a1",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 17
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 6
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:556x45m856",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 17
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 6
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:556x45m856a1",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 17
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 6
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:556x45m995",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 17
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 6
+        },
+        {
+          "itemId": "minecraft:emerald",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:57x28l191",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 8
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:57x28sb193",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 8
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:57x28ss190",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 8
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:58x42dbp191",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 18
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 6
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:58x42dbx95",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 18
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 6
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:58x42dvc12",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 18
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 6
+        },
+        {
+          "itemId": "minecraft:emerald",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:762x39ap",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 22
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 7
+        },
+        {
+          "itemId": "minecraft:emerald",
+          "count": 8
+        }
+      ]
+    },
+    {
       "gear_id": "zerocontact:762x39bp",
       "ingredient_items": [
         {
-          "itemId": "minecraft:diamond",
+          "itemId": "minecraft:copper_ingot",
+          "count": 22
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 7
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:762x39hp",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 22
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 7
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:762x39pp",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 22
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 7
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:762x39ps",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 22
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 7
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:762x39sp",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 22
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 7
+        },
+        {
+          "itemId": "minecraft:quartz",
           "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:762x54bt",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 28
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 9
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:762x54fmj",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 28
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 9
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:762x54hp",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 28
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 9
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:762x54lps",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 28
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 9
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:762x54snb",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 28
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 9
+        },
+        {
+          "itemId": "minecraft:emerald",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:9x19ap",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 7
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:9x19luger_cci",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 7
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:9x19pbp",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 7
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:gold_ingot",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:9x19pst",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 7
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:9x19rip",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 7
+        },
+        {
+          "itemId": "minecraft:gunpowder",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:quartz",
+          "count": 2
         }
       ]
     }

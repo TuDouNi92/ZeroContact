@@ -1,0 +1,206 @@
+{
+  "recipes": [
+    {
+      "gear_id": "zerocontact:nvg_t7",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:nether_star",
+          "count": 1
+        },
+        {
+          "itemId": "minecraft:glass",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:diamond",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 48
+        },
+        {
+          "itemId": "minecraft:glowstone_dust",
+          "count": 32
+        },
+        {
+          "itemId": "minecraft:redstone",
+          "count": 12
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:nvg_gpnvg",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:glass",
+          "count": 4
+        },
+        {
+          "itemId": "minecraft:diamond",
+          "count": 4
+        },
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 16
+        },
+        {
+          "itemId": "minecraft:glowstone_dust",
+          "count": 8
+        },
+        {
+          "itemId": "minecraft:redstone",
+          "count": 12
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:nvg_pvs31",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:glass",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:glowstone_dust",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:redstone",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:nvg_pvs31a",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:glass",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:glowstone_dust",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:redstone",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:tmc_admin_pouch",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:green_wool",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:battery",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:redstone",
+          "count": 12
+        },
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:beacon",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:redstone_torch",
+          "count": 3
+        },
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:ss_navboard",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 6
+        },
+        {
+          "itemId": "minecraft:compass",
+          "count": 1
+        },
+        {
+          "itemId": "minecraft:stone_button",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:map",
+          "count": 1
+        },
+        {
+          "itemId": "minecraft:emerald",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:redstone",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:prc_148",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 16
+        },
+        {
+          "itemId": "minecraft:redstone_torch",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:prc_148_black",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 16
+        },
+        {
+          "itemId": "minecraft:redstone_torch",
+          "count": 8
+        }
+      ]
+    }
+  ]
+}
