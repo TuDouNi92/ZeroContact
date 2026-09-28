@@ -101,6 +101,11 @@ public final class ClientNvgTickHandler {
         return ownedEffect.getTempTarget("heat");
     }
 
+    @Nullable
+    static RenderTarget getThermalWorldDepthTarget() {
+        return getThermalTarget() == null ? null : ownedEffect.getTempTarget("world_depth");
+    }
+
     private static void release(GameRenderer renderer) {
         if (ownedEffect != null && renderer.currentEffect() == ownedEffect) renderer.shutdownEffect();
         ownedEffect = null;

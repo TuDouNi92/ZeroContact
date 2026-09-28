@@ -15,6 +15,12 @@
     },
     {
       "name": "HeatSampler"
+    },
+    {
+      "name": "SceneDepthSampler"
+    },
+    {
+      "name": "WorldDepthSampler"
     }
   ],
   "uniforms": [

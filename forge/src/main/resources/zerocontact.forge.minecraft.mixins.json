@@ -11,6 +11,7 @@
     "ChannelMixin",
     "CompositeRenderTypeAccessor",
     "CompositeStateAccessor",
+    "EntityRenderDispatcherMixin",
     "PlayerRenderMixin",
     "SoundBufferMixin",
     "SoundEngineMixin",

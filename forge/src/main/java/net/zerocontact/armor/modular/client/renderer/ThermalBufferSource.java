@@ -19,17 +19,27 @@ import java.util.Objects;
 public final class ThermalBufferSource implements MultiBufferSource {
     private static final VertexConsumer DISCARD = new HeatVertexConsumer(null, 0);
     private final BufferSource delegate;
+    private final boolean hand;
     private int heat = 255;
 
     public ThermalBufferSource() {
-        this(MultiBufferSource.immediate(new BufferBuilder(256)));
+        this(false);
+    }
+
+    public ThermalBufferSource(boolean hand) {
+        this(MultiBufferSource.immediate(new BufferBuilder(256)), hand);
     }
 
     public ThermalBufferSource(BufferSource delegate) {
-        this.delegate = Objects.requireNonNull(delegate, "delegate");
+        this(delegate, false);
     }
 
-    /** Heat is stored as grayscale RGB, with opaque coverage in alpha. */
+    private ThermalBufferSource(BufferSource delegate, boolean hand) {
+        this.delegate = Objects.requireNonNull(delegate, "delegate");
+        this.hand = hand;
+    }
+
+    /** Red stores heat, blue marks hand heat, and alpha stores coverage. */
     public void setHeat(float heat) {
         if (!Float.isFinite(heat)) throw new IllegalArgumentException("Heat must be finite");
         this.heat = Math.round(Math.max(0, Math.min(1, heat)) * 255);
@@ -38,7 +48,7 @@ public final class ThermalBufferSource implements MultiBufferSource {
     @Override
     public @NotNull VertexConsumer getBuffer(@NotNull RenderType type) {
         RenderType thermal = ThermalRenderType.from(type);
-        return thermal == null ? DISCARD : new HeatVertexConsumer(delegate.getBuffer(thermal), heat);
+        return thermal == null ? DISCARD : new HeatVertexConsumer(delegate.getBuffer(thermal), heat, hand);
     }
 
     public void endBatch() {
@@ -50,12 +60,18 @@ public final class ThermalBufferSource implements MultiBufferSource {
     private static final class HeatVertexConsumer implements VertexConsumer {
         private final VertexConsumer delegate;
         private final int heat;
+        private final boolean hand;
         private double x, y, z;
         private float u, v;
 
         private HeatVertexConsumer(VertexConsumer delegate, int heat) {
+            this(delegate, heat, false);
+        }
+
+        private HeatVertexConsumer(VertexConsumer delegate, int heat, boolean hand) {
             this.delegate = delegate;
             this.heat = heat;
+            this.hand = hand;
         }
 
         @Override
@@ -89,7 +105,9 @@ public final class ThermalBufferSource implements MultiBufferSource {
         @Override
         public void endVertex() {
             if (delegate != null) {
-                delegate.vertex(x, y, z).color(heat, heat, heat, 255).uv(u, v).endVertex();
+                // Blue identifies hand heat, which must remain visible after the
+                // first-person depth pass replaces the world's depth buffer.
+                delegate.vertex(x, y, z).color(heat, heat, hand ? 255 : 0, 255).uv(u, v).endVertex();
             }
         }
     }

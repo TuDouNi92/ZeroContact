@@ -1,6 +1,7 @@
 {
   "targets": [
     "heat",
+    "world_depth",
     "swap"
   ],
   "passes": [
@@ -12,6 +13,14 @@
         {
           "name": "HeatSampler",
           "id": "heat"
+        },
+        {
+          "name": "SceneDepthSampler",
+          "id": "minecraft:main:depth"
+        },
+        {
+          "name": "WorldDepthSampler",
+          "id": "world_depth:depth"
         }
       ],
       "uniforms": [

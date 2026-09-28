@@ -2,6 +2,8 @@
 
 uniform sampler2D DiffuseSampler;
 uniform sampler2D HeatSampler;
+uniform sampler2D SceneDepthSampler;
+uniform sampler2D WorldDepthSampler;
 uniform float ColorMode;
 uniform float BackgroundGain;
 uniform float NoiseStrength;
@@ -26,6 +28,13 @@ vec3 thermalPalette(float temperature) {
 void main() {
     vec3 scene = texture(DiffuseSampler, texCoord).rgb;
     vec4 heat = texture(HeatSampler, texCoord);
+    // The first-person model is rendered after the world heat mask. Its depth
+    // therefore has to be compared at compositing time, after hand rendering.
+    float sceneDepth = texture(SceneDepthSampler, texCoord).r;
+    float worldDepth = texture(WorldDepthSampler, texCoord).r;
+    if (heat.b < 0.5 && sceneDepth + 0.0001 < worldDepth) {
+        heat.a = 0.0;
+    }
     float luminance = dot(scene, vec3(0.2126, 0.7152, 0.0722));
     // Scene brightness is only an artistic cold background, not a temperature estimate.
     float background = min(0.32 + pow(max(luminance, 0.0), 0.65) * BackgroundGain, 0.68);
