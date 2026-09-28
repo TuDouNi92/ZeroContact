@@ -1,9 +1,7 @@
 {
   "key.zerocontact.module_hud": "Toggle Module Quick Menu",
   "key.zerocontact.module_activate": "Activate Selected Module",
-
   "hud.zerocontact.modules.empty": "No controllable modules",
-
   "screen.zerocontact.equipment.title": "Equipment modules",
   "screen.zerocontact.equipment.unmount": "Unmount module",
   "screen.zerocontact.equipment.select_anchor": "Select an equipment anchor",
@@ -14,17 +12,13 @@
   "item.zerocontact.plate_slime": "SlimeIndustries plate",
   "item.zerocontact.plate_ballistic_convoy": "BallisticConvoy plate",
   "item.zerocontact.plate_cult_locust": "Cult locust",
-
   "item.zerocontact.dogtag.victim": "Victim: %s",
   "item.zerocontact.dogtag.time_stamp": "Time: %s",
   "item.zerocontact.dogtag.killedBy": "Killed by: %s",
   "item.zerocontact.dogtag.weaponName": "Weapon: %s",
-
   "death.attack.zc_damage.player": "%1$s was shot by %2$s",
   "death.attack.zc_damage": "%1$s was shot by %2$s",
-
   "item.zerocontact.raider_egg": "Raider",
-
   "item.zerocontact.armband_black": "Armband (Black)",
   "item.zerocontact.armband_red": "Armband (Red)",
   "item.zerocontact.armband_blue": "Armband (Blue)",
@@ -38,11 +32,8 @@
   "item.zerocontact.uniform_g99_bottom": "G99 Combat uniform (Pants)",
   "item.zerocontact.uniform_spn_top": "SPN (Uniform)",
   "item.zerocontact.uniform_spn_bottom": "SPN (Pants)",
-
   "item.zerocontact.kit_armor": "Armor repair kit",
-
   "itemGroup.zerocontact.zero_contact": "ZeroContact",
-
   "curios.modifiers.front_plate": "Front plate",
   "curios.modifiers.back_plate": "Back Plate",
   "curios.identifier.front_plate": "Front plate",
@@ -72,9 +63,7 @@
   "tooltip.zerocontact.bullet_recoil": "Recoil",
   "tooltip.zerocontact.bullet_inaccuracy": "Inaccuracy",
   "tooltip.zerocontact.bullet_knockback": "Knockback",
-
   "msg.zerocontact.no_matching_ammunition": "== No Matching Ammunition! ==",
-
   "tooltip.zerocontact.ballistic_chart": "Nominal trajectory",
   "tootip.zerocontact.kit_armor": "[Right-click] over the equipment you want to repair",
   "tooltip.zerocontact.rig": "You cannot reload the gun directly from inventory once you equip the chest rig. Put your ammo in your chest rig.",
@@ -100,5 +89,6 @@
   "config.zerocontact.client.bullet_suppression": "Bullet Suppression Effect",
   "config.zerocontact.client.trajectory_tooltip": "Display Trajectory Tooltip",
   "config.zerocontact.client.ammo_type_overlay": "Display Ammo Type overlay",
-  "config.zerocontact.client.ammo_type_tooltip": "Display Ammo Type tooltip"
+  "config.zerocontact.client.ammo_type_tooltip": "Display Ammo Type tooltip",
+  "config.zerocontact.client.audio_effect": "Audio Enhancement (Headset Module) "
 }

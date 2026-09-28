@@ -1,10 +1,9 @@
 package net.zerocontact.armor.modular.module.headset.client.audio;
 
 import com.tacz.guns.client.sound.GunSoundInstance;
-import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.client.resources.sounds.SoundInstance;
-import net.minecraft.resources.ResourceLocation;
 import net.zerocontact.armor.modular.module.headset.item.Headset;
+import net.zerocontact.config.ModConfigs;
 
 public final class AudioBehaviorManager {
     private static AudioBehaviorCalc audioBehaviorCalc;
@@ -23,7 +22,7 @@ public final class AudioBehaviorManager {
                 return originalAttenuation;
             }
             Headset.AudioProfile profile = HeadsetAudioState.getProfile();
-            if(profile!=null){
+            if (profile != null) {
                 return profile.pickUpAttenuation();
             }
             return originalAttenuation;
@@ -37,8 +36,14 @@ public final class AudioBehaviorManager {
             return original * 2;
         }
 
-        public boolean shouldAttachToPCM(SoundInstance instance){
-            return true;
+        public boolean shouldAttachToPCM(SoundInstance instance) {
+            return ModConfigs.CLIENT.audioEffect().get()
+                    && (
+                    (instance instanceof GunSoundInstance)
+                            || instance.getLocation().getPath().startsWith("ambient")
+                            || instance.getLocation().getPath().startsWith("entity")
+                            || instance.getLocation().getPath().startsWith("weather")
+            );
         }
     }
 }

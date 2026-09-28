@@ -19,7 +19,7 @@ public class ServerForgeEventBus {
 
     @SubscribeEvent
     public static void RegCommands(RegisterCommandsEvent event) {
-        CommandManager.register(event.getDispatcher());
+        CommandManager.register(event.getDispatcher(),event.getBuildContext());
     }
 
     public static void regEvents() {

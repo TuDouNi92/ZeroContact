@@ -91,5 +91,7 @@
   "config.zerocontact.client.bullet_suppression": "视觉压制效果",
   "config.zerocontact.client.trajectory_tooltip": "显示弹道提示栏",
   "config.zerocontact.client.ammo_type_overlay": "显示弹种HUD",
-  "config.zerocontact.client.ammo_type_tooltip": "显示弹种提示栏"
+  "config.zerocontact.client.ammo_type_tooltip": "显示弹种提示栏",
+  "config.zerocontact.client.audio_effect": "音频增强 （耳机模块） "
+
 }

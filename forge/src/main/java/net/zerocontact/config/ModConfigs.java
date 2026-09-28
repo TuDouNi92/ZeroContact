@@ -10,7 +10,6 @@ public class ModConfigs {
     public static final Common COMMON;
     public static final Client CLIENT;
     public static final Server SERVER;
-    public static final String ENABLE_STAMINA = "enableStamina";
 
     public static final String CLIENT_SIDE = "client";
     public static final String SERVER_SIDE = "server";
@@ -20,6 +19,7 @@ public class ModConfigs {
     public static final String TRAJECTORY_TOOLTIP = "trajectoryTooltip";
     public static final String AMMO_TYPE_OVERLAY = "ammoTypeOverlay";
     public static final String AMMO_TYPE_TOOLTIP = "ammoTypeToolTip";
+    public static final String AUDIO_EFFECT = "audioEffect";
 
     static {
         Pair<Client, ForgeConfigSpec> clientPair = new ForgeConfigSpec.Builder()
@@ -41,24 +41,21 @@ public class ModConfigs {
     }
 
     public static class Common {
-        public final ForgeConfigSpec.BooleanValue enableStamina;
+
 
         Common(ForgeConfigSpec.Builder builder) {
-            builder.push("general");
-            enableStamina = builder
-                    .comment("Enable stamina")
-                    .define(ENABLE_STAMINA, false);
-            builder.pop();
+
         }
     }
 
     public record Server(ForgeConfigSpec.BooleanValue enableUniversalFleshDamage) {
         Server(ForgeConfigSpec.Builder builder) {
-            this(getBuiltValue(builder, SERVER_SIDE, "Universal flesh damage", FLESH_ON_UNARMORED, true));
+            this(buildConfig(builder, SERVER_SIDE, "Universal flesh damage", FLESH_ON_UNARMORED, true));
         }
     }
 
     public record Client(
+            ForgeConfigSpec.BooleanValue audioEffect,
             ForgeConfigSpec.BooleanValue enableBulletSuppression,
             ForgeConfigSpec.BooleanValue enableTrajectoryTooltip,
             ForgeConfigSpec.BooleanValue ammoTypeOverLay,
@@ -66,15 +63,16 @@ public class ModConfigs {
             ) {
         Client(ForgeConfigSpec.Builder builder) {
             this(
-                    getBuiltValue(builder, CLIENT_SIDE, "Bullet suppression effect", BULLET_SUPPRESSION, true),
-                    getBuiltValue(builder, CLIENT_SIDE, "Trajectory tooltip", TRAJECTORY_TOOLTIP, true),
-                    getBuiltValue(builder, CLIENT_SIDE, "Ammo type overlay", AMMO_TYPE_OVERLAY, true),
-                    getBuiltValue(builder, CLIENT_SIDE, "Ammo type tooltip", AMMO_TYPE_TOOLTIP, true)
+                    buildConfig(builder,CLIENT_SIDE,"Enhanced Audio Effect", AUDIO_EFFECT,true),
+                    buildConfig(builder, CLIENT_SIDE, "Bullet suppression effect", BULLET_SUPPRESSION, true),
+                    buildConfig(builder, CLIENT_SIDE, "Trajectory tooltip", TRAJECTORY_TOOLTIP, true),
+                    buildConfig(builder, CLIENT_SIDE, "Ammo type overlay", AMMO_TYPE_OVERLAY, true),
+                    buildConfig(builder, CLIENT_SIDE, "Ammo type tooltip", AMMO_TYPE_TOOLTIP, true)
             );
         }
     }
 
-    private static ForgeConfigSpec.BooleanValue getBuiltValue(ForgeConfigSpec.Builder builder, String side, String comment, String path, boolean defaultValue) {
+    private static ForgeConfigSpec.BooleanValue buildConfig(ForgeConfigSpec.Builder builder, String side, String comment, String path, boolean defaultValue) {
         final ForgeConfigSpec.BooleanValue value;
         builder.push(side);
         value = builder

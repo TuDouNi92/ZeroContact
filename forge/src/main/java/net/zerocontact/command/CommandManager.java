@@ -5,34 +5,48 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.zerocontact.ZeroContact;
+import net.zerocontact.api.armor.modular.EquipmentModule;
+import net.zerocontact.api.armor.modular.ModularEquipment;
+import net.zerocontact.armor.modular.model.MountDefinition;
+import net.zerocontact.armor.modular.registry.ModuleRegistry;
 import net.zerocontact.armor.modular.service.ModuleMountService;
 import net.zerocontact.armor.modular.service.ModuleSyncService;
 import net.zerocontact.armor.modular.client.menu.EquipmentMenu;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
+import java.util.*;
 
 public class CommandManager {
 
-    private static final String STAMINA_COMMAND = "stamina";
-    private static final String STAMINA_MSG = "Enable Stamina:";
     private static final String DOGTAG_COMMAND = "dogtag";
     private static final String DOGTAG_MSG = "Enable Dogtag drop:";
     private static final String EXP_BALLISTIC_COMMAND = "experimentalBallistic";
     private static final String EXP_BALLISTIC_MSG = "Enable ExperimentalBallistic feature:";
 
     private static final String MODULAR_EQUIP_COMMAND = "modular";
-    private static final String MODULAR_EQUIP_MSG = "Equipped module: ";
+    private static final String MODULAR_EQUIP_MSG = "Successfully edited module";
+    public static final String FAILED_TO_MOUNT_MODULE_MSG = "Failed to mount module";
+    public static final String NOT_A_MODULE_ITEM_MSG = "Not a module Item";
+    public static final String FAILED_TO_FIND_TARGET_MSG = "Failed to find  target";
 
     public static class CommandSavedData extends SavedData {
         private static final String STAMINA_STATE = "staminaState";
@@ -86,7 +100,7 @@ public class CommandManager {
         }
     }
 
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext commandBuildContext) {
         dispatcher.register(Commands.literal("zerocontact")
                 .then(Commands.literal("equipment")
                         .executes(context -> {
@@ -94,24 +108,10 @@ public class CommandManager {
                                     Component.translatable("screen.zerocontact.equipment.title"));
                             return Command.SINGLE_SUCCESS;
                         })));
-        dispatcher.register(Commands.literal(STAMINA_COMMAND)
-                .requires(commandSourceStack -> Optional.ofNullable(commandSourceStack.getPlayer()).isPresent() && commandSourceStack.hasPermission(2))
-                .then(Commands.argument("boolean", BoolArgumentType.bool())
-                        .executes(context -> {
-                            boolean isEnabledStamina = context.getArgument("boolean", Boolean.class);
-                            CommandSavedData data = CommandSavedData.get(context.getSource().getLevel());
-                            data.setStaminaState(isEnabledStamina);
-                            Component message = Component.literal(STAMINA_MSG)
-                                    .withStyle(ChatFormatting.GOLD)
-                                    .append(Component.literal(String.valueOf(isEnabledStamina)).withStyle(isEnabledStamina ? ChatFormatting.GREEN : ChatFormatting.DARK_RED));
-                            context.getSource().sendSuccess(() -> message, true);
-                            return Command.SINGLE_SUCCESS;
-                        }))
 
-        );
         dispatcher.register(Commands.literal(DOGTAG_COMMAND)
                 .requires(commandSourceStack ->
-                        Optional.ofNullable(commandSourceStack.getPlayer()).isPresent() && commandSourceStack.hasPermission(2))
+                        commandSourceStack.getPlayer() != null && commandSourceStack.hasPermission(2))
                 .then(Commands.argument("boolean", BoolArgumentType.bool())
                         .executes(context -> {
                             boolean isEnabledDogTag = context.getArgument("boolean", Boolean.class);
@@ -128,7 +128,7 @@ public class CommandManager {
 
         dispatcher.register(Commands.literal(EXP_BALLISTIC_COMMAND)
                 .requires(commandSourceStack ->
-                        Optional.ofNullable(commandSourceStack.getPlayer()).isPresent() && commandSourceStack.hasPermission(2))
+                        commandSourceStack.getPlayer() != null && commandSourceStack.hasPermission(2))
                 .executes(context -> {
                     CommandSavedData data = CommandSavedData.get(context.getSource().getLevel());
                     boolean currentState = data.experimentalBallistic;
@@ -151,28 +151,123 @@ public class CommandManager {
                         }))
         );
         dispatcher.register(Commands.literal(MODULAR_EQUIP_COMMAND)
-                .requires(commandSourceStack ->
-                        Optional.ofNullable(commandSourceStack.getPlayer()).isPresent() && commandSourceStack.hasPermission(2))
-                .then(Commands.argument("mount_id", StringArgumentType.string())
-                        .executes(context -> {
-                            ServerPlayer player = context.getSource().getPlayer();
-                            if (player == null) return Command.SINGLE_SUCCESS;
-                            ItemStack mainHandItem = player.getMainHandItem();
-                            ItemStack armor = player.getItemBySlot(EquipmentSlot.CHEST);
-                            boolean result = ModuleMountService.mount(
-                                    armor,
-                                    ResourceLocation.tryParse(context.getArgument("mount_id", String.class)),
-                                    mainHandItem
-                            );
-                            if (!result) {
-                                context.getSource().sendFailure(Component.literal("Failed to mount module"));
-                                return 0;
-                            }
-                            ModuleSyncService.sync(player, EquipmentSlot.CHEST);
-                            context.getSource().sendSuccess(() -> Component.literal(MODULAR_EQUIP_MSG + "true"), true);
-                            return Command.SINGLE_SUCCESS;
-                        })
-                )
-        );
+                .requires(source -> source.getPlayer() != null && source.hasPermission(2))
+                .then(Commands.argument("target", EntityArgument.entity())
+                        .then(Commands.argument("equipmentSlot", StringArgumentType.word())
+                                .suggests((ctx, builder) -> SharedSuggestionProvider.suggest(
+                                        Arrays.stream(EquipmentSlot.values()).map(EquipmentSlot::getName), builder))
+                                .then(Commands.argument("mount_id", StringArgumentType.string())
+                                        .suggests((ctx, builder) -> {
+                                                    Entity target = EntityArgument.getEntity(ctx, "target");
+                                                    if (!(target instanceof LivingEntity livingEntity)) {
+                                                        return SharedSuggestionProvider.suggest(List.of(), builder);
+                                                    }
+
+                                                    String inputSlot = StringArgumentType.getString(ctx, "equipmentSlot");
+                                                    EquipmentSlot equipmentSlot = Arrays.stream(EquipmentSlot.values())
+                                                            .filter(s -> s.getName().equals(inputSlot))
+                                                            .findFirst()
+                                                            .orElseThrow(() -> {
+                                                                ctx.getSource().sendFailure(Component.literal(FAILED_TO_MOUNT_MODULE_MSG));
+                                                                return new NoSuchElementException();
+                                                            });
+
+                                                    ItemStack stack = livingEntity.getItemBySlot(equipmentSlot);
+                                                    if (stack.getItem() instanceof ModularEquipment modularEquipment) {
+                                                        return SharedSuggestionProvider.suggest(
+                                                                modularEquipment.getMountDefinitions(stack).stream().map(ref -> ref.mountId().getPath()),
+                                                                builder
+                                                        );
+                                                    }
+                                                    return SharedSuggestionProvider.suggest(
+                                                            List.of(),
+                                                            builder
+                                                    );
+                                                }
+
+                                        )
+                                        .then(Commands.argument("module", ItemArgument.item(commandBuildContext))
+                                                .suggests((ctx, builder) -> {
+                                                    Entity target = EntityArgument.getEntity(ctx, "target");
+                                                    if (!(target instanceof LivingEntity livingEntity)) {
+                                                        return SharedSuggestionProvider.suggest(List.of(), builder);
+                                                    }
+
+                                                    String inputSlot = StringArgumentType.getString(ctx, "equipmentSlot");
+                                                    EquipmentSlot equipmentSlot = Arrays.stream(EquipmentSlot.values())
+                                                            .filter(s -> s.getName().equals(inputSlot))
+                                                            .findFirst()
+                                                            .orElseThrow(() -> {
+                                                                ctx.getSource().sendFailure(Component.literal(FAILED_TO_MOUNT_MODULE_MSG));
+                                                                return new NoSuchElementException();
+                                                            });
+
+                                                    ItemStack stack = livingEntity.getItemBySlot(equipmentSlot);
+
+                                                    if (stack.getItem() instanceof ModularEquipment modularEquipment) {
+                                                        ResourceLocation mountId = new ResourceLocation(
+                                                                ZeroContact.MOD_ID,
+                                                                StringArgumentType.getString(ctx, "mount_id")
+                                                        );
+                                                        MountDefinition def = modularEquipment.getMountDefinition(stack, mountId).orElse(null);
+                                                        if (def != null) {
+                                                            return SharedSuggestionProvider.suggest(
+                                                                    ModuleRegistry.getModulesFor(def).stream().map(module -> ZeroContact.MOD_ID + ":" + module.getItem()),
+                                                                    builder
+                                                            );
+                                                        }
+                                                    }
+
+                                                    return SharedSuggestionProvider.suggest(List.of(), builder);
+                                                })
+                                                .executes(context -> {
+                                                    Entity target = EntityArgument.getEntity(context, "target");
+                                                    if (!(target instanceof LivingEntity livingEntity)) {
+                                                        context.getSource().sendFailure(Component.literal(FAILED_TO_FIND_TARGET_MSG));
+                                                        return 0;
+                                                    }
+
+                                                    Item module = ItemArgument.getItem(context, "module").getItem();
+                                                    if (!(module instanceof EquipmentModule) && module != Items.AIR) {
+                                                        context.getSource().sendFailure(Component.literal(NOT_A_MODULE_ITEM_MSG));
+                                                        return 0;
+                                                    }
+
+                                                    String inputSlot = StringArgumentType.getString(context, "equipmentSlot");
+                                                    EquipmentSlot equipmentSlot = Arrays.stream(EquipmentSlot.values())
+                                                            .filter(s -> s.getName().equals(inputSlot))
+                                                            .findFirst()
+                                                            .orElseThrow(() -> {
+                                                                context.getSource().sendFailure(Component.literal(FAILED_TO_MOUNT_MODULE_MSG));
+                                                                return new NoSuchElementException();
+                                                            });
+
+                                                    ItemStack armor = livingEntity.getItemBySlot(equipmentSlot);
+                                                    ResourceLocation mountId = new ResourceLocation(
+                                                            ZeroContact.MOD_ID,
+                                                            StringArgumentType.getString(context, "mount_id")
+                                                    );
+
+                                                    boolean result;
+                                                    if (module != Items.AIR) {
+                                                        result = ModuleMountService.mount(
+                                                                armor, mountId, module.getDefaultInstance());
+                                                    } else {
+                                                        ItemStack stack = ModuleMountService.unMount(armor, mountId);
+                                                        result = !stack.isEmpty();
+                                                    }
+
+                                                    if (!result) {
+                                                        context.getSource().sendFailure(Component.literal(FAILED_TO_MOUNT_MODULE_MSG));
+                                                        return 0;
+                                                    }
+
+                                                    if (target instanceof Player player)
+                                                        ModuleSyncService.sync(player, equipmentSlot);
+
+                                                    context.getSource().sendSuccess(
+                                                            () -> Component.literal(MODULAR_EQUIP_MSG), true);
+                                                    return Command.SINGLE_SUCCESS;
+                                                }))))));
     }
 }
