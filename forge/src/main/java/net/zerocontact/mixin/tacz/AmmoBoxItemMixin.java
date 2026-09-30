@@ -48,10 +48,12 @@ public class AmmoBoxItemMixin {
     }
 
     @Inject(method = "overrideStackedOnOther",
+            remap = true,
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/resources/ResourceLocation;equals(Ljava/lang/Object;)Z",
-                    ordinal = 2
+                    ordinal = 2,
+                    remap = true
             ), cancellable = true)
     public void updateInsertBox(ItemStack ammoBox, Slot slot, ClickAction action, Player player, CallbackInfoReturnable<Boolean> cir) {
         boolean shouldCancel = zeroContact$updateCartridge(ammoBox, slot);

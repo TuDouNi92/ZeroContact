@@ -1,13 +1,20 @@
 package net.zerocontact.mixin.magazines;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.raiiiden.taczmagazines.item.MagazineAmmoSource;
 import com.raiiiden.taczmagazines.item.MagazineItem;
 import com.raiiiden.taczmagazines.magazine.MagazineFamilySystem;
 import com.tacz.guns.api.DefaultAssets;
+import com.tacz.guns.api.item.builder.AmmoItemBuilder;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
@@ -18,15 +25,16 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.caliber.AmmoInjector;
+import net.zerocontact.compat.MagazinesCompat;
+import net.zerocontact.compat.MagazinesCompatHandler;
 import net.zerocontact.item.ammo.GenerateAmmo;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
@@ -37,113 +45,81 @@ public abstract class MagazineItemMixin {
     @Shadow(remap = false)
     public abstract int getAmmoCount(ItemStack magazine);
 
-
-    @Inject(method = "overrideStackedOnOther",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lcom/raiiiden/taczmagazines/item/MagazineItem;setAmmoId(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/resources/ResourceLocation;)V",
-                    remap = false),
-            cancellable = true
-    )
-
-    //Called when holds the magazine and right-clicks on ammo
-    public void overrideStackedOnOtherLoad(ItemStack stack, Slot slot, ClickAction action, Player player, CallbackInfoReturnable<Boolean> cir) {
-        zeroContact$updateCartridge(stack, slot, cir);
+    @WrapMethod(method = "setAmmoCount", remap = false)
+    private void zeroContact$count(ItemStack magazine, int count, Operation<Void> original) {
+        int previous = getAmmoCount(magazine);
+        original.call(magazine, count);
+        MagazinesCompatHandler.get().getCompat().ifPresent(compat ->
+                compat.updateMagazineCount(magazine, previous, getAmmoCount(magazine)));
     }
 
-    @Unique
-    private void zeroContact$updateCartridge(ItemStack mag, Slot slot, CallbackInfoReturnable<Boolean> cir) {
-
-        ItemStack other = slot.getItem();
-        String familyId = getMagazineFamilyId(mag);
-        ResourceLocation familyAmmo = MagazineFamilySystem.getAmmoTypeForFamily(familyId);
-        if (familyAmmo == null) {
-            cir.setReturnValue(false);
-            return;
-        }
-        ResourceLocation ammoId = MagazineAmmoSource.compatibleAmmoId(other, familyAmmo);
-        if (ammoId == null || ammoId.equals(DefaultAssets.EMPTY_AMMO_ID)) {
-            cir.setReturnValue(false);
-            return;
-        }
-
-        AmmoInjector.AmmoContext contextFromAmmo = AmmoInjector.read(slot.getItem());
-        if (getAmmoCount(mag) <= 0) {
-            AmmoInjector.write(contextFromAmmo, mag);
-        }
-        AmmoInjector.AmmoContext contextFromMag = AmmoInjector.read(mag);
-        if (!contextFromAmmo.caliber().equals(contextFromMag.caliber())) {
-            cir.cancel();
+    @WrapMethod(method = "overrideStackedOnOther")
+    private boolean zeroContact$loadOnOther(ItemStack stack, Slot slot, ClickAction action,
+                                            Player player, Operation<Boolean> original) {
+        MagazinesCompat compat = MagazinesCompatHandler.get().getCompat().orElseThrow();
+        if (!slot.getItem().isEmpty() && !compat.canLoadAmmo(stack, slot.getItem())) return false;
+        try (var ignored = compat.beginTransfer(stack, slot.getItem(), player)) {
+            return original.call(stack, slot, action, player);
         }
     }
 
-
-    @ModifyVariable(
-            method = "overrideOtherStackedOnMe",
-            at = @At("STORE"),
-            name = "heldAmmoId",
-            remap = false
-    )
-    private ResourceLocation useHeldAmmoId(
-            ResourceLocation heldAmmoId,
-            ItemStack magazine,
-            ItemStack heldStack,
-            Slot slot,
-            ClickAction action,
-            Player player,
-            SlotAccess heldAccess
-    ) {
-        if (!player.getAbilities().instabuild) {
-            return heldAmmoId;
+    @WrapMethod(method = "overrideOtherStackedOnMe")
+    private boolean zeroContact$loadOnMe(ItemStack magazine, ItemStack heldStack, Slot slot, ClickAction action,
+                                         Player player, SlotAccess heldAccess, Operation<Boolean> original) {
+        MagazinesCompat compat = MagazinesCompatHandler.get().getCompat().orElseThrow();
+        if (!heldStack.isEmpty() && !compat.canLoadAmmo(magazine, heldStack)) return false;
+        try (var ignored = compat.beginTransfer(magazine, heldStack, player)) {
+            return original.call(magazine, heldStack, slot, action, player, heldAccess);
         }
-
-        String familyId = getMagazineFamilyId(magazine);
-        ResourceLocation familyAmmo =
-                MagazineFamilySystem.getAmmoTypeForFamily(familyId);
-
-        ResourceLocation actual =
-                MagazineAmmoSource.compatibleAmmoId(heldStack, familyAmmo);
-
-        return actual != null
-                && !actual.equals(DefaultAssets.EMPTY_AMMO_ID)
-                ? actual
-                : heldAmmoId;
     }
 
-    @Inject(method = "overrideOtherStackedOnMe",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lcom/raiiiden/taczmagazines/item/MagazineItem;getMaxCapacity(Lnet/minecraft/world/item/ItemStack;)I",
-                    remap = false),
-            cancellable = true)
-    public void overrideOtherStackedOnMeLeftLoad(ItemStack magazine, ItemStack heldStack, Slot slot, ClickAction action, Player player, SlotAccess heldAccess, CallbackInfoReturnable<Boolean> cir) {
-        zeroContact$updateCartridge(magazine, heldStack, cir);
+    @WrapMethod(method = {"transferOneBulletOut", "unloadAll"}, remap = false)
+    private boolean zeroContact$unload(ItemStack magazine, Player player, Operation<Boolean> original) {
+        MagazinesCompat compat = MagazinesCompatHandler.get().getCompat().orElseThrow();
+        try (var ignored = compat.beginTransfer(magazine, ItemStack.EMPTY, player)) {
+            return original.call(magazine, player);
+        }
     }
 
-    @Unique
-    private void zeroContact$updateCartridge(ItemStack mag, ItemStack ammoStack, CallbackInfoReturnable<Boolean> cir) {
+    @WrapMethod(method = "unloadAllCreative", remap = false)
+    private boolean zeroContact$unloadCreative(ItemStack magazine, Player player, SlotAccess heldAccess,
+                                               Operation<Boolean> original) {
+        MagazinesCompat compat = MagazinesCompatHandler.get().getCompat().orElseThrow();
+        try (var ignored = compat.beginTransfer(magazine, ItemStack.EMPTY, player)) {
+            return original.call(magazine, player, heldAccess);
+        }
+    }
 
-        String familyId = getMagazineFamilyId(mag);
-        ResourceLocation familyAmmo = MagazineFamilySystem.getAmmoTypeForFamily(familyId);
-        if (familyAmmo == null) {
-            cir.setReturnValue(false);
-            return;
+    @WrapMethod(method = "use")
+    private InteractionResultHolder<ItemStack> zeroContact$use(Level level, Player player,
+                                                               InteractionHand hand,
+                                                               Operation<InteractionResultHolder<ItemStack>> original) {
+        MagazinesCompat compat = MagazinesCompatHandler.get().getCompat().orElseThrow();
+        try (var ignored = compat.beginTransfer(player.getItemInHand(hand), ItemStack.EMPTY, player)) {
+            return original.call(level, player, hand);
         }
-        ResourceLocation ammoId = MagazineAmmoSource.compatibleAmmoId(ammoStack, familyAmmo);
-        if (ammoId == null || ammoId.equals(DefaultAssets.EMPTY_AMMO_ID)) {
-            cir.setReturnValue(false);
-            return;
-        }
+    }
 
+    @WrapOperation(method = {"transferOneBulletOut", "unloadAll", "unloadAllCreative"}, remap = false,
+            at = @At(value = "INVOKE", target = "Lcom/tacz/guns/api/item/builder/AmmoItemBuilder;build()Lnet/minecraft/world/item/ItemStack;", remap = false))
+    private ItemStack zeroContact$returnRound(AmmoItemBuilder builder, Operation<ItemStack> original) {
+        ItemStack result = original.call(builder);
+        return MagazinesCompatHandler.get().getCompat().map(compat -> compat.returnedRounds(result)).orElse(result);
+    }
 
-        AmmoInjector.AmmoContext contextFromAmmo = AmmoInjector.read(ammoStack);
-        if (getAmmoCount(mag) <= 0) {
-            AmmoInjector.write(contextFromAmmo, mag);
-        }
-        AmmoInjector.AmmoContext contextFromMag = AmmoInjector.read(mag);
-        if (!contextFromAmmo.caliber().equals(contextFromMag.caliber())) {
-            cir.cancel();
-        }
+    @WrapOperation(method = "use", at = @At(value = "INVOKE",
+            target = "Lcom/tacz/guns/api/item/builder/AmmoItemBuilder;build()Lnet/minecraft/world/item/ItemStack;", remap = false))
+    private ItemStack zeroContact$returnUsedRound(AmmoItemBuilder builder, Operation<ItemStack> original) {
+        return zeroContact$returnRound(builder, original);
+    }
+
+    @ModifyVariable(method = "overrideOtherStackedOnMe", at = @At("STORE"), name = "heldAmmoId", remap = false)
+    private ResourceLocation zeroContact$creativeAmmoId(ResourceLocation heldAmmoId, ItemStack magazine, ItemStack heldStack,
+                                                        Slot slot, ClickAction action, Player player, SlotAccess heldAccess) {
+        if (!player.getAbilities().instabuild) return heldAmmoId;
+        ResourceLocation familyAmmo = MagazineFamilySystem.getAmmoTypeForFamily(getMagazineFamilyId(magazine));
+        ResourceLocation actual = MagazineAmmoSource.compatibleAmmoId(heldStack, familyAmmo);
+        return actual != null && !actual.equals(DefaultAssets.EMPTY_AMMO_ID) ? actual : heldAmmoId;
     }
 
     @Inject(method = "appendHoverText",

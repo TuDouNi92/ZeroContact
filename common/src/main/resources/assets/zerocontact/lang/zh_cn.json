@@ -1,4 +1,8 @@
 {
+  "tooltip.zerocontact.magazine.current": "当前：%s",
+  "tooltip.zerocontact.magazine.next": "下一轮：%s",
+  "tooltip.zerocontact.magazine.empty": "空",
+  "tooltip.zerocontact.magazine.none": "无",
   "key.zerocontact.module_hud": "打开/关闭模块快捷菜单",
   "key.zerocontact.module_activate": "切换选中模块状态",
   "key.zerocontact.open_radio": "打开电台",
@@ -32,7 +36,7 @@
   "item.zerocontact.uniform_spn_bottom": "SPN (裤子)",
 
 
-  "itemGroup.zerocontact.zero_contact": "ZeroContact",
+  "itemGroup.zerocontact.zero_contact": "ZeroContact 杂项",
   "curios.modifiers.front_plate": "前插板",
   "curios.modifiers.back_plate": "后插板",
   "curios.identifier.front_plate": "前插板",

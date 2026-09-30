@@ -170,11 +170,12 @@ public enum CaliberHelper {
                 );
                 String finalId = ammoId;
 
-                if (ammoId.isEmpty()) {
+                if (ammoId.isEmpty() && gunData.getAmmoId() != null) {
                     finalId = gunData.getAmmoId().toString();
                 }
 
                 BulletData bulletData = gunData.getBulletData();
+                if (bulletData == null) return new Caliber(finalId, 1, 1, 1, 1, 0.1f);
                 ExplosionData explosionData = bulletData.getExplosionData();
                 Ignite ignite = bulletData.getIgnite();
                 boolean explosive = false;
@@ -204,7 +205,7 @@ public enum CaliberHelper {
                                         ? Integer.MAX_VALUE
                                         : Math.max((int) (explosionData.getDelay() * 20), 1)
                         ),
-                        new AmmoDataPOJO.Ignite(
+                        ignite == null ? AmmoDataPOJO.Ignite.NONE : new AmmoDataPOJO.Ignite(
                                 ignite.isIgniteBlock(),
                                 ignite.isIgniteEntity(),
                                 bulletData.getIgniteEntityTime()

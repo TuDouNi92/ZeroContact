@@ -1,4 +1,8 @@
 {
+  "tooltip.zerocontact.magazine.current": "Current: %s",
+  "tooltip.zerocontact.magazine.next": "Next: %s",
+  "tooltip.zerocontact.magazine.empty": "Empty",
+  "tooltip.zerocontact.magazine.none": "None",
   "key.zerocontact.module_hud": "Toggle Module Quick Menu",
   "key.zerocontact.module_activate": "Activate Selected Module",
   "key.zerocontact.open_radio": "Open Radio",
@@ -34,7 +38,7 @@
   "item.zerocontact.uniform_spn_top": "SPN (Uniform)",
   "item.zerocontact.uniform_spn_bottom": "SPN (Pants)",
   "item.zerocontact.kit_armor": "Armor repair kit",
-  "itemGroup.zerocontact.zero_contact": "ZeroContact",
+  "itemGroup.zerocontact.zero_contact": "ZeroContact Misc",
   "curios.modifiers.front_plate": "Front plate",
   "curios.modifiers.back_plate": "Back Plate",
   "curios.identifier.front_plate": "Front plate",

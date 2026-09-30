@@ -8,6 +8,8 @@
     "ClientReloadKeyHandlerMixin",
     "LoadOneFromHandPacketMixin",
     "MagazineItemMixin",
+    "GunMagazineCapabilityMixin",
+    "MagazineGunScriptAPIMixin",
     "MagazineReloadSourceMixin",
     "MagazineSelectorOverlayMixin",
     "UnloadOneFromHandPacketMixin"

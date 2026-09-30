@@ -1,60 +1,43 @@
 package net.zerocontact.mixin.magazines;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.raiiiden.taczmagazines.item.MagazineItem;
 import com.raiiiden.taczmagazines.network.BulletTransferPacket;
+import com.tacz.guns.api.item.builder.AmmoItemBuilder;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.zerocontact.caliber.AmmoInjector;
-import net.zerocontact.item.ammo.GenerateAmmo;
+import net.zerocontact.compat.MagazinesCompatHandler;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
 
 @Mixin(value = BulletTransferPacket.class, remap = false)
 public class BulletTransferPacketMixin {
-
-    @Unique
-    private static void zeroContact$updateCartridge(AbstractContainerMenu menu, ItemStack mag, MagazineItem magItem, CallbackInfo ci) {
-        ItemStack carriedAmmoOrBox = menu.getCarried();
-        AmmoInjector.AmmoContext contextFromAmmo = AmmoInjector.read(carriedAmmoOrBox);
-        if (magItem.getAmmoCount(mag) <= 0) {
-            AmmoInjector.write(contextFromAmmo, mag);
-            contextFromAmmo = AmmoInjector.read(carriedAmmoOrBox);
-        }
-        AmmoInjector.AmmoContext contextFromMag = AmmoInjector.read(mag);
-        if (!contextFromAmmo.caliber().equals(contextFromMag.caliber())) {
-            ci.cancel();
+    @WrapMethod(method = "handleLoad")
+    private static void zeroContact$load(ServerPlayer player, AbstractContainerMenu menu, ItemStack mag,
+                                         MagazineItem magItem, Operation<Void> original) {
+        var compat = MagazinesCompatHandler.get().getCompat().orElseThrow();
+        if (!menu.getCarried().isEmpty() && !compat.canLoadAmmo(mag, menu.getCarried())) return;
+        try (var ignored = compat.beginTransfer(mag, menu.getCarried(), player)) {
+            original.call(player, menu, mag, magItem);
         }
     }
 
-    @Inject(method = "handleLoad",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lcom/raiiiden/taczmagazines/item/MagazineItem;setAmmoId(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/resources/ResourceLocation;)V"), cancellable = true)
-    private static void handleLoad(ServerPlayer player, AbstractContainerMenu menu, ItemStack mag, MagazineItem magItem, CallbackInfo ci) {
-        zeroContact$updateCartridge(menu, mag, magItem, ci);
+    @WrapMethod(method = "handleUnload")
+    private static void zeroContact$unload(ServerPlayer player, AbstractContainerMenu menu, ItemStack mag,
+                                           MagazineItem magItem, Operation<Void> original) {
+        var compat = MagazinesCompatHandler.get().getCompat().orElseThrow();
+        try (var ignored = compat.beginTransfer(mag, ItemStack.EMPTY, player)) {
+            original.call(player, menu, mag, magItem);
+        }
     }
 
-
-    @ModifyVariable(
-            method = "handleUnload",
-            at = @At("STORE"),
-            name = "bullet"
-    )
-    private static ItemStack replaceBullet(ItemStack bullet, ServerPlayer player, AbstractContainerMenu menu, ItemStack mag, MagazineItem magItem) {
-        AmmoInjector.AmmoContext context = AmmoInjector.read(mag);
-        if (!context.isEmpty()) {
-            Item ammoItem = AmmoInjector.getAmmoVariantItem(context);
-            if (ammoItem != null) {
-                return ammoItem instanceof GenerateAmmo ? ammoItem.getDefaultInstance() : bullet;
-            }
-        }
-        return bullet;
+    @WrapOperation(method = "handleUnload", at = @At(value = "INVOKE",
+            target = "Lcom/tacz/guns/api/item/builder/AmmoItemBuilder;build()Lnet/minecraft/world/item/ItemStack;"))
+    private static ItemStack zeroContact$returnRound(AmmoItemBuilder builder, Operation<ItemStack> original) {
+        ItemStack result = original.call(builder);
+        return MagazinesCompatHandler.get().getCompat().map(compat -> compat.returnedRounds(result)).orElse(result);
     }
 }

@@ -1,77 +1,54 @@
 package net.zerocontact.mixin.magazines;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.raiiiden.taczmagazines.client.MagazineLoadingHandler;
+import com.tacz.guns.api.item.builder.AmmoItemBuilder;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.zerocontact.caliber.AmmoInjector;
-import net.zerocontact.item.ammo.GenerateAmmo;
+import net.zerocontact.compat.MagazinesCompatHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-@Mixin(MagazineLoadingHandler.class)
+@Mixin(value = MagazineLoadingHandler.class, remap = false)
 public class MagazineLoadingHandlerMixin {
+    @Shadow private static int containerSlot;
+    @Shadow private static boolean unloading;
 
-    @Shadow(remap = false)
-    private static int containerSlot;
-
-    @ModifyVariable(
-            method = "returnCreativeInventoryRound",
-            at = @At("STORE"),
-            name = "bullet",
-            remap = false
-    )
-    //This unload is triggered from  stack right-click action.
-    private static ItemStack zeroContact$replaceCreativeBullet(
-            ItemStack bullet,
-            LocalPlayer player,
-            ResourceLocation ammoId
-    ) {
-        // 从 MagazineLoadingHandler.containerSlot 对应的弹匣读取上下文
-        ItemStack magazine = player.getInventory().getItem(containerSlot);
-
-        AmmoInjector.AmmoContext context = AmmoInjector.read(magazine);
-        if (context.isEmpty()) {
-            return bullet;
-        }
-
-        Item item = AmmoInjector.getAmmoVariantItem(context);
-        if (item == null) {
-            return bullet;
-        }
-
-        ItemStack replacement = item instanceof GenerateAmmo ? item.getDefaultInstance() : bullet;
-        replacement.setCount(bullet.getCount());
-        return replacement;
+    @Shadow
+    private static AbstractContainerMenu getVisibleMenu(LocalPlayer player) {
+        throw new AssertionError();
     }
 
-    @ModifyVariable(
-            method = "creativeUnloadOneFromHand",
-            at = @At("STORE"),
-            name = "bullet",
-            remap = false
-    )
-    //This unload is triggered in hand.
-    private static ItemStack zeroContact$replaceCreativeBullet(
-            ItemStack bullet,
-            LocalPlayer player
-    ) {
-        ItemStack heldMag = player.getMainHandItem();
-        AmmoInjector.AmmoContext context = AmmoInjector.read(heldMag);
-        if (context.isEmpty()) {
-            return bullet;
+    @WrapMethod(method = "creativeTransferInventoryRound")
+    private static void zeroContact$inventory(LocalPlayer player, Operation<Void> original) {
+        ItemStack magazine = containerSlot >= 0 && containerSlot < player.getInventory().items.size()
+                ? player.getInventory().getItem(containerSlot) : ItemStack.EMPTY;
+        var compat = MagazinesCompatHandler.get().getCompat().orElseThrow();
+        // Creative ticking uses the visible menu (which can differ from containerMenu).
+        AbstractContainerMenu menu = getVisibleMenu(player);
+        ItemStack source = unloading || menu == null ? ItemStack.EMPTY : menu.getCarried();
+        if (!source.isEmpty() && !compat.canLoadAmmo(magazine, source)) return;
+        try (var ignored = compat.beginTransfer(magazine, source, player)) {
+            original.call(player);
         }
+    }
 
-        Item item = AmmoInjector.getAmmoVariantItem(context);
-        if (item == null) {
-            return bullet;
+    @WrapMethod(method = {"creativeLoadOneInHand", "creativeUnloadOneFromHand"})
+    private static void zeroContact$hand(LocalPlayer player, Operation<Void> original) {
+        var compat = MagazinesCompatHandler.get().getCompat().orElseThrow();
+        try (var ignored = compat.beginTransfer(player.getMainHandItem(), ItemStack.EMPTY, player)) {
+            original.call(player);
         }
+    }
 
-        ItemStack replacement = item instanceof GenerateAmmo ? item.getDefaultInstance() : bullet;
-        replacement.setCount(bullet.getCount());
-        return replacement;
+    @WrapOperation(method = {"returnCreativeInventoryRound", "creativeUnloadOneFromHand"},
+            at = @At(value = "INVOKE", target = "Lcom/tacz/guns/api/item/builder/AmmoItemBuilder;build()Lnet/minecraft/world/item/ItemStack;"))
+    private static ItemStack zeroContact$returnRound(AmmoItemBuilder builder, Operation<ItemStack> original) {
+        ItemStack result = original.call(builder);
+        return MagazinesCompatHandler.get().getCompat().map(compat -> compat.returnedRounds(result)).orElse(result);
     }
 }
