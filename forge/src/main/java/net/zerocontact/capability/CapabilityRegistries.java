@@ -13,6 +13,7 @@ import net.zerocontact.armor.modular.module.nvg.container.NvgContainer;
 import net.zerocontact.armor.modular.module.pouch.container.AdminPouchContainer;
 import net.zerocontact.armor.modular.module.pouch.container.navboard.NavBoardContainer;
 import net.zerocontact.armor.modular.module.pouch.container.PouchContainer;
+import net.zerocontact.armor.modular.module.radio.api.MBITR;
 
 public class CapabilityRegistries {
     public static Capability<ICartridgeHolder> CARTRIDGE;
@@ -25,6 +26,7 @@ public class CapabilityRegistries {
     public static Capability<BatteryContainer> BATTERY;
     public static Capability<BeaconContainer> BEACON;
     public static Capability<HeadsetContainer> HEADSET;
+    public static Capability<MBITR> RADIO;
 
     public static void register() {
         CARTRIDGE = CapabilityManager.get(new CapabilityToken<>() {
@@ -46,6 +48,8 @@ public class CapabilityRegistries {
         BEACON = CapabilityManager.get(new CapabilityToken<>() {
         });
         HEADSET = CapabilityManager.get(new CapabilityToken<>() {
+        });
+        RADIO = CapabilityManager.get(new CapabilityToken<>() {
         });
     }
 

@@ -1,6 +1,7 @@
 {
   "key.zerocontact.module_hud": "打开/关闭模块快捷菜单",
   "key.zerocontact.module_activate": "切换选中模块状态",
+  "key.zerocontact.open_radio": "打开电台",
   "hud.zerocontact.modules.empty": "没有可控制的模块",
   "screen.zerocontact.equipment.title": "装备模块",
   "screen.zerocontact.equipment.unmount": "拆下模块",

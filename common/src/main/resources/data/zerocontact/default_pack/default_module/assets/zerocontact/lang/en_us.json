@@ -13,6 +13,9 @@
   "state.zerocontact.admin_p.no_map": "Put map",
   "state.zerocontact.navboard.on": "On",
   "state.zerocontact.navboard.off": "Off",
+  "state.zerocontact.radio.on": "On",
+  "state.zerocontact.radio.off": "Off",
+
 
   "item.zerocontact.nvg_pvs31": "PVS-31 Night Vison Goggle (GP)",
   "item.zerocontact.nvg_pvs31a": "PVS-31A Night Vison Goggle (WP)",

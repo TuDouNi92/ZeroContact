@@ -23,6 +23,8 @@ import net.zerocontact.armor.modular.model.MountDefinition;
 import net.zerocontact.armor.modular.module.pouch.service.AdminPouchController;
 import net.zerocontact.armor.modular.module.pouch.service.NavBoardController;
 import net.zerocontact.armor.modular.module.pouch.capability.NavBoardProvider;
+import net.zerocontact.armor.modular.module.radio.capability.RadioProvider;
+import net.zerocontact.armor.modular.module.radio.service.MBITRController;
 import net.zerocontact.capability.CapabilityRegistries;
 import org.jetbrains.annotations.Nullable;
 
@@ -79,7 +81,10 @@ public final class ModuleRegistry {
                         new ResourceLocation(ZeroContact.MOD_ID, "beacon"),
                         new CapabilityEntry(CapabilityRegistries.BEACON, new BeaconController(), BeaconProvider::new),
                         new ResourceLocation(ZeroContact.MOD_ID, "headset"),
-                        new CapabilityEntry(CapabilityRegistries.HEADSET, new HeadsetController(), HeadsetProvider::new)
+                        new CapabilityEntry(CapabilityRegistries.HEADSET, new HeadsetController(), HeadsetProvider::new),
+                        new ResourceLocation(ZeroContact.MOD_ID, "radio"),
+                        new CapabilityEntry(CapabilityRegistries.RADIO, new MBITRController(), RadioProvider::new)
+
                 )
         );
     }

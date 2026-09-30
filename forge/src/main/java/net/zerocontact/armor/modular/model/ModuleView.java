@@ -9,9 +9,12 @@ import java.util.Optional;
 public record ModuleView(
         ResourceLocation stateId,
         List<ActionView> actions,
-        Optional<ResourceLocation> primaryActionId
+        Optional<ResourceLocation> primaryActionId,
+        Optional<ResourceLocation> operationId
 ) {
-    public ModuleView(ResourceLocation stateId, List<ActionView> actions) {
-        this(stateId, actions, Optional.empty());
+
+    public ModuleView(ResourceLocation stateId, List<ActionView> actions,
+                      Optional<ResourceLocation> primaryActionId) {
+        this(stateId, actions, primaryActionId, Optional.empty());
     }
 }

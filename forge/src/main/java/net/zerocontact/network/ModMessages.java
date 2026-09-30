@@ -7,17 +7,13 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
-import net.zerocontact.armor.modular.client.network.c2s.OpenModularMenuPacket;
-import net.zerocontact.armor.modular.client.network.c2s.ModuleActionPacket;
-import net.zerocontact.armor.modular.client.network.c2s.MountPacket;
-import net.zerocontact.armor.modular.client.network.c2s.UnMountPacket;
+import net.zerocontact.armor.modular.client.network.c2s.*;
 import net.zerocontact.network.c2s.*;
 import net.zerocontact.network.s2c.AppendSuppressionPacket;
 import net.zerocontact.network.s2c.ClientAmmoReloadPacket;
 import net.zerocontact.network.s2c.SyncStaminaPacket;
 import net.zerocontact.armor.modular.client.network.s2c.SyncModulesPacket;
 import net.zerocontact.armor.modular.client.network.s2c.SyncEquipmentCandidatesPacket;
-import net.zerocontact.armor.modular.client.network.c2s.SelectEquipmentMountPacket;
 import net.zerocontact.network.s2c.ToggleVisorResultPacket;
 import net.zerocontact.armor.modular.client.network.s2c.UpdateNavBoardPacket;
 
@@ -129,6 +125,11 @@ public class ModMessages {
                 .decoder(UpdateNavBoardPacket::decode)
                 .encoder(UpdateNavBoardPacket::encode)
                 .consumerMainThread(UpdateNavBoardPacket::handle)
+                .add();
+        net.messageBuilder(ModuleDataPacket.class,id(),NetworkDirection.PLAY_TO_SERVER)
+                .decoder(ModuleDataPacket::decode)
+                .encoder(ModuleDataPacket::encode)
+                .consumerMainThread(ModuleDataPacket::handle)
                 .add();
     }
 

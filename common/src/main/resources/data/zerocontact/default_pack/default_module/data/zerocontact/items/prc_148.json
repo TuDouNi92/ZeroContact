@@ -2,7 +2,7 @@
   "type": "module",
   "id": "prc_148",
   "mount_type": "pouch",
-  "module_trait": "pouch",
+  "module_trait": "radio",
   "durability": 32,
   "texture": "textures/models/pouch/prc_148.png",
   "model": "geo/pouch/prc_148.geo.json",

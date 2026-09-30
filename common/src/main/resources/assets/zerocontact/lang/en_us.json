@@ -1,6 +1,7 @@
 {
   "key.zerocontact.module_hud": "Toggle Module Quick Menu",
   "key.zerocontact.module_activate": "Activate Selected Module",
+  "key.zerocontact.open_radio": "Open Radio",
   "hud.zerocontact.modules.empty": "No controllable modules",
   "screen.zerocontact.equipment.title": "Equipment modules",
   "screen.zerocontact.equipment.unmount": "Unmount module",

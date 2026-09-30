@@ -73,6 +73,7 @@ allprojects {
         maven{
             url = "https://jitpack.io"
         }
+        maven { url = 'https://maven.maxhenkel.de/repository/public' }
     }
 
     tasks.withType(JavaCompile) {
