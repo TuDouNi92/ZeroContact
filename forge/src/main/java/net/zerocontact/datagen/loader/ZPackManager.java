@@ -29,6 +29,7 @@ import java.util.zip.ZipInputStream;
 
 public class ZPackManager implements IPackManager {
     private static final Path LOCAL_PACK_ROOT = Paths.get("config/zerocontact/packs");
+    public static final String OLD_DEFAULT_PACK = "zero_contact";
     public final Set<Zpack> outerPacks = new HashSet<>();
     private static final Set<Pack> vanillaPacks = new HashSet<>();
     private final ZAssetManager assetManager;
@@ -83,7 +84,7 @@ public class ZPackManager implements IPackManager {
 
                         String name = entry.getName();
                         Path localPack = LOCAL_PACK_ROOT.resolve(name);
-                        
+
                         if (entry.isDirectory()) {
                             Files.createDirectories(localPack);
                         } else {
@@ -108,14 +109,21 @@ public class ZPackManager implements IPackManager {
                             assetManager.deserializeFromManifest(
                                     packPath.resolve(MANIFEST_PATH), assetManager.getGson(),
                                     ManifestPOJO.class,
-                                    data -> outerPacks.add(
-                                            new Zpack(
-                                                    data.tabName(),
-                                                    packPath,
-                                                    data.author(),
-                                                    data.version())
-                                    ));
-                        } catch (IllegalArgumentException | IOException e) {
+                                    data -> {
+                                        String packName = data.tabName();
+                                        if (packName.equals(OLD_DEFAULT_PACK)) {
+                                            ZeroContactLogger.LOG.warn("Detected deprecated pack: {}. Ignoring", packName);
+                                        } else {
+                                            outerPacks.add(
+                                                    new Zpack(
+                                                            packName,
+                                                            packPath,
+                                                            data.author(),
+                                                            data.version())
+                                            );
+                                        }
+                                    });
+                        } catch (Exception e) {
                             ZeroContactLogger.LOG.error(e);
                         }
                     });
