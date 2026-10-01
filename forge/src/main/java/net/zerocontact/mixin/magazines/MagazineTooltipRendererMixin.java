@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(value = MagazineTooltipRenderer.class)
 public abstract class MagazineTooltipRendererMixin {
     @Final
-    @Shadow
+    @Shadow(remap = false)
     private MagazineTooltipData data;
 
     @Shadow

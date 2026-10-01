@@ -10,7 +10,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.caliber.compat.ReloadManager;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -19,11 +18,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ClientReloadKeyHandler.class)
 public class ClientReloadKeyHandlerMixin {
 
-
-    @Shadow(remap = false)
-    private static int resolveExtLevel(ItemStack mag) {
-        throw new UnsupportedOperationException("Implemented via mixin");
-    }
     @Redirect(
             method = "onReloadKeyReleased",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Inventory;getItem(I)Lnet/minecraft/world/item/ItemStack;", remap = true),
@@ -37,8 +31,8 @@ public class ClientReloadKeyHandlerMixin {
         return ItemStack.EMPTY;
     }
 
-    @Inject(method = "resolveFirstCompatibleExtLevel", at = @At("HEAD"), remap = false, cancellable = true)
-    private static void redirectNonSelectorMagSlot(ItemStack gun, Inventory inv, CallbackInfoReturnable<Integer> cir) {
+    @Inject(method = "firstCompatibleMagazine", at = @At("HEAD"), remap = false, cancellable = true)
+    private static void redirectNonSelectorMagSlot(ItemStack gun, Inventory inv, CallbackInfoReturnable<ItemStack> cir) {
         Player player = Minecraft.getInstance().player;
         if (player == null) return;
         ReloadManager.ReloadInventory inventory = ReloadManager.resolveReloadInv(player);
@@ -47,12 +41,12 @@ public class ClientReloadKeyHandlerMixin {
             Item item = stack.getItem();
             if (item instanceof MagazineItem magazineItem) {
                 if (magazineItem.isAmmoBoxOfGun(gun, stack)) {
-                    cir.setReturnValue(resolveExtLevel(stack));
+                    cir.setReturnValue(stack);
                     return;
                 }
             }
 
         }
-        cir.setReturnValue(0);
+        cir.setReturnValue(ItemStack.EMPTY);
     }
 }

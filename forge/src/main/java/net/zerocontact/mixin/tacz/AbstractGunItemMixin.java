@@ -1,6 +1,8 @@
 package net.zerocontact.mixin.tacz;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.IAmmo;
 import com.tacz.guns.api.item.IAmmoBox;
@@ -17,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.zerocontact.api.caliber.ICartridgeHolder;
 import net.zerocontact.caliber.AmmoInjector;
+import net.zerocontact.caliber.compat.MagazineReloadCheck;
 import net.zerocontact.caliber.compat.ReloadManager;
 import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.compat.MagazinesCompatHandler;
@@ -31,6 +34,13 @@ public abstract class AbstractGunItemMixin implements IGun {
 
     @Shadow(remap = false)
     public abstract boolean useInventoryAmmo(ItemStack gun);
+
+    @WrapMethod(method = "canReload", remap = false)
+    private boolean zeroContact$checkMagazineReloadInventory(LivingEntity shooter, ItemStack gunItem,
+                                                             Operation<Boolean> original) {
+        // The magazine mod's canReload injector queries the player's capability directly.
+        return MagazineReloadCheck.withShooter(shooter, () -> original.call(shooter, gunItem));
+    }
 
 
     @Inject(method = "canReload", at = @At("HEAD"), remap = false, cancellable = true)

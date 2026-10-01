@@ -53,7 +53,7 @@ public class AmmoBoxItemMixin {
                     value = "INVOKE",
                     target = "Lnet/minecraft/resources/ResourceLocation;equals(Ljava/lang/Object;)Z",
                     ordinal = 2,
-                    remap = true
+                    remap = false
             ), cancellable = true)
     public void updateInsertBox(ItemStack ammoBox, Slot slot, ClickAction action, Player player, CallbackInfoReturnable<Boolean> cir) {
         boolean shouldCancel = zeroContact$updateCartridge(ammoBox, slot);
