@@ -131,6 +131,11 @@ public class ModMessages {
                 .encoder(ModuleDataPacket::encode)
                 .consumerMainThread(ModuleDataPacket::handle)
                 .add();
+        net.messageBuilder(EquipPlatePacket.class,id(),NetworkDirection.PLAY_TO_SERVER)
+                .decoder(EquipPlatePacket::decode)
+                .encoder(EquipPlatePacket::encode)
+                .consumerMainThread(EquipPlatePacket::handle)
+                .add();
     }
 
     public static <MSG> void sendToTrackingAndSelf(MSG msg, Entity entity) {

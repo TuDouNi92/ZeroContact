@@ -40,8 +40,9 @@ public interface PlateInfoProvider extends ICurioItem, ICombatArmorItem {
     }
 
     default boolean canEquipFromUse(SlotContext slotContext, ItemStack stack) {
-        return true;
+        return false;
     }
+
 
     default void curioTick(SlotContext slotContext, ItemStack stack) {
         ArmorUnEquippedHelper.onArmorUnequipped(slotContext, stack);

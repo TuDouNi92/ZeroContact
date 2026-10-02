@@ -1,0 +1,62 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"plateAnimation": {
+			"loop": true
+		},
+		"install": {
+			"animation_length": 1.4583,
+			"bones": {
+				"cult_locust": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.0417": {
+							"vector": [0, -15, 0],
+							"easing": "easeInQuart"
+						},
+						"0.3333": {
+							"vector": [0, -90, 0],
+							"easing": "easeOutQuart"
+						},
+						"0.4167": {
+							"vector": [87.2512, -87.4971, -87.2538],
+							"easing": "easeOutElastic"
+						},
+						"0.5833": {
+							"vector": [0, -90, -7.5]
+						},
+						"1.125": {
+							"vector": [0, -90, 2.5]
+						}
+					},
+					"position": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.0417": {
+							"vector": [0, -0.01, -0.05]
+						},
+						"0.375": {
+							"vector": [0, -2.08, -9],
+							"easing": "easeInExpo"
+						},
+						"0.4583": {
+							"vector": [0, -2.08, -8],
+							"easing": "easeInExpo"
+						},
+						"1.2083": {
+							"vector": [0, -7.08, -8],
+							"easing": "easeInOutQuint"
+						},
+						"1.4167": {
+							"vector": [0, -28.08, -8],
+							"easing": "easeOutQuint"
+						}
+					}
+				}
+			}
+		}
+	}
+}

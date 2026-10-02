@@ -12,7 +12,7 @@
 			},
 			"bones": [
 				{
-					"name": "slime",
+					"name": "cult_locust",
 					"pivot": [0, 10.38198, 0],
 					"cubes": [
 						{
