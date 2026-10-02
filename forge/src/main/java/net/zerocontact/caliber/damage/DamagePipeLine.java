@@ -191,7 +191,7 @@ public class DamagePipeLine {
                 FirstAidCompatHandler firstAidCompatHandler = FirstAidCompatHandler.create(context.target(), current.finalSource);
                 if (firstAidCompatHandler == null) return current;
                 if (!firstAidCompatHandler.getLimbsApplicable()) return current;
-                float limbsScale = 0.25f;
+                float limbsScale = ModConfigs.SERVER.firstAidLimbsFactor().get().floatValue();
                 return current
                         .finalAmount(
                                 getHurtAmount(

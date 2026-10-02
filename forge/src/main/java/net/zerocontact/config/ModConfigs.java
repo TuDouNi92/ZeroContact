@@ -11,16 +11,6 @@ public class ModConfigs {
     public static final Client CLIENT;
     public static final Server SERVER;
 
-    public static final String CLIENT_SIDE = "client";
-    public static final String SERVER_SIDE = "server";
-
-    public static final String BULLET_SUPPRESSION = "bulletSuppression";
-    public static final String FLESH_ON_UNARMORED = "fleshDamageOnUnarmored";
-    public static final String TRAJECTORY_TOOLTIP = "trajectoryTooltip";
-    public static final String AMMO_TYPE_OVERLAY = "ammoTypeOverlay";
-    public static final String AMMO_TYPE_TOOLTIP = "ammoTypeToolTip";
-    public static final String AUDIO_EFFECT = "audioEffect";
-
     static {
         Pair<Client, ForgeConfigSpec> clientPair = new ForgeConfigSpec.Builder()
                 .configure(Client::new);
@@ -48,9 +38,32 @@ public class ModConfigs {
         }
     }
 
-    public record Server(ForgeConfigSpec.BooleanValue enableUniversalFleshDamage) {
+    public record Server(
+            ForgeConfigSpec.BooleanValue enableUniversalFleshDamage,
+            ForgeConfigSpec.DoubleValue firstAidLimbsFactor,
+            ForgeConfigSpec.DoubleValue firstAidHeadFactor
+    ) {
+
+        public static final String DAMAGE_CAT = "damage";
+
+        public static final String FIRST_AID_CAT = "first_aid";
+
+        public static final String FLESH_ON_UNARMORED = "flesh_damage_on_unarmored";
+        public static final String LIMBS_FACTOR = "limbs_factor";
+        private static final String HEAD_FACTOR = "head_factor";
+
+        public static final String UNIVERSAL_FLESH_DAMAGE_COM = "Universal flesh damage";
+        public static final String DAMAGE_FACTOR_FOR_LIMBS_COM = "Adjust the damage factor for limbs";
+        private static final String DAMAGE_FACTOR_FOR_HEAD_COM = "Adjust the damage factor for head";
+
+
+
         Server(ForgeConfigSpec.Builder builder) {
-            this(buildConfig(builder, SERVER_SIDE, "Universal flesh damage", FLESH_ON_UNARMORED, true));
+            this(
+                    buildBoolConfig(builder, DAMAGE_CAT, UNIVERSAL_FLESH_DAMAGE_COM, FLESH_ON_UNARMORED, true),
+                    buildDoubleConfig(builder, FIRST_AID_CAT, DAMAGE_FACTOR_FOR_LIMBS_COM, LIMBS_FACTOR,0.25d),
+                    buildDoubleConfig(builder, FIRST_AID_CAT, DAMAGE_FACTOR_FOR_HEAD_COM, HEAD_FACTOR,0.2d)
+            );
         }
     }
 
@@ -61,23 +74,49 @@ public class ModConfigs {
             ForgeConfigSpec.BooleanValue ammoTypeOverLay,
             ForgeConfigSpec.BooleanValue ammoTypeTooltip
             ) {
+
+        public static final String TOOLTIP_CAT = "tooltips";
+        public static final String SOUND_EFFECTS_VISUAL_EFFECTS_CAT = "sound_and_visual_effects";
+
+        public static final String BULLET_SUPPRESSION = "bullet_suppression";
+        public static final String TRAJECTORY_TOOLTIP = "trajectory_tooltip";
+        public static final String AMMO_TYPE_OVERLAY = "ammo_type_Overlay";
+        public static final String AMMO_TYPE_TOOLTIP = "ammo_type_toolTip";
+        public static final String AUDIO_EFFECT = "audio_effect";
+
+        public static final String TRAJECTORY_TOOLTIP_COM = "Shows trajectory while holding the gun and inspect inventory ammo";
+        public static final String AMMO_TYPE_OVERLAY_COM = "Shows ammo type overlay";
+        public static final String AMMO_TYPE_TOOLTIP_COM = "Shows ammo type tooltip";
+        public static final String ENHANCED_AUDIO_EFFECT_COM = "Enhance the gunfire so the Headset lowering noises work as expectedly";
+        public static final String BULLET_SUPPRESSION_EFFECT_COM = "React to incoming bullets by visual and sounds";
+
         Client(ForgeConfigSpec.Builder builder) {
             this(
-                    buildConfig(builder,CLIENT_SIDE,"Enhanced Audio Effect", AUDIO_EFFECT,true),
-                    buildConfig(builder, CLIENT_SIDE, "Bullet suppression effect", BULLET_SUPPRESSION, true),
-                    buildConfig(builder, CLIENT_SIDE, "Trajectory tooltip", TRAJECTORY_TOOLTIP, true),
-                    buildConfig(builder, CLIENT_SIDE, "Ammo type overlay", AMMO_TYPE_OVERLAY, true),
-                    buildConfig(builder, CLIENT_SIDE, "Ammo type tooltip", AMMO_TYPE_TOOLTIP, true)
+                    buildBoolConfig(builder, SOUND_EFFECTS_VISUAL_EFFECTS_CAT, ENHANCED_AUDIO_EFFECT_COM, AUDIO_EFFECT,true),
+                    buildBoolConfig(builder, SOUND_EFFECTS_VISUAL_EFFECTS_CAT, BULLET_SUPPRESSION_EFFECT_COM, BULLET_SUPPRESSION, true),
+                    buildBoolConfig(builder, TOOLTIP_CAT, TRAJECTORY_TOOLTIP_COM, TRAJECTORY_TOOLTIP, true),
+                    buildBoolConfig(builder, TOOLTIP_CAT, AMMO_TYPE_OVERLAY_COM, AMMO_TYPE_OVERLAY, true),
+                    buildBoolConfig(builder, TOOLTIP_CAT, AMMO_TYPE_TOOLTIP_COM, AMMO_TYPE_TOOLTIP, true)
             );
         }
     }
 
-    private static ForgeConfigSpec.BooleanValue buildConfig(ForgeConfigSpec.Builder builder, String side, String comment, String path, boolean defaultValue) {
+    private static ForgeConfigSpec.BooleanValue buildBoolConfig(ForgeConfigSpec.Builder builder, String categoryName, String comment, String path, boolean defaultValue) {
         final ForgeConfigSpec.BooleanValue value;
-        builder.push(side);
+        builder.push(categoryName);
         value = builder
                 .comment(comment)
                 .define(path, defaultValue);
+        builder.pop();
+        return value;
+    }
+
+    private static ForgeConfigSpec.DoubleValue buildDoubleConfig(ForgeConfigSpec.Builder builder, String categoryName, String comment, String path, double defaultValue) {
+        final ForgeConfigSpec.DoubleValue value;
+        builder.push(categoryName);
+        value =  builder
+                .comment(comment)
+                .defineInRange(path, defaultValue,0.1,128);
         builder.pop();
         return value;
     }

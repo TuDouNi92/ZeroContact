@@ -26,6 +26,7 @@ import net.zerocontact.caliber.extension.HookEventTrigger;
 import net.zerocontact.caliber.extension.model.HookContext;
 import net.zerocontact.caliber.registry.MobRuleRegistry;
 import net.zerocontact.compat.FirstAidCompatHandler;
+import net.zerocontact.config.ModConfigs;
 import net.zerocontact.datagen.model.MobRulesPOJO;
 
 import java.util.Optional;
@@ -84,7 +85,7 @@ public class PlateEntityHurtEvent {
                 eventPre.setBaseAmount(hurtAmount);
 
                 if (firstAidCompat != null && firstAidCompat.getHeadApplicable()) {
-                    eventPre.setHeadshotMultiplier(0.2f);
+                    eventPre.setHeadshotMultiplier(ModConfigs.SERVER.firstAidHeadFactor().get().floatValue());
                 } else {
                     eventPre.setHeadshotMultiplier(1f);
                 }
