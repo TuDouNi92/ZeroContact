@@ -26,13 +26,12 @@ public class ServerForgeEventBus {
         ModMessages.register();
         TickEvent.PLAYER_PRE.register(PlayerStamina::staminaTick);
         TickEvent.SERVER_LEVEL_POST.register(ZCEffect.Tick::serverTick);
-        dev.architectury.event.events.common.EntityEvent.LIVING_HURT.register(PlateEntityHurtEvent::entityHurtRegister);
         dev.architectury.event.events.common.EntityEvent.LIVING_HURT.register(PlateDamageEvent::register);
     }
 
     @SubscribeEvent
-    public static void entityHurtByGunEvent(EntityHurtByGunEvent event) {
-        PlateEntityHurtEvent.modifyEventIfHeadshot(event);
+    public static void entityHurtByGunEvent(EntityHurtByGunEvent.Pre event) {
+        PlateEntityHurtEvent.modifyDamage(event);
         PlateDamageEvent.damageHelmet(event);
     }
 

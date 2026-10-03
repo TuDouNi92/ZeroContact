@@ -1,17 +1,18 @@
 package net.zerocontact.caliber.damage.model;
 
 import net.minecraft.world.damagesource.DamageSource;
-import net.zerocontact.api.armor.ICombatArmorItem;
-import org.jetbrains.annotations.Nullable;
+import net.zerocontact.events.HitProcessEvent;
+import net.zerocontact.events.ResolveHitBodyPartEvent.HitPart;
 
 public record DamageResult(
-        boolean isBullet,
         boolean isHeadshot,
         float finalAmount,
         DamageSource finalSource,
-        @Nullable ICombatArmorItem armorProvider,
-        @Nullable ICombatArmorItem plateProvider,
-        boolean shouldCancelEvent,
-        boolean shouldStopExecute
+        HitProcessEvent.EventArmorContext armorContext,
+        HitProcessEvent.EventAmmoContext ammoContext,
+        HitProcessEvent.ZHitOutcome outcome,
+        boolean shouldReplaceDamage,
+        boolean shouldStopExecute,
+        HitPart hitPart
 ) {
 }

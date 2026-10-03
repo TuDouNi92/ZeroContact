@@ -1,22 +1,24 @@
 package net.zerocontact.caliber.damage;
 
-import com.tacz.guns.entity.EntityKineticBullet;
-import com.tacz.guns.init.ModDamageTypes;
+import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
+import com.tacz.guns.api.event.common.GunDamageSourcePart;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.DamageTypeTags;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.api.armor.ICombatArmorItem;
+import net.zerocontact.api.armor.HelmetInfoProvider;
 import net.zerocontact.caliber.damage.model.DamageContext;
 import net.zerocontact.caliber.damage.model.DamageResult;
 import net.zerocontact.caliber.registry.MobRuleRegistry;
 import net.zerocontact.config.ModConfigs;
-import net.zerocontact.compat.FirstAidCompatHandler;
 import net.zerocontact.datagen.model.MobRulesPOJO;
+import net.zerocontact.events.PlateEntityHurtEvent;
+import net.zerocontact.events.HitProcessEvent;
+import net.zerocontact.events.ResolveHitBodyPartEvent.HitPartEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,12 +32,10 @@ public class DamagePipeLine {
         plugins.addAll(List.of(
                 new Modifiers.PlayerFilter(),
                 new Modifiers.HeadShotProvider(),
-                new Modifiers.BulletProvider(),
-                new Modifiers.BulletSourceFilter(),
-                new Modifiers.DamageSourceModifier(),
                 new Modifiers.DamageAmountModifier(),
                 new Modifiers.MobRule(),
-                new Modifiers.FirstAidCptCompat()
+                new Modifiers.HitPartDamageFactor(),
+                new Modifiers.DamageSourceModifier()
         ));
     }
 
@@ -43,6 +43,7 @@ public class DamagePipeLine {
         DamageResultBuilder currentResult = DamageResultBuilder.create().fromContext(context);
         for (DamageModifier plugin : plugins) {
             currentResult = plugin.apply(context, currentResult);
+            if (currentResult.stopExecute) break;
         }
         return currentResult.build();
     }
@@ -58,7 +59,7 @@ public class DamagePipeLine {
             @Override
             public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
                 DamageResultBuilder builder = current;
-                if (context.target() instanceof ServerPlayer player && player.isCreative()) {
+                if (context.event().getHurtEntity() instanceof ServerPlayer player && player.isCreative()) {
                     builder = current.stopExecute(true);
                 }
                 return builder;
@@ -68,105 +69,112 @@ public class DamagePipeLine {
         public static class HeadShotProvider implements DamageModifier {
             @Override
             public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
-                EntityKineticBullet.EntityResult result = HitUtil.getHitResult(context.source());
-                return current.withHeadshot(result != null && result.isHeadshot());
+                boolean headshot = context.hitPart().hitPart() == HitPartEnum.HEAD;
+                context.event().setHeadshot(headshot);
+                return current.withHeadshot(headshot);
             }
         }
 
         public static class DamageSourceModifier implements DamageModifier {
             @Override
             public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
-                DamageSource source = ZDamageTypes.create(
-                        context.target().level(),
-                        context.source().getDirectEntity(),
-                        context.source().getEntity(),
-                        context.source().getSourcePosition());
+                var source = context.event().getDamageSource(GunDamageSourcePart.NON_ARMOR_PIERCING);
+                if (context.event().getHurtEntity() != null) {
+                    source = ZDamageTypes.create(
+                            current.build(),
+                            context.event().getHurtEntity().level(),
+                            context.event().getBullet(),
+                            context.event().getAttacker(),
+                            context.event().getBullet().position(),
+                            false
+                    );
+                }
                 return current.finalSource(source);
             }
         }
 
-
-        public static class BulletProvider implements DamageModifier {
-            @Override
-            public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
-                if (!context.source().is(ModDamageTypes.BULLETS_TAG)) {
-                    return current.stopExecute(true);
-                } else if (!context.armor().isEmpty() || !context.plate().isEmpty()) {
-                    return current.withBullet(true).shouldCancelEvent(true);
-                } else if (ModConfigs.SERVER.enableUniversalFleshDamage().get()) {
-                    return current.withBullet(true).shouldCancelEvent(true);
-                }
-                return current.shouldCancelEvent(false).stopExecute(true);
-            }
-        }
-
-        public static class BulletSourceFilter implements DamageModifier {
-            @Override
-            public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
-
-                //Intercepting bypass armor damage for proper damage generation and leave the general source
-                if (context.source().is(ModDamageTypes.BULLET_IGNORE_ARMOR) && context.source().typeHolder().containsTag(DamageTypeTags.BYPASSES_ARMOR)) {
-                    if (!context.armor().isEmpty() || !context.plate().isEmpty()) {
-                        return current.shouldCancelEvent(true).stopExecute(true);
-                    }
-
-                    //Interception for unarmored entity while config enabled
-                    else if (ModConfigs.SERVER.enableUniversalFleshDamage().get()) {
-                        return current.shouldCancelEvent(true).stopExecute(true);
-                    }
-
-                    //final case for unarmored and disabled config
-                    return current.shouldCancelEvent(false).stopExecute(true);
-                }
-                return current;
-            }
-        }
 
         public static class DamageAmountModifier implements DamageModifier {
             @Override
             public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
                 ItemStack armor = context.armor();
                 ItemStack plate = context.plate();
-                float finalHurtAmount = context.originalAmount();
+                DamageProcessor.DamageCalcCtx calculation =
+                        DamageProcessor.DamageCalcCtx.unprocessed(context.event().getBaseAmount());
+                DamageResultBuilder builder = current;
+
+                // Limb hits do not pass through a helmet, plate or chest armor.
+                if (context.hitPart().isLimb()) {
+                    return builder.fromCalculation(getHurtAmount(
+                                    context.event().getHurtEntity(),
+                                    context.event().getDamageSource(GunDamageSourcePart.NON_ARMOR_PIERCING),
+                                    context.event().getBaseAmount(), null, null, 0))
+                            .shouldReplaceDamage(true);
+                }
 
                 //Generate damage for unarmored entity
                 if (ModConfigs.SERVER.enableUniversalFleshDamage().get()) {
-                    finalHurtAmount = getHurtAmount(context.target(), context.source(), context.originalAmount(), null, null, 0);
+                    calculation = getHurtAmount(context.event().getHurtEntity(), context.event().getDamageSource(GunDamageSourcePart.NON_ARMOR_PIERCING), context.event().getBaseAmount(), null, null, 0);
+                    builder = builder.shouldReplaceDamage(true);
                 }
 
-                DamageResultBuilder builder = current;
+                if (context.event().isHeadShot()) {
+                    context.event().setBaseAmount(calculation.outputDamage());
+                    calculation = PlateEntityHurtEvent.modifyEventIfHeadshot(context.event(), calculation);
+                    int protectionLevel = armor.getItem() instanceof HelmetInfoProvider
+                            && armor.getItem() instanceof ICombatArmorItem armorProvider
+                            && armor.getMaxDamage() - armor.getDamageValue() > 1
+                            ? armorProvider.getAbsorb() : 0;
+                    return builder
+                            .withHeadshot(true)
+                            .setArmorContext(new HitProcessEvent.EventArmorContext(armor, plate, protectionLevel, 0))
+                            .fromCalculation(calculation)
+                            .shouldReplaceDamage(true)
+                            .finalAmount(context.event().getBaseAmount() * context.event().getHeadshotMultiplier());
+                }
+
+
                 if (!armor.isEmpty() || !plate.isEmpty()) {
                     //Generate damage for plate-carrier
                     if (!armor.isEmpty() && !plate.isEmpty()) {
                         if (armor.getItem() instanceof ICombatArmorItem armorProvider && plate.getItem() instanceof ICombatArmorItem plateProvider) {
+                            int protectionLevel = plateProvider.getAbsorb();
+                            builder = builder.setArmorContext(new HitProcessEvent.EventArmorContext(
+                                    armor, plate, 0, protectionLevel));
+                            calculation = getHurtAmount(context.event().getHurtEntity(), context.event().getDamageSource(GunDamageSourcePart.NON_ARMOR_PIERCING), context.event().getBaseAmount(), plateProvider, armorProvider, protectionLevel);
                             if (armor.getMaxDamage() - armor.getDamageValue() <= 1) {
-                                finalHurtAmount = getHurtAmount(context.target(), context.source(), context.originalAmount(), plateProvider, armorProvider, plateProvider.getAbsorb()) * (1 + armorProvider.generateBlunt());
-                                return builder.shouldCancelEvent(true).finalAmount(finalHurtAmount);
+                                return builder
+                                        .fromCalculation(calculation)
+                                        .shouldReplaceDamage(true)
+                                        .finalAmount(calculation.outputDamage() * (1 + armorProvider.generateBlunt()));
                             }
-                            builder = builder.withPlateProvider(plateProvider);
-                            finalHurtAmount = getHurtAmount(context.target(), context.source(), context.originalAmount(), plateProvider, armorProvider, plateProvider.getAbsorb());
                         }
                     }
-                    //Generate damage for body armor
+                    //Generate damage for body armor/helmet
                     else if (!armor.isEmpty()) {
+
                         if (armor.getItem() instanceof ICombatArmorItem armorProvider) {
-                            if (armor.getMaxDamage() - armor.getDamageValue() <= 1) {
-                                finalHurtAmount = getHurtAmount(context.target(), context.source(), context.originalAmount(), null, armorProvider, 0);
-                                return builder.shouldCancelEvent(true).finalAmount(finalHurtAmount);
+                            boolean broken = armor.getMaxDamage() - armor.getDamageValue() <= 1;
+                            int protectionLevel = broken ? 0 : armorProvider.getAbsorb();
+                            builder = builder.setArmorContext(new HitProcessEvent.EventArmorContext(
+                                    armor, plate, protectionLevel, 0));
+                            calculation = getHurtAmount(context.event().getHurtEntity(), context.event().getDamageSource(GunDamageSourcePart.NON_ARMOR_PIERCING), context.event().getBaseAmount(), null, armorProvider, protectionLevel);
+                            if (broken) {
+                                return builder
+                                        .fromCalculation(calculation)
+                                        .shouldReplaceDamage(true)
+                                        .finalAmount(calculation.outputDamage());
                             }
-                            builder = builder.withArmorProvider(armorProvider);
-                            int protectionLevel = armor.getOrCreateTag().getInt("protection_class");
-                            finalHurtAmount = getHurtAmount(context.target(), context.source(), context.originalAmount(), null, armorProvider, protectionLevel);
                         }
                     }
                     //Illegal state, only plates equipped
                     else {
-                        finalHurtAmount = getHurtAmount(context.target(), context.source(), context.originalAmount(), null, null, 0);
+                        calculation = getHurtAmount(context.event().getHurtEntity(), context.event().getDamageSource(GunDamageSourcePart.NON_ARMOR_PIERCING), context.event().getBaseAmount(), null, null, 0);
                     }
-                    builder = builder.shouldCancelEvent(true);
+                    builder = builder.shouldReplaceDamage(true);
                 }
 
-                return builder.finalAmount(finalHurtAmount);
+                return builder.fromCalculation(calculation);
             }
         }
 
@@ -174,47 +182,53 @@ public class DamagePipeLine {
 
             @Override
             public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
-                LivingEntity target = context.target();
+                Entity target = context.event().getHurtEntity();
+                if (target == null) return current;
                 EntityType<?> type = target.getType();
                 ResourceLocation mobId = ForgeRegistries.ENTITY_TYPES.getKey(type);
                 MobRulesPOJO.Pattern mobPattern = MobRuleRegistry.get(mobId);
-                if (mobPattern == null) return current;
+                if (mobPattern == null || context.event().isHeadShot()) return current;
                 return current.finalAmount(
-                        current.finalAmount * Math.max(0,mobPattern.bodyshotMultiplier())
+                        current.finalAmount * Math.max(0, mobPattern.bodyshotMultiplier())
                 );
             }
         }
 
-        public static class FirstAidCptCompat implements DamageModifier {
+        public static class HitPartDamageFactor implements DamageModifier {
             @Override
             public DamageResultBuilder apply(DamageContext context, DamageResultBuilder current) {
-                FirstAidCompatHandler firstAidCompatHandler = FirstAidCompatHandler.create(context.target(), current.finalSource);
-                if (firstAidCompatHandler == null) return current;
-                if (!firstAidCompatHandler.getLimbsApplicable()) return current;
-                float limbsScale = ModConfigs.SERVER.firstAidLimbsFactor().get().floatValue();
-                return current
-                        .finalAmount(
-                                getHurtAmount(
-                                        context.target(),
-                                        context.source(),
-                                        current.finalAmount,
-                                        null,
-                                        null,
-                                        0) * limbsScale
-                        );
+                float factor = context.hitPart().damageFactor();
+                if (factor == 1f) return current;
+                return current.shouldReplaceDamage(true).finalAmount(current.finalAmount * factor);
             }
         }
 
     }
 
-    public boolean execute(DamageResult result, Runnable runnable) {
-        if (result.isBullet() && !result.isHeadshot()) {
-            if (result.shouldStopExecute()) return result.shouldCancelEvent();
-            if (result.shouldCancelEvent()) {
-                runnable.run();
-            }
-            return result.shouldCancelEvent();
+    public void applyToEvent(DamageResult result, EntityHurtByGunEvent.Pre event) {
+        if (result.shouldStopExecute() || !result.shouldReplaceDamage()) return;
+
+        HitProcessEvent.Pre pre = new HitProcessEvent.Pre(
+                event.getAttacker(),
+                event.getHurtEntity(),
+                event.getBullet(),
+                result.finalSource(),
+                result.armorContext(),
+                result.ammoContext(),
+                result.outcome(),
+                result.isHeadshot(),
+                result.finalAmount()
+        );
+        boolean eventCanceled = MinecraftForge.EVENT_BUS.post(pre);
+        if (eventCanceled) {
+            event.setBaseAmount(result.finalAmount());
+            ((ZDamageTypes.ZDamageSource) result.finalSource()).setSkip(true);
+        } else {
+            // finalAmount already includes the headshot multiplier; TaCZ must not apply it again.
+            event.setBaseAmount(pre.getFinalDamage());
         }
-        return false;
+        event.setHeadshotMultiplier(1f);
+        event.setDamageSource(GunDamageSourcePart.NON_ARMOR_PIERCING, result.finalSource());
+        event.setDamageSource(GunDamageSourcePart.ARMOR_PIERCING, result.finalSource());
     }
 }

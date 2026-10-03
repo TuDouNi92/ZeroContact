@@ -1,15 +1,14 @@
 package net.zerocontact.caliber.damage.model;
 
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.LivingEntity;
+import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
 import net.minecraft.world.item.ItemStack;
+import net.zerocontact.events.ResolveHitBodyPartEvent.HitPart;
 import org.jetbrains.annotations.NotNull;
 
 public record DamageContext(
-        LivingEntity target,
-        DamageSource source,
-        float originalAmount,
+        EntityHurtByGunEvent.Pre event,
         @NotNull ItemStack plate,
-        @NotNull ItemStack armor
+        @NotNull ItemStack armor,
+        @NotNull HitPart hitPart
 ) {
 }

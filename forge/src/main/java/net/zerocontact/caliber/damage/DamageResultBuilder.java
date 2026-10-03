@@ -1,33 +1,43 @@
 package net.zerocontact.caliber.damage;
 
+import com.tacz.guns.api.event.common.GunDamageSourcePart;
 import net.minecraft.world.damagesource.DamageSource;
-import net.zerocontact.api.armor.ICombatArmorItem;
 import net.zerocontact.caliber.damage.model.DamageContext;
 import net.zerocontact.caliber.damage.model.DamageResult;
-import org.jetbrains.annotations.Nullable;
+import net.zerocontact.events.HitProcessEvent;
+import net.zerocontact.events.ResolveHitBodyPartEvent.HitPart;
 
 public class DamageResultBuilder {
-    boolean isBullet;
     boolean isHeadshot;
     float finalAmount;
     DamageSource finalSource;
-    boolean shouldCancelEvent;
+    HitProcessEvent.EventArmorContext armorContext;
+    HitProcessEvent.EventAmmoContext ammoContext;
+    HitProcessEvent.ZHitOutcome outcome;
+    boolean shouldReplaceDamage;
     boolean stopExecute;
-    @Nullable ICombatArmorItem armorProvider;
-    @Nullable ICombatArmorItem plateProvider;
+    HitPart hitPart;
 
     public static DamageResultBuilder create() {
         return new DamageResultBuilder();
     }
 
     public DamageResultBuilder fromContext(DamageContext context) {
-        this.finalAmount = context.originalAmount();
-        this.finalSource = context.source();
+        fromCalculation(DamageProcessor.DamageCalcCtx.unprocessed(context.event().getBaseAmount()));
+        this.isHeadshot = context.event().isHeadShot();
+        this.hitPart = context.hitPart();
+        this.finalSource = context.event().getDamageSource(GunDamageSourcePart.NON_ARMOR_PIERCING);
+        this.armorContext = new HitProcessEvent.EventArmorContext(context.armor(), context.plate(), 0, 0);
         return this;
     }
 
-    public DamageResultBuilder withBullet(boolean isBullet) {
-        this.isBullet = isBullet;
+    /** Copies the metadata from the same calculation that produced the damage. */
+    public DamageResultBuilder fromCalculation(DamageProcessor.DamageCalcCtx calculation) {
+        this.finalAmount = calculation.outputDamage();
+        this.outcome = calculation.outcome();
+        this.ammoContext = new HitProcessEvent.EventAmmoContext(
+                calculation.caliberId(), calculation.caliberVariant(), calculation.penetrationLevel(),
+                calculation.fleshDamage(), calculation.armorDamage());
         return this;
     }
 
@@ -46,36 +56,35 @@ public class DamageResultBuilder {
         return this;
     }
 
-    public DamageResultBuilder shouldCancelEvent(boolean shouldCancelEvent) {
-        this.shouldCancelEvent = shouldCancelEvent;
+    public DamageResultBuilder shouldReplaceDamage(boolean shouldReplaceDamage) {
+        this.shouldReplaceDamage = shouldReplaceDamage;
         return this;
     }
 
-    public DamageResultBuilder withArmorProvider(ICombatArmorItem armorProvider) {
-        this.armorProvider = armorProvider;
-        return this;
-    }
 
-    public DamageResultBuilder withPlateProvider(ICombatArmorItem plateProvider) {
-        this.plateProvider = plateProvider;
-        return this;
-    }
 
     public DamageResultBuilder stopExecute(boolean stop) {
         this.stopExecute = stop;
         return this;
     }
 
+
+    public DamageResultBuilder setArmorContext(HitProcessEvent.EventArmorContext armorContext) {
+        this.armorContext = armorContext;
+        return this;
+    }
+
     public DamageResult build() {
         return new DamageResult(
-                isBullet,
                 isHeadshot,
                 finalAmount,
                 finalSource,
-                armorProvider,
-                plateProvider,
-                shouldCancelEvent,
-                stopExecute
+                armorContext,
+                ammoContext,
+                outcome,
+                shouldReplaceDamage,
+                stopExecute,
+                hitPart
         );
     }
 
