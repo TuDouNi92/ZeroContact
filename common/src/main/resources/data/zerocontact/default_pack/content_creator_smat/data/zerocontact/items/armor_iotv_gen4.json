@@ -1,0 +1,33 @@
+{
+  "type":"armor",
+  "id": "armor_iotv_gen4",
+  "defense": 6,
+  "protection_class":4,
+  "equipment_slot": "PLATE_CARRIER",
+  "movement_fix": -0.08,
+  "default_durability": 96,
+  "texture": "textures/iotv_gen4.png",
+  "model": "geo/iotv_gen4.geo.json",
+  "hurt_modifier":
+  {
+    "ricochet_multiplier":0.02,
+    "penetrate_multiplier":0.87,
+    "blunt_multiplier":0.32
+  },
+  "durability_loss_modifier":1,
+
+  "attachments": [
+    {
+      "mount_id": "command_pouch",
+      "mount_type": "armor_pouch",
+      "mount_bone": "command_pouch_fix",
+      "accept_categories": ["admin_pouch"]
+    },
+    {
+      "mount_id": "radio_pouch",
+      "mount_type": "armor_pouch",
+      "mount_bone": "radio_pouch_fix",
+      "accept_categories": ["pouch"]
+    }
+  ]
+}

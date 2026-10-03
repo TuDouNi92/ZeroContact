@@ -1,0 +1,12 @@
+{
+  "type":"armor",
+  "id": "uniform_g3pro_ctsfo_top",
+  "defense": 1,
+  "protection_class":0,
+  "equipment_slot": "UNIFORM_TOP",
+  "movement_fix": 0,
+  "default_durability": 0,
+  "texture": "textures/g3pro_ctsfo.png",
+  "model": "geo/g3pro_ctsfo_top.geo.json",
+  "durability_loss_modifier":1
+}

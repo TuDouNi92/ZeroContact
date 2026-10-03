@@ -1,6 +1,74 @@
 {
   "recipes": [
     {
+      "gear_id": "zerocontact:headset_amp",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 6
+        },
+        {
+          "itemId": "minecraft:redstone",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:headset_amp_black",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 6
+        },
+        {
+          "itemId": "minecraft:redstone",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:headset_comtac2",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:redstone",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "gear_id": "zerocontact:headset_comtac2_brown",
+      "ingredient_items": [
+        {
+          "itemId": "minecraft:copper_ingot",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:iron_ingot",
+          "count": 2
+        },
+        {
+          "itemId": "minecraft:redstone",
+          "count": 4
+        }
+      ]
+    },
+    {
       "gear_id": "zerocontact:nvg_t7",
       "ingredient_items": [
         {

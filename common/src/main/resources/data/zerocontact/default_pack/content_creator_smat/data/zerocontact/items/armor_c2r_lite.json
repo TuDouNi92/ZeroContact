@@ -1,0 +1,33 @@
+{
+  "type":"armor",
+  "id": "armor_c2r_lite",
+  "defense": 6,
+  "protection_class":3,
+  "equipment_slot": "PLATE_CARRIER",
+  "movement_fix": -0.08,
+  "default_durability": 96,
+  "texture": "textures/c2r_mor_lite.png",
+  "model": "geo/c2r_mor_lite.geo.json",
+  "hurt_modifier":
+  {
+    "ricochet_multiplier":0.10,
+    "penetrate_multiplier":0.95,
+    "blunt_multiplier":0.26
+  },
+  "durability_loss_modifier":1,
+
+  "attachments": [
+    {
+      "mount_id": "command_pouch",
+      "mount_type": "armor_pouch",
+      "mount_bone": "command_pouch_fix",
+      "accept_categories": ["admin_pouch"]
+    },
+    {
+      "mount_id": "radio_pouch",
+      "mount_type": "armor_pouch",
+      "mount_bone": "radio_pouch_fix",
+      "accept_categories": ["pouch"]
+    }
+  ]
+}

@@ -4,12 +4,22 @@
 
   "item.zerocontact.armor_fcpc_v5": "FCPC V5 (MC)",
   "item.zerocontact.armor_lv119_wedge": "SS Lv119 (Icebreaker)",
+  "item.zerocontact.armor_iba_otv": "IBA OTV (Woodland)",
+  "item.zerocontact.armor_iotv_gen4": "IOTV Gen4 (MC)",
+  "item.zerocontact.armor_c2r_lite": "C2R MOR Lite (WG)",
+  "item.zerocontact.helmet_c2r": "C2R Fast helmet (BLACK)",
+
 
   "item.zerocontact.uniform_g3pro_top": "CP G3 Pro Combat uniform (Shirt)",
   "item.zerocontact.uniform_g3pro_pants": "CP G3 Pro Combat uniform (Pants)",
+  "item.zerocontact.uniform_g3pro_ctsfo_top": "CP G3 Pro Combat uniform (Shirt)(WG)",
+  "item.zerocontact.uniform_g3pro_ctsfo_pants": "CP G3 Pro Combat uniform (Pants)(WG)",
 
   "item.zerocontact.uniform_wedge_top": "The Wedge (Jacket)",
   "item.zerocontact.uniform_wedge_pants": "The Wedge (Pants)",
+
   "item.zerocontact.sb_pvs31a": "PVS-31A Night Vison Goggle",
+  "item.zerocontact.sb_gpnvg": "GPNVG-18 Night Vison Goggle",
+
   "item.zerocontact.bastion_cover_black": "Bastion Helmet Cover (Black) "
 }

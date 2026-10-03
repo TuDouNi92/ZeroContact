@@ -1,11 +1,11 @@
 {
   "type": "module_nvg",
-  "id": "sb_pvs31a",
+  "id": "sb_gpnvg",
   "mount_type": "night_vision",
   "module_trait": "nvg",
   "durability": 12000,
-  "texture": "textures/sb_pvs31a.png",
-  "model": "geo/sb_nvg_pvs31a.geo.json",
+  "texture": "textures/sb_gpnvg.png",
+  "model": "geo/sb_gpnvg.geo.json",
   "animation": "animations/nvg_pvs31.animation.json",
   "color": "WHITE"
 }
