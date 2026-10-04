@@ -6,6 +6,8 @@ When a Lua script runs, the global `zc` table provides all currently registered 
 zc.<namespace>.<function>(arguments...)
 ```
 
+See the [pack authoring guide](./data-driven-pack-guide-en.md) for script placement and ID mapping, and the [ammo reference](./ammo-definition-json-en.md) for triggers and Java damage extension events. Through `09966b2` (2026-10-04), the new body-part and damage events belong to the Forge Java API; Lua Helper signatures remain unchanged.
+
 ## Helper Usage Table
 
 | Namespace | Function | Parameters | Return value | Usage and notes | Example |
@@ -87,3 +89,7 @@ The script file must return a table. The `function` configured in JSON must matc
 | `ctx.victim` | `string` or `nil` | The victim entity's UUID. |
 
 JSON `arguments` are passed as the callback's second parameter. Missing fields are `nil` in Lua; use `args.value or default_value` to provide defaults.
+
+`HIT_ENTITY` runs after ZeroContact's hurt call and `HitProcessEvent.Post`, using the victim's current position and `nil` for `ctx.previous_position`. The callback does not establish that health was actually lost. Canceling `HitProcessEvent.Pre` skips this callback on that path. Exact collision coordinates and body-part data are available through Java events, not current `ctx` fields.
+
+`BULLET_TICKING` runs before updating the bullet position: `ctx.previous_position` is the position before the update and `ctx.position` is the next position calculated for this tick. `HIT_BLOCK` and `HIT_BLOCK_TICKING` use the hit block's center with a `nil` previous position; the latter does not automatically repeat on later ticks.

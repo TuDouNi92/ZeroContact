@@ -6,6 +6,9 @@ For complete ammunition-field and Lua API references, see:
 
 - [`Ammo Definition JSON Usage Table`](./ammo-definition-json-en.md)
 - [`ZeroContact Lua Helpers`](./lua-helpers-en.md)
+- [`Configuration, Commands, and Equipment Operations`](./configuration-and-equipment-en.md)
+
+This guide has been checked against commits and implementation through `09966b2` (2026-10-04). Damage extension events are documented in the ammunition reference.
 
 ## Installation location and loading time
 
@@ -17,10 +20,14 @@ config/zerocontact/packs/<pack-directory>/
 
 The manager only scans first-level directories under `packs`; it does not directly load ZIP files placed there. Items and ammunition are loaded during item registration, so fully restart the game after adding or changing this content. Do not rely on `/reload` to register items again.
 
-At startup, the mod also extracts its built-in default pack to:
+At startup, the mod also extracts each pack in the built-in ZIP into a separate directory under `packs`:
 
 ```text
-config/zerocontact/packs/default_pack/
+config/zerocontact/packs/default_ammo/
+config/zerocontact/packs/default_armor/
+config/zerocontact/packs/default_loadout/
+config/zerocontact/packs/default_module/
+config/zerocontact/packs/content_creator_smat/
 ```
 
 By default, files with matching names are overwritten by the built-in versions. To disable this behavior, set the following value in `config/zerocontact/override.toml`:
@@ -30,6 +37,8 @@ pack.default_pack_override = false
 ```
 
 This setting only controls extraction of the default pack; it does not affect other extension packs.
+
+A legacy pack whose manifest has `pack_name: "zero_contact"` is skipped with a `Detected deprecated pack` warning. Migrate it to the current structure and a unique pack name; renaming its directory alone does not remove this restriction. Extraction overwrites matching files but does not remove old files no longer present in the built-in ZIP. Check for leftover definitions after upgrades to avoid duplicate registration.
 
 ## Minimum directory structure
 
@@ -132,6 +141,9 @@ Each JSON file defines one item. The top-level `type` field is a required type d
 | `armor` | Armor, helmets, masks, plate carriers, uniforms, or armbands | `equipment_slot` |
 | `plate` | Armor plate inserted into a plate carrier | None |
 | `loadout` | Backpack or chest-rig container | `equipment_slot` |
+| `module` | Generic module, such as a battery, beacon, pouch, or radio | `mount_type`, `module_trait` |
+| `module_nvg` | Night-vision or thermal module | `mount_type`, `module_trait` |
+| `module_headset` | Headset module with an audio profile | `mount_type`, `module_trait` |
 
 An unknown `type` cannot be deserialized. Valid JSON also does not guarantee that an item will be generated: an unsupported `equipment_slot` may be ignored or cause loading to fail.
 
@@ -152,14 +164,15 @@ An unknown `type` cannot be deserialized. Valid JSON also does not guarantee tha
 | `model` | `string` | Empty string | GeckoLib model path in the `zerocontact` namespace. |
 | `animation` | `string` | Empty string | GeckoLib animation path in the `zerocontact` namespace. |
 | `hurt_modifier` | `object` | Default multiplier object | Damage multipliers applied to different hit outcomes. |
+| `attachments` | `object[]` | `[]` | Module mounts for `ARMOR`, `PLATE_CARRIER`, `HELMET`, and `MASK`; see below. |
 
 `hurt_modifier` supports:
 
 | Field | Default | Description |
 | --- | --- | --- |
-| `ricochet_multiplier` | `0.05` | Proportion of the original damage applied after a ricochet result. |
-| `penetrate_multiplier` | `0.7` | Proportion of the original damage applied after a penetration result. |
-| `blunt_multiplier` | `0.1` | Proportion of the original damage applied as blunt damage when penetration fails. |
+| `ricochet_multiplier` | `0.05` | Still deserialized and passed to the item; the current `DamageProcessor` only marks `RICOCHET` and does not apply this additional multiplier. |
+| `penetrate_multiplier` | `0.7` | Multiplier for positive penetration damage, normally applied to ammo `flesh_damage`. |
+| `blunt_multiplier` | `0.1` | Non-penetration blunt multiplier; the current base calculation is `penetration_class * 0.3 * blunt_multiplier`, rather than a fixed proportion of original damage. |
 
 Example:
 
@@ -195,6 +208,36 @@ Different armor categories consume different subsets of the available fields:
 
 Do not assume that every field present in the POJO affects every `equipment_slot`.
 
+### Armor module mounts: `attachments[]`
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `mount_id` | `string` | Mount path unique within this equipment; automatically uses the `zerocontact` namespace. Commands also use this path. |
+| `mount_type` | `string` | Mount position type: `HELMET_FRONT`, `HELMET_RAIL`, `HELMET_BACK`, `HELMET_TOP`, `FACE`, `ARMOR_POUCH`, or `UNDEFINED`. |
+| `mount_bone` | `string` | Attachment bone name in the equipment's GeckoLib model. |
+| `accept_categories` | `string[]` | Accepted module categories; provide an array. Names are case-insensitive. |
+
+Module categories are `NIGHT_VISION`, `FLASH_LIGHT`, `VISOR`, `ADMIN_POUCH`, `HELMET_COVER`, `POUCH`, `BATTERY`, `BEACON`, `HEADSET`, and `UNDEFINED`. Unknown names or an empty category array become `UNDEFINED` and do not provide valid module candidates. Categories determine mount compatibility; they do not grant functionality.
+
+Add this fragment to a helmet definition whose model has `nvg_fix` and `headset_fix` bones:
+
+```json
+"attachments": [
+  {
+    "mount_id": "nvg_mount",
+    "mount_type": "helmet_front",
+    "mount_bone": "nvg_fix",
+    "accept_categories": ["night_vision"]
+  },
+  {
+    "mount_id": "headset_mount",
+    "mount_type": "helmet_top",
+    "mount_bone": "headset_fix",
+    "accept_categories": ["headset"]
+  }
+]
+```
+
 ### `plate` fields
 
 | Field | Type | Default / requirement | Description |
@@ -211,6 +254,8 @@ Do not assume that every field present in the POJO affects every `equipment_slot
 
 Important: the current POJO recognizes only `ricochet_multiplier`, `penetrate_multiplier`, and `blunt_multiplier`. Names ending in `*_modifier` are treated as unknown fields by Gson and ignored.
 
+Held-plate installation now uses the `install` clip in the built-in `animations/plate.animation.json`; the held-item renderer does not read the definition's `animation` field. Custom models need compatible bones. To override the animation, supply a client resource at that same path. See the [equipment operations reference](./configuration-and-equipment-en.md).
+
 ### `loadout` fields
 
 | Field | Type | Default / requirement | Description |
@@ -221,7 +266,91 @@ Important: the current POJO recognizes only `ricochet_multiplier`, `penetrate_mu
 | `equipment_slot` | `string` | Required | Currently supports `BACKPACK` or `RIGS`. |
 | `texture`, `model`, `animation` | `string` | Empty string | GeckoLib resource paths in the `zerocontact` namespace. |
 
-Although `HEADSET` exists in the internal equipment-type enum, it currently has no data-generation adapter and cannot be registered through JSON alone.
+`equipment_slot: "HEADSET"` is still unsupported for `loadout`; define headsets with `type: "module_headset"`.
+
+### Common module fields
+
+`module`, `module_nvg`, and `module_headset` share these fields. All belong in `items` and do not require `equipment_slot`:
+
+| Field | Type | Default / requirement | Description |
+| --- | --- | --- | --- |
+| `type` | `string` | Required | One of the three module types above. |
+| `id` | `string` | Required | Generates `zerocontact:<id>` and registers its module category. |
+| `mount_type` | `string` | Required | **Module category** from `MountCategory`, such as `night_vision`, `headset`, or `pouch`. This differs from the same-named field inside a mount. Case-insensitive. |
+| `module_trait` | `string` | Required | Functionality path without a namespace, such as `nvg`, `headset`, or `radio`. |
+| `durability` | `integer` | `0` | Item durability; NVG internal battery capacity is currently fixed at `12000` and is not changed by this field. |
+| `texture`, `model`, `animation` | `string` | Empty string | GeckoLib resource paths in the `zerocontact` namespace. |
+
+Currently registered generic module traits are `pouch`, `admin_pouch`, `navboard`, `nvg`, `battery`, `beacon`, `headset`, and `radio`. Use the dedicated types for NVGs and headsets to obtain the `INvg` implementation or audio profile. Their item traits are fixed to `nvg` and `headset`; changing `module_trait` does not switch their functionality. The adapter still reads that field, so provide a valid path.
+
+Radios use `module`, category `pouch`, and trait `radio`; there is no `RADIO` module category. See [`prc_148.json`](../common/src/main/resources/data/zerocontact/default_pack/default_module/data/zerocontact/items/prc_148.json) for a complete example. Channels are configured in game and are not current module JSON fields.
+
+### Night vision: `module_nvg`
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `vignette` | `string` | `textures/gui/bino_nvg.png` | View-mask texture path in the `zerocontact` namespace. |
+| `color` | `string` | `GREEN` | Supports `GREEN`, `WHITE`, `THERMAL`, and `THERMAL_COLOR`. Case-insensitive; unknown values fall back to `GREEN`. |
+
+```json
+{
+  "type": "module_nvg",
+  "id": "example_nvg",
+  "mount_type": "night_vision",
+  "module_trait": "nvg",
+  "durability": 12000,
+  "texture": "textures/sb_pvs31a.png",
+  "model": "geo/sb_nvg_pvs31a.geo.json",
+  "animation": "animations/nvg_pvs31.animation.json",
+  "vignette": "textures/gui/bino_nvg.png",
+  "color": "WHITE"
+}
+```
+
+This example reuses built-in resources; keep their packs enabled when distributing it. Currently `NVG.getAnimation()` always returns `animations/nvg_pvs31.animation.json`, so the JSON `animation` field alone cannot switch the animation file. Animation clips are `activate`, `deactivate`, `on_pose`, and `off_pose`.
+
+### Headsets: `module_headset`
+
+Omitting the entire `audio_profile` gives a compressor ratio of `0`, attack/sustain gains of `0`, pickup attenuation distance of `16`, and five EQ bands at 125, 500, 2000, 4000, and 8000 Hz (gain `0`, Q `1`). When providing this object, supply every field and the `eq` array: missing fields are not merged with the default profile. Do not explicitly use `null`.
+
+| `audio_profile` field | Type | Description |
+| --- | --- | --- |
+| `compressor_ratio` | `number` | Dynamic compressor ratio. |
+| `transient_attack` | `number` | Transient attack gain in dB. |
+| `transient_sustain` | `number` | Transient sustain gain in dB. |
+| `pick_up_attenuation` | `number` | Linear sound attenuation distance parameter while the headset is on. |
+| `eq` | `object[]` | Peaking equalizer bands; `[]` sets no bands. |
+| `eq[].freq_hz` | `number` | Center frequency; must be positive and finite, in Hz. |
+| `eq[].gain` | `number` | Finite gain in the range `-24..24` dB. |
+| `eq[].precision` | `number` | Finite Q value in the range `0.1..20`. |
+
+```json
+{
+  "type": "module_headset",
+  "id": "example_headset",
+  "mount_type": "headset",
+  "module_trait": "headset",
+  "durability": 0,
+  "texture": "textures/c2r_headset.png",
+  "model": "geo/c2r_headset.geo.json",
+  "animation": "",
+  "audio_profile": {
+    "compressor_ratio": 10,
+    "transient_attack": -6,
+    "transient_sustain": -12,
+    "pick_up_attenuation": 18,
+    "eq": [
+      { "freq_hz": 125, "gain": -3, "precision": 1 },
+      { "freq_hz": 500, "gain": -3, "precision": 1 },
+      { "freq_hz": 2000, "gain": -5, "precision": 1 },
+      { "freq_hz": 4000, "gain": -2, "precision": 1 },
+      { "freq_hz": 8000, "gain": 5, "precision": 1 }
+    ]
+  }
+}
+```
+
+The example reuses built-in C2R resources. The audio profile comes from a mounted headset, which must be switched on; PCM processing also depends on client setting `sound_and_visual_effects.audio_effect`. When several headsets are mounted, the implementation selects one profile; do not rely on stacking or a fixed priority. See the full default definition in [`headset_c2r.json`](../common/src/main/resources/data/zerocontact/default_pack/content_creator_smat/data/zerocontact/items/headset_c2r.json).
 
 ## Ammunition definitions: `data/zerocontact/ammoDefinitions`
 
@@ -312,6 +441,8 @@ External packs are loaded as Minecraft client resource packs and may provide sta
 | `animations/...` | GeckoLib animations. |
 | `textures/models/...` | Textures for GeckoLib wearable models. |
 
+These subdirectories are organizational conventions; fields such as `texture` and `model` determine the actual paths. The current creator pack also uses files directly under `textures`, such as `textures/c2r_headset.png`. Do not infer paths from the older directory layout.
+
 Example ordinary item model:
 
 ```json
@@ -355,6 +486,8 @@ Except for Lua scripts, there is no stable cross-pack loading priority on which 
 - Fixed directory names and the `zerocontact` namespace are spelled correctly, including the capitalization of `ammoDefinitions`.
 - Every JSON file is strict JSON, with no comments, trailing commas, or duplicate keys.
 - Values of `type` and `equipment_slot` in `items` are supported by a current adapter.
+- Module `mount_type` uses a category name, while mount `mount_type` uses a position type; `accept_categories` and `mount_bone` match the module and model.
+- Headsets provide a complete `audio_profile` or omit the whole object, and EQ values satisfy their ranges.
 - `hurt_modifier` uses field names ending in `*_multiplier`.
 - Material entries in `gear_recipes` use the spelling `itemId`, and recipes avoid ambiguous multi-file overrides.
 - Every generated item has the required translation key and model, texture, or GeckoLib resources.

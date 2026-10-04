@@ -1,6 +1,6 @@
 # Ammo Definition JSON Usage Table
 
-This document describes the ammo definition JSON represented by [`AmmoDataPOJO`](../forge/src/main/java/net/zerocontact/datagen/AmmoDataPOJO.java). For a complete configuration, see [`40mm_incendiary.json`](../common/src/main/resources/data/zerocontact/default_pack/default_ammo/data/zerocontact/ammoDefinitions/40mm_incendiary.json).
+This document describes the ammo definition JSON represented by [`AmmoDataPOJO`](../forge/src/main/java/net/zerocontact/datagen/model/AmmoDataPOJO.java), plus magazine compatibility and damage extension events through `09966b2` (2026-10-04). For a complete configuration, see [`40mm_incendiary.json`](../common/src/main/resources/data/zerocontact/default_pack/default_ammo/data/zerocontact/ammoDefinitions/40mm_incendiary.json).
 
 Place ammo definition files in the resource pack's `data/zerocontact/ammoDefinitions` directory. Defaults in the tables come from the POJO field initializers. Fields marked as required have no explicit validation, but omitting them prevents the definition from producing valid ammo registration data.
 
@@ -75,7 +75,7 @@ Each array entry consists of a `trigger` and optional `actions` and `scripts`. F
 | `trigger` value | When it fires | Typical use case |
 | --- | --- | --- |
 | `SPAWN` | When a projectile is spawned and its ammo context is bound. | Initialize an effect or write a log entry. |
-| `HIT_ENTITY` | After the projectile deals gun damage to a living entity and completes the ZeroContact damage pipeline. | Apply a negative effect to the victim. |
+| `HIT_ENTITY` | After the ZeroContact damage path calls the living target's hurt method and posts `HitProcessEvent.Post`, provided the bullet has ammo context and the shooter is a living entity. | Apply a negative effect to the victim; does not guarantee that the hurt method returned success. |
 | `HIT_BLOCK` | When the projectile hits a block. | Run one-shot explosion, ignition, or script logic. |
 | `HIT_BLOCK_TICKING` | In the current implementation, fires together with `HIT_BLOCK` when a block is hit. | Supports existing smoke-ammo configurations. Do not assume that it repeats automatically on subsequent ticks. |
 | `BULLET_TICKING` | On each server tick while the projectile is flying, before its position is updated. | Spawn in-flight particles or continuously scan for entities along the trajectory. |
@@ -102,6 +102,37 @@ Each array entry consists of a `trigger` and optional `actions` and `scripts`. F
 | `arguments` | `object` | `{}` | Converted and passed unchanged as the callback's second `args` parameter. It may contain strings, numbers, booleans, arrays, or nested objects. | `{ "duration": 50, "radius": 4.0 }` |
 
 The Lua file must return a table and expose a function whose name exactly matches `function`. See [`ZeroContact Lua Helpers Usage`](./lua-helpers-en.md) for the available helpers, callback context `ctx`, target selectors, and a complete script example.
+
+For `HIT_ENTITY`, the position is the victim's current position and `previous_position` is `nil`; it is not the exact bullet collision point. Canceling `HitProcessEvent.Pre` skips the current ZeroContact hurt call, `Post`, and this Lua hook. Other TaCZ post-hit logic still continues, so cancellation does not cancel the entire projectile hit sequence.
+
+## TaCZ Magazines compatibility
+
+`511fc5d` introduced temporary compatibility for TaCZ Magazines 0.2.6; `49a011e` and `1672124` improved per-cartridge variants, chamber handling, and reloading. Pack authors continue using the same ammo JSON without magazine-specific fields.
+
+- Each cartridge preserves its original `ammo_id` and variant. A magazine can mix variants of the same caliber; the last loaded cartridge feeds first. Tooltips show consecutive variant groups in feeding order.
+- Chambered ammunition is retained separately. Removing or replacing a magazine leaves the chambered cartridge's parameters in control of the next shot.
+- `bullet_amount` is the number of projectiles spawned by one cartridge. A value of `8` produces eight projectiles per shot; it does not consume eight magazine cartridges.
+- Per-cartridge management targets detachable-magazine guns. Split reload, dummy-ammo, and inventory-ammo paths do not use this management path.
+- Magazine mod APIs may differ across versions. This describes the repository's 0.2.6 compatibility implementation; check the actual version before distributing a modpack.
+
+## Java extensions: body-part and damage events
+
+These events are posted to `MinecraftForge.EVENT_BUS` for Forge extension subscribers. They are not additional `effects[].trigger` values and do not automatically expose corresponding methods to Lua.
+
+| Event | Timing and mutable data |
+| --- | --- |
+| [`ResolveHitBodyPartEvent.Pre`](../forge/src/main/java/net/zerocontact/events/ResolveHitBodyPartEvent.java) | Before armor selection and damage calculation; use `setHitPart(new HitPart(...))` to change the body part and factor. Not cancelable. |
+| `ResolveHitBodyPartEvent.Post` | After resolution; observes the resolved part. |
+| [`HitProcessEvent.Pre`](../forge/src/main/java/net/zerocontact/events/HitProcessEvent.java) | After ZeroContact computes final damage, before writing it back to the TaCZ event. Use `setDamageAmount(float)` or cancel it. Posted only when damage needs replacement and processing has not stopped early. |
+| `HitProcessEvent.Post` | After ZeroContact calls the hurt method. It does not check the return value of `hurt()`; `getFinalDamage()` is the requested damage, not actual health lost. |
+
+`HitPartEnum` contains `HEAD`, `TORSO`, `ARM`, `LEG`, and `UNSET`. TaCZ's headshot flag defaults to `HEAD` or `TORSO`; `UNSET` falls back to that default while preserving the chosen factor. `HitPart.damageFactor` must be finite and non-negative and is applied once after damage calculation. Resolution is cached within a hit and reused by damage and durability handling.
+
+Head hits select the helmet. Limb hits bypass helmets, chest armor, and plates and do not damage their durability. Torso hits follow existing chest-armor/front-or-back-plate selection. First Aid integration modifies parts through `ResolveHitBodyPartEvent.Pre` at `HIGH` priority, requiring both `firstaid` and `tacz_firstaid_compat` and a player collision position. See the [configuration reference](./configuration-and-equipment-en.md) for its factors.
+
+`HitProcessEvent` exposes the nullable attacker, target, bullet, headshot state, damage, armor snapshots, and ammo context. Outcomes are `NON_PEN`, `PEN`, `NO_ARMOR`, `NO_OUTCOME`, and `RICOCHET`. These describe the calculation path and do not establish actual health lost. Armor-context stacks are copied at construction; editing a snapshot does not edit the entity's equipment.
+
+`Pre.getFinalDamage()` already includes headshot, penetration, mob rules, and the body-part factor. The pipeline then sets TaCZ's headshot multiplier to `1` to avoid applying it again. Subscribers should not repeat these multipliers; later TaCZ event handling can still change damage. Canceling `Pre` causes the ZeroContact damage source to skip its hurt call and associated `Post`/`HIT_ENTITY`, while TaCZ's other post-hit effects continue.
 
 ## Complete example: 40 mm incendiary ammo
 

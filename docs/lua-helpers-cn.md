@@ -6,6 +6,8 @@ Lua 脚本执行时，全局表 `zc` 会提供当前已注册的 helper。调用
 zc.<命名空间>.<函数名>(参数...)
 ```
 
+脚本文件放置和 ID 映射见[数据驱动包指南](./data-driven-pack-guide-cn.md)，触发器及 Java 伤害扩展事件见[弹药定义参考](./ammo-definition-json-cn.md)。截至 `09966b2`（2026-10-04），新增的命中部位与伤害事件属于 Forge Java API，Lua Helper 的调用签名未改变。
+
 ## Helper 用法表
 
 | 命名空间 | 函数 | 参数 | 返回值 | 用途与注意事项 | 示例 |
@@ -87,3 +89,7 @@ return handlers
 | `ctx.victim` | `string` 或 `nil` | 受击实体 UUID。 |
 
 JSON `arguments` 会作为回调的第二个参数传入；缺少的字段在 Lua 中为 `nil`，可用 `args.value or 默认值` 提供默认值。
+
+`HIT_ENTITY` 回调在 ZeroContact 的受伤方法调用和 `HitProcessEvent.Post` 之后执行，使用受击实体当前位置，`ctx.previous_position` 为 `nil`；不能将回调出现视为实际扣血成功。取消 `HitProcessEvent.Pre` 时这条路径不会执行该回调。精确碰撞坐标与命中部位来自 Java 事件，不是当前 `ctx` 字段。
+
+`BULLET_TICKING` 在更新弹体位置前执行；此时 `ctx.previous_position` 是更新前位置，`ctx.position` 是本 tick 计算出的下一位置。`HIT_BLOCK` 和 `HIT_BLOCK_TICKING` 使用命中方块中心，上一位置为 `nil`，后者不会自动在后续 tick 重复。

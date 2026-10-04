@@ -1,6 +1,6 @@
 # 弹药定义 JSON 用法表
 
-本文档说明 [`AmmoDataPOJO`](../forge/src/main/java/net/zerocontact/datagen/AmmoDataPOJO.java) 对应的弹药定义 JSON。完整配置可参考 [`40mm_incendiary.json`](../common/src/main/resources/data/zerocontact/default_pack/default_ammo/data/zerocontact/ammoDefinitions/40mm_incendiary.json)。
+本文档说明 [`AmmoDataPOJO`](../forge/src/main/java/net/zerocontact/datagen/model/AmmoDataPOJO.java) 对应的弹药定义 JSON，并补充截至 `09966b2`（2026-10-04）的弹匣兼容与伤害扩展事件。完整配置可参考 [`40mm_incendiary.json`](../common/src/main/resources/data/zerocontact/default_pack/default_ammo/data/zerocontact/ammoDefinitions/40mm_incendiary.json)。
 
 弹药定义文件放在资源包的 `data/zerocontact/ammoDefinitions` 目录中。表内“默认值”来自 POJO 的字段初始化值；标为“必填”的字段虽然没有显式校验，但缺失时无法形成有效的弹药注册信息。
 
@@ -75,7 +75,7 @@
 | `trigger` 值 | 触发时机 | 典型用例 |
 | --- | --- | --- |
 | `SPAWN` | 弹体生成并绑定弹药上下文时。 | 初始化效果或记录日志。 |
-| `HIT_ENTITY` | 弹体对生物造成枪械伤害并完成 ZeroContact 伤害流程时。 | 给受击者施加负面效果。 |
+| `HIT_ENTITY` | ZeroContact 伤害路径调用生物受伤方法并发布 `HitProcessEvent.Post` 后，且弹体有弹药上下文、射手为生物时。 | 给受击者施加负面效果；不保证受伤方法返回成功。 |
 | `HIT_BLOCK` | 弹体命中方块时。 | 单次触发爆炸、燃烧或脚本逻辑。 |
 | `HIT_BLOCK_TICKING` | 当前实现中与 `HIT_BLOCK` 一同在命中方块时触发。 | 兼容现有烟雾弹等配置；不要假定它会在后续每个 tick 自动重复。 |
 | `BULLET_TICKING` | 弹体飞行过程中每个服务端 tick、更新位置前触发。 | 生成飞行粒子或持续扫描弹道附近实体。 |
@@ -102,6 +102,37 @@
 | `arguments` | `object` | `{}` | 原样转换后作为回调第二个参数 `args` 传入，可包含字符串、数字、布尔值、数组或嵌套对象。 | `{ "duration": 50, "radius": 4.0 }` |
 
 Lua 文件必须返回 table，并暴露与 `function` 同名的函数。可用的 Helper、回调上下文 `ctx`、目标选择器及完整脚本写法见 [`ZeroContact Lua Helpers 用法`](./lua-helpers-cn.md)。
+
+`HIT_ENTITY` 的位置使用受击实体当前位置，`previous_position` 为 `nil`；它不是精确的弹体碰撞坐标。若 `HitProcessEvent.Pre` 被取消，当前 ZeroContact 路径不调用受伤方法、`Post` 或这个 Lua 钩子。其他 TaCZ 命中后续逻辑仍继续执行，因此取消不能理解为取消整个弹体命中流程。
+
+## TaCZ Magazines 兼容
+
+`511fc5d` 为 TaCZ Magazines 0.2.6 引入临时兼容，后续 `49a011e`、`1672124` 改进逐发弹种、枪膛和换弹处理。数据包作者继续使用同一份弹药 JSON，无需新增弹匣专用字段。
+
+- 兼容层按每发子弹保存原始 `ammo_id` 与变体；同口径弹匣可混装变体，最后装入的一发先供弹。提示按供弹顺序展示连续的弹种分组。
+- 枪膛弹种单独保留，移除或更换弹匣后，已有膛内弹仍决定下一次射击的参数。
+- `bullet_amount` 表示一发子弹生成的弹丸数；例如 `8` 是一次射击的 8 个弹丸，不是消耗 8 发弹匣子弹。
+- 逐发管理针对可拆卸弹匣路径；分段装填、虚拟弹药和直接使用背包弹药的枪械不走这条管理路径。
+- 不同弹匣模组版本的 API 可能不同；这里描述的是仓库中的 0.2.6 兼容实现，发布整合包前应核对实际版本。
+
+## Java 扩展：命中部位与伤害事件
+
+以下事件发往 `MinecraftForge.EVENT_BUS`，供 Forge 扩展代码订阅；它们不是 `effects[].trigger` 的新增取值，也不会向 Lua 自动暴露相应方法。
+
+| 事件 | 时机与可修改内容 |
+| --- | --- |
+| [`ResolveHitBodyPartEvent.Pre`](../forge/src/main/java/net/zerocontact/events/ResolveHitBodyPartEvent.java) | 选取护甲和计算伤害之前，用 `setHitPart(new HitPart(...))` 修改命中部位及倍率；不可取消。 |
+| `ResolveHitBodyPartEvent.Post` | 部位解析完成后，供观察最终部位。 |
+| [`HitProcessEvent.Pre`](../forge/src/main/java/net/zerocontact/events/HitProcessEvent.java) | ZeroContact 已计算最终伤害、即将回写 TaCZ 事件时；用 `setDamageAmount(float)` 修改伤害，也可以取消。仅在流程需要替换伤害且未提前停止时发布。 |
+| `HitProcessEvent.Post` | ZeroContact 调用受伤方法后发布；不检查 `hurt()` 返回值，`getFinalDamage()` 是传入伤害，不是生命值实际扣减量。 |
+
+`HitPartEnum` 为 `HEAD`、`TORSO`、`ARM`、`LEG`、`UNSET`。默认按 TaCZ 的爆头结果解析为 `HEAD` 或 `TORSO`；`UNSET` 回退到默认部位并保留指定倍率。`HitPart.damageFactor` 必须为有限且非负的数，只在伤害计算后应用一次。同一次命中解析的部位会缓存，伤害和耐久处理复用该结果。
+
+头部命中选取头盔；四肢命中跳过头盔、胸甲与插板，且不会损耗它们的耐久；躯干按现有胸甲/前后插板规则处理。First Aid 集成通过 `ResolveHitBodyPartEvent.Pre`（`HIGH` 优先级）修改部位，需要同时安装 `firstaid` 和 `tacz_firstaid_compat`，并能取得玩家的碰撞位置。配置倍率见[配置参考](./configuration-and-equipment-cn.md)。
+
+`HitProcessEvent` 提供射手（可为空）、目标、弹体、爆头状态、伤害、护甲快照和弹药上下文。结果枚举为 `NON_PEN`、`PEN`、`NO_ARMOR`、`NO_OUTCOME`、`RICOCHET`；它描述计算路径，不能单凭此值推断实际生命值变化。护甲上下文的物品栈在构造时复制，修改快照不会改动实体装备。
+
+`Pre.getFinalDamage()` 已包含爆头、穿透、生物规则及部位倍率，处理器随后把 TaCZ 爆头倍率设为 `1`，避免再次乘算。订阅者无需重复应用这些倍率；后续 TaCZ 事件处理仍可能调整伤害。取消 `Pre` 会让 ZeroContact 伤害源跳过自身伤害调用及其 `Post`/`HIT_ENTITY`，不会中止 TaCZ 的全部命中后续效果。
 
 ## 完整用例：40 mm 燃烧弹
 

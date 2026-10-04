@@ -6,6 +6,9 @@
 
 - [`弹药定义 JSON 用法表`](./ammo-definition-json-cn.md)
 - [`ZeroContact Lua Helpers 用法`](./lua-helpers-cn.md)
+- [`配置、命令与装备操作`](./configuration-and-equipment-cn.md)
+
+本文已对照截至 `09966b2`（2026-10-04）的提交与实现更新；伤害扩展事件见弹药文档。
 
 ## 安装位置与加载时机
 
@@ -17,10 +20,14 @@ config/zerocontact/packs/<包目录>/
 
 管理器只扫描 `packs` 下的一级子目录，不会直接加载放在这里的 ZIP 文件。包内的物品与弹药会在物品注册阶段加载，因此新增或修改这些内容后应完整重启游戏；不要把 `/reload` 当作重新注册物品的方式。
 
-启动时，模组还会把内置默认包解压到：
+启动时，模组还会把内置 ZIP 中的各个包解压到 `packs` 下的独立目录：
 
 ```text
-config/zerocontact/packs/default_pack/
+config/zerocontact/packs/default_ammo/
+config/zerocontact/packs/default_armor/
+config/zerocontact/packs/default_loadout/
+config/zerocontact/packs/default_module/
+config/zerocontact/packs/content_creator_smat/
 ```
 
 默认情况下，同名文件会被内置版本覆盖。可在 `config/zerocontact/override.toml` 中设置：
@@ -30,6 +37,8 @@ pack.default_pack_override = false
 ```
 
 这只控制默认包的重新解压，不影响其他扩展包。
+
+清单中 `pack_name` 为 `zero_contact` 的旧包会记录 `Detected deprecated pack` 警告并被跳过。更新旧包时应迁移到当前结构并改用唯一的包名；仅修改目录名不能解除此限制。解压会覆盖同名文件，但不会清理内置 ZIP 已移除的旧文件，升级后也应检查遗留定义，避免重复注册。
 
 ## 最小目录结构
 
@@ -132,6 +141,9 @@ data/zerocontact/scripts
 | `armor` | 护甲、头盔、面具、插板背心、制服或臂章 | `equipment_slot` |
 | `plate` | 可装入插板背心的防弹插板 | 无 |
 | `loadout` | 背包或胸挂容器 | `equipment_slot` |
+| `module` | 通用模块，例如电池、信标、袋具或无线电 | `mount_type`、`module_trait` |
+| `module_nvg` | 夜视或热成像模块 | `mount_type`、`module_trait` |
+| `module_headset` | 带音频配置的耳机模块 | `mount_type`、`module_trait` |
 
 未知的 `type` 无法反序列化。有效 JSON 并不代表一定能生成物品；不受适配器支持的 `equipment_slot` 会被忽略或导致加载失败。
 
@@ -152,14 +164,15 @@ data/zerocontact/scripts
 | `model` | `string` | 空字符串 | `zerocontact` 命名空间下的 GeckoLib 模型路径。 |
 | `animation` | `string` | 空字符串 | `zerocontact` 命名空间下的 GeckoLib 动画路径。 |
 | `hurt_modifier` | `object` | 默认倍率对象 | 不同命中结果最终应用的伤害倍率。 |
+| `attachments` | `object[]` | `[]` | `ARMOR`、`PLATE_CARRIER`、`HELMET` 和 `MASK` 的模块挂点，见下节。 |
 
 `hurt_modifier` 支持：
 
 | 字段 | 默认值 | 说明 |
 | --- | --- | --- |
-| `ricochet_multiplier` | `0.05` | 跳弹结果下应用的原伤害比例。 |
-| `penetrate_multiplier` | `0.7` | 穿透结果下应用的原伤害比例。 |
-| `blunt_multiplier` | `0.1` | 未穿透钝击结果下应用的原伤害比例。 |
+| `ricochet_multiplier` | `0.05` | 仍会反序列化并传入物品；当前 `DamageProcessor` 只标记 `RICOCHET`，不会额外乘算此值。 |
+| `penetrate_multiplier` | `0.7` | 正的穿透伤害乘数，通常作用于弹药 `flesh_damage`。 |
+| `blunt_multiplier` | `0.1` | 未穿透钝击倍率；当前基础计算为 `penetration_class * 0.3 * blunt_multiplier`，并非原始伤害的固定比例。 |
 
 示例：
 
@@ -195,6 +208,36 @@ data/zerocontact/scripts
 
 因此，不要假定 POJO 中出现的每个字段都会对所有 `equipment_slot` 生效。
 
+### 护甲模块挂点：`attachments[]`
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `mount_id` | `string` | 装备内唯一的挂点路径，自动使用 `zerocontact` 命名空间；命令也使用此路径。 |
+| `mount_type` | `string` | 挂点位置类型：`HELMET_FRONT`、`HELMET_RAIL`、`HELMET_BACK`、`HELMET_TOP`、`FACE`、`ARMOR_POUCH`、`UNDEFINED`。 |
+| `mount_bone` | `string` | 装备 GeckoLib 模型中的挂载骨骼名称。 |
+| `accept_categories` | `string[]` | 可接受的模块分类，必须提供数组；不区分大小写。 |
+
+模块分类为 `NIGHT_VISION`、`FLASH_LIGHT`、`VISOR`、`ADMIN_POUCH`、`HELMET_COVER`、`POUCH`、`BATTERY`、`BEACON`、`HEADSET`、`UNDEFINED`。未知名称或空分类数组会转换为 `UNDEFINED`，不能据此获得有效的模块候选。分类只决定挂载兼容性，不会自动赋予功能。
+
+以下片段可加入头盔定义；模型应包含 `nvg_fix` 和 `headset_fix` 骨骼：
+
+```json
+"attachments": [
+  {
+    "mount_id": "nvg_mount",
+    "mount_type": "helmet_front",
+    "mount_bone": "nvg_fix",
+    "accept_categories": ["night_vision"]
+  },
+  {
+    "mount_id": "headset_mount",
+    "mount_type": "helmet_top",
+    "mount_bone": "headset_fix",
+    "accept_categories": ["headset"]
+  }
+]
+```
+
 ### `plate` 字段
 
 | 字段 | 类型 | 默认值 / 要求 | 说明 |
@@ -211,6 +254,8 @@ data/zerocontact/scripts
 
 注意：当前 POJO 只识别 `ricochet_multiplier`、`penetrate_multiplier` 和 `blunt_multiplier`。JSON 中写成 `*_modifier` 会被 Gson 当作未知字段忽略。
 
+插板手持安装现使用内置 `animations/plate.animation.json` 中的 `install` 动画，手持渲染器不会读取定义中的 `animation`。自定义模型需与该动画的骨骼兼容；若要覆盖动画，应提供同路径的客户端资源。操作方式见[装备操作参考](./configuration-and-equipment-cn.md)。
+
 ### `loadout` 字段
 
 | 字段 | 类型 | 默认值 / 要求 | 说明 |
@@ -221,7 +266,91 @@ data/zerocontact/scripts
 | `equipment_slot` | `string` | 必填 | 当前支持 `BACKPACK` 或 `RIGS`。 |
 | `texture`、`model`、`animation` | `string` | 空字符串 | `zerocontact` 命名空间下的 GeckoLib 资源路径。 |
 
-`HEADSET` 虽然存在于内部装备类型枚举中，但当前没有对应的数据生成适配器，不能仅凭 JSON 注册。
+`loadout` 的 `equipment_slot: "HEADSET"` 仍不受支持；耳机应使用 `type: "module_headset"`。
+
+### 模块公共字段
+
+`module`、`module_nvg`、`module_headset` 使用以下公共字段，均放在 `items` 目录，无需 `equipment_slot`：
+
+| 字段 | 类型 | 默认值 / 要求 | 说明 |
+| --- | --- | --- | --- |
+| `type` | `string` | 必填 | 上述三种模块类型之一。 |
+| `id` | `string` | 必填 | 生成 `zerocontact:<id>`，并注册模块分类。 |
+| `mount_type` | `string` | 必填 | **模块分类**，取值来自 `MountCategory`，例如 `night_vision`、`headset`、`pouch`。与挂点内同名字段的含义不同，不区分大小写。 |
+| `module_trait` | `string` | 必填 | 功能路径，不带命名空间，例如 `nvg`、`headset`、`radio`。 |
+| `durability` | `integer` | `0` | 物品耐久；夜视仪内部电池上限当前固定为 `12000`，此字段不会修改电池容量。 |
+| `texture`、`model`、`animation` | `string` | 空字符串 | `zerocontact` 命名空间下的 GeckoLib 资源路径。 |
+
+通用模块当前注册的功能为 `pouch`、`admin_pouch`、`navboard`、`nvg`、`battery`、`beacon`、`headset`、`radio`。夜视仪和耳机应使用各自专用类型，以获得 `INvg` 实现或音频配置；专用物品的功能固定为 `nvg`、`headset`，不要通过改写 `module_trait` 期待切换功能。适配器仍会读取此字段，必须提供合法路径。
+
+无线电使用 `module`，分类为 `pouch`、功能为 `radio`；没有 `RADIO` 模块分类。完整例子见 [`prc_148.json`](../common/src/main/resources/data/zerocontact/default_pack/default_module/data/zerocontact/items/prc_148.json)。频道在游戏内设置，不是当前模块 JSON 字段。
+
+### 夜视仪：`module_nvg`
+
+| 字段 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `vignette` | `string` | `textures/gui/bino_nvg.png` | `zerocontact` 下的视野遮罩纹理路径。 |
+| `color` | `string` | `GREEN` | 支持 `GREEN`、`WHITE`、`THERMAL`、`THERMAL_COLOR`；不区分大小写，未知值回退到 `GREEN`。 |
+
+```json
+{
+  "type": "module_nvg",
+  "id": "example_nvg",
+  "mount_type": "night_vision",
+  "module_trait": "nvg",
+  "durability": 12000,
+  "texture": "textures/sb_pvs31a.png",
+  "model": "geo/sb_nvg_pvs31a.geo.json",
+  "animation": "animations/nvg_pvs31.animation.json",
+  "vignette": "textures/gui/bino_nvg.png",
+  "color": "WHITE"
+}
+```
+
+示例复用内置资源，发布时需保持对应包启用。当前 `NVG.getAnimation()` 固定返回 `animations/nvg_pvs31.animation.json`，因此不能仅靠 JSON 的 `animation` 切换动画文件。动画使用 `activate`、`deactivate`、`on_pose`、`off_pose` 片段。
+
+### 耳机：`module_headset`
+
+`audio_profile` 整体省略时，默认值为压缩比 `0`、瞬态起始/持续增益 `0`、拾音衰减距离 `16`，以及 125、500、2000、4000、8000 Hz 五个 EQ 频段（增益 `0`、Q `1`）。提供此对象时应写全所有字段与 `eq` 数组，不会逐字段合并默认配置；不要显式写 `null`。
+
+| `audio_profile` 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `compressor_ratio` | `number` | 动态压缩比。 |
+| `transient_attack` | `number` | 瞬态起始增益，单位 dB。 |
+| `transient_sustain` | `number` | 瞬态持续部分增益，单位 dB。 |
+| `pick_up_attenuation` | `number` | 耳机开启时使用的线性声音衰减距离参数。 |
+| `eq` | `object[]` | 峰值均衡器频段；可用 `[]` 表示不设置频段。 |
+| `eq[].freq_hz` | `number` | 中心频率，必须为正的有限数，单位 Hz。 |
+| `eq[].gain` | `number` | 增益，必须为有限数，范围 `-24..24` dB。 |
+| `eq[].precision` | `number` | Q 值，必须为有限数，范围 `0.1..20`。 |
+
+```json
+{
+  "type": "module_headset",
+  "id": "example_headset",
+  "mount_type": "headset",
+  "module_trait": "headset",
+  "durability": 0,
+  "texture": "textures/c2r_headset.png",
+  "model": "geo/c2r_headset.geo.json",
+  "animation": "",
+  "audio_profile": {
+    "compressor_ratio": 10,
+    "transient_attack": -6,
+    "transient_sustain": -12,
+    "pick_up_attenuation": 18,
+    "eq": [
+      { "freq_hz": 125, "gain": -3, "precision": 1 },
+      { "freq_hz": 500, "gain": -3, "precision": 1 },
+      { "freq_hz": 2000, "gain": -5, "precision": 1 },
+      { "freq_hz": 4000, "gain": -2, "precision": 1 },
+      { "freq_hz": 8000, "gain": 5, "precision": 1 }
+    ]
+  }
+}
+```
+
+示例复用内置 C2R 资源。音频配置取自已挂载的耳机，需开启耳机；PCM 处理还受客户端 `sound_and_visual_effects.audio_effect` 控制。多个耳机同时挂载时，当前实现只取一个配置，不能依赖叠加或固定优先级。完整默认定义见 [`headset_c2r.json`](../common/src/main/resources/data/zerocontact/default_pack/content_creator_smat/data/zerocontact/items/headset_c2r.json)。
 
 ## 弹药定义：`data/zerocontact/ammoDefinitions`
 
@@ -312,6 +441,8 @@ data/zerocontact/scripts/incendiary/on_hit.lua
 | `animations/...` | GeckoLib 动画。 |
 | `textures/models/...` | GeckoLib 穿戴模型纹理。 |
 
+这些子目录是组织惯例，实际路径由定义中的 `texture`、`model` 等字段决定。当前创作者包也使用 `textures/c2r_headset.png` 等直接位于 `textures` 下的资源，不应按旧目录布局猜测路径。
+
 普通物品模型示例：
 
 ```json
@@ -355,6 +486,8 @@ data/zerocontact/scripts/incendiary/on_hit.lua
 - 固定目录名与 `zerocontact` 命名空间拼写正确，尤其是 `ammoDefinitions` 的大小写。
 - 所有 JSON 都是严格 JSON：没有注释、尾随逗号或重复键。
 - `items` 中的 `type` 和 `equipment_slot` 是当前适配器支持的值。
+- 模块的 `mount_type` 使用分类名，挂点的 `mount_type` 使用位置类型；`accept_categories`、`mount_bone` 与模块和模型匹配。
+- 耳机提供完整的 `audio_profile` 或省略整个对象，EQ 参数满足范围要求。
 - `hurt_modifier` 使用 `*_multiplier` 字段名。
 - `gear_recipes` 中材料字段写作 `itemId`，并避免不确定的多文件覆盖。
 - 每个生成物品都有对应的语言键以及所需模型、纹理或 GeckoLib 资源。
