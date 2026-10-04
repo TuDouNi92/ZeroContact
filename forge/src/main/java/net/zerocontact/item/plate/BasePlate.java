@@ -92,8 +92,10 @@ public class BasePlate extends ArmorItem implements PlateInfoProvider, GeoItem, 
 
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand usedHand) {
-        ItemStack handStack = player.getMainHandItem();
-        PlateInteractionManager.install(this);
+        ItemStack handStack = player.getItemInHand(usedHand);
+        if (level.isClientSide && usedHand == InteractionHand.MAIN_HAND) {
+            PlateInteractionManager.install(this);
+        }
         return InteractionResultHolder.consume(handStack);
     }
 
