@@ -7,5 +7,6 @@
   "texture": "textures/sb_gpnvg.png",
   "model": "geo/sb_gpnvg.geo.json",
   "animation": "animations/nvg_pvs31.animation.json",
-  "color": "WHITE"
+  "color": "WHITE",
+  "vignette": "textures/gui/gpnvg.png"
 }
