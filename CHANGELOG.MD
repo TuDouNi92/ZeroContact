@@ -279,3 +279,59 @@ The weapon will then be able to use that ammunition type infinitely in Creative 
 - 12g AP slug, Dragon-Breath shell, Flechette shell.
 - 5.7x28mm L191, SB193, SS190.
 - 5.8x42mm DBX95, DBP191, DVC12.
+
+## Beta 1.1.6
+
+### New Items
+
+- Night vision and thermal goggles: PVS-31, PVS-31A, GPNVG-18, and T7.
+- Headsets: ComTac II (OD, CB) and Ops-Core AMP (TAN, BLACK).
+- Equipment modules: AA Battery Pouch, Helmet Mounted Beacon, TMC Admin Pouch, and S&S Navboard FlipLite.
+- AN/PRC-148 MBITR radio, including a black variant.
+- SMAT Content Creator Pack:
+  - FCPC V5, SS LV119 (Icebreaker), IBA OTV, IOTV Gen4, C2R MOR Lite, and Hound Wolf plate carrier.
+  - C2R Fast and Hound Wolf helmets, and a black Bastion helmet cover.
+  - CP G3 Pro uniforms, including CTSFO variants, Hound Wolf uniform and jeans, and The Wedge jacket and pants.
+  - Adept Colossus plate, additional PVS-31A and GPNVG-18 models, ComTac XPI and Hound Wolf AMP headsets.
+
+### New Mechanism
+
+- Modular equipment system: install compatible modules on armor and helmets through the equipment menu.
+  - Open the menu with the grave accent key or `/zerocontact equipment`.
+  - Use `G` to open the module HUD, scroll to select a module, and use `H` to activate it. The HUD remembers the last selection.
+- Night vision and thermal effects with view masks, equip animations, and sound effects.
+- Headset audio processing with sound pickup, equalization, and gunfire compression.
+- MBITR radio integration with Simple Voice Chat, supporting a home channel and up to 16 scan channels.
+  - Use `Shift + 3` to configure an active mounted radio. Communication works within 128 blocks in the same dimension.
+- Animated installation of held plates into empty front or back plate slots.
+- `/modular <target> <equipmentSlot> <mount_id> <module>` command for installing or removing equipment modules, with slot and mount suggestions.
+- Client config option to toggle audio processing; server config options for First Aid limb and helmeted-head damage factors.
+- Workbench module category, improved list layout, and additional recipes for existing equipment and modules.
+
+### Data Packs & Extensions
+
+- Reorganize built-in content into separate ammo, armor, loadout, module, and SMAT creator packs.
+- Add data-driven equipment mounts and modules, configurable night vision colors and view masks, and custom headset audio profiles.
+- Add per-mob headshot and bodyshot damage rules.
+- Add Forge `ResolveHitBodyPartEvent.Pre/Post` and `HitProcessEvent.Pre/Post` events for body-part resolution and damage extensions.
+- Add English and Chinese references for [pack authoring](docs/data-driven-pack-guide-en.md), [ammo definitions](docs/ammo-definition-json-en.md), [Lua helpers](docs/lua-helpers-en.md), and [configuration and equipment operations](docs/configuration-and-equipment-en.md).
+- Legacy packs using `pack_name: "zero_contact"` are now skipped with a deprecation warning. Migrate them to the current pack structure and a unique pack name; check for leftover definitions after upgrading.
+
+### Compatibility
+
+- Update temporary compatibility for TaCZ Magazines 0.2.6.
+- Preserve ammo IDs and variants per cartridge, supporting mixed variants of the same caliber in detachable magazines.
+- Track chambered ammunition separately so the next shot retains its ammo parameters when a magazine is removed or replaced.
+- Improve magazine loading, unloading, reloading, selector overlays, and tooltips showing cartridge groups in feeding order.
+- Improve First Aid body-part damage handling; limb hits no longer consume helmet, chest armor, or plate durability.
+
+### Fix & Optimize
+
+- Fix modules disappearing after armor is unequipped on servers, and improve module capability synchronization.
+- Fix multiplayer night vision animation desync, equip sound synchronization, and incorrect module durability loss.
+- Improve night vision rendering and view masks, disable its animations in GUI previews, and fix rendering after switching game modes.
+- Fix thermal target depth glitches and the SMAT GPNVG-18 view mask.
+- Fix plate installation failing to complete, reset the installation timer, and cancel installation when the held item changes.
+- Fix backpack inventory synchronization, ammo selection after refactoring, and explosion delay calculation.
+- Fix TaCZ and TaCZ Magazines mixin compatibility issues and improve reload detection.
+- Refactor damage processing and correct body-part and headshot factor handling.
