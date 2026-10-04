@@ -4,6 +4,7 @@ import net.minecraft.world.entity.player.Player;
 import net.zerocontact.armor.modular.ModuleQuery;
 import net.zerocontact.armor.modular.module.headset.container.HeadsetContainer;
 import net.zerocontact.armor.modular.module.headset.item.Headset;
+import net.zerocontact.armor.modular.module.headset.model.AudioProfile;
 import net.zerocontact.capability.CapabilityRegistries;
 
 import java.util.Optional;
@@ -22,10 +23,10 @@ public final class HeadsetService {
                 );
     }
 
-    public static Optional<Headset.AudioProfile> getAudioProfile(Player player) {
+    public static Optional<AudioProfile> getAudioProfile(Player player) {
         if (player == null) return Optional.empty();
         return ModuleQuery.streamMounted(player)
-                .<Headset.AudioProfile>mapMulti((ref, out) -> {
+                .<AudioProfile>mapMulti((ref, out) -> {
                     if (ref.stack().getItem() instanceof Headset headset) {
                         out.accept(headset.getAudioProfile());
                     }

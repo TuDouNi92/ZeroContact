@@ -9,6 +9,8 @@ import net.zerocontact.ZeroContact;
 import net.zerocontact.api.datagen.IAssetManager;
 import net.zerocontact.api.armor.IEquipmentTypeTag;
 import net.zerocontact.armor.modular.model.MountCategory;
+import net.zerocontact.armor.modular.module.headset.item.Headset;
+import net.zerocontact.armor.modular.module.headset.model.AudioProfile;
 import net.zerocontact.armor.modular.module.nvg.api.INvg;
 import net.zerocontact.armor.modular.module.nvg.item.NVG;
 import net.zerocontact.armor.modular.registry.ModuleRegistry;
@@ -69,7 +71,7 @@ public class ItemAdapter {
             new ModuleAdapter()
     );
 
-    public static void register(ZAssetManager zAssetManager){
+    public static void register(ZAssetManager zAssetManager) {
         ZContentLoader.itemGenData.forEach((data, tab) -> ItemAdapter.ADAPTERS.forEach(adapter -> {
             if (data instanceof ItemPOJO.Armor armor) {
                 LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(armor, tab);
@@ -79,25 +81,26 @@ public class ItemAdapter {
                 LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(plate, tab);
                 if (records.isEmpty()) return;
                 zAssetManager.registerItems(ITEMS_REG_TAB, ItemsReg.ITEMS, new IAssetManager.WearableType(records, "PLATE_LIKE"));
-            } else if(data instanceof AmmoDataPOJO ammo){
+            } else if (data instanceof AmmoDataPOJO ammo) {
                 LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(ammo, tab);
-                if(records.isEmpty())return;
-                zAssetManager.registerItems(ITEMS_REG_TAB,ItemsReg.ITEMS, new IAssetManager.WearableType(records,"AMMO"));
-            }
-            else if(data instanceof ItemPOJO.Loadout loadout){
+                if (records.isEmpty()) return;
+                zAssetManager.registerItems(ITEMS_REG_TAB, ItemsReg.ITEMS, new IAssetManager.WearableType(records, "AMMO"));
+            } else if (data instanceof ItemPOJO.Loadout loadout) {
                 LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(loadout, tab);
-                if(records.isEmpty())return;
-                zAssetManager.registerItems(ITEMS_REG_TAB,ItemsReg.ITEMS, new IAssetManager.WearableType(records,"LOADOUT"));
-            }
-            else if(data instanceof ModularNVGPOJO modularNVGPOJO){
+                if (records.isEmpty()) return;
+                zAssetManager.registerItems(ITEMS_REG_TAB, ItemsReg.ITEMS, new IAssetManager.WearableType(records, "LOADOUT"));
+            } else if (data instanceof ModularNVGPOJO modularNVGPOJO) {
                 LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(modularNVGPOJO, tab);
-                if(records.isEmpty())return;
-                zAssetManager.registerItems(ITEMS_REG_TAB,ItemsReg.ITEMS, new IAssetManager.WearableType(records,"NVG"));
-            }
-            else if(data instanceof ModularPOJO modular){
+                if (records.isEmpty()) return;
+                zAssetManager.registerItems(ITEMS_REG_TAB, ItemsReg.ITEMS, new IAssetManager.WearableType(records, "NVG"));
+            } else if (data instanceof ModularHeadsetPOJO headsetPOJO) {
+                LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(headsetPOJO, tab);
+                if (records.isEmpty()) return;
+                zAssetManager.registerItems(ITEMS_REG_TAB, ItemsReg.ITEMS, new IAssetManager.WearableType(records, "NVG"));
+            } else if (data instanceof ModularPOJO modular) {
                 LinkedHashSet<GenerationRecord<?>> records = adapter.deserializeItems(modular, tab);
-                if(records.isEmpty())return;
-                zAssetManager.registerItems(ITEMS_REG_TAB,ItemsReg.ITEMS, new IAssetManager.WearableType(records,"MODULE"));
+                if (records.isEmpty()) return;
+                zAssetManager.registerItems(ITEMS_REG_TAB, ItemsReg.ITEMS, new IAssetManager.WearableType(records, "MODULE"));
             }
         }));
     }
@@ -416,6 +419,22 @@ public class ItemAdapter {
                                         return nvgType;
                                     }
                                 },
+                                tab
+                        )
+                );
+            } else if (data instanceof ModularHeadsetPOJO headsetPOJO) {
+                AudioProfile audioProfile = headsetPOJO.audioProfile;
+                items.add(
+                        new GenerationRecord<Item>(
+                                modular.id,
+                                new Headset(
+                                        "",
+                                        durability,
+                                        texture,
+                                        model,
+                                        animation,
+                                        audioProfile
+                                ),
                                 tab
                         )
                 );

@@ -9,17 +9,31 @@
   "item.zerocontact.armor_c2r_lite": "C2R MOR Lite (WG)",
   "item.zerocontact.helmet_c2r": "C2R Fast helmet (BLACK)",
 
+  "item.zerocontact.armor_hound_wolf": "Hound Wolf Plate-carrier",
+  "item.zerocontact.helmet_hound_wolf": "Hound Wolf Helmet",
+
+
 
   "item.zerocontact.uniform_g3pro_top": "CP G3 Pro Combat uniform (Shirt)",
   "item.zerocontact.uniform_g3pro_pants": "CP G3 Pro Combat uniform (Pants)",
   "item.zerocontact.uniform_g3pro_ctsfo_top": "CP G3 Pro Combat uniform (Shirt)(WG)",
   "item.zerocontact.uniform_g3pro_ctsfo_pants": "CP G3 Pro Combat uniform (Pants)(WG)",
+  "item.zerocontact.uniform_hound_wolf_top": "Hound Wolf Combat uniform",
+  "item.zerocontact.uniform_hound_wolf_pants": "Hound Wolf Jeans",
+
+  "item.zerocontact.plate_colossus": "Adept Colossus",
+
+
 
   "item.zerocontact.uniform_wedge_top": "The Wedge (Jacket)",
   "item.zerocontact.uniform_wedge_pants": "The Wedge (Pants)",
 
   "item.zerocontact.sb_pvs31a": "PVS-31A Night Vison Goggle",
   "item.zerocontact.sb_gpnvg": "GPNVG-18 Night Vison Goggle",
+  "item.zerocontact.headset_c2r": "ComTac XPI Headset (BLACK)",
+  "item.zerocontact.headset_hound_wolf": "Ops-Core AMP Headset (HF)",
+
+
 
   "item.zerocontact.bastion_cover_black": "Bastion Helmet Cover (Black) "
 }

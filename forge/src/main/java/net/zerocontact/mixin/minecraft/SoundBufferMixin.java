@@ -3,7 +3,7 @@ package net.zerocontact.mixin.minecraft;
 import com.mojang.blaze3d.audio.SoundBuffer;
 import net.zerocontact.armor.modular.module.headset.client.audio.StaticPcmProcessor;
 import net.zerocontact.armor.modular.module.headset.client.audio.StaticSoundBufferSource;
-import net.zerocontact.armor.modular.module.headset.item.Headset;
+import net.zerocontact.armor.modular.module.headset.model.AudioProfile;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,10 +31,10 @@ public abstract class SoundBufferMixin implements StaticSoundBufferSource {
     @Unique
     private ByteBuffer zeroContact$originalPcm;
     @Unique
-    private final Map<Headset.AudioProfile, SoundBuffer> zeroContact$processedActivatedBuffers = new HashMap<>();
+    private final Map<AudioProfile, SoundBuffer> zeroContact$processedActivatedBuffers = new HashMap<>();
 
     @Unique
-    private final Map<Headset.AudioProfile, SoundBuffer> zeroContact$processedDeactivatedBuffers = new HashMap<>();
+    private final Map<AudioProfile, SoundBuffer> zeroContact$processedDeactivatedBuffers = new HashMap<>();
 
     @Unique
     private void zeroContact$retainOriginalPcm() {
@@ -49,7 +49,7 @@ public abstract class SoundBufferMixin implements StaticSoundBufferSource {
         zeroContact$retainOriginalPcm();
     }
     @Override
-    public SoundBuffer zeroContact$forPlayback(boolean process, @Nullable Headset.AudioProfile profile) {
+    public SoundBuffer zeroContact$forPlayback(boolean process, @Nullable AudioProfile profile) {
         SoundBuffer original = (SoundBuffer) (Object) this;
         if (!StaticPcmProcessor.supports(format)) {
             return original;
@@ -61,7 +61,7 @@ public abstract class SoundBufferMixin implements StaticSoundBufferSource {
         }
         // Static channels may share this buffer: playback state belongs to the channel.
         // EQ parameters are supplied by the immutable profile; do not reuse another profile's PCM.
-        Map<Headset.AudioProfile, SoundBuffer> buffers = process
+        Map<AudioProfile, SoundBuffer> buffers = process
                 ? zeroContact$processedActivatedBuffers : zeroContact$processedDeactivatedBuffers;
         SoundBuffer processed = buffers.get(profile);
         if (processed == null) {

@@ -12,19 +12,15 @@ import net.zerocontact.api.datagen.IAssetManager;
 import net.zerocontact.datagen.adapter.ItemAdapter;
 import net.zerocontact.datagen.adapter.RuntimeTypeAdapterFactory;
 import net.zerocontact.datagen.model.*;
-import net.zerocontact.registries.ItemsReg;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-
-import static net.zerocontact.forge_registries.ItemRegistry.ITEMS_REG_TAB;
 
 public class ZAssetManager implements IAssetManager {
     private final RuntimeTypeAdapterFactory<ItemPOJO> typeAdapterFactory =
@@ -34,7 +30,8 @@ public class ZAssetManager implements IAssetManager {
                     .registerSubtype(ItemPOJO.Armor.class, "armor")
                     .registerSubtype(ItemPOJO.Loadout.class, "loadout")
                     .registerSubtype(ModularPOJO.class, "module")
-                    .registerSubtype(ModularNVGPOJO.class, "module_nvg");
+                    .registerSubtype(ModularNVGPOJO.class, "module_nvg")
+                    .registerSubtype(ModularHeadsetPOJO.class,"module_headset");
     private final Gson gson = new GsonBuilder().registerTypeAdapterFactory(typeAdapterFactory).create();
 
     @Override

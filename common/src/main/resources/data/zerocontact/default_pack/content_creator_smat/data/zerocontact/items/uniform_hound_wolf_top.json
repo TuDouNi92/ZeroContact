@@ -1,0 +1,12 @@
+{
+  "type":"armor",
+  "id": "uniform_hound_wolf_top",
+  "defense": 1,
+  "protection_class":0,
+  "equipment_slot": "UNIFORM_TOP",
+  "movement_fix": 0.01,
+  "default_durability": 0,
+  "texture": "textures/hound_wolf_uniform_top.png",
+  "model": "geo/hound_wolf_uniform_top.geo.json",
+  "durability_loss_modifier":1
+}

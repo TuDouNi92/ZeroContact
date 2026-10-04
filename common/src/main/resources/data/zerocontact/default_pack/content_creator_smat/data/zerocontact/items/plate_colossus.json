@@ -1,0 +1,17 @@
+{
+  "type": "plate",
+  "id": "plate_colossus",
+  "durability": 128,
+  "defense": 3,
+  "protection_class": 14,
+  "movement_fix": -0.05,
+  "durability_loss_modifier": 1,
+  "texture": "textures/jx.png",
+  "model": "geo/jx.geo.json",
+  "animation": "",
+  "hurt_modifier": {
+    "blunt_modifier": 0.01,
+    "penetrate_modifier": 0.70,
+    "ricochet_modifier": 0.02
+  }
+}

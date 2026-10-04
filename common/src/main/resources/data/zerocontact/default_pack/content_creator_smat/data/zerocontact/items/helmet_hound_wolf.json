@@ -1,16 +1,16 @@
 {
   "type": "armor",
-  "id": "helmet_c2r",
+  "id": "helmet_hound_wolf",
   "defense": 0,
-  "protection_class": 6,
+  "protection_class": 5,
   "equipment_slot": "HELMET",
-  "default_durability": 64,
-  "texture": "textures/c2r_helmet.png",
-  "model": "geo/c2r_helmet.geo.json",
+  "default_durability": 40,
+  "texture": "textures/hound_wolf_helmet.png",
+  "model": "geo/hound_wolf_helmet.geo.json",
   "hurt_modifier": {
-    "ricochet_multiplier": 0.16,
+    "ricochet_multiplier": 0.12,
     "penetrate_multiplier": 0.90,
-    "blunt_multiplier": 0.20
+    "blunt_multiplier": 0.45
   },
   "durability_loss_modifier": 1,
   "attachments": [

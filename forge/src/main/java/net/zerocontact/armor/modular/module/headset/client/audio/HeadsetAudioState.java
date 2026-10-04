@@ -8,7 +8,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.zerocontact.ZeroContact;
-import net.zerocontact.armor.modular.module.headset.item.Headset;
+import net.zerocontact.armor.modular.module.headset.model.AudioProfile;
 import net.zerocontact.armor.modular.module.headset.service.HeadsetService;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 @Mod.EventBusSubscriber(modid = ZeroContact.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public final class HeadsetAudioState {
     private static volatile boolean active;
-    private static Headset.AudioProfile profile = null;
+    private static AudioProfile profile = null;
 
     private HeadsetAudioState() {
     }
@@ -47,7 +47,7 @@ public final class HeadsetAudioState {
         profile = null;
     }
 
-    public static @Nullable Headset.AudioProfile getProfile() {
+    public static @Nullable AudioProfile getProfile() {
         return profile;
     }
 }

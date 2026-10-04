@@ -1,6 +1,6 @@
 package net.zerocontact.armor.modular.module.headset.client.audio;
 
-import net.zerocontact.armor.modular.module.headset.item.Headset;
+import net.zerocontact.armor.modular.module.headset.model.AudioProfile;
 import org.jetbrains.annotations.Nullable;
 
 import javax.sound.sampled.AudioFormat;
@@ -23,7 +23,7 @@ public final class StaticPcmProcessor {
                 && format.getSampleRate() > 0;
     }
 
-    public static ByteBuffer copyAndProcess(ByteBuffer original, AudioFormat format, boolean process, @Nullable Headset.AudioProfile profile) {
+    public static ByteBuffer copyAndProcess(ByteBuffer original, AudioFormat format, boolean process, @Nullable AudioProfile profile) {
         return copyAndProcess(original, format, process, true, true, true,profile);
     }
 
@@ -31,14 +31,14 @@ public final class StaticPcmProcessor {
     public static ByteBuffer copyAndProcess(ByteBuffer original, AudioFormat format,
                                           boolean headsetActive, boolean enableTransient,
                                           boolean enableCompressor, boolean enableSoftClip,
-                                            @Nullable Headset.AudioProfile profile
+                                            @Nullable AudioProfile profile
     ) {
-        Headset.AudioProfile defaultProfile = new Headset.AudioProfile(
+        AudioProfile defaultProfile = new AudioProfile(
                 0,
                 6,
                 5,
                 16,
-                Headset.AudioProfile.defaultEqBands()
+                AudioProfile.defaultEqBands()
         );
 
         if (!supports(format) || original.remaining() % format.getFrameSize() != 0) {
@@ -47,7 +47,7 @@ public final class StaticPcmProcessor {
         ByteBuffer copy = ByteBuffer.allocateDirect(original.remaining())
                 .order(format.isBigEndian() ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN);
         copy.put(original.duplicate()).flip();
-        Headset.AudioProfile eqProfile = headsetActive && profile != null ? profile : defaultProfile;
+        AudioProfile eqProfile = headsetActive && profile != null ? profile : defaultProfile;
         MultiBandEqualizer equalizer = new MultiBandEqualizer(
                 format.getSampleRate(), format.getChannels(), eqProfile.equalizerBands());
         AudioProcessor.TransientShaper transientShaper = null;

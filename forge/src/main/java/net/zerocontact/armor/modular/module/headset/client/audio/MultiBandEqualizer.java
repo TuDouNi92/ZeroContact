@@ -1,6 +1,6 @@
 package net.zerocontact.armor.modular.module.headset.client.audio;
 
-import net.zerocontact.armor.modular.module.headset.item.EqualizerBand;
+import net.zerocontact.armor.modular.module.headset.model.EqualizerBand;
 
 import java.util.List;
 

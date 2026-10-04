@@ -1,9 +1,9 @@
 package net.zerocontact.armor.modular.module.headset.client.audio;
 
 import com.mojang.blaze3d.audio.SoundBuffer;
-import net.zerocontact.armor.modular.module.headset.item.Headset;
+import net.zerocontact.armor.modular.module.headset.model.AudioProfile;
 import org.jetbrains.annotations.Nullable;
 
 public interface StaticSoundBufferSource {
-    SoundBuffer zeroContact$forPlayback(boolean process, @Nullable Headset.AudioProfile profile);
+    SoundBuffer zeroContact$forPlayback(boolean process, @Nullable AudioProfile profile);
 }

@@ -3,6 +3,8 @@ package net.zerocontact.armor.modular.module.headset.item;
 import net.minecraft.resources.ResourceLocation;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.armor.modular.model.MountCategory;
+import net.zerocontact.armor.modular.module.headset.model.AudioProfile;
+import net.zerocontact.armor.modular.module.headset.model.EqualizerBand;
 import net.zerocontact.armor.modular.registry.ModuleRegistry;
 
 import java.util.List;

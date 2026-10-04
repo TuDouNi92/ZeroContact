@@ -1,0 +1,43 @@
+{
+  "type": "module_headset",
+  "id": "headset_c2r",
+  "mount_type": "headset",
+  "module_trait": "headset",
+  "durability": 0,
+  "texture": "textures/c2r_headset.png",
+  "model": "geo/c2r_headset.geo.json",
+  "animation": "",
+  "audio_profile": {
+    "compressor_ratio":10,
+    "transient_attack": -6,
+    "transient_sustain": -12,
+    "pick_up_attenuation": 18,
+    "eq": [
+      {
+        "freq_hz": 125,
+        "gain": -3,
+        "precision": 1
+      },
+      {
+        "freq_hz": 500,
+        "gain": -3,
+        "precision": 1
+      },
+      {
+        "freq_hz": 2000,
+        "gain": -5,
+        "precision": 1
+      },
+      {
+        "freq_hz": 4000,
+        "gain": -2,
+        "precision": 1
+      },
+      {
+        "freq_hz": 8000,
+        "gain": 5,
+        "precision": 1
+      }
+    ]
+  }
+}

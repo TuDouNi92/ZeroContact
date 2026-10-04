@@ -1,0 +1,43 @@
+{
+  "type": "module_headset",
+  "id": "headset_hound_wolf",
+  "mount_type": "headset",
+  "module_trait": "headset",
+  "durability": 0,
+  "texture": "textures/hound_wolf_headset.png",
+  "model": "geo/hound_wolf_headset.geo.json",
+  "animation": "",
+  "audio_profile": {
+    "compressor_ratio":7,
+    "transient_attack": -8,
+    "transient_sustain": -16,
+    "pick_up_attenuation": 24,
+    "eq": [
+      {
+        "freq_hz": 125,
+        "gain": 5,
+        "precision": 1
+      },
+      {
+        "freq_hz": 500,
+        "gain": 0,
+        "precision": 1
+      },
+      {
+        "freq_hz": 2000,
+        "gain": 2,
+        "precision": 1
+      },
+      {
+        "freq_hz": 4000,
+        "gain": -5,
+        "precision": 1
+      },
+      {
+        "freq_hz": 8000,
+        "gain": -5,
+        "precision": 1
+      }
+    ]
+  }
+}

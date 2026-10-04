@@ -2,7 +2,7 @@ package net.zerocontact.armor.modular.module.headset.client.audio;
 
 import com.tacz.guns.client.sound.GunSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
-import net.zerocontact.armor.modular.module.headset.item.Headset;
+import net.zerocontact.armor.modular.module.headset.model.AudioProfile;
 import net.zerocontact.config.ModConfigs;
 
 public final class AudioBehaviorManager {
@@ -21,7 +21,7 @@ public final class AudioBehaviorManager {
             if (!HeadsetAudioState.isActive()) {
                 return originalAttenuation;
             }
-            Headset.AudioProfile profile = HeadsetAudioState.getProfile();
+            AudioProfile profile = HeadsetAudioState.getProfile();
             if (profile != null) {
                 return profile.pickUpAttenuation();
             }

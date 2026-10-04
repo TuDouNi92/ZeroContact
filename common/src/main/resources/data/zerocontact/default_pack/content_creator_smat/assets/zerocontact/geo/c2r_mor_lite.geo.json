@@ -12,15 +12,6 @@
 			},
 			"bones": [
 				{
-					"name": "bipedHead",
-					"pivot": [0, 24, 0]
-				},
-				{
-					"name": "armorHead",
-					"parent": "bipedHead",
-					"pivot": [0, 24, 0]
-				},
-				{
 					"name": "bipedBody",
 					"pivot": [0, 24, 0]
 				},
@@ -743,50 +734,14 @@
 					"rotation": [0, 0, -3]
 				},
 				{
-					"name": "bipedRightArm",
-					"pivot": [-5, 22, 0]
+					"name": "command_pouch_fix",
+					"parent": "armorBody",
+					"pivot": [0, 22.25, -3]
 				},
 				{
-					"name": "armorRightArm",
-					"parent": "bipedRightArm",
-					"pivot": [-5, 22, 0]
-				},
-				{
-					"name": "bipedLeftArm",
-					"pivot": [5, 22, 0]
-				},
-				{
-					"name": "armorLeftArm",
-					"parent": "bipedLeftArm",
-					"pivot": [5, 22, 0]
-				},
-				{
-					"name": "bipedLeftLeg",
-					"pivot": [2, 12, 0]
-				},
-				{
-					"name": "armorLeftLeg",
-					"parent": "bipedLeftLeg",
-					"pivot": [2, 12, 0]
-				},
-				{
-					"name": "armorLeftBoot",
-					"parent": "bipedLeftLeg",
-					"pivot": [2, 12, 0]
-				},
-				{
-					"name": "bipedRightLeg",
-					"pivot": [-2, 12, 0]
-				},
-				{
-					"name": "armorRightLeg",
-					"parent": "bipedRightLeg",
-					"pivot": [-2, 12, 0]
-				},
-				{
-					"name": "armorRightBoot",
-					"parent": "bipedRightLeg",
-					"pivot": [-2, 12, 0]
+					"name": "radio_pouch_fix",
+					"parent": "armorBody",
+					"pivot": [4.5, 17.5, -3.75]
 				}
 			]
 		}

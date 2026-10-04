@@ -1,0 +1,33 @@
+{
+  "type":"armor",
+  "id": "armor_hound_wolf",
+  "defense": 2,
+  "protection_class":3,
+  "equipment_slot": "PLATE_CARRIER",
+  "movement_fix": 0.1,
+  "default_durability": 48,
+  "texture": "textures/hound_wolf_armor.png",
+  "model": "geo/hound_wolf_armor.geo.json",
+  "hurt_modifier":
+  {
+    "ricochet_multiplier":0.10,
+    "penetrate_multiplier":0.80,
+    "blunt_multiplier":0.33
+  },
+  "durability_loss_modifier":1,
+
+  "attachments": [
+    {
+      "mount_id": "command_pouch",
+      "mount_type": "armor_pouch",
+      "mount_bone": "command_pouch_fix",
+      "accept_categories": ["admin_pouch"]
+    },
+    {
+      "mount_id": "radio_pouch",
+      "mount_type": "armor_pouch",
+      "mount_bone": "radio_pouch_fix",
+      "accept_categories": ["pouch"]
+    }
+  ]
+}
