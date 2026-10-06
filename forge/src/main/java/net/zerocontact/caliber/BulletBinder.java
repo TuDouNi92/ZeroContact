@@ -1,6 +1,8 @@
 package net.zerocontact.caliber;
 
 import com.tacz.guns.api.item.gun.AbstractGunItem;
+import com.tacz.guns.config.common.AmmoConfig;
+import com.tacz.guns.config.sync.SyncConfig;
 import com.tacz.guns.entity.EntityKineticBullet;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -41,14 +43,15 @@ public class BulletBinder {
         accessor.knockback(caliber.knockback());
         accessor.explosion(caliber.explosion() != AmmoDataPOJO.Explosion.NONE);
         accessor.explosionKnockback(caliber.explosion().knockback());
-        accessor.explosionDamage(caliber.explosion().damage());
+        accessor.explosionDamage((float) Math.max(
+                0.0, caliber.explosion().damage() * SyncConfig.DAMAGE_BASE_MULTIPLIER.get()
+        ));
         // Match TaCZ: negative disables timed detonation; allow collision checks before detonation.
         int delayTicks = caliber.explosion().delayCount();
         accessor.explosionDelayCount(delayTicks < 0 ? Integer.MAX_VALUE : Math.max(delayTicks, 1));
-        accessor.explosionDestroyBlock(caliber.explosion().destroyBlock());
+        accessor.explosionDestroyBlock(AmmoConfig.EXPLOSIVE_AMMO_DESTROYS_BLOCK.get() && caliber.explosion().destroyBlock());
         accessor.explosionRadius(caliber.explosion().radius());
         accessor.igniteEntity(caliber.ignite() != AmmoDataPOJO.Ignite.NONE);
-        accessor.igniteEntity(caliber.ignite().igniteEntity());
         accessor.igniteEntityTime(caliber.ignite().igniteEntityTime());
         accessor.igniteBlock(caliber.ignite().igniteBlock());
     }
