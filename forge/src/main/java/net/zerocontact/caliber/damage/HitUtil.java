@@ -2,6 +2,7 @@ package net.zerocontact.caliber.damage;
 
 import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.util.EntityUtil;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -102,7 +103,7 @@ public class HitUtil {
             double lookDx = lv.getLookAngle().x;
             double lookDz = lv.getLookAngle().z;
             double lookAngle = Math.toDegrees(Math.atan2(lookDz, lookDx));
-            incidentAngle = Math.toDegrees(Math.atan2(sourceDz, sourceDx)) - lookAngle;
+            incidentAngle = Mth.wrapDegrees(Math.toDegrees(Math.atan2(sourceDz, sourceDx)) - lookAngle);
         }
         return incidentAngle;
     }
