@@ -36,6 +36,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.zerocontact.api.armor.IEquipmentTypeTag;
+import net.zerocontact.curios.CuriosConstants;
 import net.zerocontact.entity.ai.NameList;
 import net.zerocontact.entity.ai.controller.GlobalStateController;
 import net.zerocontact.entity.ai.goal.AvoidGoal;
@@ -57,11 +58,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class ArmedRaider extends PatrollingMonster implements GeoEntity, InventoryCarrier {
-    public static final String FRONT_PLATE = "front_plate";
-    public static final String BACK_PLATE = "back_plate";
-    public static final String BACKPACK = "backpack";
-    public static final String ARMBAND = "armband";
-
     public static final String GUN_ID = "gun_id";
     public static final String CARTRIDGE_ID = "cartridge_id";
     public static final String HELMET_ID = "helmet_id";
@@ -177,8 +173,8 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
             CuriosApi.getCuriosInventory(this).ifPresent(handler -> {
                 Item plate = loadout.plateStack().getItem();
                 ItemStack plateStack = new ItemStack(plate);
-                handler.setEquippedCurio(FRONT_PLATE, 0, plateStack);
-                handler.setEquippedCurio(BACK_PLATE, 0, plateStack.copy());
+                handler.setEquippedCurio(CuriosConstants.FRONT_PLATE, 0, plateStack);
+                handler.setEquippedCurio(CuriosConstants.BACK_PLATE, 0, plateStack.copy());
             });
         }
         this.setItemSlot(EquipmentSlot.HEAD, new ItemStack(helmet));
@@ -189,9 +185,9 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         Item armband = loadout.armbandStack().getItem();
         CuriosApi.getCuriosInventory(this).ifPresent(handler -> {
             if (backpack instanceof IEquipmentTypeTag tag && tag.getArmorType().equals(IEquipmentTypeTag.EquipmentType.BACKPACK)) {
-                handler.setEquippedCurio(BACKPACK, 0, new ItemStack(backpack));
+                handler.setEquippedCurio(CuriosConstants.BACKPACK, 0, new ItemStack(backpack));
             }
-            handler.setEquippedCurio(ARMBAND, 0, new ItemStack(armband));
+            handler.setEquippedCurio(CuriosConstants.ARMBAND, 0, new ItemStack(armband));
         });
     }
 

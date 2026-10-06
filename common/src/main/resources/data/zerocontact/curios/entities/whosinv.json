@@ -4,13 +4,13 @@
     "zerocontact:armed_raider"
   ],
   "slots": [
-    "front_plate",
-    "back_plate",
-    "mask",
-    "uniform_top",
-    "uniform_pants",
-    "armband",
-    "backpack",
-    "rigs"
+    "zc_front_plate",
+    "zc_back_plate",
+    "zc_mask",
+    "zc_uniform_top",
+    "zc_uniform_pants",
+    "zc_armband",
+    "zc_backpack",
+    "zc_rigs"
   ]
 }

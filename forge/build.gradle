@@ -66,7 +66,9 @@ dependencies {
     modLocalRuntime('curse.maven:tacz-simple-enemy-1471691:8289695')
 //    modLocalRuntime("curse.maven:shoulder-surfing-reloaded-243190:8725611")
 //    modLocalRuntime("curse.maven:tacz-gunshot-reverb-1690954:8923504")
-    modLocalRuntime("curse.maven:simple-voice-chat-416089:8928453");
+    modLocalRuntime("curse.maven:simple-voice-chat-416089:8928453")
+//    modLocalRuntime("curse.maven:fracture-point-1207137:8673148")
+//    modLocalRuntime("curse.maven:locknarfieldframe-1647669:9061097")
 }
 
 processResources {

@@ -11,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.zerocontact.api.armor.IEquipmentTypeTag;
+import net.zerocontact.curios.CuriosConstants;
 import net.zerocontact.events.EventUtil;
 import net.zerocontact.events.ResolveHitBodyPartEvent;
 import net.zerocontact.events.ResolveHitBodyPartEvent.HitPart;
@@ -79,8 +80,8 @@ public class HitUtil {
             defenseStacks.set(new ItemStack[]{lv.getItemBySlot(EquipmentSlot.CHEST)});
             return defenseStacks.get();
         }
-        ItemStack frontPlate = EventUtil.getCuriosStackFirst(lv, "front_plate");
-        ItemStack backPlate = EventUtil.getCuriosStackFirst(lv, "back_plate");
+        ItemStack frontPlate = EventUtil.getCuriosStackFirst(lv, CuriosConstants.FRONT_PLATE);
+        ItemStack backPlate = EventUtil.getCuriosStackFirst(lv, CuriosConstants.BACK_PLATE);
         ItemStack plateStack = ItemStack.EMPTY;
         if (incidentAngleAbs != 361) {
             if (incidentAngleAbs > 90) {

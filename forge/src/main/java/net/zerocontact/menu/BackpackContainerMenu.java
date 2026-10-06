@@ -11,6 +11,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.zerocontact.curios.CuriosConstants;
 import net.zerocontact.forge_registries.MenuRegistry;
 import net.zerocontact.item.backpack.BaseBackpack;
 import net.zerocontact.item.rigs.BaseRigs;
@@ -52,14 +53,14 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
             bindInventory(backpackRenderStack);
         } else if (source == TriggerSource.KEY) {
             CuriosApi.getCuriosInventory(playerInv.player).ifPresent(inventoryHandler -> {
-                inventoryHandler.getStacksHandler("backpack").ifPresent(stacksHandler -> {
+                inventoryHandler.getStacksHandler(CuriosConstants.BACKPACK).ifPresent(stacksHandler -> {
                     ItemStack backpackStack = stacksHandler.getStacks().getStackInSlot(0);
                     if (backpackStack.getItem() instanceof BaseBackpack) {
                         backpackRenderStack = backpackStack;
                         bindInventory(backpackStack);
                     }
                 });
-                inventoryHandler.getStacksHandler("rigs").ifPresent(stacksHandler -> {
+                inventoryHandler.getStacksHandler(CuriosConstants.RIGS).ifPresent(stacksHandler -> {
                     ItemStack rigsStack = stacksHandler.getStacks().getStackInSlot(0);
                     if (rigsStack.getItem() instanceof BaseRigs) {
                         rigsRenderStack = rigsStack;
