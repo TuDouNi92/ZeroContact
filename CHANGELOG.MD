@@ -335,3 +335,11 @@ The weapon will then be able to use that ammunition type infinitely in Creative 
 - Fix backpack inventory synchronization, ammo selection after refactoring, and explosion delay calculation.
 - Fix TaCZ and TaCZ Magazines mixin compatibility issues and improve reload detection.
 - Refactor damage processing and correct body-part and headshot factor handling.
+
+## Beta 1.1.6-hotfix1
+
+## Fix
+
+- Fix the issue that ammo disappears from extracting mag in rigs menu 
+- Fix incorrect explosion/ignition bullet data
+- Rename curios slots to avoid potential breaks to other mods
