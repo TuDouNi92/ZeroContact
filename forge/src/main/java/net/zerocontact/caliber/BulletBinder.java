@@ -51,7 +51,8 @@ public class BulletBinder {
         accessor.explosionDelayCount(delayTicks < 0 ? Integer.MAX_VALUE : Math.max(delayTicks, 1));
         accessor.explosionDestroyBlock(AmmoConfig.EXPLOSIVE_AMMO_DESTROYS_BLOCK.get() && caliber.explosion().destroyBlock());
         accessor.explosionRadius(caliber.explosion().radius());
-        accessor.igniteEntity(caliber.ignite() != AmmoDataPOJO.Ignite.NONE);
+        //Ignite data is always present, do not assert NONE
+        accessor.igniteEntity(caliber.ignite().igniteEntity());
         accessor.igniteEntityTime(caliber.ignite().igniteEntityTime());
         accessor.igniteBlock(caliber.ignite().igniteBlock());
     }
