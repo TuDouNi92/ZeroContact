@@ -15,6 +15,7 @@ import net.zerocontact.menu.BackpackContainerMenu;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 
 @Mixin(value = MagazineLoadingHandler.class, remap = false)
 public class MagazineLoadingHandlerMixin {
@@ -29,9 +30,9 @@ public class MagazineLoadingHandlerMixin {
     @WrapMethod(method = "creativeTransferInventoryRound")
     private static void zeroContact$inventory(LocalPlayer player, Operation<Void> original) {
         AbstractContainerMenu menu = getVisibleMenu(player);
-        // Backpack clicks are processed by the server even in creative mode. A client-only
+        // Backpack and Curios clicks are processed by the server even in creative mode. A client-only
         // cursor stack would disappear when the next click is reconciled with that menu.
-        if (menu instanceof BackpackContainerMenu) {
+        if (menu instanceof BackpackContainerMenu || menu instanceof CuriosContainer) {
             PacketHandler.CHANNEL.sendToServer(new BulletTransferPacket(containerSlot, unloading));
             return;
         }
