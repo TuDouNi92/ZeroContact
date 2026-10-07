@@ -17,6 +17,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderArmEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.zerocontact.curios.CuriosConstants;
 import net.zerocontact.events.EventUtil;
 import net.zerocontact.armor.modular.module.nvg.event.ThermalRenderHandler;
 import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
@@ -40,7 +41,7 @@ public class UniformArmRenderer {
     }
 
     private static void renderArm(Player player, HumanoidArm arm, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, RenderArmEvent event) {
-        ItemStack uniformStack = EventUtil.getCuriosStackFirst(player, "uniform_top");
+        ItemStack uniformStack = EventUtil.getCuriosStackFirst(player, CuriosConstants.UNIFORM_TOP);
         if (!(uniformStack.getItem() instanceof AbstractGenerateGeoCurioItemImpl abstractGenerateGeoCurioItem)) return;
         AccessoriesRender<?> baseRenderer = (AccessoriesRender<?>) CuriosRendererRegistry.getRenderer(abstractGenerateGeoCurioItem).orElse(null);
         if (baseRenderer == null) return;

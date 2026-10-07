@@ -4,11 +4,14 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.raiiiden.taczmagazines.client.MagazineLoadingHandler;
+import com.raiiiden.taczmagazines.network.BulletTransferPacket;
+import com.raiiiden.taczmagazines.network.PacketHandler;
 import com.tacz.guns.api.item.builder.AmmoItemBuilder;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.compat.MagazinesCompatHandler;
+import net.zerocontact.menu.BackpackContainerMenu;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,11 +28,18 @@ public class MagazineLoadingHandlerMixin {
 
     @WrapMethod(method = "creativeTransferInventoryRound")
     private static void zeroContact$inventory(LocalPlayer player, Operation<Void> original) {
+        AbstractContainerMenu menu = getVisibleMenu(player);
+        // Backpack clicks are processed by the server even in creative mode. A client-only
+        // cursor stack would disappear when the next click is reconciled with that menu.
+        if (menu instanceof BackpackContainerMenu) {
+            PacketHandler.CHANNEL.sendToServer(new BulletTransferPacket(containerSlot, unloading));
+            return;
+        }
+
         ItemStack magazine = containerSlot >= 0 && containerSlot < player.getInventory().items.size()
                 ? player.getInventory().getItem(containerSlot) : ItemStack.EMPTY;
         var compat = MagazinesCompatHandler.get().getCompat().orElseThrow();
         // Creative ticking uses the visible menu (which can differ from containerMenu).
-        AbstractContainerMenu menu = getVisibleMenu(player);
         ItemStack source = unloading || menu == null ? ItemStack.EMPTY : menu.getCarried();
         if (!source.isEmpty() && !compat.canLoadAmmo(magazine, source)) return;
         try (var ignored = compat.beginTransfer(magazine, source, player)) {

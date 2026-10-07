@@ -23,6 +23,7 @@ import net.minecraftforge.network.NetworkHooks;
 import net.zerocontact.api.armor.IEquipmentTypeTag;
 import net.zerocontact.api.armor.Toggleable;
 import net.zerocontact.container.BackpackInventory;
+import net.zerocontact.curios.CuriosConstants;
 import net.zerocontact.menu.BackpackContainerMenu;
 import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
 import org.jetbrains.annotations.NotNull;
@@ -112,7 +113,7 @@ public class BaseBackpack extends AbstractGenerateGeoCurioItemImpl implements IE
             if (isLookAtTargetBack(serverPlayer, targetEntity) && player.isCrouching()) {
                 CuriosApi.getCuriosInventory(targetEntity)
                         .ifPresent(itemHandler ->
-                                itemHandler.getStacksHandler("backpack").ifPresent(stacksHandler -> {
+                                itemHandler.getStacksHandler(CuriosConstants.BACKPACK).ifPresent(stacksHandler -> {
                                     ItemStack backpackStack = stacksHandler.getStacks().getStackInSlot(0);
                                     if (backpackStack.getItem() instanceof BaseBackpack backpack && player.isCrouching())
                                         backpack.callOpenScreen(serverPlayer, BackpackContainerMenu.TriggerSource.ALLY, backpackStack);

@@ -6,6 +6,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import net.zerocontact.curios.CuriosConstants;
 import net.zerocontact.events.EventUtil;
 
 public class ReloadManager {
@@ -26,7 +27,7 @@ public class ReloadManager {
         ReloadSource source;
         ItemStack containerStack = ItemStack.EMPTY;
         IItemHandler handler;
-        ItemStack rigs = EventUtil.getCuriosStackFirst(shooter, "rigs");
+        ItemStack rigs = EventUtil.getCuriosStackFirst(shooter, CuriosConstants.RIGS);
         Runnable saveFunc = ()->{};
         if (!rigs.isEmpty()) {
             source = ReloadSource.RIGS;

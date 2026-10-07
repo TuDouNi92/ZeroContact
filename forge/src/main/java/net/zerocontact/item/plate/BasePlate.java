@@ -24,6 +24,7 @@ import net.zerocontact.api.armor.IEquipmentTypeTag;
 import net.zerocontact.api.armor.PlateInfoProvider;
 import net.zerocontact.client.interaction.PlateInteractionManager;
 import net.zerocontact.client.renderer.ItemRender;
+import net.zerocontact.curios.CuriosConstants;
 import net.zerocontact.item.PlateBaseMaterial;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.jetbrains.annotations.NotNull;
@@ -59,9 +60,6 @@ public class BasePlate extends ArmorItem implements PlateInfoProvider, GeoItem, 
     private final float movementFix;
     private final float durabilityLoss;
     public final RawAnimation installAnim;
-
-    public static final String FRONT_PLATE = "front_plate";
-    public static final String BACK_PLATE = "back_plate";
 
     public BasePlate(int durability, int defense, int absorb, float bluntReduction, float penetrateReduction, float ricochetReduction, float movementFix, float durabilityLoss, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
         super(PlateBaseMaterial.ARMOR_STEEL, Type.CHESTPLATE, new Properties().defaultDurability(durability));
@@ -197,8 +195,8 @@ public class BasePlate extends ArmorItem implements PlateInfoProvider, GeoItem, 
 
     public static void resolveSlot(Player player, TriConsumer<ICuriosItemHandler, Optional<ICurioStacksHandler>, Optional<ICurioStacksHandler>> consumer) {
         CuriosApi.getCuriosInventory(player).resolve().ifPresent(i -> {
-            Optional<ICurioStacksHandler> frontHandler = i.getStacksHandler(FRONT_PLATE);
-            Optional<ICurioStacksHandler> backHandler = i.getStacksHandler(BACK_PLATE);
+            Optional<ICurioStacksHandler> frontHandler = i.getStacksHandler(CuriosConstants.FRONT_PLATE);
+            Optional<ICurioStacksHandler> backHandler = i.getStacksHandler(CuriosConstants.BACK_PLATE);
             consumer.accept(i, frontHandler, backHandler);
         });
     }

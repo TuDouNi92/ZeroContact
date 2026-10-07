@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
+import net.zerocontact.curios.CuriosConstants;
 import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.events.EventUtil;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +25,6 @@ public class ArmedRaiderArmorLayer extends ItemArmorGeoLayer<ArmedRaider> {
     protected static final String HEAD_BONE = "Head";
     protected static final String LEFT_ARM_BONE = "LeftArm";
     protected static final String RIGHT_ARM_BONE = "RightArm";
-    protected static final String ARMBAND_CURIO = "armband";
 
     public ArmedRaiderArmorLayer(GeoRenderer<ArmedRaider> geoRenderer) {
         super(geoRenderer);
@@ -59,7 +59,7 @@ public class ArmedRaiderArmorLayer extends ItemArmorGeoLayer<ArmedRaider> {
                 return this.helmetStack;
             }
             case RIGHT_ARM_BONE -> {
-                ItemStack stack = EventUtil.getCuriosStackFirst(animatable, ARMBAND_CURIO);
+                ItemStack stack = EventUtil.getCuriosStackFirst(animatable, CuriosConstants.ARMBAND);
                 if (!stack.isEmpty()) {
                     return stack;
                 }

@@ -154,22 +154,28 @@ public class DamageProcessor {
     public static DamageCalcCtx getHurtAmount(Entity lv, DamageSource source, float amount, @Nullable ICombatArmorItem plateProvider, @Nullable ICombatArmorItem armorProvider, int hurtCanHold) {
         DamageCalcCtx finalCtx;
         DamageCalcCtx generateCaliberDamage;
+        ICombatArmorItem provider = armorProvider;
         if (plateProvider != null && armorProvider != null) {
             generateCaliberDamage = generateDamageAmount(amount, source, hurtCanHold, plateProvider);
+            provider = plateProvider;
         } else if (armorProvider != null) {
             generateCaliberDamage = generateDamageAmount(amount, source, hurtCanHold, armorProvider);
         } else {
             generateCaliberDamage = generateDamageAmount(amount, source, hurtCanHold, null);
         }
-        if (armorProvider != null && HitUtil.isIncidentAngleValid(lv, source)) {
+        // An unmatched caliber must retain its original damage and unprocessed outcome.
+        if (generateCaliberDamage.outcome() == HitProcessEvent.ZHitOutcome.NO_OUTCOME) {
+            return generateCaliberDamage;
+        }
+        if (HitUtil.isIncidentAngleValid(lv, source)) {
             finalCtx = new DamageCalcCtx(
-                    HitProcessEvent.ZHitOutcome.RICOCHET,
+                    provider != null ? HitProcessEvent.ZHitOutcome.RICOCHET : HitProcessEvent.ZHitOutcome.NO_ARMOR,
                     generateCaliberDamage.caliberId(),
                     generateCaliberDamage.caliberVariant(),
                     generateCaliberDamage.penetrationLevel(),
                     generateCaliberDamage.fleshDamage(),
                     generateCaliberDamage.armorDamage(),
-                    generateCaliberDamage.outputDamage()
+                    generateCaliberDamage.outputDamage() * (provider != null ? provider.generateRicochet() : 1)
             );
         } else {
             finalCtx = generateCaliberDamage;

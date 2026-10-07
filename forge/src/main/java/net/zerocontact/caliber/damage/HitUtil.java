@@ -2,6 +2,7 @@ package net.zerocontact.caliber.damage;
 
 import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.util.EntityUtil;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -10,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.zerocontact.api.armor.IEquipmentTypeTag;
+import net.zerocontact.curios.CuriosConstants;
 import net.zerocontact.events.EventUtil;
 import net.zerocontact.events.ResolveHitBodyPartEvent;
 import net.zerocontact.events.ResolveHitBodyPartEvent.HitPart;
@@ -78,8 +80,8 @@ public class HitUtil {
             defenseStacks.set(new ItemStack[]{lv.getItemBySlot(EquipmentSlot.CHEST)});
             return defenseStacks.get();
         }
-        ItemStack frontPlate = EventUtil.getCuriosStackFirst(lv, "front_plate");
-        ItemStack backPlate = EventUtil.getCuriosStackFirst(lv, "back_plate");
+        ItemStack frontPlate = EventUtil.getCuriosStackFirst(lv, CuriosConstants.FRONT_PLATE);
+        ItemStack backPlate = EventUtil.getCuriosStackFirst(lv, CuriosConstants.BACK_PLATE);
         ItemStack plateStack = ItemStack.EMPTY;
         if (incidentAngleAbs != 361) {
             if (incidentAngleAbs > 90) {
@@ -102,7 +104,7 @@ public class HitUtil {
             double lookDx = lv.getLookAngle().x;
             double lookDz = lv.getLookAngle().z;
             double lookAngle = Math.toDegrees(Math.atan2(lookDz, lookDx));
-            incidentAngle = Math.toDegrees(Math.atan2(sourceDz, sourceDx)) - lookAngle;
+            incidentAngle = Mth.wrapDegrees(Math.toDegrees(Math.atan2(sourceDz, sourceDx)) - lookAngle);
         }
         return incidentAngle;
     }
