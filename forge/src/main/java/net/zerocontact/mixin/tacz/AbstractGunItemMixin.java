@@ -28,6 +28,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.zerocontact.item.ammo.GenerateAmmo;
 
 @Mixin(AbstractGunItem.class)
 public abstract class AbstractGunItemMixin implements IGun {
@@ -92,29 +94,73 @@ public abstract class AbstractGunItemMixin implements IGun {
     }
 
     @Unique
-    private static boolean zeroContact$sameOrSelectedCaliber(LivingEntity shooter, ItemStack gunItem, IItemHandler iItemHandler, int i) {
+    private static boolean zeroContact$sameOrSelectedCaliber(
+            LivingEntity shooter,
+            ItemStack gunItem,
+            IItemHandler iItemHandler,
+            int i) {
+
         ItemStack checkAmmoStack = iItemHandler.getStackInSlot(i);
-        if (checkAmmoStack.getItem() instanceof IAmmo iAmmo && iAmmo.isAmmoOfGun(gunItem, checkAmmoStack)) {
+        String selectedAmmoId = gunItem
+                .getCapability(CapabilityRegistries.CARTRIDGE)
+                .map(cap -> cap.getClientSelectedAmmoVariant(gunItem))
+                .orElse("");
+
+        if (checkAmmoStack.getItem() instanceof IAmmo ammo
+                && ammo.isAmmoOfGun(gunItem, checkAmmoStack)) {
 
             AmmoInjector.AmmoContext gunCtx = AmmoInjector.read(gunItem);
             AmmoInjector.AmmoContext ammoCtx = AmmoInjector.read(checkAmmoStack);
-            String selectedVariant = gunItem.getCapability(CapabilityRegistries.CARTRIDGE).map(cap ->
-                    cap.getClientSelectedAmmoVariant(gunItem)).orElse("");
 
-            if (gunCtx.isEmpty()) return false;
+            if (gunCtx.isEmpty() || ammoCtx.isEmpty()) {
+                return false;
+            }
 
-            return gunCtx.caliber().equals(ammoCtx.caliber()) || selectedVariant.equals(ammoCtx.caliber().variant());
+            ResourceLocation actualAmmoId = ammo.getAmmoId(checkAmmoStack);
+            ResourceLocation itemId =
+                    ForgeRegistries.ITEMS.getKey(checkAmmoStack.getItem());
+
+            // Exact data-driven TaCZ ammo ID.
+            if (!selectedAmmoId.isEmpty()
+                    && actualAmmoId != null
+                    && selectedAmmoId.equals(actualAmmoId.toString())) {
+                return true;
+            }
+
+            // Preserve registered ZeroContact GenerateAmmo variants.
+            if (!selectedAmmoId.isEmpty()
+                    && checkAmmoStack.getItem() instanceof GenerateAmmo
+                    && itemId != null
+                    && selectedAmmoId.equals(itemId.toString())) {
+                return true;
+            }
+
+            // Preserve the existing caliber/variant matching behavior.
+            return gunCtx.caliber().equals(ammoCtx.caliber())
+                    || (!selectedAmmoId.isEmpty()
+                    && selectedAmmoId.equals(ammoCtx.caliber().variant()));
         }
-        if (checkAmmoStack.getItem() instanceof IAmmoBox iAmmoBox && iAmmoBox.isAmmoBoxOfGun(gunItem, checkAmmoStack)) {
+
+        if (checkAmmoStack.getItem() instanceof IAmmoBox ammoBox
+                && ammoBox.isAmmoBoxOfGun(gunItem, checkAmmoStack)) {
 
             AmmoInjector.AmmoContext gunCtx = AmmoInjector.read(gunItem);
             AmmoInjector.AmmoContext ammoCtx = AmmoInjector.read(checkAmmoStack);
-            String selectedCaliber = gunItem.getCapability(CapabilityRegistries.CARTRIDGE).map(cap ->
-                    cap.getClientSelectedAmmoVariant(gunItem)).orElse("");
-            if (gunCtx.isEmpty()) return false;
-            if (iAmmoBox.isAllTypeCreative(checkAmmoStack)) return true;
-            return gunCtx.caliber().equals(ammoCtx.caliber()) || selectedCaliber.equals(ammoCtx.caliber().variant());
+
+            if (gunCtx.isEmpty() || ammoCtx.isEmpty()) {
+                return false;
+            }
+
+            if (ammoBox.isAllTypeCreative(checkAmmoStack)) {
+                return true;
+            }
+
+            // Keep the pre-existing behavior for ordinary ammo boxes.
+            return gunCtx.caliber().equals(ammoCtx.caliber())
+                    || (!selectedAmmoId.isEmpty()
+                    && selectedAmmoId.equals(ammoCtx.caliber().variant()));
         }
+
         return false;
     }
 

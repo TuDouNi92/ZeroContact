@@ -39,7 +39,10 @@ import net.zerocontact.network.c2s.SelectAmmoPacket;
 import net.zerocontact.network.s2c.ClientAmmoReloadPacket;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import net.zerocontact.item.ammo.GenerateAmmo;
 
+import static net.zerocontact.caliber.CaliberSerializer.AI_AMMO;
+import static net.zerocontact.caliber.CaliberSerializer.EXISTED_AMMO_ID;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -75,6 +78,7 @@ public class ServerAmmoSelector {
             });
     }
 
+
     public static void handleSelected(SelectAmmoPacket msg, Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
         ServerPlayer player = context.getSender();
@@ -83,28 +87,52 @@ public class ServerAmmoSelector {
             if (!IGun.mainHandHoldGun(player)) return;
             ItemStack gunStack = player.getMainHandItem();
             ItemStack selectedAmmoStack = msg.ammoItem();
-            ResourceLocation selectedAmmoKey = ForgeRegistries.ITEMS.getKey(selectedAmmoStack.getItem());
+            if (selectedAmmoStack.isEmpty()) return;
+            ResourceLocation selectedAmmoKey;
+            if (selectedAmmoStack.getItem() instanceof GenerateAmmo) {
+                selectedAmmoKey = ForgeRegistries.ITEMS.getKey(selectedAmmoStack.getItem());
+            } else if (selectedAmmoStack.getItem() instanceof IAmmo ammo) {
+                selectedAmmoKey = ammo.getAmmoId(selectedAmmoStack);
+            } else {
+                selectedAmmoKey = ForgeRegistries.ITEMS.getKey(selectedAmmoStack.getItem());
+            }
             if (selectedAmmoKey == null) return;
-            gunStack.getCapability(CapabilityRegistries.CARTRIDGE).ifPresent(cap -> cap.setClientSelectedAmmoVariant(gunStack, selectedAmmoKey.toString()));
-            ModMessages.sendToPlayer(new ClientAmmoReloadPacket(player.getInventory().selected, selectedAmmoKey.toString()), player);
+            String selectedAmmoId = selectedAmmoKey.toString();
+            gunStack.getCapability(CapabilityRegistries.CARTRIDGE)
+                    .ifPresent(cap -> cap.setClientSelectedAmmoVariant(gunStack, selectedAmmoId));
+            ModMessages.sendToPlayer(
+                    new ClientAmmoReloadPacket(player.getInventory().selected, selectedAmmoId),
+                    player
+            );
         });
     }
+
 
     public static IItemHandler filteredAmmoHandler(IItemHandler raw, String selectedAmmoKey, ItemStack gunStack) {
         List<Integer> mappedSlots = new ArrayList<>();
         for (int i = 0; i < raw.getSlots(); i++) {
             ItemStack checkAmmoStack = raw.getStackInSlot(i);
-            if (checkAmmoStack.getItem() instanceof IAmmo) {
-                ResourceLocation stackKey = ForgeRegistries.ITEMS.getKey(checkAmmoStack.getItem());
-                if (stackKey != null && stackKey.toString().equals(selectedAmmoKey)) {
-                    mappedSlots.add(i);
-                } else if (selectedAmmoKey.isEmpty()) {
-                    ResourceLocation vanillaKey = ForgeRegistries.ITEMS.getKey(checkAmmoStack.getItem());
-                    if (vanillaKey != null && vanillaKey.toString().equals("tacz:ammo")) {
-                        mappedSlots.add(i);
-                    }
+            if (checkAmmoStack.getItem() instanceof IAmmo ammo) {
+                ResourceLocation stackAmmoId = ammo.getAmmoId(checkAmmoStack);
+                ResourceLocation stackItemId = ForgeRegistries.ITEMS.getKey(checkAmmoStack.getItem());
+                boolean matchesSelectedAmmo;
+                if (selectedAmmoKey.isEmpty()) {
+                    // Preserve the old default behavior for generic TaCZ ammo.
+                    matchesSelectedAmmo = stackItemId != null
+                            && stackItemId.toString().equals("tacz:ammo");
+                } else {
+                    matchesSelectedAmmo =
+                            (stackAmmoId != null
+                                    && stackAmmoId.toString().equals(selectedAmmoKey))
+                                    || (checkAmmoStack.getItem() instanceof GenerateAmmo
+                                    && stackItemId != null
+                                    && stackItemId.toString().equals(selectedAmmoKey));
                 }
-            } else if (checkAmmoStack.getItem() instanceof IAmmoBox iAmmoBox) {
+                if (matchesSelectedAmmo) {
+                    mappedSlots.add(i);
+                }
+            }
+            else if (checkAmmoStack.getItem() instanceof IAmmoBox iAmmoBox) {
                 boolean boxedMagazine = MagazinesCompatHandler.get().getCompat()
                         .map(compat -> compat.hasCompatibleMagazineInBox(checkAmmoStack, gunStack))
                         .orElse(false);
@@ -199,26 +227,49 @@ public class ServerAmmoSelector {
         if (gunTag == null) return neededAmount;
         ICartridgeHolder cap = gunStack.getCapability(CapabilityRegistries.CARTRIDGE).resolve().orElse(null);
         if (cap == null) return neededAmount;
-        String existedAmmoKey = cap.getAmmoVariantInGun(gunStack);
-        Item existedAmmo = ForgeRegistries.ITEMS.getValue(new ResourceLocation(existedAmmoKey));
-        if (existedAmmo == null) return neededAmount;
-        if (!newAmmoStack.is(existedAmmo)) {
+        String existedAmmoKey = gunStack.getOrCreateTagElement(AI_AMMO)
+                .getString(EXISTED_AMMO_ID);
+
+        String newAmmoKey = AmmoInjector.getAmmoIdentity(newAmmoStack);
+
+        if (existedAmmoKey.isEmpty() || newAmmoKey.isEmpty()) {
+            return neededAmount;
+        }
+
+        if (!newAmmoKey.equals(existedAmmoKey)) {
             int currentAmmoCount = gun.getCurrentAmmoCount(gunStack);
-            if (existedAmmo instanceof AmmoItem || existedAmmo.equals(Items.AIR)) {
-                Consumer<ItemStack> finalPaybackFunc = paybackFunc;
-                TimelessAPI.getCommonGunIndex(gun.getGunId(gunStack)).ifPresent(index -> {
-                    ResourceLocation vanillaAmmoIdResource = index.getGunData().getAmmoId();
-                    ItemStack vanillaAmmoStack = AmmoItemBuilder.create().setId(vanillaAmmoIdResource).setCount(currentAmmoCount).build();
-                    if (currentAmmoCount == 0 && vanillaAmmoStack.getCount() != currentAmmoCount) {
-                        vanillaAmmoStack.setCount(currentAmmoCount);
-                    }
-                    finalPaybackFunc.accept(vanillaAmmoStack);
-                });
-            } else {
-                ItemStack defaultInstanceStack = existedAmmo.getDefaultInstance();
-                defaultInstanceStack.setCount(currentAmmoCount);
-                paybackFunc.accept(defaultInstanceStack);
+
+            if (currentAmmoCount > 0) {
+                ResourceLocation existedAmmoId =
+                        ResourceLocation.tryParse(existedAmmoKey);
+
+                Item existedAmmo = existedAmmoId == null
+                        ? null
+                        : ForgeRegistries.ITEMS.getValue(existedAmmoId);
+
+                ItemStack refundStack;
+
+                if (existedAmmo instanceof GenerateAmmo) {
+                    refundStack = existedAmmo.getDefaultInstance();
+                } else if (existedAmmo instanceof AmmoItem
+                        || (existedAmmo != null && existedAmmo.equals(Items.AIR))
+                        || existedAmmo == null) {
+                    // TaCZ ammo IDs can come from resource packs and need not
+                    // correspond to registered Forge items.
+                    refundStack = AmmoItemBuilder.create()
+                            .setId(existedAmmoId != null
+                                    ? existedAmmoId
+                                    : new ResourceLocation(existedAmmoKey))
+                            .setCount(currentAmmoCount)
+                            .build();
+                } else {
+                    refundStack = existedAmmo.getDefaultInstance();
+                }
+
+                refundStack.setCount(currentAmmoCount);
+                paybackFunc.accept(refundStack);
             }
+
             neededAmount += currentAmmoCount;
             gun.setCurrentAmmoCount(gunStack, 0);
         }
@@ -294,15 +345,19 @@ public class ServerAmmoSelector {
         return finalItems;
     }
 
+
     public record ItemWrapper(Item item, String ammoId) {
         @Override
         public boolean equals(Object obj) {
-            return obj instanceof ItemWrapper wrapper && wrapper.item.equals(item);
+            return obj instanceof ItemWrapper wrapper
+                    && item.equals(wrapper.item)
+                    && ammoId.equals(wrapper.ammoId);
         }
 
         @Override
         public int hashCode() {
-            return item.hashCode();
+            return java.util.Objects.hash(item, ammoId);
         }
     }
+
 }

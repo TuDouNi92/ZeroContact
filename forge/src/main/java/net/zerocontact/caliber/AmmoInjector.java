@@ -13,7 +13,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.item.ammo.GenerateAmmo;
 import org.jetbrains.annotations.Nullable;
-
+import com.tacz.guns.api.item.IAmmo;
 import java.util.Optional;
 
 import static net.zerocontact.caliber.CaliberSerializer.*;
@@ -66,6 +66,7 @@ public class AmmoInjector {
         gunStack.getOrCreateTagElement(AI_AMMO).putString(VARIANT, defaultVariant);
         gunStack.getOrCreateTagElement(AI_AMMO).putString(SELECTED_VARIANT, defaultVariant);
         gunStack.getOrCreateTagElement(AI_AMMO).putString(EXISTED_VARIANT, defaultVariant);
+        gunStack.getOrCreateTagElement(AI_AMMO).putString(EXISTED_AMMO_ID, defaultAmmo.toString());
         return CaliberSerializer.load(gunStack.getTag(), gunStack);
     }
 
@@ -74,17 +75,45 @@ public class AmmoInjector {
     }
 
     //Update cartridge tag in gun
+
     public static void setAmmoVariantInGun(ItemStack gunStack, String selectedVariant) {
-        gunStack.getOrCreateTagElement(AI_AMMO).putString(EXISTED_VARIANT, selectedVariant);
-        Item ammoItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(selectedVariant));
-        if (!(ammoItem instanceof GenerateAmmo ammo)) {
-            AmmoContext context = setDefaultAmmoVariantInGun(gunStack);
-            if (context == null) return;
-            copyTags(context.caliber(), gunStack);
+        ResourceLocation selectedId = ResourceLocation.tryParse(selectedVariant);
+        if (selectedId == null) {
             return;
         }
-        CaliberHelper.Caliber caliber = ammo.getDefualtCaliber();
-        copyTags(caliber, gunStack);
+        Item ammoItem = ForgeRegistries.ITEMS.getValue(selectedId);
+        if (ammoItem instanceof GenerateAmmo ammo) {
+            CaliberHelper.Caliber caliber = ammo.getDefualtCaliber();
+            copyTags(caliber, gunStack);
+
+            gunStack.getOrCreateTagElement(AI_AMMO)
+                    .putString(EXISTED_VARIANT, selectedVariant);
+            gunStack.getOrCreateTagElement(AI_AMMO)
+                    .putString(EXISTED_AMMO_ID, selectedVariant);
+            return;
+        }
+        if (ammoItem instanceof IAmmo ammo) {
+            ItemStack ammoStack = ammoItem.getDefaultInstance();
+            ResourceLocation ammoId = ammo.getAmmoId(ammoStack);
+            if (ammoId == null) {
+                return;
+            }
+            selectedId = ammoId;
+        }
+        // For data-driven TaCZ ammo, selectedId is the ammo ID, not an item ID.
+        AmmoContext context = new AmmoContext(
+                CaliberHelper.Caliber.createDefaultCaliberFromStack(
+                        selectedId.toString(), gunStack
+                )
+        );
+        if (context.isEmpty()) {
+            return;
+        }
+        copyTags(context.caliber(), gunStack);
+        gunStack.getOrCreateTagElement(AI_AMMO)
+                .putString(EXISTED_VARIANT, selectedVariant);
+        gunStack.getOrCreateTagElement(AI_AMMO)
+                .putString(EXISTED_AMMO_ID, selectedId.toString());
     }
 
 
@@ -105,5 +134,28 @@ public class AmmoInjector {
         ItemStack checkGunStack = player.getMainHandItem();
         if (!IGun.mainHandHoldGun(player)) return null;
         return setDefaultAmmoVariantInGun(checkGunStack);
+    }
+
+    public static String getAmmoIdentity(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return "";
+        }
+
+        if (stack.getItem() instanceof GenerateAmmo) {
+            ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(stack.getItem());
+            return itemId == null ? "" : itemId.toString();
+        }
+
+        if (stack.getItem() instanceof IAmmo ammo) {
+            ResourceLocation ammoId = ammo.getAmmoId(stack);
+            return ammoId == null ? "" : ammoId.toString();
+        }
+
+        return "";
+    }
+
+    public static void setExistedAmmoIdentity(ItemStack gunStack, String ammoId) {
+        gunStack.getOrCreateTagElement(AI_AMMO)
+                .putString(EXISTED_AMMO_ID, ammoId);
     }
 }
