@@ -14,6 +14,7 @@ import net.zerocontact.ZeroContact;
 import net.zerocontact.item.ammo.GenerateAmmo;
 import org.jetbrains.annotations.Nullable;
 import com.tacz.guns.api.item.IAmmo;
+
 import java.util.Optional;
 
 import static net.zerocontact.caliber.CaliberSerializer.*;
@@ -57,7 +58,7 @@ public class AmmoInjector {
         return defaultAmmoId;
     }
 
-    //Set default ammo in gun once spawn
+    //Set default ammo for gun
     public static @Nullable AmmoContext setDefaultAmmoVariantInGun(ItemStack gunStack) {
         String defaultVariant = DEFAULT_AMMO;
         ResourceLocation defaultAmmo = getGunDefaultAmmo(gunStack);
@@ -77,8 +78,13 @@ public class AmmoInjector {
     //Update cartridge tag in gun
 
     public static void setAmmoVariantInGun(ItemStack gunStack, String selectedVariant) {
+        //Empty selectedVariant indicates that the gunStack need to be initialized with default ammo.
         ResourceLocation selectedId = ResourceLocation.tryParse(selectedVariant);
-        if (selectedId == null) {
+        if (selectedId == null || selectedId.getPath().isEmpty()) {
+            AmmoContext context = setDefaultAmmoVariantInGun(gunStack);
+            if(context!=null){
+                copyTags(context.caliber(),gunStack);
+            }
             return;
         }
         Item ammoItem = ForgeRegistries.ITEMS.getValue(selectedId);
@@ -92,9 +98,14 @@ public class AmmoInjector {
                     .putString(EXISTED_AMMO_ID, selectedVariant);
             return;
         }
-        if (ammoItem instanceof IAmmo ammo) {
-            ItemStack ammoStack = ammoItem.getDefaultInstance();
-            ResourceLocation ammoId = ammo.getAmmoId(ammoStack);
+        if (ammoItem instanceof IAmmo) {
+            // Do not use getDefaultInstance() to initialize an IAmmo stack because it has no ammoId! Fetch ammoId from GunData.
+            @Nullable IGun iGun = IGun.getIGunOrNull(gunStack);
+            if (iGun == null) return;
+            ResourceLocation gunId = iGun.getGunId(gunStack);
+            @Nullable var gunIndex = TimelessAPI.getCommonGunIndex(gunId).orElse(null);
+            if (gunIndex == null) return;
+            ResourceLocation ammoId = gunIndex.getGunData().getAmmoId();
             if (ammoId == null) {
                 return;
             }
@@ -154,8 +165,4 @@ public class AmmoInjector {
         return "";
     }
 
-    public static void setExistedAmmoIdentity(ItemStack gunStack, String ammoId) {
-        gunStack.getOrCreateTagElement(AI_AMMO)
-                .putString(EXISTED_AMMO_ID, ammoId);
-    }
 }

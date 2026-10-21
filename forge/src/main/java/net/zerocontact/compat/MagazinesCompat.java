@@ -280,6 +280,8 @@ public class MagazinesCompat {
         AmmoInjector.write(context, gun);
         gun.getOrCreateTagElement(CaliberSerializer.AI_AMMO)
                 .putString(CaliberSerializer.EXISTED_VARIANT, round.variant());
+        gun.getOrCreateTagElement(CaliberSerializer.AI_AMMO)
+                .putString(CaliberSerializer.EXISTED_AMMO_ID,round.ammoId());
     }
 
     public void captureChamber(ItemStack gunStack) {
