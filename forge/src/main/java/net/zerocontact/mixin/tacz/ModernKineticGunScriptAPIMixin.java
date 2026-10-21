@@ -34,6 +34,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.LinkedHashMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import com.tacz.guns.api.item.builder.AmmoItemBuilder;
+import net.zerocontact.item.ammo.GenerateAmmo;
 
 @Mixin(ModernKineticGunScriptAPI.class)
 public abstract class ModernKineticGunScriptAPIMixin {
@@ -124,8 +126,15 @@ public abstract class ModernKineticGunScriptAPIMixin {
             return neededAmount;
         String clientSelected = cap.getClientSelectedAmmoVariant(itemStack);
         if (clientSelected.isEmpty()) return neededAmount;
-        Item selectedItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(clientSelected));
-        if (selectedItem == null) return neededAmount;
+        ResourceLocation selectedId = ResourceLocation.tryParse(clientSelected);
+        if (selectedId == null) return neededAmount;
+        Item selectedItem = ForgeRegistries.ITEMS.getValue(selectedId);
+        ItemStack selectedAmmoStack;
+        if (selectedItem instanceof GenerateAmmo) {
+            selectedAmmoStack = selectedItem.getDefaultInstance();
+        } else {
+            selectedAmmoStack = AmmoItemBuilder.create().setId(selectedId).setCount(1).build();
+        }
         int currentAmmoCount = this.abstractGunItem.getCurrentAmmoCount(itemStack);
         boolean hadAmmoInBarrel = this.abstractGunItem.hasBulletInBarrel(itemStack);
         boolean includeBarrelAmmo = this.zeroContact$hasSelectedAmmoForReload && hadAmmoInBarrel;
@@ -133,7 +142,7 @@ public abstract class ModernKineticGunScriptAPIMixin {
             this.abstractGunItem.setCurrentAmmoCount(itemStack, currentAmmoCount + 1);
             this.abstractGunItem.setBulletInBarrel(itemStack, false);
         }
-        int adjustedAmount = ServerAmmoSelector.dropAmmoFromGun(shooter, itemStack, new ItemStack(selectedItem), neededAmount, rigs);
+        int adjustedAmount = ServerAmmoSelector.dropAmmoFromGun(shooter, itemStack, selectedAmmoStack, neededAmount, rigs);
         if (adjustedAmount != neededAmount) {
             this.zeroContact$shouldRestoreChamber = includeBarrelAmmo;
             return adjustedAmount;

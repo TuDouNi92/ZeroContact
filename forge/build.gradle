@@ -51,6 +51,10 @@ dependencies {
     modImplementation("software.bernie.geckolib:geckolib-forge-1.20.1:${geckolib_version}")
     modImplementation("com.github.mcmodderanchor:simplebedrockmodel:2.5.1-forge-mc1.20.1")
 
+// Endless Ammo compatibility
+    modCompileOnly("curse.maven:tacz-endless-ammo-1166149:8107585")
+    modLocalRuntime("curse.maven:tacz-endless-ammo-1166149:8107585")
+
     modCompileOnly files('libs/firstaid-1.20.1-1.1.jar')
     modCompileOnly files('libs/tacz-firstaid-compat-1.0.0.jar')
 

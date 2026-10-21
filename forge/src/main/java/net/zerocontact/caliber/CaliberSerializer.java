@@ -12,6 +12,7 @@ public class CaliberSerializer {
     public static final String AI_AMMO = "ai_ammo";
     public static final String SELECTED_VARIANT = "selected_variant";
     public static final String EXISTED_VARIANT = "existed_variant";
+    public static final String EXISTED_AMMO_ID = "existed_ammo_id";
 
 
     public static CompoundTag save(AmmoInjector.AmmoContext context) {
