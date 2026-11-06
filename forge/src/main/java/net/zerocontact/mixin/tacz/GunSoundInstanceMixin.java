@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 @Mixin(value = GunSoundInstance.class, remap = false)
 public class GunSoundInstanceMixin {
     @ModifyArg(
-            method = "<init>(Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFLnet/minecraft/world/entity/Entity;ILnet/minecraft/resources/ResourceLocation;ZZ)V",
+            method = "<init>",
             at = @At(
                     value = "INVOKE",
                     target = "Ljava/lang/Math;min(FF)F"

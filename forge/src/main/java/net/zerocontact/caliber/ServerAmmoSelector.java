@@ -42,6 +42,7 @@ import org.jetbrains.annotations.Nullable;
 import net.zerocontact.item.ammo.GenerateAmmo;
 
 import static net.zerocontact.caliber.CaliberSerializer.AI_AMMO;
+import static net.zerocontact.caliber.CaliberSerializer.DEFAULT_AMMO;
 import static net.zerocontact.caliber.CaliberSerializer.EXISTED_AMMO_ID;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -109,6 +110,9 @@ public class ServerAmmoSelector {
 
 
     public static IItemHandler filteredAmmoHandler(IItemHandler raw, String selectedAmmoKey, ItemStack gunStack) {
+        // Fresh guns use an empty selection; default initialization writes the item ID,
+        // not a data-driven ammo ID such as tacz:9mm. Both mean ordinary TaCZ ammo.
+        boolean useDefaultAmmo = selectedAmmoKey.isEmpty() || DEFAULT_AMMO.equals(selectedAmmoKey);
         List<Integer> mappedSlots = new ArrayList<>();
         for (int i = 0; i < raw.getSlots(); i++) {
             ItemStack checkAmmoStack = raw.getStackInSlot(i);
@@ -116,10 +120,9 @@ public class ServerAmmoSelector {
                 ResourceLocation stackAmmoId = ammo.getAmmoId(checkAmmoStack);
                 ResourceLocation stackItemId = ForgeRegistries.ITEMS.getKey(checkAmmoStack.getItem());
                 boolean matchesSelectedAmmo;
-                if (selectedAmmoKey.isEmpty()) {
-                    // Preserve the old default behavior for generic TaCZ ammo.
+                if (useDefaultAmmo) {
                     matchesSelectedAmmo = stackItemId != null
-                            && stackItemId.toString().equals("tacz:ammo");
+                            && stackItemId.toString().equals(DEFAULT_AMMO);
                 } else {
                     matchesSelectedAmmo =
                             (stackAmmoId != null
@@ -148,7 +151,7 @@ public class ServerAmmoSelector {
                         mappedSlots.add(i);
                     } else if (stackKey.equals(selectedAmmoKey)) {
                         mappedSlots.add(i);
-                    } else if (stackKey.isEmpty() && selectedAmmoKey.equals("tacz:ammo")) {
+                    } else if (useDefaultAmmo && (stackKey.isEmpty() || DEFAULT_AMMO.equals(stackKey))) {
                         mappedSlots.add(i);
                     }
                 } else if (MagazinesCompatHandler

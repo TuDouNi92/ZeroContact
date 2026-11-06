@@ -49,7 +49,7 @@ dependencies {
     modImplementation("top.theillusivec4.curios:curios-forge:${curios_version}")
     modImplementation("curse.maven:${tacz_version}")
     modImplementation("software.bernie.geckolib:geckolib-forge-1.20.1:${geckolib_version}")
-    modImplementation("com.github.mcmodderanchor:simplebedrockmodel:2.5.1-forge-mc1.20.1")
+    modImplementation("com.github.mcmodderanchor:simplebedrockmodel:2.6.2-forge-mc1.20.1")
 
 // Endless Ammo compatibility
     modCompileOnly("curse.maven:tacz-endless-ammo-1166149:8107585")
@@ -60,13 +60,16 @@ dependencies {
 
     modLocalRuntime files("libs/Jade-1.20.1-Forge-11.12.3.jar")
     modLocalRuntime files('libs/curtain-mc1.20.1-1.3.2.jar')
+
     modLocalRuntime files('libs/firstaid-1.20.1-1.1.jar')
     modLocalRuntime files('libs/tacz-firstaid-compat-1.0.0.jar')
+
     modLocalRuntime files('libs/embeddium-0.3.31+mc1.20.1 (1).jar')
     modLocalRuntime files('libs/oculus-mc1.20.1-1.8.0 (1).jar')
+
 //    modLocalRuntime('curse.maven:sound-physics-remastered-535489:7032235')
     modCompileOnly("curse.maven:tacz-magazines-1504588:${magazine_version}")
-    modLocalRuntime("curse.maven:tacz-magazines-1504588:${magazine_version}")
+//    modLocalRuntime("curse.maven:tacz-magazines-1504588:${magazine_version}")
     modLocalRuntime('curse.maven:tacz-simple-enemy-1471691:8289695')
 //    modLocalRuntime("curse.maven:shoulder-surfing-reloaded-243190:8725611")
 //    modLocalRuntime("curse.maven:tacz-gunshot-reverb-1690954:8923504")
@@ -80,6 +83,8 @@ dependencies {
     modLocalRuntime("dev.engine-room.flywheel:flywheel-forge-1.20.1:1.0.5")
     modLocalRuntime('curse.maven:superb-warfare-1218165:9019882')
 
+    modCompileOnly("curse.maven:tacz-scope-overhaul-1753519:${pip_version}")
+//    modLocalRuntime("curse.maven:tacz-scope-overhaul-1753519:${pip_version}")
 
 }
 
