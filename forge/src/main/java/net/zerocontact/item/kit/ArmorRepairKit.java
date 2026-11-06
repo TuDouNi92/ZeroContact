@@ -43,9 +43,9 @@ import static net.zerocontact.ZeroContact.MOD_ID;
 
 public class ArmorRepairKit extends Item implements GeoItem {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
-    private static final ResourceLocation texture = new ResourceLocation(MOD_ID, "textures/item/kit_armor.png");
-    private static final ResourceLocation model = new ResourceLocation(MOD_ID, "geo/kit_armor.geo.json");
-    private static final ResourceLocation animation = new ResourceLocation("");
+    private static final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/item/kit_armor.png");
+    private static final ResourceLocation model = ResourceLocation.fromNamespaceAndPath(MOD_ID, "geo/kit_armor.geo.json");
+    private static final ResourceLocation animation = ResourceLocation.parse("");
 
     public ArmorRepairKit() {
         super(new Properties().defaultDurability(256));

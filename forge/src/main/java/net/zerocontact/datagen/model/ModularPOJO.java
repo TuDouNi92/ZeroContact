@@ -19,7 +19,7 @@ public class ModularPOJO extends ItemPOJO {
     public String animation = "";
 
     public ResourceLocation getTrait() {
-        return new ResourceLocation(ZeroContact.MOD_ID, moduleTrait);
+        return ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, moduleTrait);
     }
 
     public MountCategory getMountCategory() {

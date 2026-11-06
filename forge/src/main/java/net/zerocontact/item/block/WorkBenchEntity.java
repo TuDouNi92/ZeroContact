@@ -68,7 +68,7 @@ public class WorkBenchEntity extends BlockEntity implements GeoBlockEntity {
         if (player.isCreative()) return true;
         Inventory inv = player.getInventory();
         for (RecipePOJO.IngredientItems req : data.ingredientItems) {
-            Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(req.itemId));
+            Item item = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(req.itemId));
             if (item == null) return false;
             int total = 0;
             for (ItemStack stack : inv.items) {
@@ -87,7 +87,7 @@ public class WorkBenchEntity extends BlockEntity implements GeoBlockEntity {
         if (player.isCreative()) return;
         Inventory inv = player.getInventory();
         for (RecipePOJO.IngredientItems req : data.ingredientItems) {
-            Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(req.itemId));
+            Item item = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(req.itemId));
             if (item == null) continue;
             int remaining = req.neededCount;
             for (ItemStack stack : inv.items) {
@@ -103,7 +103,7 @@ public class WorkBenchEntity extends BlockEntity implements GeoBlockEntity {
     }
 
     public void giveItem(ServerPlayer player, String id) {
-        Item targetItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(id));
+        Item targetItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(id));
         if (targetItem == null) return;
         ItemStack stack = new ItemStack(targetItem);
         stack.setCount(stack.getMaxStackSize());

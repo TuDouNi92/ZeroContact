@@ -8,12 +8,12 @@ import software.bernie.geckolib.model.GeoModel;
 public class FastMtModel extends GeoModel<FastMt> {
     @Override
     public ResourceLocation getModelResource(FastMt helmet) {
-        return new ResourceLocation(ZeroContact.MOD_ID,"geo/fast_mt.geo.json");
+        return ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID,"geo/fast_mt.geo.json");
     }
 
     @Override
     public ResourceLocation getTextureResource(FastMt helmet) {
-        return new ResourceLocation(ZeroContact.MOD_ID,"textures/models/helmet/fast_mt.png");
+        return ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID,"textures/models/helmet/fast_mt.png");
     }
 
     @Override

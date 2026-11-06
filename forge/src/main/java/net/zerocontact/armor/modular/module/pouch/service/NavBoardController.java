@@ -18,8 +18,8 @@ import java.util.Optional;
 import java.util.List;
 
 public class NavBoardController implements ModuleController {
-    public static final ResourceLocation ENABLE = new ResourceLocation(ZeroContact.MOD_ID, "navboard/enable");
-    public static final ResourceLocation DISABLE = new ResourceLocation(ZeroContact.MOD_ID, "navboard/disable");
+    public static final ResourceLocation ENABLE = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "navboard/enable");
+    public static final ResourceLocation DISABLE = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "navboard/disable");
 
     @Override
     public Optional<ModuleView> inspect(ModuleContext context) {

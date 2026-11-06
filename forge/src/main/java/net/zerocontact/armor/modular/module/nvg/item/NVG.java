@@ -22,14 +22,14 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 
 public abstract class NVG extends AbstractGenerateGeoCurioItemImpl implements EquipmentModule, INvg {
-    protected static final ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, "textures/models/nvg/nvg_pvs31.png");
-    protected static final ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, "geo/nvg/nvg_pvs31.geo.json");
-    protected static final ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, "animations/nvg_pvs31.animation.json");
+    protected static final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "textures/models/nvg/nvg_pvs31.png");
+    protected static final ResourceLocation model = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "geo/nvg/nvg_pvs31.geo.json");
+    protected static final ResourceLocation animation = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "animations/nvg_pvs31.animation.json");
     protected static final RawAnimation ACTIVATE = RawAnimation.begin().then("activate", Animation.LoopType.HOLD_ON_LAST_FRAME);
     protected static final RawAnimation DEACTIVATE = RawAnimation.begin().then("deactivate", Animation.LoopType.HOLD_ON_LAST_FRAME);
 
-    private static final ResourceLocation vignette = new ResourceLocation(ZeroContact.MOD_ID, "textures/gui/bino_nvg.png");
-    private static final ResourceLocation trait = new ResourceLocation(ZeroContact.MOD_ID, "nvg");
+    private static final ResourceLocation vignette = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "textures/gui/bino_nvg.png");
+    private static final ResourceLocation trait = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "nvg");
 
     public NVG(int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
         super("nvg", defaultDurability, texture, model, animation, ArmorItem.Type.HELMET);

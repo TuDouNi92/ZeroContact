@@ -8,13 +8,13 @@ import net.zerocontact.armor.modular.module.nvg.api.INvg;
 import net.zerocontact.armor.modular.registry.ModuleRegistry;
 
 public class T7 extends NVG {
-    private static final ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, "textures/models/nvg/t7.png");
-    private static final ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, "geo/nvg/t7.geo.json");
-    private static final ResourceLocation vignette = new ResourceLocation(ZeroContact.MOD_ID, "textures/gui/bino_nvg.png");
+    private static final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "textures/models/nvg/t7.png");
+    private static final ResourceLocation model = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "geo/nvg/t7.geo.json");
+    private static final ResourceLocation vignette = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "textures/gui/bino_nvg.png");
 
     public T7() {
         super( 12000, texture, model, animation);
-        ModuleRegistry.registerCategory(new ResourceLocation(ZeroContact.MOD_ID, "nvg_t7"), MountCategory.NIGHT_VISION);
+        ModuleRegistry.registerCategory(ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "nvg_t7"), MountCategory.NIGHT_VISION);
     }
 
     @Override

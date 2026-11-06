@@ -46,7 +46,7 @@ public class AmmoInjector {
 
     //Get default tacz ammoId for gun.
     public static ResourceLocation getGunDefaultAmmo(ItemStack gunStack) {
-        ResourceLocation defaultAmmoId = new ResourceLocation("");
+        ResourceLocation defaultAmmoId = ResourceLocation.parse("");
         IGun gun = IGun.getIGunOrNull(gunStack);
         if (gun == null) return defaultAmmoId;
         Optional<CommonGunIndex> gunIndex = TimelessAPI.getCommonGunIndex(gun.getGunId(gunStack));
@@ -72,7 +72,7 @@ public class AmmoInjector {
     }
 
     public static @Nullable Item getAmmoVariantItem(AmmoContext context) {
-        return ForgeRegistries.ITEMS.getValue(new ResourceLocation(context.caliber.variant()));
+        return ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(context.caliber.variant()));
     }
 
     //Update cartridge tag in gun

@@ -13,17 +13,17 @@ import software.bernie.geckolib.model.data.EntityModelData;
 public class ArmedRaiderModel extends GeoModel<ArmedRaider> {
     @Override
     public ResourceLocation getModelResource(ArmedRaider armedRaider) {
-        return new ResourceLocation(ZeroContact.MOD_ID, "geo/armed_raider.geo.json");
+        return ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "geo/armed_raider.geo.json");
     }
 
     @Override
     public ResourceLocation getTextureResource(ArmedRaider armedRaider) {
-        return new ResourceLocation(ZeroContact.MOD_ID, "textures/models/armed_raider.png");
+        return ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "textures/models/armed_raider.png");
     }
 
     @Override
     public ResourceLocation getAnimationResource(ArmedRaider armedRaider) {
-        return new ResourceLocation(ZeroContact.MOD_ID,"animations/raider.animation.json");
+        return ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID,"animations/raider.animation.json");
     }
 
     @Override

@@ -31,7 +31,7 @@ public class AmmoBoxItemMixin {
             AmmoInjector.write(contextFromAmmo, ammoBoxStack);
         } else if (box.isCreative(ammoBoxStack) && box.getAmmoId(ammoBoxStack).equals(DefaultAssets.EMPTY_AMMO_ID)) {
             AmmoInjector.write(contextFromAmmo, ammoBoxStack);
-            box.setAmmoId(ammoBoxStack, new ResourceLocation(contextFromAmmo.caliber().id()));
+            box.setAmmoId(ammoBoxStack, ResourceLocation.parse(contextFromAmmo.caliber().id()));
         }
         AmmoInjector.AmmoContext contextFromMag = AmmoInjector.read(ammoBoxStack);
         return !contextFromAmmo.caliber().equals(contextFromMag.caliber());
@@ -83,7 +83,7 @@ public class AmmoBoxItemMixin {
         AmmoInjector.AmmoContext context = AmmoInjector.read(stack);
         if (!context.isEmpty()) {
             String variantId = context.caliber().variant();
-            Item ammoItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(variantId));
+            Item ammoItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(variantId));
             if (ammoItem == null) return ammoStack;
             return ammoItem instanceof GenerateAmmo ? ammoItem.getDefaultInstance() : ammoStack;
         }

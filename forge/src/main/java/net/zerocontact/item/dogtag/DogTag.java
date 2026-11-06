@@ -16,8 +16,8 @@ import static net.zerocontact.ZeroContact.MOD_ID;
 
 public class DogTag extends BaseDogTag{
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
-    private final ResourceLocation texture = new ResourceLocation(MOD_ID,"textures/item/dogtag.png");
-    private final ResourceLocation model = new ResourceLocation(MOD_ID, "geo/dogtag.geo.json");
+    private final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(MOD_ID,"textures/item/dogtag.png");
+    private final ResourceLocation model = ResourceLocation.fromNamespaceAndPath(MOD_ID, "geo/dogtag.geo.json");
     public DogTag(Properties properties) {
         super(properties);
     }

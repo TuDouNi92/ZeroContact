@@ -16,10 +16,10 @@ import java.util.function.Supplier;
 
 public class BeaconController implements ModuleController {
 
-    public static final ResourceLocation DISABLE_ACTION = new ResourceLocation(ZeroContact.MOD_ID, "beacon/disable");
-    public static final ResourceLocation RED_ACTION = new ResourceLocation(ZeroContact.MOD_ID, "beacon/red");
-    public static final ResourceLocation GREEN_ACTION = new ResourceLocation(ZeroContact.MOD_ID, "beacon/green");
-    public static final ResourceLocation BLUE_ACTION = new ResourceLocation(ZeroContact.MOD_ID, "beacon/blue");
+    public static final ResourceLocation DISABLE_ACTION = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "beacon/disable");
+    public static final ResourceLocation RED_ACTION = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "beacon/red");
+    public static final ResourceLocation GREEN_ACTION = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "beacon/green");
+    public static final ResourceLocation BLUE_ACTION = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "beacon/blue");
 
     @Override
     public Optional<ModuleView> inspect(ModuleContext context) {

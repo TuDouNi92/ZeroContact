@@ -25,10 +25,10 @@ import java.util.Objects;
 @Mod.EventBusSubscriber(modid = ZeroContact.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public final class ClientNvgTickHandler {
     private static final Map<INvg.Type, ResourceLocation> TYPE_EFFECTS = Map.of(
-            INvg.Type.GREEN, new ResourceLocation(ZeroContact.MOD_ID, "shaders/post/nvg_green.json"),
-            INvg.Type.WHITE, new ResourceLocation(ZeroContact.MOD_ID, "shaders/post/nvg_white.json"),
-            INvg.Type.THERMAL, new ResourceLocation(ZeroContact.MOD_ID, "shaders/post/thermal_white.json"),
-            INvg.Type.THERMAL_COLOR, new ResourceLocation(ZeroContact.MOD_ID, "shaders/post/thermal_color.json")
+            INvg.Type.GREEN, ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "shaders/post/nvg_green.json"),
+            INvg.Type.WHITE, ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "shaders/post/nvg_white.json"),
+            INvg.Type.THERMAL, ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "shaders/post/thermal_white.json"),
+            INvg.Type.THERMAL_COLOR, ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "shaders/post/thermal_color.json")
     );
     private static ResourceLocation loadedEffect;
     private static ResourceLocation failedEffect;

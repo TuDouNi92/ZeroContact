@@ -5,8 +5,8 @@ import net.minecraft.resources.ResourceLocation;
 import static net.zerocontact.ZeroContact.MOD_ID;
 
 public class PhoneTalker extends BaseGeoHelmet {
-    private static final ResourceLocation texture = new ResourceLocation(MOD_ID, "textures/models/helmet/helmet_phonetalkeriii_blue.png");
-    private static final ResourceLocation model = new ResourceLocation(MOD_ID, "geo/helmet/helmet_phonetalkeriii_blue.geo.json");
+    private static final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/models/helmet/helmet_phonetalkeriii_blue.png");
+    private static final ResourceLocation model = ResourceLocation.fromNamespaceAndPath(MOD_ID, "geo/helmet/helmet_phonetalkeriii_blue.geo.json");
     private static final ResourceLocation animation = null;
 
     public PhoneTalker(int absorb, int defaultDurability, float bluntReduction, float penetrateReduction) {

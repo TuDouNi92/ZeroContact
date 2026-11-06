@@ -93,7 +93,7 @@ public class DamageProcessor {
             float outputDamage
     ) {
         public static DamageCalcCtx unprocessed(float damage) {
-            ResourceLocation unknown = new ResourceLocation("zerocontact", "unknown");
+            ResourceLocation unknown = ResourceLocation.fromNamespaceAndPath("zerocontact", "unknown");
             return new DamageCalcCtx(HitProcessEvent.ZHitOutcome.NO_OUTCOME,
                     unknown, unknown, 0, 0, 0, damage);
         }
@@ -121,8 +121,8 @@ public class DamageProcessor {
             if (randomSource.nextFloat() < penetrateOdds) {
                 return new DamageCalcCtx(
                         hurtCanHold == 0 ? HitProcessEvent.ZHitOutcome.NO_ARMOR : HitProcessEvent.ZHitOutcome.PEN,
-                        new ResourceLocation(caliber.id()),
-                        new ResourceLocation(caliber.variant()),
+                        ResourceLocation.parse(caliber.id()),
+                        ResourceLocation.parse(caliber.variant()),
                         caliber.penetrationClass(),
                         caliber.fleshDamage(),
                         caliber.armorDamage(),
@@ -131,8 +131,8 @@ public class DamageProcessor {
             }
             return new DamageCalcCtx(
                     HitProcessEvent.ZHitOutcome.NON_PEN,
-                    new ResourceLocation(caliber.id()),
-                    new ResourceLocation(caliber.variant()),
+                    ResourceLocation.parse(caliber.id()),
+                    ResourceLocation.parse(caliber.variant()),
                     caliber.penetrationClass(),
                     caliber.fleshDamage(),
                     caliber.armorDamage(),
@@ -141,8 +141,8 @@ public class DamageProcessor {
         } else {
             return new DamageCalcCtx(
                     hurtCanHold <= 0 ? HitProcessEvent.ZHitOutcome.NO_ARMOR : HitProcessEvent.ZHitOutcome.PEN,
-                    new ResourceLocation(caliber.id()),
-                    new ResourceLocation(caliber.variant()),
+                    ResourceLocation.parse(caliber.id()),
+                    ResourceLocation.parse(caliber.variant()),
                     caliber.penetrationClass(),
                     caliber.fleshDamage(),
                     caliber.armorDamage(),

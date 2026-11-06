@@ -22,7 +22,7 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 
 public class GenerateModuleGeoImpl extends AbstractGenerateGeoCurioItemImpl implements EquipmentModule {
-    private static final ResourceLocation NAVBOARD_TRAIT = new ResourceLocation(ZeroContact.MOD_ID, "navboard");
+    private static final ResourceLocation NAVBOARD_TRAIT = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "navboard");
     private static final RawAnimation OPEN = RawAnimation.begin().then("open", Animation.LoopType.HOLD_ON_LAST_FRAME);
     private static final RawAnimation CLOSE = RawAnimation.begin().then("close", Animation.LoopType.HOLD_ON_LAST_FRAME);
     private final ResourceLocation moduleTrait;

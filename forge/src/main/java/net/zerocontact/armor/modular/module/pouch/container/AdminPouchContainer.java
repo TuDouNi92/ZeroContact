@@ -10,8 +10,8 @@ import net.zerocontact.ZeroContact;
 import org.jetbrains.annotations.NotNull;
 
 public class AdminPouchContainer extends ItemStackHandler {
-    public static final ResourceLocation HAS_MAP_SATE = new ResourceLocation(ZeroContact.MOD_ID,"admin_p/has_map");
-    public static final ResourceLocation NO_MAP_SATE = new ResourceLocation(ZeroContact.MOD_ID,"admin_p/no_map");
+    public static final ResourceLocation HAS_MAP_SATE = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID,"admin_p/has_map");
+    public static final ResourceLocation NO_MAP_SATE = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID,"admin_p/no_map");
 
     private static final String NBT_HAS_MAP = "has_map";
 

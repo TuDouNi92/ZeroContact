@@ -17,51 +17,51 @@ public class Armband extends AbstractGenerateGeoCurioItemImpl implements IEquipm
     public enum Series {
         BLACK(
                 new ArmbandResources(
-                        new ResourceLocation(MOD_ID,"textures/models/armband/armband_black.png"),
-                        new ResourceLocation(MOD_ID,"geo/armband/armband_black.geo.json"),
-                        new ResourceLocation(MOD_ID,"")
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"textures/models/armband/armband_black.png"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"geo/armband/armband_black.geo.json"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"")
                         )
         ),
         BLUE(
                 new ArmbandResources(
-                        new ResourceLocation(MOD_ID,"textures/models/armband/armband_blue.png"),
-                        new ResourceLocation(MOD_ID,"geo/armband/armband_blue.geo.json"),
-                        new ResourceLocation(MOD_ID,"")
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"textures/models/armband/armband_blue.png"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"geo/armband/armband_blue.geo.json"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"")
                 )
         ),
         GREEN(
                 new ArmbandResources(
-                        new ResourceLocation(MOD_ID,"textures/models/armband/armband_green.png"),
-                        new ResourceLocation(MOD_ID,"geo/armband/armband_green.geo.json"),
-                        new ResourceLocation(MOD_ID,"")
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"textures/models/armband/armband_green.png"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"geo/armband/armband_green.geo.json"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"")
                 )
         ),
         RED(
                 new ArmbandResources(
-                        new ResourceLocation(MOD_ID,"textures/models/armband/armband_red.png"),
-                        new ResourceLocation(MOD_ID,"geo/armband/armband_red.geo.json"),
-                        new ResourceLocation(MOD_ID,"")
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"textures/models/armband/armband_red.png"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"geo/armband/armband_red.geo.json"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"")
                 )
         ),
         FLORA(
                 new ArmbandResources(
-                        new ResourceLocation(MOD_ID,"textures/models/armband/armband_vsrf.png"),
-                        new ResourceLocation(MOD_ID,"geo/armband/armband_flora.geo.json"),
-                        new ResourceLocation(MOD_ID,"")
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"textures/models/armband/armband_vsrf.png"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"geo/armband/armband_flora.geo.json"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"")
                 )
         ),
         WHITE(
                 new ArmbandResources(
-                        new ResourceLocation(MOD_ID,"textures/models/armband/armband_white.png"),
-                        new ResourceLocation(MOD_ID,"geo/armband/armband_white.geo.json"),
-                        new ResourceLocation(MOD_ID,"")
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"textures/models/armband/armband_white.png"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"geo/armband/armband_white.geo.json"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"")
                 )
         ),
         YELLOW(
                 new ArmbandResources(
-                        new ResourceLocation(MOD_ID,"textures/models/armband/armband_yellow.png"),
-                        new ResourceLocation(MOD_ID,"geo/armband/armband_yellow.geo.json"),
-                        new ResourceLocation(MOD_ID,"")
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"textures/models/armband/armband_yellow.png"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"geo/armband/armband_yellow.geo.json"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID,"")
                 )
         );
         public final ArmbandResources resourceLocations;

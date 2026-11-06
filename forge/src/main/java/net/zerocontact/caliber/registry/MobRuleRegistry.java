@@ -18,7 +18,7 @@ public class MobRuleRegistry {
 
     public static void register(MobRulesPOJO pojo) {
         for (MobRulesPOJO.Pattern mob : pojo.mobs) {
-            ResourceLocation mobId = new ResourceLocation(mob.mobId());
+            ResourceLocation mobId = ResourceLocation.parse(mob.mobId());
             EntityType<?> type = ForgeRegistries.ENTITY_TYPES.getValue(mobId);
             if (type != null) {
                 MOB_RULES.put(mobId, mob);

@@ -104,7 +104,7 @@ public class ZContentLoader implements IContentLoader {
 
                             final ResourceLocation scriptId;
                             try {
-                                scriptId = new ResourceLocation(MOD_ID, resourcePath);
+                                scriptId = ResourceLocation.fromNamespaceAndPath(MOD_ID, resourcePath);
                             } catch (IllegalArgumentException exception) {
                                 ZeroContactLogger.LOG.error(
                                         "Invalid Lua script path: {}",

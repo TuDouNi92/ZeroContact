@@ -8,11 +8,11 @@ import net.zerocontact.ZeroContact;
 import java.util.Arrays;
 
 public class BeaconContainer implements INBTSerializable<CompoundTag> {
-    public static final ResourceLocation STATE_ON = new ResourceLocation(ZeroContact.MOD_ID, "beacon/on");
-    public static final ResourceLocation STATE_RED = new ResourceLocation(ZeroContact.MOD_ID, "beacon/red");
-    public static final ResourceLocation STATE_GREEN = new ResourceLocation(ZeroContact.MOD_ID, "beacon/green");
-    public static final ResourceLocation STATE_BLUE = new ResourceLocation(ZeroContact.MOD_ID, "beacon/blue");
-    public static final ResourceLocation STATE_OFF = new ResourceLocation(ZeroContact.MOD_ID, "beacon/off");
+    public static final ResourceLocation STATE_ON = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "beacon/on");
+    public static final ResourceLocation STATE_RED = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "beacon/red");
+    public static final ResourceLocation STATE_GREEN = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "beacon/green");
+    public static final ResourceLocation STATE_BLUE = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "beacon/blue");
+    public static final ResourceLocation STATE_OFF = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "beacon/off");
     public static final String NBT_MODE = "mode";
 
     private Mode mode = Mode.OFF;

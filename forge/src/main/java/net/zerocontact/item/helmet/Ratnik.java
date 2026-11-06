@@ -15,15 +15,15 @@ public class Ratnik extends BaseGeoHelmet {
     public enum Color {
         EMR(
                 new ColorResources(
-                        new ResourceLocation(MOD_ID, "textures/models/helmet/helmet_6b47_cover_emr.png"),
-                        new ResourceLocation(MOD_ID, "geo/helmet/helmet_6b47_cover_emr.geo.json"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/models/helmet/helmet_6b47_cover_emr.png"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID, "geo/helmet/helmet_6b47_cover_emr.geo.json"),
                         null
                 )
         ),
         ARCTIC(
                 new ColorResources(
-                        new ResourceLocation(MOD_ID, "textures/models/helmet/helmet_6b47_cover_arctic.png"),
-                        new ResourceLocation(MOD_ID, "geo/helmet/helmet_6b47_cover_arctic.geo.json"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/models/helmet/helmet_6b47_cover_arctic.png"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID, "geo/helmet/helmet_6b47_cover_arctic.geo.json"),
                         null
                 )
         );

@@ -5,8 +5,8 @@ import net.minecraft.resources.ResourceLocation;
 import static net.zerocontact.ZeroContact.MOD_ID;
 
 public class UntarArmorImpl extends BaseArmorGeoImpl {
-    private static final ResourceLocation texture = new ResourceLocation(MOD_ID, "textures/models/vest/vest_untar_blue.png");
-    private static final ResourceLocation model = new ResourceLocation(MOD_ID, "geo/vest/vest_untar_blue.geo.json");
+    private static final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/models/vest/vest_untar_blue.png");
+    private static final ResourceLocation model = ResourceLocation.fromNamespaceAndPath(MOD_ID, "geo/vest/vest_untar_blue.geo.json");
     private static final ResourceLocation animation = null;
 
     public UntarArmorImpl(int defense, int defaultDurability, int absorb, float bluntReduction, float penetrateReduction, float mass) {

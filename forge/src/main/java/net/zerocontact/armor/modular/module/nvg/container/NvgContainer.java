@@ -7,9 +7,9 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.zerocontact.ZeroContact;
 
 public class NvgContainer implements INBTSerializable<CompoundTag> {
-    public static final ResourceLocation STATE_ON = new ResourceLocation(ZeroContact.MOD_ID, "nvg/on");
-    public static final ResourceLocation STATE_OFF = new ResourceLocation(ZeroContact.MOD_ID, "nvg/off");
-    public static final ResourceLocation STATE_NO_POWER = new ResourceLocation(ZeroContact.MOD_ID, "nvg/no_power");
+    public static final ResourceLocation STATE_ON = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "nvg/on");
+    public static final ResourceLocation STATE_OFF = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "nvg/off");
+    public static final ResourceLocation STATE_NO_POWER = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "nvg/no_power");
     public static final String NBT_ENABLED = "enabled";
     public static final String NBT_BATTERY = "battery";
     private static final String NBT_POWER = "power_status";

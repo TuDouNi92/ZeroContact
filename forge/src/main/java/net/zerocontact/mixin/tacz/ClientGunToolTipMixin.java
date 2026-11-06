@@ -29,7 +29,7 @@ public class ClientGunToolTipMixin {
     private void replaceAmmoStack(GunTooltip tooltip, CallbackInfo ci){
         AmmoInjector.AmmoContext context = AmmoInjector.read(this.gun);
         if(!context.isEmpty() && !context.caliber().variant().equals("tacz:ammo")){
-            Item variantItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(context.caliber().variant()));
+            Item variantItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(context.caliber().variant()));
             if(variantItem!=null){
                 this.ammo = variantItem.getDefaultInstance();
             }

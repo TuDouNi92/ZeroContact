@@ -35,7 +35,7 @@ import java.util.Collections;
  */
 public class EquipmentMenu extends AbstractContainerMenu {
     public static final int CREATIVE_SLOT = -1;
-    public static final ResourceLocation NO_MOUNT = new ResourceLocation("zerocontact", "none");
+    public static final ResourceLocation NO_MOUNT = ResourceLocation.fromNamespaceAndPath("zerocontact", "none");
     private final List<ItemStack> displayStacks = new ArrayList<>();
     public final List<ItemStack> renderStacks = Collections.unmodifiableList(displayStacks);
     private final Inventory playerInv;

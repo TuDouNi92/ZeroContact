@@ -57,12 +57,12 @@ public class ScrollList extends AbstractSelectionList<ScrollList.GearEntry> {
 
         public GearEntry(RecipePOJO gearRecipeData, ScrollList parent, int recipeIndex) {
             this.parent = parent;
-            this.gearItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(gearRecipeData.gearId));
+            this.gearItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(gearRecipeData.gearId));
             this.recipeIndex = recipeIndex;
             if (this.gearItem != null) {
                 this.gearName = Component.translatable(this.gearItem.getDescriptionId()).getString();
                 for (RecipePOJO.IngredientItems ingredientItems : gearRecipeData.ingredientItems) {
-                    Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(ingredientItems.itemId));
+                    Item item = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(ingredientItems.itemId));
                     if (item == null) continue;
                     recipes.put(new ItemStack(item), ingredientItems.neededCount);
                 }

@@ -87,7 +87,7 @@ public class WorkbenchScreen extends AbstractContainerScreen<WorkbenchMenu> {
         LinkedHashSet<RecipePOJO> recipes = new LinkedHashSet<>();
         replaceData(tab, (type, data) -> {
             LinkedHashSet<RecipePOJO> filteredRecipes = data.stream().filter(e -> {
-                Item gearItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(e.gearId));
+                Item gearItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(e.gearId));
                 if (gearItem == null) return false;
                 return gearItem instanceof IEquipmentTypeTag tag && tag.getArmorType().equals(type);
             }).collect(Collectors.toCollection(LinkedHashSet::new));

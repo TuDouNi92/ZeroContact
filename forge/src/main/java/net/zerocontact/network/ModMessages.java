@@ -29,7 +29,7 @@ public class ModMessages {
 
     public static void register() {
         SimpleChannel net = NetworkRegistry.ChannelBuilder
-                .named(new ResourceLocation(MOD_ID, "messages"))
+                .named(ResourceLocation.fromNamespaceAndPath(MOD_ID, "messages"))
                 .networkProtocolVersion(() -> "1.0f")
                 .clientAcceptedVersions(s -> true)
                 .serverAcceptedVersions(s -> true)

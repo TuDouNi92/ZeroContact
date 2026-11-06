@@ -7,11 +7,11 @@ import net.zerocontact.armor.modular.model.MountCategory;
 import net.zerocontact.armor.modular.registry.ModuleRegistry;
 
 public class PVS31 extends NVG {
-    private static final ResourceLocation vignette = new ResourceLocation(ZeroContact.MOD_ID, "textures/gui/bino_nvg.png");
+    private static final ResourceLocation vignette = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "textures/gui/bino_nvg.png");
 
     public PVS31() {
         super(12000, texture, model, animation);
-        ModuleRegistry.registerCategory(new ResourceLocation(ZeroContact.MOD_ID,"nvg_pvs31"), MountCategory.NIGHT_VISION);
+        ModuleRegistry.registerCategory(ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID,"nvg_pvs31"), MountCategory.NIGHT_VISION);
     }
 
     @Override

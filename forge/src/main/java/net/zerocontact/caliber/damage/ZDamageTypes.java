@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import static net.zerocontact.ZeroContact.MOD_ID;
 
 public class ZDamageTypes {
-    public static final ResourceKey<DamageType> ZC_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(MOD_ID, "zc_damage"));
+    public static final ResourceKey<DamageType> ZC_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(MOD_ID, "zc_damage"));
 
     public static DamageSource create(
             DamageResult result,

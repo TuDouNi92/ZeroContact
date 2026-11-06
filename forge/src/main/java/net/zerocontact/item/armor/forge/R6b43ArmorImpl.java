@@ -7,8 +7,8 @@ import static net.zerocontact.ZeroContact.MOD_ID;
 public class R6b43ArmorImpl extends BaseArmorGeoImpl {
     public enum Series {
         FLORA(
-                new ResourceLocation(MOD_ID, "textures/models/vest/vest_6b43_flora.png"),
-                new ResourceLocation(MOD_ID, "geo/vest/vest_6b43_flora.geo.json"),
+                ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/models/vest/vest_6b43_flora.png"),
+                ResourceLocation.fromNamespaceAndPath(MOD_ID, "geo/vest/vest_6b43_flora.geo.json"),
                 null
         );
         private final ResourceLocation texture;

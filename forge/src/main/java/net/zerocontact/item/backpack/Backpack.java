@@ -7,9 +7,9 @@ import static net.zerocontact.ZeroContact.MOD_ID;
 public class Backpack extends BaseBackpack {
     public enum Series {
         R6SH118(new ResourceWrapper(
-                new ResourceLocation(MOD_ID,"textures/models/backpack/backpack_6sh118_emr.png"),
-                new ResourceLocation(MOD_ID,"geo/backpack/backpack_6sh118_emr.geo.json"),
-                new ResourceLocation("")
+                ResourceLocation.fromNamespaceAndPath(MOD_ID,"textures/models/backpack/backpack_6sh118_emr.png"),
+                ResourceLocation.fromNamespaceAndPath(MOD_ID,"geo/backpack/backpack_6sh118_emr.geo.json"),
+                ResourceLocation.parse("")
         ));
         private final ResourceWrapper wrapper;
 

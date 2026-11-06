@@ -158,7 +158,7 @@ public enum CaliberHelper {
             boolean isGun = Optional.ofNullable(IGun.getIGunOrNull(checkStack)).isPresent();
 
             if (isGun) {
-                ResourceLocation gunId = Optional.ofNullable(IGun.getIGunOrNull(checkStack)).map(ig -> ig.getGunId(checkStack)).orElse(new ResourceLocation(""));
+                ResourceLocation gunId = Optional.ofNullable(IGun.getIGunOrNull(checkStack)).map(ig -> ig.getGunId(checkStack)).orElse(ResourceLocation.parse(""));
                 GunData gunData = TimelessAPI.getCommonGunIndex(gunId).map(CommonGunIndex::getGunData).orElse(null);
                 if (gunData == null) return new Caliber(
                         ammoId,
@@ -247,7 +247,7 @@ public enum CaliberHelper {
 
         @Override
         public @NotNull Map<InaccuracyType, Float> getInaccuracy(ItemStack gunStack) {
-            ResourceLocation gunId = Optional.ofNullable(IGun.getIGunOrNull(gunStack)).map(ig -> ig.getGunId(gunStack)).orElse(new ResourceLocation(""));
+            ResourceLocation gunId = Optional.ofNullable(IGun.getIGunOrNull(gunStack)).map(ig -> ig.getGunId(gunStack)).orElse(ResourceLocation.parse(""));
             GunData gunData = TimelessAPI.getCommonGunIndex(gunId).map(CommonGunIndex::getGunData).orElse(null);
             if (gunData != null) {
                 Map<InaccuracyType, Float> inaccuracyMap = new EnumMap<>(InaccuracyType.class);
@@ -260,7 +260,7 @@ public enum CaliberHelper {
 
         @Override
         public GunRecoil getRecoil(ItemStack gunStack) {
-            ResourceLocation gunId = Optional.ofNullable(IGun.getIGunOrNull(gunStack)).map(ig -> ig.getGunId(gunStack)).orElse(new ResourceLocation(""));
+            ResourceLocation gunId = Optional.ofNullable(IGun.getIGunOrNull(gunStack)).map(ig -> ig.getGunId(gunStack)).orElse(ResourceLocation.parse(""));
             GunData gunData = TimelessAPI.getCommonGunIndex(gunId).map(CommonGunIndex::getGunData).orElse(null);
             if (gunData == null) return null;
             GunRecoil gunRecoil = copyRecoil(gunData.getRecoil());

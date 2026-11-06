@@ -21,11 +21,11 @@ import java.util.List;
 import java.util.Optional;
 
 public class MBITRController implements ModuleDataController {
-    public static final ResourceLocation STATE_ON = new ResourceLocation(ZeroContact.MOD_ID, "radio/on");
-    public static final ResourceLocation STATE_OFF = new ResourceLocation(ZeroContact.MOD_ID, "radio/off");
-    public static final ResourceLocation ENABLE_ACTION = new ResourceLocation(ZeroContact.MOD_ID, "radio/enable");
-    public static final ResourceLocation DISABLE_ACTION = new ResourceLocation(ZeroContact.MOD_ID, "radio/disable");
-    public static final ResourceLocation SET_PROFILE_OPERATION = new ResourceLocation(ZeroContact.MOD_ID, "radio/set_profile");
+    public static final ResourceLocation STATE_ON = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "radio/on");
+    public static final ResourceLocation STATE_OFF = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "radio/off");
+    public static final ResourceLocation ENABLE_ACTION = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "radio/enable");
+    public static final ResourceLocation DISABLE_ACTION = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "radio/disable");
+    public static final ResourceLocation SET_PROFILE_OPERATION = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "radio/set_profile");
     public static final int MIN_FREQUENCY = 300;  // 30.0 MHz, stored in tenths
     public static final int MAX_FREQUENCY = 5120; // 512.0 MHz, stored in tenths
 

@@ -35,7 +35,7 @@ public class GunCartridgeTypeCap implements ICartridgeHolder {
 
     //Get generated cartridge stack;
     public ItemStack getDefaultStack(String fullKey) {
-        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(fullKey));
+        Item item = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(fullKey));
         if (item instanceof GenerateAmmo ammo) {
             return ammo.getDefaultInstance();
         }

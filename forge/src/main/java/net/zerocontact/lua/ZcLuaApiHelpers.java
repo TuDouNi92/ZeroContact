@@ -36,7 +36,7 @@ public class ZcLuaApiHelpers {
 
     private static void registerLog() {
         ZCLuaApi.register(
-                new ResourceLocation(ZeroContact.MOD_ID, "log"),
+                ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "log"),
                 (api, context) -> {
                     api.set("info", new OneArgFunction() {
                         @Override
@@ -63,7 +63,7 @@ public class ZcLuaApiHelpers {
 
     private static void registerEffect() {
         ZCLuaApi.register(
-                new ResourceLocation(ZeroContact.MOD_ID, "effect"),
+                ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "effect"),
                 (api, context) -> {
                     api.set("apply", new VarArgFunction() {
                         @Override
@@ -110,7 +110,7 @@ public class ZcLuaApiHelpers {
 
     private static void registerEntity() {
         ZCLuaApi.register(
-                new ResourceLocation(ZeroContact.MOD_ID, "entity"),
+                ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "entity"),
                 (api, context) -> {
 
                     api.set("position", new OneArgFunction() {
@@ -135,7 +135,7 @@ public class ZcLuaApiHelpers {
                         @Override
                         public LuaValue call(LuaValue arg, LuaValue arg2) {
                             String target = arg.checkjstring();
-                            ResourceLocation type = new ResourceLocation(arg2.checkjstring());
+                            ResourceLocation type = ResourceLocation.parse(arg2.checkjstring());
                             TargetSelector selector = parseTarget(target);
                             return selector.resolve(context.hookContext(), 0)
                                     .findFirst()
@@ -209,7 +209,7 @@ public class ZcLuaApiHelpers {
                         public LuaValue call(LuaValue arg, LuaValue arg2) {
                             String target = arg.checkjstring();
                             String effect = arg2.checkjstring();
-                            MobEffect mobEffect = ForgeRegistries.MOB_EFFECTS.getValue(new ResourceLocation(effect));
+                            MobEffect mobEffect = ForgeRegistries.MOB_EFFECTS.getValue(ResourceLocation.parse(effect));
                             if (mobEffect == null) return LuaValue.FALSE;
                             TargetSelector selector = parseTarget(target);
                             return selector.resolve(context.hookContext(), 0)
@@ -223,7 +223,7 @@ public class ZcLuaApiHelpers {
                         public LuaValue call(LuaValue arg, LuaValue arg2) {
                             String target = arg.checkjstring();
                             String effect = arg2.checkjstring();
-                            MobEffect mobEffect = ForgeRegistries.MOB_EFFECTS.getValue(new ResourceLocation(effect));
+                            MobEffect mobEffect = ForgeRegistries.MOB_EFFECTS.getValue(ResourceLocation.parse(effect));
                             if (mobEffect == null) return LuaValue.FALSE;
                             TargetSelector selector = parseTarget(target);
                             return selector.resolve(context.hookContext(), 0)
@@ -290,7 +290,7 @@ public class ZcLuaApiHelpers {
 
     private static void registerParticle() {
         ZCLuaApi.register(
-                new ResourceLocation(ZeroContact.MOD_ID, "particle"),
+                ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "particle"),
                 (api, context) ->
                         api.set("spawn_simple", new VarArgFunction() {
                             @Override
@@ -305,7 +305,7 @@ public class ZcLuaApiHelpers {
                                 double zOffset = varargs.checkdouble(8);
                                 double speed = varargs.checkdouble(9);
                                 ServerLevel level = context.level();
-                                ParticleType<?> particleType = ForgeRegistries.PARTICLE_TYPES.getValue(new ResourceLocation(particlePath));
+                                ParticleType<?> particleType = ForgeRegistries.PARTICLE_TYPES.getValue(ResourceLocation.parse(particlePath));
                                 if (particleType == null) return LuaValue.FALSE;
                                 if (particleType instanceof SimpleParticleType simpleParticleType) {
                                     level.sendParticles(simpleParticleType, x, y, z, count, xOffset, yOffset, zOffset, speed);

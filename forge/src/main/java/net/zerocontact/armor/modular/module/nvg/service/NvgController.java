@@ -14,8 +14,8 @@ import java.util.function.Supplier;
 
 public class NvgController implements ModuleController {
 
-    public static final ResourceLocation ENABLE_ACTION = new ResourceLocation(ZeroContact.MOD_ID, "nvg/enable");
-    public static final ResourceLocation DISABLE_ACTION = new ResourceLocation(ZeroContact.MOD_ID, "nvg/disable");
+    public static final ResourceLocation ENABLE_ACTION = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "nvg/enable");
+    public static final ResourceLocation DISABLE_ACTION = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "nvg/disable");
 
     @Override
     public Optional<ModuleView> inspect(ModuleContext context) {

@@ -65,7 +65,7 @@ public final class MagazinesCompatNullSafetyTest {
         MagazineItem item;
         try {
             item = new MagazineItem(new Item.Properties());
-            registry.register(new ResourceLocation("zerocontact_test", "magazine"), item);
+            registry.register(ResourceLocation.fromNamespaceAndPath("zerocontact_test", "magazine"), item);
         } finally {
             registry.freeze();
             BuiltInRegistries.ITEM.freeze();

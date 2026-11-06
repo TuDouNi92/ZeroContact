@@ -23,7 +23,7 @@ import software.bernie.geckolib.renderer.layer.GeoRenderLayer;
 
 public class EmissiveBeaconRenderLayer<T extends Item & GeoItem & GeoAnimatable> extends GeoRenderLayer<T> {
     private static final ResourceLocation GLOW_TEXTURE =
-            new ResourceLocation(
+            ResourceLocation.fromNamespaceAndPath(
                     ZeroContact.MOD_ID,
                     "textures/models/beacon/beacon.png"
             );

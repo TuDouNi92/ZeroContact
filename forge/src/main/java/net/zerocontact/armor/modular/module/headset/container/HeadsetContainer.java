@@ -6,8 +6,8 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.zerocontact.ZeroContact;
 
 public class HeadsetContainer implements INBTSerializable<CompoundTag> {
-    public static final ResourceLocation STATE_ON = new ResourceLocation(ZeroContact.MOD_ID, "headset/on");
-    public static final ResourceLocation STATE_OFF = new ResourceLocation(ZeroContact.MOD_ID, "headset/off");
+    public static final ResourceLocation STATE_ON = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "headset/on");
+    public static final ResourceLocation STATE_OFF = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "headset/off");
     private static final String NBT_ON = "headset_on";
     private boolean headsetOn = false;
 

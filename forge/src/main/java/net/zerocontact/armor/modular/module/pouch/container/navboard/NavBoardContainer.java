@@ -9,8 +9,8 @@ import net.zerocontact.ZeroContact;
 import java.util.Map;
 
 public class NavBoardContainer implements INBTSerializable<CompoundTag> {
-    public static final ResourceLocation STATE_ON = new ResourceLocation(ZeroContact.MOD_ID, "navboard/on");
-    public static final ResourceLocation STATE_OFF = new ResourceLocation(ZeroContact.MOD_ID, "navboard/off");
+    public static final ResourceLocation STATE_ON = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "navboard/on");
+    public static final ResourceLocation STATE_OFF = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "navboard/off");
 
     private static final String NBT_STATE = "state";
 

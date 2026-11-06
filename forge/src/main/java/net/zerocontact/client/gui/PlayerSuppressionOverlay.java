@@ -12,7 +12,7 @@ import net.zerocontact.ZeroContact;
 import net.zerocontact.client.interaction.SuppressionManager;
 
 public class PlayerSuppressionOverlay {
-    private static final ResourceLocation VIGNETTE_LOCATION = new ResourceLocation(ZeroContact.MOD_ID,"textures/gui/suppression.png");
+    private static final ResourceLocation VIGNETTE_LOCATION = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID,"textures/gui/suppression.png");
     public static final IGuiOverlay SUPPRESSION_OVERLAY = (forgeGui, graphics, ticks, w, h) -> {
         float suppressionLevel = SuppressionManager.suppressionLevel;
         if (suppressionLevel > 0) {

@@ -10,12 +10,12 @@ import net.zerocontact.armor.modular.registry.ModuleRegistry;
 import java.util.List;
 
 public class Amp extends Headset {
-    private static final ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, "geo/headset/amp.geo.json");
-    private static final ResourceLocation animation = new ResourceLocation("");
+    private static final ResourceLocation model = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "geo/headset/amp.geo.json");
+    private static final ResourceLocation animation = ResourceLocation.parse("");
 
     public enum Color {
-        TAN(new ResourceLocation(ZeroContact.MOD_ID, "textures/models/headset/amp.png")),
-        BLACK(new ResourceLocation(ZeroContact.MOD_ID, "textures/models/headset/amp_black.png"));
+        TAN(ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "textures/models/headset/amp.png")),
+        BLACK(ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "textures/models/headset/amp_black.png"));
         private final ResourceLocation texture;
 
         Color(ResourceLocation texture) {
@@ -37,6 +37,6 @@ public class Amp extends Headset {
                         new EqualizerBand(8000, 5, 1)
                 )
         ));
-        ModuleRegistry.registerCategory(new ResourceLocation(ZeroContact.MOD_ID, id), MountCategory.HEADSET);
+        ModuleRegistry.registerCategory(ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, id), MountCategory.HEADSET);
     }
 }

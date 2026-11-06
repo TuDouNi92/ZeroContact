@@ -9,18 +9,18 @@ import static net.zerocontact.ZeroContact.MOD_ID;
 public class JpcArmorImpl extends BaseArmorGeoImpl {
     public enum Series {
         V1(
-                new ResourceLocation(MOD_ID, "textures/models/armorrig/armorrig_jpc_1v_tan.png"),
-                new ResourceLocation(MOD_ID, "geo/armorrig/armorrig_jpc_1v_tan.geo.json"),
+                ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/models/armorrig/armorrig_jpc_1v_tan.png"),
+                ResourceLocation.fromNamespaceAndPath(MOD_ID, "geo/armorrig/armorrig_jpc_1v_tan.geo.json"),
                 null
         ),
         V2(
-                new ResourceLocation(MOD_ID, "textures/models/armorrig/armorrig_jpc_2v_tan.png"),
-                new ResourceLocation(MOD_ID, "geo/armorrig/armorrig_jpc_2v_tan.geo.json"),
+                ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/models/armorrig/armorrig_jpc_2v_tan.png"),
+                ResourceLocation.fromNamespaceAndPath(MOD_ID, "geo/armorrig/armorrig_jpc_2v_tan.geo.json"),
                 null
         ),
         V2SC(
-                new ResourceLocation(MOD_ID, "textures/models/armorrig/armorrig_jpc_2v_sc_tan.png"),
-                new ResourceLocation(MOD_ID, "geo/armorrig/armorrig_jpc_2v_sc_tan.geo.json"),
+                ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/models/armorrig/armorrig_jpc_2v_sc_tan.png"),
+                ResourceLocation.fromNamespaceAndPath(MOD_ID, "geo/armorrig/armorrig_jpc_2v_sc_tan.geo.json"),
                 null
         );
         private final ResourceLocation texture;

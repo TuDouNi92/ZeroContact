@@ -68,7 +68,7 @@ public class GenerateArmorGeoImpl extends BaseArmorGeoImpl implements GeoItem, I
     public Collection<MountDefinition> getMountDefinitions(ItemStack stack) {
         return attachments.stream().map(pojo ->
                 new MountDefinition(
-                        new ResourceLocation(ZeroContact.MOD_ID, pojo.mountId),
+                        ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, pojo.mountId),
                         pojo.getMountType(),
                         pojo.mountBone,
                         pojo.getAcceptCategories()

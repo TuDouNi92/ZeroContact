@@ -105,7 +105,7 @@ public class BasePlate extends ArmorItem implements PlateInfoProvider, GeoItem, 
             @Override
             public BlockEntityWithoutLevelRenderer getCustomRenderer() {
                 if (render == null) {
-                    render = new ItemRender<>(texture, model, new ResourceLocation(ZeroContact.MOD_ID,"animations/plate.animation.json"));
+                    render = new ItemRender<>(texture, model, ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID,"animations/plate.animation.json"));
                 }
                 return render;
             }

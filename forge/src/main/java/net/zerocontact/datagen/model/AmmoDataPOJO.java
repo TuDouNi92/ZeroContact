@@ -143,7 +143,7 @@ public class AmmoDataPOJO {
             float radius
     ) {
         public @Nullable MobEffect resolveEffect() {
-            return ForgeRegistries.MOB_EFFECTS.getValue(new ResourceLocation(effect));
+            return ForgeRegistries.MOB_EFFECTS.getValue(ResourceLocation.parse(effect));
         }
     }
 

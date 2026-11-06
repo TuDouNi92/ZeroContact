@@ -118,9 +118,9 @@ public class ItemAdapter {
             float bluntFactor = data.hurtModifier.bluntMultiplier;
             float penetratedFactor = data.hurtModifier.penetrateMultiplier;
             float ricochetFactor = data.hurtModifier.ricochetMultiplier;
-            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
-            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
-            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
+            ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.texture);
+            ResourceLocation model = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.model);
+            ResourceLocation animation = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.animation);
             List<ItemPOJO.Armor.Attachments> attachments = data.attachments;
             items.add(
                     new GenerationRecord<>(
@@ -162,9 +162,9 @@ public class ItemAdapter {
             float movementFix = data.movementFix;
             float durabilityLossProvider = data.durabilityLossModifier;
             int durability = data.durability;
-            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
-            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
-            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
+            ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.texture);
+            ResourceLocation model = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.model);
+            ResourceLocation animation = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.animation);
             items.add(new GenerationRecord<>(id, new BasePlate(durability, defense, absorb, bluntDamage, penetrateDamage, ricochetDamage, movementFix, durabilityLossProvider, texture, model, animation), tab));
             return items;
         }
@@ -184,9 +184,9 @@ public class ItemAdapter {
             float penetrateReduction = data.hurtModifier.penetrateMultiplier;
             float bluntReduction = data.hurtModifier.bluntMultiplier;
             float ricochetReduction = data.hurtModifier.ricochetMultiplier;
-            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
-            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
-            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
+            ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.texture);
+            ResourceLocation model = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.model);
+            ResourceLocation animation = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.animation);
             List<ItemPOJO.Armor.Attachments> attachments = data.attachments;
             items.add(
                     new GenerationRecord<>(
@@ -218,11 +218,11 @@ public class ItemAdapter {
             int absorb = data.protectionClass;
             float durabilityLossProvider = data.durabilityLossModifier;
             int defaultDurability = data.defaultDurability;
-            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
-            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
-            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
+            ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.texture);
+            ResourceLocation model = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.model);
+            ResourceLocation animation = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.animation);
             List<MobEffect> immuneEffects = data.immuneEffects.stream()
-                    .map(s -> ForgeRegistries.MOB_EFFECTS.getValue(new ResourceLocation(s)))
+                    .map(s -> ForgeRegistries.MOB_EFFECTS.getValue(ResourceLocation.parse(s)))
                     .filter(Objects::nonNull)
                     .toList();
             List<ItemPOJO.Armor.Attachments> attachments = data.attachments;
@@ -263,11 +263,11 @@ public class ItemAdapter {
             int absorb = data.protectionClass;
             float durabilityLossProvider = data.durabilityLossModifier;
             int defaultDurability = data.defaultDurability;
-            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
-            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
-            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
+            ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.texture);
+            ResourceLocation model = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.model);
+            ResourceLocation animation = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.animation);
             List<MobEffect> immuneEffects = data.immuneEffects.stream()
-                    .map(s -> ForgeRegistries.MOB_EFFECTS.getValue(new ResourceLocation(s)))
+                    .map(s -> ForgeRegistries.MOB_EFFECTS.getValue(ResourceLocation.parse(s)))
                     .filter(Objects::nonNull)
                     .toList();
             List<ItemPOJO.Armor.Attachments> attachments = data.attachments;
@@ -303,9 +303,9 @@ public class ItemAdapter {
             if (getMapper(data).type != IEquipmentTypeTag.EquipmentType.UNIFORM_TOP) return items;
             String id = data.id;
             int defaultDurability = data.defaultDurability;
-            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
-            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
-            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
+            ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.texture);
+            ResourceLocation model = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.model);
+            ResourceLocation animation = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.animation);
             items.add(new GenerationRecord<>(id, new GenerateUniformTopGeoImpl(id, defaultDurability, texture, model, animation), tab));
             return items;
         }
@@ -319,9 +319,9 @@ public class ItemAdapter {
             if (getMapper(data).type != IEquipmentTypeTag.EquipmentType.UNIFORM_PANTS) return items;
             String id = data.id;
             int defaultDurability = data.defaultDurability;
-            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
-            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
-            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
+            ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.texture);
+            ResourceLocation model = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.model);
+            ResourceLocation animation = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.animation);
             items.add(new GenerationRecord<>(id, new GenerateUniformPantsGeoImpl(id, defaultDurability, texture, model, animation), tab));
             return items;
         }
@@ -335,9 +335,9 @@ public class ItemAdapter {
             if (getMapper(data).type != IEquipmentTypeTag.EquipmentType.ARMBAND) return items;
             String id = data.id;
             int defaultDurability = data.defaultDurability;
-            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, data.texture);
-            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, data.model);
-            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, data.animation);
+            ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.texture);
+            ResourceLocation model = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.model);
+            ResourceLocation animation = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.animation);
             items.add(new GenerationRecord<>(id, new GenerateUniformArmbandGeoImpl(id, defaultDurability, texture, model, animation), tab));
             return items;
         }
@@ -361,9 +361,9 @@ public class ItemAdapter {
             if (!getMapper(data).type.equals(IEquipmentTypeTag.EquipmentType.BACKPACK)) return items;
             String id = loadout.id;
             int containerSize = loadout.containerSize;
-            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, loadout.texture);
-            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, loadout.model);
-            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, loadout.animation);
+            ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, loadout.texture);
+            ResourceLocation model = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, loadout.model);
+            ResourceLocation animation = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, loadout.animation);
             items.add(new GenerationRecord<>(id, new BaseBackpack(texture, model, animation, containerSize), tab));
             return items;
         }
@@ -377,9 +377,9 @@ public class ItemAdapter {
             if (!getMapper(data).type.equals(IEquipmentTypeTag.EquipmentType.RIGS)) return items;
             String id = loadout.id;
             int containerSize = loadout.containerSize;
-            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, loadout.texture);
-            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, loadout.model);
-            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, loadout.animation);
+            ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, loadout.texture);
+            ResourceLocation model = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, loadout.model);
+            ResourceLocation animation = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, loadout.animation);
             items.add(new GenerationRecord<>(id, new BaseRigs(texture, model, animation, containerSize), tab));
             return items;
         }
@@ -390,15 +390,15 @@ public class ItemAdapter {
         public <T> LinkedHashSet<GenerationRecord<?>> deserializeItems(T data, String tab) {
             LinkedHashSet<GenerationRecord<?>> items = new LinkedHashSet<>();
             if (!(data instanceof ModularPOJO modular)) return items;
-            ResourceLocation id = new ResourceLocation(ZeroContact.MOD_ID, modular.id);
+            ResourceLocation id = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, modular.id);
             int durability = modular.durability;
-            ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, modular.texture);
-            ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, modular.model);
-            ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, modular.animation);
+            ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, modular.texture);
+            ResourceLocation model = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, modular.model);
+            ResourceLocation animation = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, modular.animation);
             MountCategory moduleType = modular.getMountCategory();
             ResourceLocation trait = modular.getTrait();
             if (data instanceof ModularNVGPOJO modularNVGPOJO) {
-                ResourceLocation vignette = new ResourceLocation(ZeroContact.MOD_ID, modularNVGPOJO.vignette);
+                ResourceLocation vignette = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, modularNVGPOJO.vignette);
                 INvg.Type nvgType = Arrays.stream(INvg.Type.values()).filter(t -> t.name().equals(modularNVGPOJO.color.toUpperCase())).findAny().orElse(INvg.Type.GREEN);
                 items.add(
                         new GenerationRecord<Item>(

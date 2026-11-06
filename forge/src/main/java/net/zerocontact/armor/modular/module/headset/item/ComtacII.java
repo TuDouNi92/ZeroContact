@@ -10,12 +10,12 @@ import net.zerocontact.armor.modular.registry.ModuleRegistry;
 import java.util.List;
 
 public class ComtacII extends Headset {
-    private static final ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, "geo/headset/comtac2.geo.json");
-    private static final ResourceLocation animation = new ResourceLocation("");
+    private static final ResourceLocation model = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "geo/headset/comtac2.geo.json");
+    private static final ResourceLocation animation = ResourceLocation.parse("");
 
     public enum Color {
-        OD(new ResourceLocation(ZeroContact.MOD_ID, "textures/models/headset/comtac2.png")),
-        CB(new ResourceLocation(ZeroContact.MOD_ID, "textures/models/headset/comtac2_brown.png"));
+        OD(ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "textures/models/headset/comtac2.png")),
+        CB(ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "textures/models/headset/comtac2_brown.png"));
 
         Color(ResourceLocation texture) {
             this.texture = texture;
@@ -40,6 +40,6 @@ public class ComtacII extends Headset {
                                 new EqualizerBand(8000, 6, 1)
                         )
                 ));
-        ModuleRegistry.registerCategory(new ResourceLocation(ZeroContact.MOD_ID, id), MountCategory.HEADSET);
+        ModuleRegistry.registerCategory(ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, id), MountCategory.HEADSET);
     }
 }

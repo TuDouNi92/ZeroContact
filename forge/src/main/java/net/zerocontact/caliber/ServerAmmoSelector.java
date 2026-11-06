@@ -262,7 +262,7 @@ public class ServerAmmoSelector {
                     refundStack = AmmoItemBuilder.create()
                             .setId(existedAmmoId != null
                                     ? existedAmmoId
-                                    : new ResourceLocation(existedAmmoKey))
+                                    : ResourceLocation.parse(existedAmmoKey))
                             .setCount(currentAmmoCount)
                             .build();
                 } else {

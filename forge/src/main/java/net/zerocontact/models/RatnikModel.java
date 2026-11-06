@@ -8,12 +8,12 @@ import software.bernie.geckolib.model.GeoModel;
 public class RatnikModel extends GeoModel<Ratnik> {
     @Override
     public ResourceLocation getModelResource(Ratnik ratnik) {
-        return new ResourceLocation(ZeroContact.MOD_ID,"geo/helmet_6b47_cover_emr.geo.json");
+        return ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID,"geo/helmet_6b47_cover_emr.geo.json");
     }
 
     @Override
     public ResourceLocation getTextureResource(Ratnik ratnik) {
-        return new ResourceLocation(ZeroContact.MOD_ID, "textures/models/helmet/helmet_6b47_cover_emr.png");
+        return ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "textures/models/helmet/helmet_6b47_cover_emr.png");
     }
 
     @Override

@@ -18,13 +18,13 @@ public class AttachCapListener {
     public static void attachStackCap(AttachCapabilitiesEvent<ItemStack> event) {
         if (IGun.getIGunOrNull(event.getObject()) != null) {
             event.addCapability(
-                    new ResourceLocation(ZeroContact.MOD_ID, "cartridge"), new GunCartridgeTypeCapProvider()
+                    ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "cartridge"), new GunCartridgeTypeCapProvider()
             );
         }
 
         if (event.getObject().getItem() instanceof ModularEquipment) {
             event.addCapability(
-                    new ResourceLocation(ZeroContact.MOD_ID, "modular_equipment"),
+                    ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "modular_equipment"),
                     new ModularContainerProvider()
             );
         }

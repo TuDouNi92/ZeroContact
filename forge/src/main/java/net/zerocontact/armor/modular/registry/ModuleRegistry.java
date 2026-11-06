@@ -68,21 +68,21 @@ public final class ModuleRegistry {
     public static void registerTrait() {
         traits.putAll(
                 Map.of(
-                        new ResourceLocation(ZeroContact.MOD_ID, "pouch"),
+                        ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "pouch"),
                         new CapabilityEntry(CapabilityRegistries.POUCH, null, PouchProvider::new),
-                        new ResourceLocation(ZeroContact.MOD_ID, "admin_pouch"),
+                        ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "admin_pouch"),
                         new CapabilityEntry(CapabilityRegistries.ADMIN_POUCH, new AdminPouchController(), AdminPouchProvider::new),
-                        new ResourceLocation(ZeroContact.MOD_ID, "navboard"),
+                        ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "navboard"),
                         new CapabilityEntry(CapabilityRegistries.NAV_BOARD, new NavBoardController(), NavBoardProvider::new),
-                        new ResourceLocation(ZeroContact.MOD_ID, "nvg"),
+                        ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "nvg"),
                         new CapabilityEntry(CapabilityRegistries.NVG, new NvgController(), NvgProvider::new),
-                        new ResourceLocation(ZeroContact.MOD_ID, "battery"),
+                        ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "battery"),
                         new CapabilityEntry(CapabilityRegistries.BATTERY, null, BatteryProvider::new),
-                        new ResourceLocation(ZeroContact.MOD_ID, "beacon"),
+                        ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "beacon"),
                         new CapabilityEntry(CapabilityRegistries.BEACON, new BeaconController(), BeaconProvider::new),
-                        new ResourceLocation(ZeroContact.MOD_ID, "headset"),
+                        ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "headset"),
                         new CapabilityEntry(CapabilityRegistries.HEADSET, new HeadsetController(), HeadsetProvider::new),
-                        new ResourceLocation(ZeroContact.MOD_ID, "radio"),
+                        ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "radio"),
                         new CapabilityEntry(CapabilityRegistries.RADIO, new MBITRController(), RadioProvider::new)
 
                 )

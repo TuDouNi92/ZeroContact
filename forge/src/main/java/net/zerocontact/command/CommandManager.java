@@ -205,7 +205,7 @@ public class CommandManager {
                                                     ItemStack stack = livingEntity.getItemBySlot(equipmentSlot);
 
                                                     if (stack.getItem() instanceof ModularEquipment modularEquipment) {
-                                                        ResourceLocation mountId = new ResourceLocation(
+                                                        ResourceLocation mountId = ResourceLocation.fromNamespaceAndPath(
                                                                 ZeroContact.MOD_ID,
                                                                 StringArgumentType.getString(ctx, "mount_id")
                                                         );
@@ -243,7 +243,7 @@ public class CommandManager {
                                                             });
 
                                                     ItemStack armor = livingEntity.getItemBySlot(equipmentSlot);
-                                                    ResourceLocation mountId = new ResourceLocation(
+                                                    ResourceLocation mountId = ResourceLocation.fromNamespaceAndPath(
                                                             ZeroContact.MOD_ID,
                                                             StringArgumentType.getString(context, "mount_id")
                                                     );

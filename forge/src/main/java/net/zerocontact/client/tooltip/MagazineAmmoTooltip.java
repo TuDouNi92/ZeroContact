@@ -51,9 +51,9 @@ public final class MagazineAmmoTooltip {
     }
 
     private static ItemStack displayStack(Round round) {
-        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(round.variant()));
+        Item item = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(round.variant()));
         return item instanceof GenerateAmmo ? item.getDefaultInstance()
-                : AmmoItemBuilder.create().setId(new ResourceLocation(round.ammoId())).setCount(1).build();
+                : AmmoItemBuilder.create().setId(ResourceLocation.parse(round.ammoId())).setCount(1).build();
     }
 
     public static ItemStack topAmmo(ItemStack magazine) {

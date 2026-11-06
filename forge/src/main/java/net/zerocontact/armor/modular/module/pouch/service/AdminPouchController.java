@@ -16,8 +16,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public class AdminPouchController implements ModuleController {
-    public static final ResourceLocation TAKE_MAP_ACTION = new ResourceLocation(ZeroContact.MOD_ID, "admin_p/take_map");
-    public static final ResourceLocation PUT_MAP_ACTION = new ResourceLocation(ZeroContact.MOD_ID, "admin_p/put_map");
+    public static final ResourceLocation TAKE_MAP_ACTION = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "admin_p/take_map");
+    public static final ResourceLocation PUT_MAP_ACTION = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "admin_p/put_map");
 
     @Override
     public Optional<ModuleView> inspect(ModuleContext context) {

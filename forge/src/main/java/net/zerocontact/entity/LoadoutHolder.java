@@ -84,7 +84,7 @@ class LoadoutHolder {
 
     //Get a gun stack generated from TaCZ API
     void finalizeGun() {
-        ItemStack gunStack = GunItemBuilder.create().setId(new ResourceLocation(gunId)).build();
+        ItemStack gunStack = GunItemBuilder.create().setId(ResourceLocation.parse(gunId)).build();
         IGun gun = IGun.getIGunOrNull(gunStack);
         if (gun == null) return;
         TimelessAPI.getCommonGunIndex(gun.getGunId(gunStack)).ifPresent(commonGunIndex -> {
@@ -106,7 +106,7 @@ class LoadoutHolder {
             Integer stackSize = TimelessAPI.getCommonAmmoIndex(ammoIdFromGun).map(CommonAmmoIndex::getStackSize).orElse(1);
             //If input is not vanilla ammo, find its resource and build. Or build the vanilla ammo
             if (ammoId != null && !ammoId.equals(ammoIdFromGun.toString())) {
-                @Nullable Item ammoItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(ammoId));
+                @Nullable Item ammoItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(ammoId));
                 @Nullable GenerateAmmo generateAmmo = ammoItem instanceof GenerateAmmo ? (GenerateAmmo) ammoItem : null;
                 if (generateAmmo != null) {
                     ammoStack = generateAmmo.getDefaultInstance();
@@ -164,11 +164,11 @@ class LoadoutHolder {
 
     private ItemStack finalizeItem(@Nullable String id, @Nullable String defaultId) {
         if (defaultId == null) return ItemStack.EMPTY;
-        @Nullable Item defaultItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(defaultId));
+        @Nullable Item defaultItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(defaultId));
         if (defaultItem == null) return ItemStack.EMPTY;
         ItemStack defaultStack = new ItemStack(defaultItem);
         if (id == null) return defaultStack;
-        @Nullable Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(id));
+        @Nullable Item item = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(id));
         if (item == null) return defaultStack;
         return new ItemStack(item);
     }

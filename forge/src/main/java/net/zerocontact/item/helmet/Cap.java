@@ -15,15 +15,15 @@ public class Cap extends BaseGeoHelmet {
     public enum Color {
         CYAN(
                 new ColorResources(
-                        new ResourceLocation(MOD_ID, "textures/models/helmet/helmet_cap_cyan.png"),
-                        new ResourceLocation(MOD_ID, "geo/helmet/helmet_cap_cyan.geo.json"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/models/helmet/helmet_cap_cyan.png"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID, "geo/helmet/helmet_cap_cyan.geo.json"),
                         null
                 )
         ),
         BOSS(
                 new ColorResources(
-                        new ResourceLocation(MOD_ID, "textures/models/helmet/helmet_cap_boss.png"),
-                        new ResourceLocation(MOD_ID, "geo/helmet/helmet_cap_boss.geo.json"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/models/helmet/helmet_cap_boss.png"),
+                        ResourceLocation.fromNamespaceAndPath(MOD_ID, "geo/helmet/helmet_cap_boss.geo.json"),
                         null
                 )
         );

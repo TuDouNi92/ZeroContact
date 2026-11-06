@@ -7,7 +7,7 @@ import net.zerocontact.armor.modular.module.headset.model.AudioProfile;
 import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
 
 public class Headset extends AbstractGenerateGeoCurioItemImpl implements EquipmentModule {
-    private static final ResourceLocation trait = new ResourceLocation(ZeroContact.MOD_ID, "headset");
+    private static final ResourceLocation trait = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "headset");
     private final AudioProfile profile;
 
     public Headset(

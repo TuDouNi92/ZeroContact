@@ -37,7 +37,7 @@ public class GenerateAmmo extends Item implements AmmoItemDataAccessor, IEquipme
     @Override
     public @NotNull ResourceLocation getAmmoId(ItemStack ammo) {
         AmmoInjector.write(new AmmoInjector.AmmoContext(caliber), ammo);
-        return new ResourceLocation(caliber.id());
+        return ResourceLocation.parse(caliber.id());
     }
 
     public CaliberHelper.Caliber getDefualtCaliber() {

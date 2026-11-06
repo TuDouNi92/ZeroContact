@@ -87,7 +87,7 @@ public abstract class BaseDogTag extends Item implements GeoItem {
         if (!(livingEntity.level() instanceof ServerLevel serverLevel)) return false;
         if (!CommandManager.CommandSavedData.get(serverLevel).dogTagState) return false;
         if (livingEntity instanceof ServerPlayer || livingEntity instanceof ArmedRaider) {
-            Item dogTag = ForgeRegistries.ITEMS.getValue(new ResourceLocation(MOD_ID, "dog_tag"));
+            Item dogTag = ForgeRegistries.ITEMS.getValue(ResourceLocation.fromNamespaceAndPath(MOD_ID, "dog_tag"));
             if (!(dogTag instanceof BaseDogTag baseDogTag)) return true;
             Entity projectile = damageSource.getDirectEntity();
             LivingEntity attacker = (LivingEntity) damageSource.getEntity();

@@ -34,7 +34,7 @@ import static net.zerocontact.ZeroContact.MOD_ID;
 @Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class BackpackScreen extends AbstractContainerScreen<BackpackContainerMenu> {
 
-    private static final ResourceLocation BACKGROUND = new ResourceLocation(MOD_ID,"textures/gui/kevlar_bg.png");
+    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(MOD_ID,"textures/gui/kevlar_bg.png");
     private static final int OUTLINE_COLOR = 0xcc141414;
     private static final int SLOT_BG_COLOR = 0x55a1a1a1;
     private static final int VIGNETTE_COLOR = 0x88000000;

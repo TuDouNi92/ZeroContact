@@ -140,7 +140,7 @@ public class MagazinesCompat {
         tag.putInt("AmmoCount", rounds.size());
         Round top = rounds.peek();
         ((MagazineItem) magazine.getItem()).setAmmoId(magazine,
-                top == null ? DefaultAssets.EMPTY_AMMO_ID : new ResourceLocation(top.ammoId()));
+                top == null ? DefaultAssets.EMPTY_AMMO_ID : ResourceLocation.parse(top.ammoId()));
         if (top == null) {
             magazine.removeTagKey(CaliberSerializer.AI_AMMO);
         } else {
@@ -230,9 +230,9 @@ public class MagazinesCompat {
 
     private ItemStack createRound(@Nullable Round round) {
         if (round == null) return ItemStack.EMPTY;
-        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(round.variant()));
+        Item item = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(round.variant()));
         return item instanceof GenerateAmmo ? item.getDefaultInstance()
-                : AmmoItemBuilder.create().setId(new ResourceLocation(round.ammoId())).setCount(1).build();
+                : AmmoItemBuilder.create().setId(ResourceLocation.parse(round.ammoId())).setCount(1).build();
     }
 
     /**

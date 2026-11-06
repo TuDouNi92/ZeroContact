@@ -25,7 +25,7 @@ public class AttachStaminaEvent {
     public static void attach(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof Player player) {
             if (!event.getObject().getCapability(PlayerStaminaProvider.PLAYER_STAMINA).isPresent()) {
-                event.addCapability(new ResourceLocation(MOD_ID, "properties"), new PlayerStaminaProvider(player));
+                event.addCapability(ResourceLocation.fromNamespaceAndPath(MOD_ID, "properties"), new PlayerStaminaProvider(player));
             }
         }
     }

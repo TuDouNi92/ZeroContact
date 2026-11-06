@@ -13,7 +13,7 @@ import static net.zerocontact.ZeroContact.MOD_ID;
 
 public class Predicate {
     public static void predicateCurios() {
-        CuriosApi.registerCurioPredicate(new ResourceLocation(MOD_ID, "zc_predicate"), slotResult -> {
+        CuriosApi.registerCurioPredicate(ResourceLocation.fromNamespaceAndPath(MOD_ID, "zc_predicate"), slotResult -> {
             LivingEntity entity = slotResult.slotContext().entity();
             if (entity == null) return false;
             if (slotResult.stack().getItem() instanceof PlateInfoProvider

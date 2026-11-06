@@ -36,9 +36,9 @@ import static net.zerocontact.ZeroContact.MOD_ID;
 @SuppressWarnings("deprecation")
 
 public class Workbench extends Block implements EntityBlock {
-    public static final ResourceLocation texture = new ResourceLocation(MOD_ID, "textures/models/block/laptop_screen.png");
-    public static final ResourceLocation model = new ResourceLocation(MOD_ID, "geo/block/laptop.geo.json");
-    public static final ResourceLocation animation = new ResourceLocation(MOD_ID, "animations/laptop.animation.json");
+    public static final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/models/block/laptop_screen.png");
+    public static final ResourceLocation model = ResourceLocation.fromNamespaceAndPath(MOD_ID, "geo/block/laptop.geo.json");
+    public static final ResourceLocation animation = ResourceLocation.fromNamespaceAndPath(MOD_ID, "animations/laptop.animation.json");
     private static final DirectionProperty FACING = BlockStateProperties.FACING;
 
     public Workbench() {

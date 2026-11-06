@@ -14,14 +14,14 @@ import org.jetbrains.annotations.NotNull;
 
 public class Battery extends AbstractGenerateGeoCurioItemImpl implements EquipmentModule {
 
-    protected static final ResourceLocation texture = new ResourceLocation(ZeroContact.MOD_ID, "textures/models/battery/battery.png");
-    protected static final ResourceLocation model = new ResourceLocation(ZeroContact.MOD_ID, "geo/battery/battery.geo.json");
-    protected static final ResourceLocation animation = new ResourceLocation(ZeroContact.MOD_ID, "");
-    private static final ResourceLocation trait = new ResourceLocation(ZeroContact.MOD_ID, "battery");
+    protected static final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "textures/models/battery/battery.png");
+    protected static final ResourceLocation model = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "geo/battery/battery.geo.json");
+    protected static final ResourceLocation animation = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "");
+    private static final ResourceLocation trait = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "battery");
 
     public Battery() {
         super("battery", 12000, texture, model, animation, Type.HELMET);
-        ModuleRegistry.registerCategory(new ResourceLocation(ZeroContact.MOD_ID,"battery"), MountCategory.BATTERY);
+        ModuleRegistry.registerCategory(ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID,"battery"), MountCategory.BATTERY);
     }
 
     @Override

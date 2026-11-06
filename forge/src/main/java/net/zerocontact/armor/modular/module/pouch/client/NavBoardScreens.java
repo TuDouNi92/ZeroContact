@@ -162,7 +162,7 @@ public final class NavBoardScreens {
             if (session.screen == null) {
                 Key key = entry.getKey();
                 // Stable names also avoid growing Minecraft's memoized RenderType cache on every toggle.
-                session.screen = new NavBoardScreenTarget(new ResourceLocation(ZeroContact.MOD_ID,
+                session.screen = new NavBoardScreenTarget(ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID,
                         "navboard/" + key.target().slot() + "/" + key.target().index() + "/"
                                 + key.mount().getNamespace() + "/" + key.mount().getPath()));
             }

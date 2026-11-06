@@ -9,12 +9,12 @@ public class JpcModel extends GeoModel<JpcArmorImpl> {
 
     @Override
     public ResourceLocation getModelResource(JpcArmorImpl sapiIV) {
-        return new ResourceLocation(ZeroContact.MOD_ID,"geo/jpc_armor.geo.json");
+        return ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID,"geo/jpc_armor.geo.json");
     }
 
     @Override
     public ResourceLocation getTextureResource(JpcArmorImpl sapiIV) {
-        return new ResourceLocation(ZeroContact.MOD_ID,"textures/models/armor/jpc.png");
+        return ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID,"textures/models/armor/jpc.png");
     }
 
     @Override

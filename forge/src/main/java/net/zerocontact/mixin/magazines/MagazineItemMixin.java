@@ -131,7 +131,7 @@ public abstract class MagazineItemMixin {
         AmmoInjector.AmmoContext context = AmmoInjector.read(stack);
         if (context.isEmpty()) return;
         String variantId = context.caliber().variant();
-        Item ammoItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(variantId));
+        Item ammoItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(variantId));
         if (ammoItem == null) return;
         MutableComponent ammoLabel = Component.translatable("tooltip.zerocontact.gun.ammoVariant").withStyle(ChatFormatting.GOLD).append(":");
         Component ammoDescription = Component.literal("\uD83E\uDC35 ").append(Component.translatable(ammoItem.getDefaultInstance().getDescriptionId())).withStyle(ChatFormatting.YELLOW);

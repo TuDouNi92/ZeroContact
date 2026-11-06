@@ -5,8 +5,8 @@ import net.minecraft.resources.ResourceLocation;
 import static net.zerocontact.ZeroContact.MOD_ID;
 
 public class AirFrame extends BaseGeoHelmet {
-    private static final ResourceLocation texture = new ResourceLocation(MOD_ID, "textures/models/helmet/helmet_airframe_tan.png");
-    private static final ResourceLocation model = new ResourceLocation(MOD_ID, "geo/helmet/helmet_airframe_tan.geo.json");
+    private static final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/models/helmet/helmet_airframe_tan.png");
+    private static final ResourceLocation model = ResourceLocation.fromNamespaceAndPath(MOD_ID, "geo/helmet/helmet_airframe_tan.geo.json");
     private static final ResourceLocation animation = null;
 
     public AirFrame(int absorb, int defaultDurability, float bluntReduction, float penetrateReduction) {

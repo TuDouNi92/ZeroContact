@@ -13,8 +13,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public class HeadsetController implements ModuleController {
-    public static final ResourceLocation DISABLE_ACTION = new ResourceLocation(ZeroContact.MOD_ID, "headset/disable");
-    public static final ResourceLocation ENABLE_ACTION = new ResourceLocation(ZeroContact.MOD_ID, "headset/enable");
+    public static final ResourceLocation DISABLE_ACTION = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "headset/disable");
+    public static final ResourceLocation ENABLE_ACTION = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "headset/enable");
 
     @Override
     public Optional<ModuleView> inspect(ModuleContext context) {
