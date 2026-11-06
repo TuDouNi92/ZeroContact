@@ -8,6 +8,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -23,6 +24,8 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
     private Container backpackContainer = new SimpleContainer(0);
     private Container rigsContainer = new SimpleContainer(0);
     private final TriggerSource triggerSource;
+    private int openedInventorySlot = -1;
+    private ItemStack openedStack = ItemStack.EMPTY;
     public int minSlotX = Integer.MAX_VALUE;
     public int maxSlotX = Integer.MIN_VALUE;
     public int minSlotY = Integer.MAX_VALUE;
@@ -50,6 +53,9 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
         this.triggerSource = source;
         if (triggerSource == TriggerSource.USE) {
             backpackRenderStack = getHandStack(playerInv.player);
+            openedStack = backpackRenderStack;
+            openedInventorySlot = openedStack == playerInv.player.getMainHandItem()
+                    ? playerInv.selected : Inventory.SLOT_OFFHAND;
             bindInventory(backpackRenderStack);
         } else if (source == TriggerSource.KEY) {
             CuriosApi.getCuriosInventory(playerInv.player).ifPresent(inventoryHandler -> {
@@ -87,11 +93,8 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
     private ItemStack getHandStack(Player player) {
         ItemStack mainHandStack = player.getMainHandItem();
         ItemStack offHandStack = player.getItemInHand(InteractionHand.OFF_HAND);
-        if (mainHandStack == ItemStack.EMPTY && offHandStack == ItemStack.EMPTY) {
-            return ItemStack.EMPTY;
-        } else {
-            return mainHandStack == ItemStack.EMPTY ? offHandStack : mainHandStack;
-        }
+        if (mainHandStack.getItem() instanceof BaseBackpack) return mainHandStack;
+        return offHandStack.getItem() instanceof BaseBackpack ? offHandStack : ItemStack.EMPTY;
     }
 
     private void bindInventory(ItemStack stack) {
@@ -116,9 +119,10 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
 
     @Override
     public @NotNull ItemStack quickMoveStack(@NotNull Player player, int index) {
+        if (!stillValid(player) || index < 0 || index >= slots.size()) return ItemStack.EMPTY;
         ItemStack copy = ItemStack.EMPTY;
         Slot sourceSlot = this.slots.get(index);
-        if (!sourceSlot.hasItem()) return copy;
+        if (!sourceSlot.hasItem() || !sourceSlot.mayPickup(player)) return copy;
         ItemStack sourceStack = sourceSlot.getItem();
         copy = sourceStack.copy();
         if (rigsSlotEnd == 0) rigsSlotEnd = backpackSlotEnd;
@@ -145,8 +149,33 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
     }
 
     @Override
+    public void clicked(int slotId, int button, @NotNull ClickType clickType, @NotNull Player player) {
+        if (!stillValid(player)) return;
+        // SWAP accesses the hotbar/offhand directly, bypassing the source slot's mayPickup.
+        if (clickType == ClickType.SWAP && button == openedInventorySlot) return;
+        super.clicked(slotId, button, clickType, player);
+    }
+
+    @Override
     public boolean stillValid(@NotNull Player player) {
-        return true;
+        // Client slot synchronization replaces ItemStack instances; check identity only on the server.
+        return triggerSource != TriggerSource.USE || player.level().isClientSide
+                || (!openedStack.isEmpty() && player.getInventory().getItem(openedInventorySlot) == openedStack);
+    }
+
+    private Slot playerSlot(Inventory inventory, int index, int x, int y) {
+        return new Slot(inventory, index, x, y) {
+            @Override
+            public boolean mayPickup(@NotNull Player player) {
+                return getContainerSlot() != openedInventorySlot && super.mayPickup(player);
+            }
+
+            @Override
+            public boolean mayPlace(@NotNull ItemStack stack) {
+                // Keep the slot locked by index even when client synchronization replaces its stack.
+                return getContainerSlot() != openedInventorySlot && super.mayPlace(stack);
+            }
+        };
     }
 
     class CustomInventory {
@@ -220,12 +249,11 @@ public class BackpackContainerMenu extends AbstractContainerMenu {
             for (int i = 0; i < 3; ++i) {
                 for (int j = 0; j < 9; ++j) {
                     playerInvY = customInventory.backpackCustomInvY == 0 ? customInventory.rigsCustomInvY + 24 + i * 18 : Math.max(customInventory.backpackCustomInvY + 24 + i * 18, customInventory.rigsCustomInvY + 24 + i * 18);
-                    customInventory.menu.addSlot(new Slot(inventory, j + i * 9 + 9, 8 + j * 18, playerInvY)
-                    );
+                    customInventory.menu.addSlot(playerSlot(inventory, j + i * 9 + 9, 8 + j * 18, playerInvY));
                 }
             }
             for (int j = 0; j < 9; ++j) {
-                customInventory.menu.addSlot(new Slot(inventory, j, 8 + j * 18, playerInvY + 24));
+                customInventory.menu.addSlot(playerSlot(inventory, j, 8 + j * 18, playerInvY + 24));
             }
         }
     }
