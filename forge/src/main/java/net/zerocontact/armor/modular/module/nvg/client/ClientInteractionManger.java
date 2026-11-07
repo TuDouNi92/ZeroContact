@@ -1,12 +1,14 @@
 package net.zerocontact.armor.modular.module.nvg.client;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.LightLayer;
 import net.zerocontact.armor.modular.module.nvg.api.INvg;
 import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.registries.ModSoundEventsReg;
@@ -30,6 +32,7 @@ public final class ClientInteractionManger {
 
     public static final class ClientEffect {
         private final NvgEffectState state = new NvgEffectState();
+        private final NvgExposureState exposure = new NvgExposureState();
         private ItemStack module = ItemStack.EMPTY;
         private ModuleIdentity identity;
         private Object level;
@@ -94,6 +97,16 @@ public final class ClientInteractionManger {
             }
             var previousPhase = state.phase();
             state.tick(capability.outOfPower());
+            var type = ((INvg) module.getItem()).getNVGType();
+            if (type == INvg.Type.GREEN || type == INvg.Type.WHITE) {
+                BlockPos eyePos = BlockPos.containing(minecraft.player.getEyePosition());
+                int blockLight = minecraft.level.getBrightness(LightLayer.BLOCK, eyePos);
+                var dimension = minecraft.level.dimensionType();
+                boolean exposedToSky = dimension.hasSkyLight() && minecraft.level.canSeeSky(eyePos);
+                // Use the live client sky factor, as LightTexture does. The no-argument
+                // getSkyDarken() reads a cached integer; raw sky light can be 15 even at night.
+                exposure.tick(blockLight, exposedToSky, minecraft.level.getSkyDarken(1.0F));
+            }
             // Set a stable pose even if the view model was not rendered during the transition.
             if (previousPhase != state.phase()) {
                 switch (state.phase()) {
@@ -135,12 +148,17 @@ public final class ClientInteractionManger {
             return state.alpha(partialTick);
         }
 
+        public float gain(float partialTick) {
+            return exposure.gain(partialTick);
+        }
+
         public void reset() {
             ++generation;
             rendering = false;
             module = ItemStack.EMPTY;
             identity = null;
             state.reset();
+            exposure.reset();
         }
     }
 }

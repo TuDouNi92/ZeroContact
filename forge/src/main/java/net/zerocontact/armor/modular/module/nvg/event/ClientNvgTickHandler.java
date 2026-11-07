@@ -16,6 +16,7 @@ import net.zerocontact.ZeroContact;
 import net.zerocontact.armor.modular.module.nvg.api.INvg;
 import net.zerocontact.armor.modular.module.nvg.client.ClientInteractionManger;
 import net.zerocontact.mixin.minecraft.GameRendererAccessor;
+import net.zerocontact.mixin.minecraft.PostChainAccessor;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -86,6 +87,27 @@ public final class ClientNvgTickHandler {
         else {
             loadedEffect = desired;
             failedEffect = null;
+        }
+    }
+
+    @SubscribeEvent
+    public static void renderTick(TickEvent.RenderTickEvent event) {
+        if (event.phase != TickEvent.Phase.START) return;
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.level == null || minecraft.player == null
+                || minecraft.getOverlay() instanceof LoadingOverlay || reloadPending) return;
+        GameRenderer renderer = minecraft.gameRenderer;
+        if (ownedEffect == null || renderer.currentEffect() != ownedEffect
+                || !((GameRendererAccessor) renderer).isEffectActive()) return;
+        if (!Objects.equals(loadedEffect, TYPE_EFFECTS.get(INvg.Type.GREEN))
+                && !Objects.equals(loadedEffect, TYPE_EFFECTS.get(INvg.Type.WHITE))) return;
+
+        // Update the existing program before this frame's PostChain.process().
+        float partialTick = minecraft.isPaused() ? 1.0F : event.renderTickTime;
+        float gain = ClientInteractionManger.get().gain(partialTick);
+        for (var pass : ((PostChainAccessor) ownedEffect).zerocontact$getPasses()) {
+            var uniform = pass.getEffect().getUniform("Gain");
+            if (uniform != null) uniform.set(gain);
         }
     }
 

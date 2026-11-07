@@ -3,6 +3,7 @@
 uniform sampler2D DiffuseSampler;
 
 uniform float Time;
+// 客户端根据眼部世界光照测光，平滑更新绿磷/白磷的增益。
 uniform float Gain;
 uniform float Gamma;
 uniform float NoiseStrength;

@@ -9,11 +9,11 @@ public final class NvgEffectStateTest {
         state.request(true);
         tick(state, 9);
         check(!state.wantsShader() && state.alpha(1) == 0, "wait for readiness");
-        tick(state, 4);
-        check(!state.wantsShader(), "respect five-tick readiness delay");
+        tick(state, 9);
+        check(!state.wantsShader(), "respect ten-tick readiness delay");
         tick(state, 1);
         check(state.wantsShader(), "fallback enables without render callbacks");
-        tick(state, 6);
+        tick(state, 1);
         check(state.phase() == NvgEffectState.Phase.ON, "activation settles");
 
         state.request(false);
@@ -27,7 +27,7 @@ public final class NvgEffectStateTest {
 
         state.request(true);
         state.marker(" nvg_ready; ");
-        tick(state, 5);
+        tick(state, 10);
         check(state.wantsShader(), "semicolon marker handled before fallback");
         state.tick(true);
         check(!state.wantsShader(), "power loss disables immediately");

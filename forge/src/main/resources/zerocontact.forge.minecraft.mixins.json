@@ -15,7 +15,8 @@
     "PlayerRenderMixin",
     "SoundBufferMixin",
     "SoundEngineMixin",
-    "GameRendererAccessor"
+    "GameRendererAccessor",
+    "PostChainAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
