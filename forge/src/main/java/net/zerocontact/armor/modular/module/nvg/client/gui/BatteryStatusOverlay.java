@@ -3,8 +3,6 @@ package net.zerocontact.armor.modular.module.nvg.client.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
@@ -26,10 +24,27 @@ public final class BatteryStatusOverlay {
         ItemStack checkStack = ClientInteractionManger.get().module();
         if (checkStack.getItem() instanceof INvg) {
             checkStack.getCapability(CapabilityRegistries.NVG).ifPresent(cap -> {
-                int startX = w / 2 + w / 5;
-                int widthX = startX + 12;
-                int heightY = h - 2;
+                String battery = "Power";
+                int fontWidth = minecraft.font.width(battery);
+                int barWidth = 12;
                 int maxHeight = 18;
+                int screenMargin = 4;
+                // Include the label's shadow when checking the screen boundary.
+                int overlayWidth = Math.max(barWidth, fontWidth + 1);
+                int hotbarRight = w / 2 + 91;
+                // Reserve space for an offhand slot or the hotbar attack indicator.
+                int overlayLeft = hotbarRight;
+                int heightY = h - 2;
+                if (overlayLeft + overlayWidth > w - screenMargin) {
+                    overlayLeft = Math.max(screenMargin,
+                            Math.min(hotbarRight - overlayWidth, w - screenMargin - overlayWidth));
+                    // Stay above the hotbar and the current health/armor/air rows.
+                    heightY = h - Math.max(22, Math.max(forgeGui.leftHeight, forgeGui.rightHeight)) - screenMargin;
+                }
+                int startX = overlayLeft + (overlayWidth - barWidth) / 2;
+                int widthX = startX + barWidth;
+                int labelX = overlayLeft + (overlayWidth - fontWidth) / 2;
+                int labelY = heightY - maxHeight - minecraft.font.lineHeight - 2;
                 float maxBattery = cap.getMaxBattery();
                 float remainBatteryPercent = maxBattery > 0
                         ? Math.max(0f, Math.min(1f, cap.getBattery() / maxBattery))
@@ -41,11 +56,9 @@ public final class BatteryStatusOverlay {
                 RenderSystem.defaultBlendFunc();
                 RenderSystem.setShader(GameRenderer::getPositionShader);
                 RenderSystem.setShaderColor(1, 1, 1, alpha);
-                String battery = "Power";
-                int fontWidth = minecraft.font.width(battery);
                 graphics.fill(startX, startY, widthX, heightY, 0xffffffff);
                 graphics.fill(startX, startY, widthX, heightY - maxHeight, 0xaaaaaaaa);
-                graphics.drawString(minecraft.font, battery, startX - fontWidth/3, heightY - maxHeight -8, 0xffffff);
+                graphics.drawString(minecraft.font, battery, labelX, labelY, 0xffffff);
                 RenderSystem.setShaderColor(1, 1, 1, 1);
                 RenderSystem.disableBlend();
                 RenderSystem.depthMask(true);
