@@ -3,20 +3,45 @@ package net.zerocontact.mixin.magazines;
 
 import com.raiiiden.taczmagazines.client.ClientReloadKeyHandler;
 import com.raiiiden.taczmagazines.item.MagazineItem;
+import com.tacz.guns.client.input.ReloadKey;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.event.TickEvent;
 import net.zerocontact.caliber.compat.ReloadManager;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ClientReloadKeyHandler.class)
 public class ClientReloadKeyHandlerMixin {
+
+    @Shadow(remap = false)
+    private static boolean keyDown;
+
+    @Shadow(remap = false)
+    private static boolean inSelectorMode;
+
+    @Shadow(remap = false)
+    public static void onReloadKeyReleased() {
+        throw new AssertionError();
+    }
+
+    @Inject(method = "onClientTick", at = @At("RETURN"), remap = false)
+    private static void zeroContact$releaseSelector(TickEvent.ClientTickEvent event, CallbackInfo ci) {
+        // Upstream returns from the selector branch before checking whether R was released.
+        // Run after its cancellation/screen cleanup, including that early return.
+        if (event.phase == TickEvent.Phase.END && keyDown && inSelectorMode
+                && !ReloadKey.RELOAD_KEY.isDown()) {
+            onReloadKeyReleased();
+        }
+    }
 
     @Redirect(
             method = "onReloadKeyReleased",

@@ -69,7 +69,7 @@ dependencies {
 
 //    modLocalRuntime('curse.maven:sound-physics-remastered-535489:7032235')
     modCompileOnly("curse.maven:tacz-magazines-1504588:${magazine_version}")
-//    modLocalRuntime("curse.maven:tacz-magazines-1504588:${magazine_version}")
+    modLocalRuntime("curse.maven:tacz-magazines-1504588:${magazine_version}")
     modLocalRuntime('curse.maven:tacz-simple-enemy-1471691:8289695')
 //    modLocalRuntime("curse.maven:shoulder-surfing-reloaded-243190:8725611")
 //    modLocalRuntime("curse.maven:tacz-gunshot-reverb-1690954:8923504")
