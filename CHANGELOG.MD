@@ -343,3 +343,20 @@ The weapon will then be able to use that ammunition type infinitely in Creative 
 - Fix the issue that ammo disappears from extracting mag in rigs menu 
 - Fix incorrect explosion/ignition bullet data
 - Rename curios slots to avoid potential breaks to other mods
+
+
+## Beta 1.1.7
+
+## Feat
+
+ - NVGs now capable of auto-gating
+
+## Compat
+
+ - Works with TaCZ forge 1.2.0. Older versions are no longer supported.
+ - Works with TaCZ Magazines 0.2.9-hotfix-beta.
+ - Compatibility for Endless Ammo.
+
+## Fix
+
+ - Fix an item-duplication issue from backpack.
