@@ -4,7 +4,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class ModConfigs {
-    public static final ForgeConfigSpec CLIENT_CONFIG_SPEC;
+    public static final ConfigSpec CLIENT_CONFIG_SPEC;
     public static final ForgeConfigSpec COMMON_CONFIG_SPEC;
     public static final ForgeConfigSpec SERVER_CONFIG_SPEC;
     public static final Common COMMON;

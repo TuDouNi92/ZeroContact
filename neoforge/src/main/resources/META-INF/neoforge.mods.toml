@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[47,)"
+loaderVersion = "[4,)"
 #issueTrackerURL = ""
 license = "Insert License Here"
 
@@ -14,44 +14,52 @@ This is an example description! Tell everyone what your mod is about!
 #logoFile = ""
 
 [[dependencies.zerocontact]]
-modId = "forge"
-mandatory = true
-versionRange = "[47.3.0,)"
+modId = "neoforge"
+type = "required"
+versionRange = "[21.1.265,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.zerocontact]]
 modId = "minecraft"
-mandatory = true
-versionRange = "[1.20.1,)"
+type = "required"
+versionRange = "[1.21.1,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.zerocontact]]
 modId = "architectury"
-mandatory = true
-versionRange = "[9.1.12,)"
+type = "required"
+versionRange = "[13.0.8,)"
 ordering = "AFTER"
 side = "BOTH"
 
 [[dependencies.zerocontact]]
 modId = "curios"
-mandatory = true
-versionRange = "[5.12.0,)"
+type = "required"
+versionRange = "[9.5.1,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.zerocontact]]
 modId = "tacz"
-mandatory = true
+type = "required"
 versionRange = "[1.2.0,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.zerocontact]]
 modId = "geckolib"
-mandatory = true
-versionRange = "[4.7.1.2,)"
+type = "required"
+versionRange = "[4.8.4,)"
 ordering = "NONE"
 side = "BOTH"
 
+[[mixins]]
+config = "zerocontact.forge.minecraft.mixins.json"
+
+[[mixins]]
+config = "zerocontact.forge.tacz.mixins.json"
+
+[[mixins]]
+config = "zerocontact.forge.magazines.mixins.json"

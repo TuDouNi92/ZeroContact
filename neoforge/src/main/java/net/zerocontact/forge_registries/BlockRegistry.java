@@ -4,14 +4,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegisterEvent;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zerocontact.item.block.WorkBenchEntity;
 import net.zerocontact.item.block.Workbench;
 import net.zerocontact.item.block.WorkbenchItem;
@@ -22,7 +16,7 @@ import java.util.List;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
 
-@Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = MOD_ID)
 public class BlockRegistry {
     private static final LinkedHashSet<RegistryObject<? extends ItemLike>> BLOCK_ITEMS_REG_TAB = new LinkedHashSet<>();
     private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPE_DEFERRED_REGISTER = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, MOD_ID);
