@@ -3,7 +3,6 @@ package net.zerocontact;
 import com.google.common.base.Suppliers;
 import dev.architectury.registry.registries.RegistrarManager;
 import net.zerocontact.registries.ItemsReg;
-import net.zerocontact.registries.ModSoundEventsReg;
 
 import java.util.function.Supplier;
 
