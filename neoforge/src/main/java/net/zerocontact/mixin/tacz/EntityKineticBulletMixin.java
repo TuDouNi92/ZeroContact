@@ -3,6 +3,7 @@ package net.zerocontact.mixin.tacz;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.util.TacHitResult;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -13,7 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.MinecraftForge;
+import net.neoforged.neoforge.common.NeoForge;
 import net.zerocontact.caliber.*;
 import net.zerocontact.caliber.damage.BulletHitAccessor;
 import net.zerocontact.caliber.damage.ZDamageTypes;
@@ -24,6 +25,7 @@ import net.zerocontact.caliber.extension.model.HookContext;
 import net.zerocontact.events.HitProcessEvent;
 import net.zerocontact.events.ResolveHitBodyPartEvent.HitPart;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -93,7 +95,7 @@ public class EntityKineticBulletMixin extends Projectile implements BulletHitAcc
             parts.hitPart().hurt(source, damage);
             Entity attacker = source.getEntity();
             if (parts.core() instanceof LivingEntity hurt) {
-                MinecraftForge.EVENT_BUS.post(new HitProcessEvent.Post(
+                NeoForge.EVENT_BUS.post(new HitProcessEvent.Post(
                         attacker instanceof LivingEntity ? (LivingEntity) attacker : null,
                         hurt,
                         source.getDirectEntity(),
@@ -163,6 +165,7 @@ public class EntityKineticBulletMixin extends Projectile implements BulletHitAcc
     }
 
     @Override
-    protected void defineSynchedData() {
+    protected void defineSynchedData(SynchedEntityData.@NotNull Builder builder) {
+
     }
 }

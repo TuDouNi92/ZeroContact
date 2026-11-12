@@ -2,14 +2,14 @@ package net.zerocontact.api.armor;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+
 @ApiStatus.Internal
 public interface IEquipmentTypeTag {
     enum EquipmentType {
@@ -27,9 +27,10 @@ public interface IEquipmentTypeTag {
         AMMO("AMMO");
         private final String name;
         private final String translationValue;
+
         EquipmentType(String name) {
             this.name = name;
-            this.translationValue = "tooltip.zerocontact.armor_category"+"."+name.toLowerCase();
+            this.translationValue = "tooltip.zerocontact.armor_category" + "." + name.toLowerCase();
         }
 
         public String getTypeId() {
@@ -41,12 +42,12 @@ public interface IEquipmentTypeTag {
         }
     }
 
-    default @NotNull IEquipmentTypeTag.EquipmentType getArmorType(){
+    default @NotNull IEquipmentTypeTag.EquipmentType getArmorType() {
         return EquipmentType.ARMOR;
     }
 
-    default void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-        if(stack.getItem() instanceof IEquipmentTypeTag tag && tag.getArmorType().equals(EquipmentType.RIGS)){
+    default void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        if (stack.getItem() instanceof IEquipmentTypeTag tag && tag.getArmorType().equals(EquipmentType.RIGS)) {
             Component rigTip = Component.translatable("tooltip.zerocontact.rig").withStyle(ChatFormatting.DARK_GRAY);
             tooltipComponents.add(rigTip);
         }

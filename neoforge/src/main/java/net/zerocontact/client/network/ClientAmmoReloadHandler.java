@@ -6,8 +6,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.zerocontact.capability.CapabilityRegistries;
+import net.zerocontact.caliber.capability.CapabilityRegistry;
 import net.zerocontact.network.s2c.ClientAmmoReloadPacket;
+
+import java.util.Optional;
 
 public final class ClientAmmoReloadHandler {
     private ClientAmmoReloadHandler() {
@@ -22,7 +24,7 @@ public final class ClientAmmoReloadHandler {
         if (inventory.selected != gunSlot) return;
         if (!IGun.mainHandHoldGun(player)) return;
         ItemStack gunStack = player.getMainHandItem();
-        gunStack.getCapability(CapabilityRegistries.CARTRIDGE).ifPresent(cap -> {
+        Optional.ofNullable(gunStack.getCapability(CapabilityRegistry.CARTRIDGE)).ifPresent(cap -> {
             cap.setClientSelectedAmmoVariant(gunStack, packet.selectedAmmoKey());
             IClientPlayerGunOperator operator = IClientPlayerGunOperator.fromLocalPlayer(player);
             operator.reload();

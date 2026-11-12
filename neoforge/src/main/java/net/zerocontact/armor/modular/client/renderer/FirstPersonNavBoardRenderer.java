@@ -2,32 +2,32 @@ package net.zerocontact.armor.modular.client.renderer;
 
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.Tag;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderHandEvent;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RenderFrameEvent;
+import net.neoforged.neoforge.client.event.RenderHandEvent;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.armor.modular.ModuleQuery;
-import net.zerocontact.armor.modular.module.pouch.container.navboard.NavBoardContainer;
-import net.zerocontact.capability.CapabilityRegistries;
-import software.bernie.geckolib.animatable.GeoItem;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.animation.ContextAwareAnimatableManager;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Item;
-import net.minecraft.resources.ResourceLocation;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.model.EquipmentTarget;
+import net.zerocontact.armor.modular.module.pouch.container.navboard.NavBoardContainer;
+import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.ContextAwareAnimatableManager;
 
 import java.util.Comparator;
+import java.util.Optional;
 
 /** Camera-relative terminal model. Uses the actual mounted stack so the live screen stays attached. */
-@Mod.EventBusSubscriber(modid = ZeroContact.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@EventBusSubscriber(modid = ZeroContact.MOD_ID, value = Dist.CLIENT)
 public final class FirstPersonNavBoardRenderer {
     // Camera coordinates: +X right, +Y up, -Z forward. Adjust these together for model fitting.
     private static final double OFFSET_X = 0.0;
@@ -51,8 +51,7 @@ public final class FirstPersonNavBoardRenderer {
     private FirstPersonNavBoardRenderer() {}
 
     @SubscribeEvent
-    public static void beginFrame(TickEvent.RenderTickEvent event) {
-        if (event.phase != TickEvent.Phase.START) return;
+    public static void beginFrame(RenderFrameEvent.Pre event) {
         renderedThisFrame = false;
         var minecraft = Minecraft.getInstance();
         if (minecraft.level != renderedLevel || minecraft.player != renderedPlayer
@@ -77,11 +76,10 @@ public final class FirstPersonNavBoardRenderer {
         // Prefer an enabled terminal, then the one already on screen while it closes.
         var selected = ModuleQuery.streamMounted(minecraft.player)
                 .filter(ref -> ref.stack().getItem() instanceof GeoItem
-                        && ref.stack().getCapability(CapabilityRegistries.NAV_BOARD).isPresent()
-                        && ref.stack().getTag() != null
-                        && ref.stack().getTag().contains(GeoItem.ID_NBT_KEY, Tag.TAG_ANY_NUMERIC))
+                        && Optional.ofNullable(ref.stack().getCapability(ModularCapabilityRegistry.NAV_BOARD)).isPresent()
+                        && GeoItem.getId(ref.stack()) != Long.MAX_VALUE)
                 .min(Comparator.comparingInt((ModuleQuery.MountedModuleRef ref) ->
-                                ref.stack().getCapability(CapabilityRegistries.NAV_BOARD)
+                                Optional.ofNullable(ref.stack().getCapability(ModularCapabilityRegistry.NAV_BOARD))
                                         .map(cap -> cap.isEnabled() ? 0 : VisibleModule.of(ref).equals(visibleModule) ? 1 : 2).orElse(2))
                         .thenComparing(ref -> ref.equipmentTarget().slot())
                         .thenComparingInt(ref -> ref.equipmentTarget().index())
@@ -92,7 +90,7 @@ public final class FirstPersonNavBoardRenderer {
             return;
         }
         var identity = VisibleModule.of(selected);
-        boolean enabled = selected.stack().getCapability(CapabilityRegistries.NAV_BOARD)
+        boolean enabled = Optional.ofNullable(selected.stack().getCapability(ModularCapabilityRegistry.NAV_BOARD))
                 .map(NavBoardContainer::isEnabled).orElse(false);
         if (!enabled && !identity.equals(visibleModule)) {
             visibleModule = null;

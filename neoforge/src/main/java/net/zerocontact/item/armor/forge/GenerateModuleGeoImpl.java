@@ -4,22 +4,20 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.zerocontact.ZeroContact;
 import net.zerocontact.api.armor.modular.EquipmentModule;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.module.pouch.container.navboard.NavBoardContainer;
 import net.zerocontact.armor.modular.registry.ModuleRegistry;
-import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
+import net.zerocontact.item.neoforge.AbstractGenerateGeoCurioItemImpl;
 import org.jetbrains.annotations.NotNull;
-import net.zerocontact.ZeroContact;
-import net.zerocontact.capability.CapabilityRegistries;
-import net.minecraft.world.item.ItemDisplayContext;
+import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.constant.DataTickets;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.Animation;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.animation.RawAnimation;
-import software.bernie.geckolib.core.object.PlayState;
+
+import java.util.Optional;
 
 public class GenerateModuleGeoImpl extends AbstractGenerateGeoCurioItemImpl implements EquipmentModule {
     private static final ResourceLocation NAVBOARD_TRAIT = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "navboard");
@@ -46,7 +44,7 @@ public class GenerateModuleGeoImpl extends AbstractGenerateGeoCurioItemImpl impl
             }
             ItemStack stack = state.getData(DataTickets.ITEMSTACK);
             if (stack == null) return PlayState.STOP;
-            boolean enabled = stack.getCapability(CapabilityRegistries.NAV_BOARD)
+            boolean enabled = Optional.ofNullable(stack.getCapability(ModularCapabilityRegistry.NAV_BOARD))
                     .map(NavBoardContainer::isEnabled).orElse(false);
             // Reusing the same RawAnimation holds its last frame; only state changes switch clips.
             state.getController().setAnimation(enabled ? OPEN : CLOSE);
@@ -63,7 +61,7 @@ public class GenerateModuleGeoImpl extends AbstractGenerateGeoCurioItemImpl impl
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player,
                                                           @NotNull InteractionHand usedHand) {
-        ModuleRegistry.CapabilityEntry trait = ModuleRegistry.getTrait(getModuleTrait());
+        ModuleRegistry.CapabilityEntry<?> trait = ModuleRegistry.getTrait(getModuleTrait());
         if (trait != null && trait.useHandler().isPresent()) {
             return trait.useHandler().get().use(level, player, usedHand);
         }

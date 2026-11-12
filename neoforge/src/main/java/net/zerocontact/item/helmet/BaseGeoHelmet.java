@@ -1,36 +1,24 @@
 package net.zerocontact.item.helmet;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.api.armor.ICombatArmorItem;
 import net.zerocontact.api.armor.HelmetInfoProvider;
 import net.zerocontact.api.armor.IEquipmentTypeTag;
-import net.zerocontact.client.renderer.HelmetRender;
-import net.zerocontact.item.PlateBaseMaterial;
-import net.zerocontact.models.GenerateModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoItem;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 public class BaseGeoHelmet extends ArmorItem implements HelmetInfoProvider, GeoItem, ICombatArmorItem, IEquipmentTypeTag {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -43,7 +31,7 @@ public class BaseGeoHelmet extends ArmorItem implements HelmetInfoProvider, GeoI
     private final float bluntReduction, penetrateReduction;
 
     public BaseGeoHelmet(int absorb, int defaultDurability, ResourceLocation texture, ResourceLocation model, ResourceLocation animation, float bluntReduction, float penetrateReduction) {
-        super(PlateBaseMaterial.ARMOR_STEEL, Type.HELMET, new Properties().defaultDurability(defaultDurability));
+        super(ArmorMaterials.IRON, Type.HELMET, new Properties().durability(defaultDurability));
         this.bluntReduction = bluntReduction;
         this.penetrateReduction = penetrateReduction;
         this.defense = 4;
@@ -54,14 +42,21 @@ public class BaseGeoHelmet extends ArmorItem implements HelmetInfoProvider, GeoI
         this.defaultDurability = defaultDurability;
     }
 
-    @Override
-    public @NotNull Type getType() {
-        return type;
+    public ResourceLocation getTexture() {
+        return texture;
+    }
+
+    public ResourceLocation getModel() {
+        return model;
+    }
+
+    public ResourceLocation getAnimation() {
+        return animation;
     }
 
     @Override
-    public @NotNull ArmorMaterial getMaterial() {
-        return material;
+    public @NotNull Type getType() {
+        return type;
     }
 
     @Override
@@ -84,11 +79,13 @@ public class BaseGeoHelmet extends ArmorItem implements HelmetInfoProvider, GeoI
         return 1;
     }
 
+
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
-        Multimap<Attribute, AttributeModifier> modifierMultimap = HashMultimap.create();
-        stack.getOrCreateTag().putInt("protection_class", getAbsorb());
-        return modifierMultimap;
+    public @NotNull ItemAttributeModifiers getDefaultAttributeModifiers(@NotNull ItemStack stack) {
+        CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+        tag.putInt("protection_class", getAbsorb());
+        CustomData.set(DataComponents.CUSTOM_DATA, stack, tag);
+        return super.getDefaultAttributeModifiers(stack);
     }
 
     @Override
@@ -101,34 +98,10 @@ public class BaseGeoHelmet extends ArmorItem implements HelmetInfoProvider, GeoI
         return cache;
     }
 
-    @Override
-    public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(new IClientItemExtensions() {
-            private HelmetRender.HelmetArmorRender<BaseGeoHelmet> render;
-            private HelmetRender.HelmetItemRender<BaseGeoHelmet> itemRender;
-
-            @Override
-            public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
-                if (this.render == null) {
-                    this.render = new HelmetRender.HelmetArmorRender<>(new GenerateModel<>(texture, model, animation));
-                }
-                this.render.prepForRender(livingEntity, itemStack, equipmentSlot, original);
-                return this.render;
-            }
-
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                if (this.itemRender == null) {
-                    this.itemRender = new HelmetRender.HelmetItemRender<>(new GenerateModel<>(texture, model, animation));
-                }
-                return this.itemRender;
-            }
-        });
-    }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
-        ICombatArmorItem.super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
+        ICombatArmorItem.super.appendHoverText(stack, context, tooltipComponents, isAdvanced);
     }
 
     @Override

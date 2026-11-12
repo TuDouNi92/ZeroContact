@@ -1,13 +1,15 @@
 package net.zerocontact.caliber.compat;
 
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import net.zerocontact.curios.CuriosConstants;
 import net.zerocontact.events.EventUtil;
+import net.zerocontact.item.rigs.BaseRigs;
+
+import java.util.Optional;
 
 public class ReloadManager {
     public enum ReloadSource {
@@ -32,18 +34,17 @@ public class ReloadManager {
         if (!rigs.isEmpty()) {
             source = ReloadSource.RIGS;
             containerStack = rigs;
-            handler = containerStack.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(new ItemStackHandler());
+            handler = Optional.ofNullable(containerStack.getCapability(Capabilities.ItemHandler.ITEM)).orElse(new ItemStackHandler());
             saveFunc = ()->{
               if(handler instanceof ItemStackHandler itemStackHandler){
-                  rigs.getOrCreateTag().put(
-                          "inventory",
-                          itemStackHandler.serializeNBT().getList("Items", Tag.TAG_COMPOUND)
-                  );
+                  if(rigs.getItem() instanceof BaseRigs baseRigs){
+                      baseRigs.manualSave(rigs,itemStackHandler,shooter.level().registryAccess());
+                  }
               }
             };
         } else {
             source = ReloadSource.VANILLA;
-            handler = shooter.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(new ItemStackHandler());
+            handler = Optional.ofNullable(shooter.getCapability(Capabilities.ItemHandler.ENTITY)).orElse(new ItemStackHandler());
         }
         return new ReloadInventory(
                 source,

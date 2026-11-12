@@ -10,6 +10,7 @@ import com.tacz.guns.api.DefaultAssets;
 import com.tacz.guns.api.item.builder.AmmoItemBuilder;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -23,7 +24,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.caliber.AmmoInjector;
 import net.zerocontact.compat.MagazinesCompat;
 import net.zerocontact.compat.MagazinesCompatHandler;
@@ -127,12 +127,11 @@ public abstract class MagazineItemMixin {
                     target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
                     ordinal = 0,
                     shift = At.Shift.AFTER))
-    public void appendCartridgeText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag, CallbackInfo ci) {
-        AmmoInjector.AmmoContext context = AmmoInjector.read(stack);
-        if (context.isEmpty()) return;
-        String variantId = context.caliber().variant();
-        Item ammoItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(variantId));
-        if (ammoItem == null) return;
+    public void appendCartridgeText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag, CallbackInfo ci) {
+        AmmoInjector.AmmoContext ammoContext = AmmoInjector.get().readCxtFromStack(stack);
+        if (ammoContext.isEmpty()) return;
+        String variantId = ammoContext.caliber().variant();
+        Item ammoItem = BuiltInRegistries.ITEM.get(ResourceLocation.parse(variantId));
         MutableComponent ammoLabel = Component.translatable("tooltip.zerocontact.gun.ammoVariant").withStyle(ChatFormatting.GOLD).append(":");
         Component ammoDescription = Component.literal("\uD83E\uDC35 ").append(Component.translatable(ammoItem.getDefaultInstance().getDescriptionId())).withStyle(ChatFormatting.YELLOW);
         if (!(ammoItem instanceof GenerateAmmo))

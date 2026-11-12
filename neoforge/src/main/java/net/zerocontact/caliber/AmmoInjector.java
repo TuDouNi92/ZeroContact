@@ -4,48 +4,56 @@ import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.world.item.component.CustomData;
 import net.zerocontact.ZeroContact;
+import net.zerocontact.caliber.api.AmmoInjectService;
 import net.zerocontact.item.ammo.GenerateAmmo;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.tacz.guns.api.item.IAmmo;
 
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import static net.zerocontact.caliber.CaliberSerializer.*;
 
-public class AmmoInjector {
+public final class AmmoInjector implements AmmoInjectService {
 
-    public record AmmoContext(CaliberHelper.Caliber caliber) {
-        public boolean isEmpty() {
-            return caliber == null || caliber.id().isEmpty() || caliber.variant().isEmpty();
-        }
+    private static AmmoInjectService ammoInjectService;
+
+    public static AmmoInjectService get() {
+        return Objects.requireNonNullElseGet(ammoInjectService, AmmoInjector::new);
     }
 
     //Write for data-driven registration
-    public static void write(AmmoContext context, ItemStack stack) {
+    public void writeCxtToStack(AmmoContext context, ItemStack stack) {
         CompoundTag ammoTag = CaliberSerializer.save(context);
-        stack.getOrCreateTag().merge(ammoTag);
+        CustomData.update(DataComponents.CUSTOM_DATA, stack, tag -> tag.merge(ammoTag));
     }
 
 
     //Read and bind Bullet and Gun in the spawn event
-    public static AmmoContext read(ItemStack stack) {
-        return CaliberSerializer.load(stack.getTag(), stack);
+    public AmmoContext readCxtFromStack(ItemStack stack) {
+        return CaliberSerializer.load(stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag(), stack);
     }
 
     //Sync tags when change cartridge;
-    public static void copyTags(CaliberHelper.Caliber defaultCaliber, ItemStack gun) {
-        gun.getOrCreateTag().merge(CaliberSerializer.save(new AmmoContext(defaultCaliber)));
+    public void syncTagWithCartridge(CaliberHelper.Caliber defaultCaliber, ItemStack gun) {
+        writeCxtToStack(new AmmoContext(defaultCaliber), gun);
     }
 
     //Get default tacz ammoId for gun.
-    public static ResourceLocation getGunDefaultAmmo(ItemStack gunStack) {
+    public ResourceLocation getDefaultAmmoIDFromGun(ItemStack gunStack) {
         ResourceLocation defaultAmmoId = ResourceLocation.parse("");
         IGun gun = IGun.getIGunOrNull(gunStack);
         if (gun == null) return defaultAmmoId;
@@ -59,43 +67,45 @@ public class AmmoInjector {
     }
 
     //Set default ammo for gun
-    public static @Nullable AmmoContext setDefaultAmmoVariantInGun(ItemStack gunStack) {
+    public @Nullable AmmoContext setDefaultAmmoVariantInGun(ItemStack gunStack) {
         String defaultVariant = DEFAULT_AMMO;
-        ResourceLocation defaultAmmo = getGunDefaultAmmo(gunStack);
+        ResourceLocation defaultAmmo = getDefaultAmmoIDFromGun(gunStack);
         if (defaultAmmo.toString().isEmpty()) return null;
-        gunStack.getOrCreateTagElement(AI_AMMO).putString(AI_AMMO_ID, defaultAmmo.toString());
-        gunStack.getOrCreateTagElement(AI_AMMO).putString(VARIANT, defaultVariant);
-        gunStack.getOrCreateTagElement(AI_AMMO).putString(SELECTED_VARIANT, defaultVariant);
-        gunStack.getOrCreateTagElement(AI_AMMO).putString(EXISTED_VARIANT, defaultVariant);
-        gunStack.getOrCreateTagElement(AI_AMMO).putString(EXISTED_AMMO_ID, defaultAmmo.toString());
-        return CaliberSerializer.load(gunStack.getTag(), gunStack);
+        updateAmmoTag(gunStack, ammoTag -> {
+            ammoTag.putString(AI_AMMO_ID, defaultAmmo.toString());
+            ammoTag.putString(VARIANT, defaultVariant);
+            ammoTag.putString(SELECTED_VARIANT, defaultVariant);
+            ammoTag.putString(EXISTED_VARIANT, defaultVariant);
+            ammoTag.putString(EXISTED_AMMO_ID, defaultAmmo.toString());
+        });
+        return readCxtFromStack(gunStack);
     }
 
-    public static @Nullable Item getAmmoVariantItem(AmmoContext context) {
-        return ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(context.caliber.variant()));
+    public @NotNull Item getItemForVariant(AmmoContext context) {
+        return BuiltInRegistries.ITEM.get(ResourceLocation.parse(context.caliber().variant()));
     }
 
     //Update cartridge tag in gun
 
-    public static void setAmmoVariantInGun(ItemStack gunStack, String selectedVariant) {
+    public void setAmmoVariantInGun(ItemStack gunStack, String selectedVariant) {
         //Empty selectedVariant indicates that the gunStack need to be initialized with default ammo.
         ResourceLocation selectedId = ResourceLocation.tryParse(selectedVariant);
         if (selectedId == null || selectedId.getPath().isEmpty()) {
             AmmoContext context = setDefaultAmmoVariantInGun(gunStack);
-            if(context!=null){
-                copyTags(context.caliber(),gunStack);
+            if (context != null) {
+                syncTagWithCartridge(context.caliber(), gunStack);
             }
             return;
         }
-        Item ammoItem = ForgeRegistries.ITEMS.getValue(selectedId);
+        Item ammoItem = BuiltInRegistries.ITEM.get(selectedId);
         if (ammoItem instanceof GenerateAmmo ammo) {
             CaliberHelper.Caliber caliber = ammo.getDefualtCaliber();
-            copyTags(caliber, gunStack);
+            syncTagWithCartridge(caliber, gunStack);
 
-            gunStack.getOrCreateTagElement(AI_AMMO)
-                    .putString(EXISTED_VARIANT, selectedVariant);
-            gunStack.getOrCreateTagElement(AI_AMMO)
-                    .putString(EXISTED_AMMO_ID, selectedVariant);
+            updateAmmoTag(gunStack, ammoTag -> {
+                ammoTag.putString(EXISTED_VARIANT, selectedVariant);
+                ammoTag.putString(EXISTED_AMMO_ID, selectedVariant);
+            });
             return;
         }
         if (ammoItem instanceof IAmmo) {
@@ -120,41 +130,54 @@ public class AmmoInjector {
         if (context.isEmpty()) {
             return;
         }
-        copyTags(context.caliber(), gunStack);
-        gunStack.getOrCreateTagElement(AI_AMMO)
-                .putString(EXISTED_VARIANT, selectedVariant);
-        gunStack.getOrCreateTagElement(AI_AMMO)
-                .putString(EXISTED_AMMO_ID, selectedId.toString());
+        syncTagWithCartridge(context.caliber(), gunStack);
+        String selectedAmmoId = selectedId.toString();
+        updateAmmoTag(gunStack, ammoTag -> {
+            ammoTag.putString(EXISTED_VARIANT, selectedVariant);
+            ammoTag.putString(EXISTED_AMMO_ID, selectedAmmoId);
+        });
+    }
+
+    private static void updateAmmoTag(ItemStack stack, Consumer<CompoundTag> updater) {
+        CustomData.update(DataComponents.CUSTOM_DATA, stack, tag -> {
+            CompoundTag ammoTag = tag.getCompound(AI_AMMO);
+            updater.accept(ammoTag);
+            tag.put(AI_AMMO, ammoTag);
+        });
     }
 
 
     //Set default cartridge for entity
-    public static void setEntityGunContext(ItemStack gunStack) {
-        setDefaultAmmoVariantInGun(gunStack);
+    public void prepareGunCtxForEntity(LivingEntity livingEntity) {
+        ItemStack mainHandStack = livingEntity.getItemInHand(InteractionHand.MAIN_HAND);
+        IGun gun = IGun.getIGunOrNull(mainHandStack);
+        if (gun == null) return;
+        setDefaultAmmoVariantInGun(mainHandStack);
     }
 
     //Use for changing the cartridges from custom entities
-    public static void setEntityGunContext(ItemStack gunStack, Item ammo) {
+    public void setVariantForEntity(ItemStack gunStack, Item ammo) {
         if (ammo instanceof GenerateAmmo generateAmmo) {
             setAmmoVariantInGun(gunStack, ZeroContact.MOD_ID + ":" + generateAmmo);
         }
     }
 
+    @Deprecated(forRemoval = true)
     //Correct the default context on mainHand in damage processing if it is somehow empty
-    public static @Nullable AmmoContext setPlayerGunContext(ServerPlayer player) {
+    public @Nullable AmmoContext setPlayerGunContext(ServerPlayer player) {
         ItemStack checkGunStack = player.getMainHandItem();
         if (!IGun.mainHandHoldGun(player)) return null;
         return setDefaultAmmoVariantInGun(checkGunStack);
     }
 
-    public static String getAmmoIdentity(ItemStack stack) {
+    public String getAmmoIdentity(ItemStack stack) {
         if (stack.isEmpty()) {
             return "";
         }
 
         if (stack.getItem() instanceof GenerateAmmo) {
-            ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(stack.getItem());
-            return itemId == null ? "" : itemId.toString();
+            ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
+            return itemId.toString();
         }
 
         if (stack.getItem() instanceof IAmmo ammo) {

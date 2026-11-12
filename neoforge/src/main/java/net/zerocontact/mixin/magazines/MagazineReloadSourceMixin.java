@@ -2,7 +2,7 @@ package net.zerocontact.mixin.magazines;
 
 import com.raiiiden.taczmagazines.item.MagazineReloadSource;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.zerocontact.caliber.compat.MagazineReloadCheck;
 import net.zerocontact.compat.MagazinesCompatHandler;
 import org.spongepowered.asm.mixin.Mixin;

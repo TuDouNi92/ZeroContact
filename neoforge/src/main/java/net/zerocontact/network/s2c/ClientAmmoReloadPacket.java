@@ -1,27 +1,39 @@
 package net.zerocontact.network.s2c;
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.zerocontact.client.network.ClientAmmoReloadHandler;
 
-import java.util.function.Supplier;
+public record ClientAmmoReloadPacket(int gunSlot, String selectedAmmoKey) implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<ClientAmmoReloadPacket> TYPE = new CustomPacketPayload.Type<>(
+            ResourceLocation.fromNamespaceAndPath(net.zerocontact.ZeroContact.MOD_ID, "client_ammo_reload"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, ClientAmmoReloadPacket> STREAM_CODEC =
+            StreamCodec.ofMember(ClientAmmoReloadPacket::encode, ClientAmmoReloadPacket::decode);
 
-public record ClientAmmoReloadPacket(int gunSlot, String selectedAmmoKey) {
-    public void encode(FriendlyByteBuf buf) {
+    @Override
+    public CustomPacketPayload.Type<ClientAmmoReloadPacket> type() {
+        return TYPE;
+    }
+
+    public void encode(RegistryFriendlyByteBuf buf) {
         buf.writeInt(gunSlot);
         buf.writeUtf(selectedAmmoKey);
     }
 
-    public static ClientAmmoReloadPacket decode(FriendlyByteBuf buf) {
+    public static ClientAmmoReloadPacket decode(RegistryFriendlyByteBuf buf) {
         return new ClientAmmoReloadPacket(buf.readInt(), buf.readUtf());
     }
 
-
-    public static void handle(ClientAmmoReloadPacket packet, Supplier<NetworkEvent.Context> supplier) {
-        NetworkEvent.Context context = supplier.get();
-        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
-                () -> () -> ClientAmmoReloadHandler.handle(packet)));
+    public static void handle(ClientAmmoReloadPacket packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (FMLEnvironment.dist == Dist.CLIENT) {
+                ClientAmmoReloadHandler.handle(packet);
+            }
+        });
     }
 }

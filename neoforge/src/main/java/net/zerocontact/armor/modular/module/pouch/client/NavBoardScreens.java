@@ -6,25 +6,26 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.client.event.RenderFrameEvent;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.armor.modular.ModuleQuery;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.model.EquipmentTarget;
 import net.zerocontact.armor.modular.module.pouch.container.navboard.NavBoardContainer;
-import net.zerocontact.capability.CapabilityRegistries;
 
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Local wearer's transient screen sessions. Uploads and composition run only at the render boundary.
  */
-@Mod.EventBusSubscriber(modid = ZeroContact.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = ZeroContact.MOD_ID, value = Dist.CLIENT)
 public final class NavBoardScreens {
     public static final int CHUNK_RADIUS = 8;
     public static final int MAP_SIZE = (CHUNK_RADIUS * 2 + 1) * 16;
@@ -129,8 +130,7 @@ public final class NavBoardScreens {
     }
 
     @SubscribeEvent
-    public static void renderTick(TickEvent.RenderTickEvent event) {
-        if (event.phase != TickEvent.Phase.START) return;
+    public static void renderTick(RenderFrameEvent.Pre event) {
         checkLevel();
         VISIBLE.clear();
         var mc = Minecraft.getInstance();
@@ -140,20 +140,20 @@ public final class NavBoardScreens {
             return;
         }
         Map<Key, ItemStack> active = new HashMap<>();
-        ModuleQuery.streamMounted(player).forEach(ref -> ref.stack().getCapability(CapabilityRegistries.NAV_BOARD)
+        ModuleQuery.streamMounted(player).forEach(ref -> Optional.ofNullable(ref.stack().getCapability(ModularCapabilityRegistry.NAV_BOARD))
                 .ifPresent(cap -> {
                     if (cap.isEnabled()) active.put(new Key(ref.equipmentTarget(), ref.mountId()), ref.stack());
                 }));
         SESSIONS.entrySet().removeIf(entry -> {
             var stack = active.get(entry.getKey());
             if (stack == null || !entry.getValue().item.equals(
-                    net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()))) {
+                    net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem()))) {
                 entry.getValue().close();
                 return true;
             }
             return false;
         });
-        float partial = mc.isPaused() ? 1 : event.renderTickTime;
+        float partial = mc.isPaused() ? 1 : event.getPartialTick().getGameTimeDeltaPartialTick(false);
         double playerX = Mth.lerp(partial, player.xo, player.getX());
         double playerZ = Mth.lerp(partial, player.zo, player.getZ());
         float yaw = Mth.rotLerp(partial, player.yRotO, player.getYRot());

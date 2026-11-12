@@ -1,22 +1,22 @@
 package net.zerocontact.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class ModConfigs {
-    public static final ConfigSpec CLIENT_CONFIG_SPEC;
-    public static final ForgeConfigSpec COMMON_CONFIG_SPEC;
-    public static final ForgeConfigSpec SERVER_CONFIG_SPEC;
+    public static final ModConfigSpec CLIENT_CONFIG_SPEC;
+    public static final ModConfigSpec COMMON_CONFIG_SPEC;
+    public static final ModConfigSpec SERVER_CONFIG_SPEC;
     public static final Common COMMON;
     public static final Client CLIENT;
     public static final Server SERVER;
 
     static {
-        Pair<Client, ForgeConfigSpec> clientPair = new ForgeConfigSpec.Builder()
+        Pair<Client, ModConfigSpec> clientPair = new ModConfigSpec.Builder()
                 .configure(Client::new);
-        Pair<Common, ForgeConfigSpec> commonPair = new ForgeConfigSpec.Builder()
+        Pair<Common, ModConfigSpec> commonPair = new ModConfigSpec.Builder()
                 .configure(Common::new);
-        Pair<Server, ForgeConfigSpec> serverPair = new ForgeConfigSpec.Builder()
+        Pair<Server, ModConfigSpec> serverPair = new ModConfigSpec.Builder()
                 .configure(Server::new);
         COMMON_CONFIG_SPEC = commonPair.getRight();
         CLIENT_CONFIG_SPEC = clientPair.getRight();
@@ -26,22 +26,22 @@ public class ModConfigs {
         SERVER = serverPair.getLeft();
     }
 
-    public static void flipValue(ForgeConfigSpec.BooleanValue booleanValue) {
+    public static void flipValue(ModConfigSpec.BooleanValue booleanValue) {
         booleanValue.set(!booleanValue.get());
     }
 
     public static class Common {
 
 
-        Common(ForgeConfigSpec.Builder builder) {
+        Common(ModConfigSpec.Builder builder) {
 
         }
     }
 
     public record Server(
-            ForgeConfigSpec.BooleanValue enableUniversalFleshDamage,
-            ForgeConfigSpec.DoubleValue firstAidLimbsFactor,
-            ForgeConfigSpec.DoubleValue firstAidHeadFactor
+            ModConfigSpec.BooleanValue enableUniversalFleshDamage,
+            ModConfigSpec.DoubleValue firstAidLimbsFactor,
+            ModConfigSpec.DoubleValue firstAidHeadFactor
     ) {
 
         public static final String DAMAGE_CAT = "damage";
@@ -58,7 +58,7 @@ public class ModConfigs {
 
 
 
-        Server(ForgeConfigSpec.Builder builder) {
+        Server(ModConfigSpec.Builder builder) {
             this(
                     buildBoolConfig(builder, DAMAGE_CAT, UNIVERSAL_FLESH_DAMAGE_COM, FLESH_ON_UNARMORED, true),
                     buildDoubleConfig(builder, FIRST_AID_CAT, DAMAGE_FACTOR_FOR_LIMBS_COM, LIMBS_FACTOR,0.25d),
@@ -68,11 +68,11 @@ public class ModConfigs {
     }
 
     public record Client(
-            ForgeConfigSpec.BooleanValue audioEffect,
-            ForgeConfigSpec.BooleanValue enableBulletSuppression,
-            ForgeConfigSpec.BooleanValue enableTrajectoryTooltip,
-            ForgeConfigSpec.BooleanValue ammoTypeOverLay,
-            ForgeConfigSpec.BooleanValue ammoTypeTooltip
+            ModConfigSpec.BooleanValue audioEffect,
+            ModConfigSpec.BooleanValue enableBulletSuppression,
+            ModConfigSpec.BooleanValue enableTrajectoryTooltip,
+            ModConfigSpec.BooleanValue ammoTypeOverLay,
+            ModConfigSpec.BooleanValue ammoTypeTooltip
             ) {
 
         public static final String TOOLTIP_CAT = "tooltips";
@@ -90,7 +90,7 @@ public class ModConfigs {
         public static final String ENHANCED_AUDIO_EFFECT_COM = "Enhance the gunfire so the Headset lowering noises work as expectedly";
         public static final String BULLET_SUPPRESSION_EFFECT_COM = "React to incoming bullets by visual and sounds";
 
-        Client(ForgeConfigSpec.Builder builder) {
+        Client(ModConfigSpec.Builder builder) {
             this(
                     buildBoolConfig(builder, SOUND_EFFECTS_VISUAL_EFFECTS_CAT, ENHANCED_AUDIO_EFFECT_COM, AUDIO_EFFECT,true),
                     buildBoolConfig(builder, SOUND_EFFECTS_VISUAL_EFFECTS_CAT, BULLET_SUPPRESSION_EFFECT_COM, BULLET_SUPPRESSION, true),
@@ -101,8 +101,8 @@ public class ModConfigs {
         }
     }
 
-    private static ForgeConfigSpec.BooleanValue buildBoolConfig(ForgeConfigSpec.Builder builder, String categoryName, String comment, String path, boolean defaultValue) {
-        final ForgeConfigSpec.BooleanValue value;
+    private static ModConfigSpec.BooleanValue buildBoolConfig(ModConfigSpec.Builder builder, String categoryName, String comment, String path, boolean defaultValue) {
+        final ModConfigSpec.BooleanValue value;
         builder.push(categoryName);
         value = builder
                 .comment(comment)
@@ -111,8 +111,8 @@ public class ModConfigs {
         return value;
     }
 
-    private static ForgeConfigSpec.DoubleValue buildDoubleConfig(ForgeConfigSpec.Builder builder, String categoryName, String comment, String path, double defaultValue) {
-        final ForgeConfigSpec.DoubleValue value;
+    private static ModConfigSpec.DoubleValue buildDoubleConfig(ModConfigSpec.Builder builder, String categoryName, String comment, String path, double defaultValue) {
+        final ModConfigSpec.DoubleValue value;
         builder.push(categoryName);
         value =  builder
                 .comment(comment)

@@ -2,10 +2,10 @@ package net.zerocontact.mixin.tacz;
 
 import com.tacz.guns.client.tooltip.ClientGunTooltip;
 import com.tacz.guns.inventory.tooltip.GunTooltip;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.caliber.AmmoInjector;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,12 +27,10 @@ public class ClientGunToolTipMixin {
 
     @Inject(method = "<init>",at = @At("RETURN"),remap = false)
     private void replaceAmmoStack(GunTooltip tooltip, CallbackInfo ci){
-        AmmoInjector.AmmoContext context = AmmoInjector.read(this.gun);
+        AmmoInjector.AmmoContext context = AmmoInjector.get().readCxtFromStack(this.gun);
         if(!context.isEmpty() && !context.caliber().variant().equals("tacz:ammo")){
-            Item variantItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(context.caliber().variant()));
-            if(variantItem!=null){
-                this.ammo = variantItem.getDefaultInstance();
-            }
+            Item variantItem = BuiltInRegistries.ITEM.get(ResourceLocation.parse(context.caliber().variant()));
+            this.ammo = variantItem.getDefaultInstance();
         }
     }
 }

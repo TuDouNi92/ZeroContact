@@ -1,22 +1,33 @@
 package net.zerocontact.network.c2s;
 
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.zerocontact.caliber.ServerAmmoSelector;
 
-import java.util.function.Supplier;
+public record SelectAmmoPacket(ItemStack ammoItem) implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<SelectAmmoPacket> TYPE = new CustomPacketPayload.Type<>(
+            ResourceLocation.fromNamespaceAndPath(net.zerocontact.ZeroContact.MOD_ID, "select_ammo"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, SelectAmmoPacket> STREAM_CODEC =
+            StreamCodec.ofMember(SelectAmmoPacket::encode, SelectAmmoPacket::decode);
 
-public record SelectAmmoPacket(ItemStack ammoItem) {
-    public void encode(FriendlyByteBuf buf) {
-        buf.writeItem(ammoItem);
+    @Override
+    public CustomPacketPayload.Type<SelectAmmoPacket> type() {
+        return TYPE;
     }
 
-    public static SelectAmmoPacket decode(FriendlyByteBuf buf) {
-        return new SelectAmmoPacket(buf.readItem());
+    public void encode(RegistryFriendlyByteBuf buf) {
+        ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, ammoItem);
     }
 
-    public static void handle(SelectAmmoPacket msg, Supplier<NetworkEvent.Context> supplier) {
-        ServerAmmoSelector.handleSelected(msg, supplier);
+    public static SelectAmmoPacket decode(RegistryFriendlyByteBuf buf) {
+        return new SelectAmmoPacket(ItemStack.OPTIONAL_STREAM_CODEC.decode(buf));
+    }
+
+    public static void handle(SelectAmmoPacket msg, IPayloadContext context) {
+        ServerAmmoSelector.handleSelected(msg, context);
     }
 }

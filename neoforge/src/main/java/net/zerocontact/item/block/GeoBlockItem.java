@@ -1,20 +1,16 @@
 package net.zerocontact.item.block;
 
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.zerocontact.client.renderer.ItemRender;
+import net.zerocontact.api.armor.RenderableItem;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.function.Consumer;
-
-public class GeoBlockItem extends BlockItem implements GeoItem {
+public class GeoBlockItem extends BlockItem implements GeoItem, RenderableItem {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private final ResourceLocation texture, model, animation;
 
@@ -31,23 +27,24 @@ public class GeoBlockItem extends BlockItem implements GeoItem {
 
     }
 
-    @Override
-    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(new IClientItemExtensions() {
-            private ItemRender<?> renderer;
-
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                if (renderer == null) {
-                    renderer = new ItemRender<>(texture, model, animation);
-                }
-                return renderer;
-            }
-        });
-    }
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
+    }
+
+    @Override
+    public ResourceLocation getTexture() {
+        return texture;
+    }
+
+    @Override
+    public ResourceLocation getModel() {
+        return model;
+    }
+
+    @Override
+    public ResourceLocation getAnimation() {
+        return animation;
     }
 }

@@ -47,50 +47,42 @@ public final class ThermalCaptureSource {
             VertexConsumer output = target.getBuffer(entry.getKey());
             FloatArrayList recorded = entry.getValue();
             for (int i = 0; i < recorded.size(); i += 5) {
-                output.vertex(recorded.getFloat(i), recorded.getFloat(i + 1), recorded.getFloat(i + 2))
-                        .uv(recorded.getFloat(i + 3), recorded.getFloat(i + 4)).endVertex();
+                output.addVertex(recorded.getFloat(i), recorded.getFloat(i + 1), recorded.getFloat(i + 2))
+                        .setUv(recorded.getFloat(i + 3), recorded.getFloat(i + 4));
             }
         }
     }
 
     private static final class Recorder implements VertexConsumer {
         private final FloatArrayList vertices;
-        private double x, y, z;
-        private float u, v;
+        private int vertexOffset;
 
         private Recorder(FloatArrayList vertices) {
             this.vertices = vertices;
         }
 
         @Override
-        public @NotNull VertexConsumer vertex(double x, double y, double z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
+        public @NotNull VertexConsumer addVertex(float x, float y, float z) {
+            vertexOffset = vertices.size();
+            vertices.add(x);
+            vertices.add(y);
+            vertices.add(z);
+            // There is no endVertex callback; reserve UVs for setUv to fill in.
+            vertices.add(0.0F);
+            vertices.add(0.0F);
             return this;
         }
 
         @Override
-        public @NotNull VertexConsumer uv(float u, float v) {
-            this.u = u;
-            this.v = v;
+        public @NotNull VertexConsumer setUv(float u, float v) {
+            vertices.set(vertexOffset + 3, u);
+            vertices.set(vertexOffset + 4, v);
             return this;
         }
 
-        @Override public @NotNull VertexConsumer color(int r, int g, int b, int a) { return this; }
-        @Override public @NotNull VertexConsumer overlayCoords(int u, int v) { return this; }
-        @Override public @NotNull VertexConsumer uv2(int u, int v) { return this; }
-        @Override public @NotNull VertexConsumer normal(float x, float y, float z) { return this; }
-        @Override public void defaultColor(int r, int g, int b, int a) { }
-        @Override public void unsetDefaultColor() { }
-
-        @Override
-        public void endVertex() {
-            vertices.add((float) x);
-            vertices.add((float) y);
-            vertices.add((float) z);
-            vertices.add(u);
-            vertices.add(v);
-        }
+        @Override public @NotNull VertexConsumer setColor(int r, int g, int b, int a) { return this; }
+        @Override public @NotNull VertexConsumer setUv1(int u, int v) { return this; }
+        @Override public @NotNull VertexConsumer setUv2(int u, int v) { return this; }
+        @Override public @NotNull VertexConsumer setNormal(float x, float y, float z) { return this; }
     }
 }

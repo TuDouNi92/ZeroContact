@@ -8,13 +8,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.armor.modular.ModuleDataController;
-import net.zerocontact.armor.modular.model.ActionView;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.model.ActionResult;
+import net.zerocontact.armor.modular.model.ActionView;
 import net.zerocontact.armor.modular.model.ModuleAction;
 import net.zerocontact.armor.modular.model.ModuleContext;
 import net.zerocontact.armor.modular.model.ModuleView;
 import net.zerocontact.armor.modular.module.radio.model.RadioProfile;
-import net.zerocontact.capability.CapabilityRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ public class MBITRController implements ModuleDataController {
 
     @Override
     public Optional<ModuleView> inspect(ModuleContext context) {
-        return context.module().getCapability(CapabilityRegistries.RADIO).map(radio -> {
+        return Optional.ofNullable(context.module().getCapability(ModularCapabilityRegistry.RADIO)).map(radio -> {
             boolean activated = radio.getRadioState().radioActivated();
             ResourceLocation actionId = activated ? DISABLE_ACTION : ENABLE_ACTION;
             return new ModuleView(
@@ -53,7 +53,7 @@ public class MBITRController implements ModuleDataController {
         if (!ENABLE_ACTION.equals(action.id()) && !DISABLE_ACTION.equals(action.id())) {
             return ActionResult.rejected(Component.literal("Illegal radio operation"));
         }
-        return context.module().getCapability(CapabilityRegistries.RADIO).map(radio -> {
+        return Optional.ofNullable(context.module().getCapability(ModularCapabilityRegistry.RADIO)).map(radio -> {
             boolean activated = ENABLE_ACTION.equals(action.id());
             if (radio.getRadioState().radioActivated() == activated) {
                 return ActionResult.unchanged();
@@ -66,7 +66,7 @@ public class MBITRController implements ModuleDataController {
     @Override
     public ActionResult executeData(ModuleContext context, ResourceLocation operationId, CompoundTag payload) {
         if (SET_PROFILE_OPERATION.equals(operationId)) {
-            return context.module().getCapability(CapabilityRegistries.RADIO).map(radio -> {
+            return Optional.ofNullable(context.module().getCapability(ModularCapabilityRegistry.RADIO)).map(radio -> {
                 if (!radio.getRadioState().radioActivated()) {
                     return ActionResult.rejected(Component.literal("Radio is off"));
                 }

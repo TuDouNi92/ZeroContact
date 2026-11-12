@@ -4,25 +4,25 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.neoforge.common.NeoForge;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.armor.modular.registry.ModuleRegistry;
-import net.zerocontact.capability.CapabilityRegistries;
-import net.zerocontact.client.gui.ModConfigScreenHandler;
+import net.zerocontact.armor.modular.component.ModularDataComponents;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.config.ModConfigs;
 import net.zerocontact.datagen.Predicate;
 import net.zerocontact.events.*;
 import net.zerocontact.forge_registries.*;
 import net.zerocontact.lua.ZcLuaApiHelpers;
-import software.bernie.geckolib.GeckoLib;
+import net.zerocontact.network.ModMessages;
 
 @Mod(ZeroContact.MOD_ID)
 public class ZeroContactForge {
 
     public ZeroContactForge(IEventBus bus, ModContainer container) {
-        NeoForge.EVENT_BUS.register(this);
+        bus.addListener(ModMessages::register);
+        ModularDataComponents.register(bus);
+        bus.addListener(ModularCapabilityRegistry::registerCapabilities);
         ZeroContact.init();
-        GeckoLib.initialize();
         ServerForgeEventBus.regEvents();
         EntitiyRegistry.register();
         BlockRegistry.register(bus);
@@ -30,10 +30,7 @@ public class ZeroContactForge {
         EffectRegistry.register();
         ZcLuaApiHelpers.register();
         Predicate.predicateCurios();
-        EntityDeathDogTagEvent.register();
         regConfig(container);
-        regConfigScreen();
-        CapabilityRegistries.register();
         ModuleRegistry.registerTrait();
     }
 
@@ -53,7 +50,4 @@ public class ZeroContactForge {
         );
     }
 
-    private static void regConfigScreen() {
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ModConfigScreenHandler.register(context));
-    }
 }

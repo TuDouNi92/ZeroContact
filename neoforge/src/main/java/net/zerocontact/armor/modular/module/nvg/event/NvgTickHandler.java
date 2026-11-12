@@ -1,33 +1,32 @@
 package net.zerocontact.armor.modular.module.nvg.event;
 
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.nbt.Tag;
-import net.zerocontact.armor.modular.module.nvg.service.NvgPowerService;
-import software.bernie.geckolib.animatable.GeoItem;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.zerocontact.ZeroContact;
+import net.zerocontact.armor.modular.ModuleQuery;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.model.EquipmentTarget;
+import net.zerocontact.armor.modular.module.nvg.service.NvgPowerService;
 import net.zerocontact.armor.modular.service.ModuleSyncService;
+import software.bernie.geckolib.animatable.GeoItem;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.zerocontact.armor.modular.ModuleQuery;
-import net.zerocontact.capability.CapabilityRegistries;
-
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = ZeroContact.MOD_ID)
 public class NvgTickHandler {
 
     @SubscribeEvent
-    public static void serverTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
-        var player = event.player;
+    public static void serverTick(PlayerTickEvent.Post event) {
+        var player = event.getEntity();
         if (player instanceof ServerPlayer serverPlayer) {
             Set<EquipmentTarget> dirty = new HashSet<>();
             var modules = ModuleQuery.streamMounted(serverPlayer).toList();
             // Consume first, then refresh every NVG so shared batteries have one final state.
-            modules.forEach(ref -> ref.stack().getCapability(CapabilityRegistries.NVG).ifPresent(cap -> {
+            modules.forEach(ref -> Optional.ofNullable(ref.stack().getCapability(ModularCapabilityRegistry.NVG)).ifPresent(cap -> {
                 if (!cap.getEnabled()) return;
                 var supply = NvgPowerService.findSupply(serverPlayer);
                 if (supply.isPresent()) {
@@ -41,11 +40,10 @@ public class NvgTickHandler {
                 }
             }));
 
-            modules.forEach(ref -> ref.stack().getCapability(CapabilityRegistries.NVG).ifPresent(cap -> {
+            modules.forEach(ref -> Optional.ofNullable(ref.stack().getCapability(ModularCapabilityRegistry.NVG)).ifPresent(cap -> {
                 // Mounted modules do not receive vanilla inventoryTick; initialize old saves here too.
                 if (ref.stack().getItem() instanceof GeoItem
-                        && (ref.stack().getTag() == null
-                        || !ref.stack().getTag().contains(GeoItem.ID_NBT_KEY, Tag.TAG_ANY_NUMERIC))) {
+                        && (GeoItem.getId(ref.stack()) == Long.MAX_VALUE)) {
                     GeoItem.getOrAssignId(ref.stack(), serverPlayer.serverLevel());
                     dirty.add(ref.equipmentTarget());
                 }

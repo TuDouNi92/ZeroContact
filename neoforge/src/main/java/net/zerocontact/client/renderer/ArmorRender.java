@@ -1,5 +1,6 @@
 package net.zerocontact.client.renderer;
 
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -9,8 +10,9 @@ import net.minecraft.client.model.HumanoidModel;
 import net.zerocontact.armor.modular.client.renderer.AttachmentRenderLayer;
 import net.zerocontact.armor.modular.module.beacon.client.renderer.EmissiveBeaconRenderLayer;
 import net.zerocontact.armor.modular.module.pouch.client.NavBoardScreenLayer;
+import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animatable.GeoItem;
-import software.bernie.geckolib.core.animatable.GeoAnimatable;
+
 import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.renderer.GeoArmorRenderer;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
@@ -29,9 +31,9 @@ public class ArmorRender<T extends Item & GeoItem & GeoAnimatable> extends GeoAr
     }
 
     @Override
-    public void prepForRender(Entity entity, ItemStack stack, EquipmentSlot slot, HumanoidModel<?> baseModel) {
-        this.setAllVisible(true);
-        super.prepForRender(entity, stack, slot, baseModel);
+    public void prepForRender(Entity entity, ItemStack stack, EquipmentSlot slot, HumanoidModel<?> baseModel, MultiBufferSource bufferSource, float partialTick, float limbSwing, float limbSwingAmount, float netHeadYaw, float headPitch) {
+        this.setAllBonesVisible(true);
+        super.prepForRender(entity, stack, slot, baseModel, bufferSource, partialTick, limbSwing, limbSwingAmount, netHeadYaw, headPitch);
     }
 
     public static class ItemRender<T extends Item & GeoItem & GeoAnimatable> extends GeoItemRenderer<T> {

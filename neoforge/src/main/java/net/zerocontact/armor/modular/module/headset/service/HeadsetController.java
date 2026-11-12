@@ -4,9 +4,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.armor.modular.ModuleController;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.model.*;
 import net.zerocontact.armor.modular.module.headset.container.HeadsetContainer;
-import net.zerocontact.capability.CapabilityRegistries;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +18,7 @@ public class HeadsetController implements ModuleController {
 
     @Override
     public Optional<ModuleView> inspect(ModuleContext context) {
-        return context.module().getCapability(CapabilityRegistries.HEADSET).map(
+        return Optional.ofNullable(context.module().getCapability(ModularCapabilityRegistry.HEADSET)).map(
                 cap -> {
                     Supplier<ResourceLocation> state = () -> cap.isHeadsetOn() ? HeadsetContainer.STATE_ON : HeadsetContainer.STATE_OFF;
                     return new ModuleView(
@@ -45,7 +45,7 @@ public class HeadsetController implements ModuleController {
 
     @Override
     public ActionResult execute(ModuleContext context, ModuleAction action) {
-        return context.module().getCapability(CapabilityRegistries.HEADSET).map(
+        return Optional.ofNullable(context.module().getCapability(ModularCapabilityRegistry.HEADSET)).map(
                 cap -> {
                     if (action.id().equals(ENABLE_ACTION)) {
                         if (!cap.isHeadsetOn()) {

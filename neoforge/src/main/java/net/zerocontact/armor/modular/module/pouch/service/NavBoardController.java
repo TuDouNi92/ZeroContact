@@ -1,21 +1,21 @@
 package net.zerocontact.armor.modular.module.pouch.service;
 
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
+import net.zerocontact.ZeroContact;
 import net.zerocontact.api.armor.modular.ModuleController;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.model.ActionResult;
+import net.zerocontact.armor.modular.model.ActionView;
 import net.zerocontact.armor.modular.model.ModuleAction;
 import net.zerocontact.armor.modular.model.ModuleContext;
 import net.zerocontact.armor.modular.model.ModuleView;
-import net.zerocontact.armor.modular.model.ActionView;
 import net.zerocontact.armor.modular.module.pouch.container.navboard.NavBoardContainer;
-import net.zerocontact.capability.CapabilityRegistries;
-import net.zerocontact.ZeroContact;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.zerocontact.registries.ModSoundEventsReg;
 
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 public class NavBoardController implements ModuleController {
     public static final ResourceLocation ENABLE = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "navboard/enable");
@@ -23,7 +23,7 @@ public class NavBoardController implements ModuleController {
 
     @Override
     public Optional<ModuleView> inspect(ModuleContext context) {
-        return context.module().getCapability(CapabilityRegistries.NAV_BOARD).map(cap -> {
+        return Optional.ofNullable(context.module().getCapability(ModularCapabilityRegistry.NAV_BOARD)).map(cap -> {
             var action = cap.isEnabled() ? DISABLE : ENABLE;
             return new ModuleView(cap.isEnabled() ? NavBoardContainer.STATE_ON : NavBoardContainer.STATE_OFF,
                     List.of(new ActionView(action, Component.literal(cap.isEnabled() ? "Disable" : "Enable"),
@@ -33,7 +33,7 @@ public class NavBoardController implements ModuleController {
 
     @Override
     public ActionResult execute(ModuleContext context, ModuleAction action) {
-        return context.module().getCapability(CapabilityRegistries.NAV_BOARD).map(cap -> {
+        return Optional.ofNullable(context.module().getCapability(ModularCapabilityRegistry.NAV_BOARD)).map(cap -> {
             if (!action.id().equals(ENABLE) && !action.id().equals(DISABLE)) {
                 return ActionResult.rejected(Component.literal("Illegal Operation"));
             }

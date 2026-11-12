@@ -1,6 +1,6 @@
 package net.zerocontact.armor.modular.client.menu;
 
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -9,26 +9,25 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkHooks;
 import net.zerocontact.api.armor.modular.ModularEquipment;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.client.network.ItemStackCodec;
-import net.zerocontact.armor.modular.model.MountCategory;
-import net.zerocontact.armor.modular.model.EquipmentTarget;
-import net.zerocontact.armor.modular.registry.ModuleRegistry;
-import net.zerocontact.forge_registries.MenuRegistry;
-import net.zerocontact.network.ModMessages;
-import net.zerocontact.armor.modular.client.network.c2s.SelectEquipmentMountPacket;
 import net.zerocontact.armor.modular.client.network.c2s.MountPacket;
+import net.zerocontact.armor.modular.client.network.c2s.SelectEquipmentMountPacket;
 import net.zerocontact.armor.modular.client.network.c2s.UnMountPacket;
+import net.zerocontact.armor.modular.client.network.s2c.SyncEquipmentCandidatesPacket;
+import net.zerocontact.armor.modular.model.EquipmentTarget;
+import net.zerocontact.armor.modular.model.MountCategory;
+import net.zerocontact.armor.modular.registry.ModuleRegistry;
 import net.zerocontact.armor.modular.service.ModuleMountService;
 import net.zerocontact.armor.modular.service.ModuleSyncService;
-import net.zerocontact.capability.CapabilityRegistries;
-import net.zerocontact.armor.modular.client.network.s2c.SyncEquipmentCandidatesPacket;
+import net.zerocontact.forge_registries.MenuRegistry;
+import net.zerocontact.network.ModMessages;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Server-authoritative candidates, refreshed as the selected mount or inventory changes.
@@ -55,8 +54,8 @@ public class EquipmentMenu extends AbstractContainerMenu {
     }
 
     //Client
-    public EquipmentMenu(int containerId, Inventory playerInv, FriendlyByteBuf buf) {
-        this(containerId, playerInv, buf.readItem(), buf.readResourceLocation(),
+    public EquipmentMenu(int containerId, Inventory playerInv, RegistryFriendlyByteBuf buf) {
+        this(containerId, playerInv, ItemStackCodec.read(buf), buf.readResourceLocation(),
                 EquipmentTarget.read(buf),
                 buf.readList(buffer -> new Candidate(buffer.readVarInt(), ItemStackCodec.read(buf))));
     }
@@ -126,11 +125,11 @@ public class EquipmentMenu extends AbstractContainerMenu {
     private static void openMenu(ServerPlayer player, ItemStack equipment, ResourceLocation mountId, Component title) {
         EquipmentTarget target = findTarget(player, equipment);
         List<Candidate> candidates = collectCandidates(player.getInventory(), equipment, mountId);
-        NetworkHooks.openScreen(player,
+        player.openMenu(
                 new SimpleMenuProvider((id, inv, owner) ->
                         new EquipmentMenu(id, inv, equipment, mountId, target, candidates), title),
                 buf -> {
-                    buf.writeItem(equipment);
+                    ItemStackCodec.write(buf, equipment);
                     buf.writeResourceLocation(mountId);
                     target.write(buf);
                     buf.writeCollection(candidates, (buffer, candidate) -> {
@@ -211,7 +210,7 @@ public class EquipmentMenu extends AbstractContainerMenu {
                 .filter(entry -> entry.inventorySlot() == inventorySlot && ItemStack.matches(entry.stack(), expectedStack))
                 .findFirst().orElse(null);
         if (candidate == null) return;
-        var container = equipment.getCapability(CapabilityRegistries.MODULAR_EQUIPMENT).map(cap -> cap).orElse(null);
+        var container = equipment.getCapability(ModularCapabilityRegistry.MODULAR_EQUIPMENT);
         if (container == null) return;
         ItemStack oldModule = container.getModule(mountId).copy();
         ItemStack module = candidate.stack().copy();

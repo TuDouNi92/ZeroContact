@@ -1,20 +1,31 @@
 package net.zerocontact.network.c2s;
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.zerocontact.caliber.ServerAmmoSelector;
 
-import java.util.function.Supplier;
+public record OpenAmmoSelectorPacket() implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<OpenAmmoSelectorPacket> TYPE = new CustomPacketPayload.Type<>(
+            ResourceLocation.fromNamespaceAndPath(net.zerocontact.ZeroContact.MOD_ID, "open_ammo_selector"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, OpenAmmoSelectorPacket> STREAM_CODEC =
+            StreamCodec.ofMember(OpenAmmoSelectorPacket::encode, OpenAmmoSelectorPacket::decode);
 
-public record OpenAmmoSelectorPacket() {
-    public void encode(FriendlyByteBuf buf) {
+    @Override
+    public CustomPacketPayload.Type<OpenAmmoSelectorPacket> type() {
+        return TYPE;
     }
 
-    public static OpenAmmoSelectorPacket decode(FriendlyByteBuf buf) {
+    public void encode(RegistryFriendlyByteBuf buf) {
+    }
+
+    public static OpenAmmoSelectorPacket decode(RegistryFriendlyByteBuf buf) {
         return new OpenAmmoSelectorPacket();
     }
 
-    public static void handle(OpenAmmoSelectorPacket msg, Supplier<NetworkEvent.Context> supplier) {
-        ServerAmmoSelector.handleMenu(msg, supplier);
+    public static void handle(OpenAmmoSelectorPacket msg, IPayloadContext context) {
+        ServerAmmoSelector.handleMenu(msg, context);
     }
 }

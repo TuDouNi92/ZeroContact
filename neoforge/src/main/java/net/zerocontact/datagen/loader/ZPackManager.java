@@ -3,18 +3,17 @@ package net.zerocontact.datagen.loader;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.file.FileNotFoundAction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.PathPackResources;
+import net.minecraft.server.packs.*;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
-import net.minecraftforge.event.AddPackFindersEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.neoforge.event.AddPackFindersEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.ZeroContactLogger;
 import net.zerocontact.api.datagen.IPackManager;
 import net.zerocontact.datagen.model.ManifestPOJO;
-import net.zerocontact.datagen.model.Zpack;
+import net.zerocontact.datagen.model.ZPack;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,8 +29,8 @@ import java.util.zip.ZipInputStream;
 public class ZPackManager implements IPackManager {
     private static final Path LOCAL_PACK_ROOT = Paths.get("config/zerocontact/packs");
     public static final String OLD_DEFAULT_PACK = "zero_contact";
-    public final Set<Zpack> outerPacks = new HashSet<>();
-    private static final Set<Pack> vanillaPacks = new HashSet<>();
+    public final Set<ZPack> outerPacks = new HashSet<>();
+    private static final Set<VPack> vanillaPacks = new HashSet<>();
     private final ZAssetManager assetManager;
     private final ZContentLoader contentLoader;
     private static final String DEFAULT_PACK_LOCATION = "/data/zerocontact/default_pack.zip";
@@ -40,6 +39,12 @@ public class ZPackManager implements IPackManager {
     private static final String CONFIG_NODE = "pack.default_pack_override";
     private boolean overridePack = true;
     private static ZPackManager singleton;
+
+    private record VPack(PackType type, Pack pack) {
+        public boolean isDataPack() {
+            return type == PackType.SERVER_DATA;
+        }
+    }
 
     private ZPackManager() {
         this.assetManager = new ZAssetManager();
@@ -115,7 +120,7 @@ public class ZPackManager implements IPackManager {
                                             ZeroContactLogger.LOG.warn("Detected deprecated pack: {}. Ignoring", packName);
                                         } else {
                                             outerPacks.add(
-                                                    new Zpack(
+                                                    new ZPack(
                                                             packName,
                                                             packPath,
                                                             data.author(),
@@ -141,19 +146,40 @@ public class ZPackManager implements IPackManager {
         outerPacks.forEach(path -> {
             String packId = path.outerPack().getFileName().toString();
             Pack resourcePack = Pack.readMetaAndCreate(
-                    packId,
-                    Component.literal("ZeroContact ResPack"),
-                    true,
-                    (id) -> new PathPackResources(id, path.outerPack(), true),
-                    PackType.CLIENT_RESOURCES, Pack.Position.TOP, PackSource.BUILT_IN);
+                    new PackLocationInfo(
+                            packId,
+                            Component.literal("ZeroContact ResPack"),
+                            PackSource.BUILT_IN,
+                            Optional.empty()
+                    ),
+                    new PathPackResources.PathResourcesSupplier(path.outerPack()),
+                    PackType.CLIENT_RESOURCES,
+                    new PackSelectionConfig(
+                            true,
+                            Pack.Position.TOP,
+                            false
+                    )
+            );
+
             Pack dataPack = Pack.readMetaAndCreate(
-                    packId,
-                    Component.literal("ZeroContact DataPack"),
-                    true,
-                    (id) -> new PathPackResources(id, path.outerPack(), true),
-                    PackType.SERVER_DATA, Pack.Position.TOP, PackSource.BUILT_IN);
-            vanillaPacks.add(resourcePack);
-            vanillaPacks.add(dataPack);
+                    new PackLocationInfo(
+                            packId,
+                            Component.literal("ZeroContact DataPack"),
+                            PackSource.BUILT_IN,
+                            Optional.empty()
+                    ),
+                    new PathPackResources.PathResourcesSupplier(path.outerPack()),
+                    PackType.SERVER_DATA,
+                    new PackSelectionConfig(
+                            true,
+                            Pack.Position.TOP,
+                            false
+                    )
+            );
+
+
+            vanillaPacks.add(new VPack(PackType.CLIENT_RESOURCES, resourcePack));
+            vanillaPacks.add(new VPack(PackType.SERVER_DATA, dataPack));
         });
     }
 
@@ -172,12 +198,24 @@ public class ZPackManager implements IPackManager {
         }
     }
 
-    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+    @EventBusSubscriber(modid = ZeroContact.MOD_ID)
     static class VanillaPackRegister {
         @SubscribeEvent
         public static void registerPacks(AddPackFindersEvent event) {
             if (vanillaPacks.isEmpty()) return;
-            vanillaPacks.forEach(pack -> event.addRepositorySource(receiver -> receiver.accept(pack)));
+            vanillaPacks.forEach(vPack ->
+                    event.addRepositorySource(receiver ->
+                            {
+                                switch (event.getPackType()) {
+                                    case SERVER_DATA -> {
+                                        if (vPack.isDataPack()) receiver.accept(vPack.pack);
+                                    }
+                                    case CLIENT_RESOURCES -> {
+                                        if (!vPack.isDataPack()) receiver.accept(vPack.pack);
+                                    }
+                                }
+                            }
+                    ));
         }
     }
 }

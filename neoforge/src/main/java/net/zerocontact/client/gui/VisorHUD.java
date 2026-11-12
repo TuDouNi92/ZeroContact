@@ -8,16 +8,17 @@ import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderGuiEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.zerocontact.ZeroContact;
 import net.zerocontact.animation_data.AnimateData;
 import net.zerocontact.api.armor.Toggleable;
 
 import java.util.Optional;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT)
+@EventBusSubscriber(modid = ZeroContact.MOD_ID, value = Dist.CLIENT)
 public class VisorHUD {
     private static int yCor;
     private static int currentTick;
@@ -37,7 +38,8 @@ public class VisorHUD {
         if (mc.player == null) return;
         ItemStack helmet = mc.player.getItemBySlot(EquipmentSlot.HEAD);
         if (helmet.getItem() instanceof Toggleable toggleable) {
-            trickyKeepAnimationLoaded(mc, event.getGuiGraphics(), 0, 0, 0, event.getPartialTick());
+            trickyKeepAnimationLoaded(mc, event.getGuiGraphics(), 0, 0, 0,
+                    event.getPartialTick().getGameTimeDeltaPartialTick(false));
             RenderSystem.disableDepthTest();
             RenderSystem.depthMask(false);
             RenderSystem.enableBlend();

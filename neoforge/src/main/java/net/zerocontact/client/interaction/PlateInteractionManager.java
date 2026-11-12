@@ -4,10 +4,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.item.plate.BasePlate;
 import net.zerocontact.network.ModMessages;
@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 
 
 // Use a unique subscriber class name: Forge's generated wrappers use the simple class name.
-@Mod.EventBusSubscriber(modid = ZeroContact.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@EventBusSubscriber(modid = ZeroContact.MOD_ID, value = Dist.CLIENT)
 public class PlateInteractionManager {
 
     private static boolean installing = false;
@@ -52,11 +52,10 @@ public class PlateInteractionManager {
     }
 
     @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
+    public static void onClientTick(ClientTickEvent.Post event) {
         if (installing) {
             ItemStack checkStack = player.get().map(LivingEntity::getMainHandItem).orElse(ItemStack.EMPTY);
-            if (checkStack.isEmpty() || !ItemStack.isSameItemSameTags(checkStack, snapshot)) {
+            if (checkStack.isEmpty() || !ItemStack.isSameItemSameComponents(checkStack, snapshot)) {
                 clear();
                 return;
             }

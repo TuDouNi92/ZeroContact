@@ -2,9 +2,9 @@ package net.zerocontact.armor.modular.module.nvg.service;
 
 import net.minecraft.world.entity.player.Player;
 import net.zerocontact.armor.modular.ModuleQuery;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.module.battery.container.BatteryContainer;
 import net.zerocontact.armor.modular.module.nvg.container.NvgContainer;
-import net.zerocontact.capability.CapabilityRegistries;
 
 import java.util.Comparator;
 import java.util.Optional;
@@ -20,7 +20,7 @@ public final class NvgPowerService {
                 .sorted(Comparator.comparing((ModuleQuery.MountedModuleRef ref) -> ref.equipmentTarget().slot())
                         .thenComparingInt(ref -> ref.equipmentTarget().index())
                         .thenComparing(ref -> ref.mountId().toString()))
-                .flatMap(ref -> ref.stack().getCapability(CapabilityRegistries.BATTERY)
+                .flatMap(ref -> Optional.ofNullable(ref.stack().getCapability(ModularCapabilityRegistry.BATTERY))
                         .map(battery -> new Supply(ref, battery)).stream())
                 .filter(supply -> !supply.battery().outOfPower())
                 .findFirst();

@@ -1,10 +1,10 @@
 package net.zerocontact.datagen.adapter;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.datagen.IAssetManager;
 import net.zerocontact.api.armor.IEquipmentTypeTag;
@@ -222,8 +222,9 @@ public class ItemAdapter {
             ResourceLocation model = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.animation);
             List<MobEffect> immuneEffects = data.immuneEffects.stream()
-                    .map(s -> ForgeRegistries.MOB_EFFECTS.getValue(ResourceLocation.parse(s)))
-                    .filter(Objects::nonNull)
+                    .map(s -> BuiltInRegistries.MOB_EFFECT.getOptional(ResourceLocation.parse(s)))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
                     .toList();
             List<ItemPOJO.Armor.Attachments> attachments = data.attachments;
             items.add(
@@ -267,8 +268,9 @@ public class ItemAdapter {
             ResourceLocation model = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.model);
             ResourceLocation animation = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, data.animation);
             List<MobEffect> immuneEffects = data.immuneEffects.stream()
-                    .map(s -> ForgeRegistries.MOB_EFFECTS.getValue(ResourceLocation.parse(s)))
-                    .filter(Objects::nonNull)
+                    .map(s -> BuiltInRegistries.MOB_EFFECT.getOptional(ResourceLocation.parse(s)))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
                     .toList();
             List<ItemPOJO.Armor.Attachments> attachments = data.attachments;
             items.add(

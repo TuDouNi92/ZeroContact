@@ -4,9 +4,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -24,8 +24,7 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.*;
-import net.minecraftforge.network.NetworkHooks;
-import net.zerocontact.menu.WorkbenchMenu;
+import net.zerocontact.item.block.menu.WorkbenchMenu;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,7 +32,6 @@ import java.util.List;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
 
-@SuppressWarnings("deprecation")
 
 public class Workbench extends Block implements EntityBlock {
     public static final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/models/block/laptop_screen.png");
@@ -60,16 +58,26 @@ public class Workbench extends Block implements EntityBlock {
     }
 
     @Override
-    public @NotNull InteractionResult use(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hit) {
+    protected @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack stack, @NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hitResult) {
+        openMenu(level, pos, player);
+        return ItemInteractionResult.SUCCESS;
+    }
+
+    @Override
+    protected @NotNull InteractionResult useWithoutItem(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull BlockHitResult hitResult) {
+        openMenu(level, pos, player);
+        return InteractionResult.SUCCESS;
+    }
+
+    public void openMenu(@NotNull Level level, @NotNull BlockPos pos, @NotNull Player player) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof WorkBenchEntity workBenchEntity) {
             workBenchEntity.triggerAnim("laptop", "open");
             if (!level.isClientSide) {
-                NetworkHooks.openScreen((ServerPlayer) player, new SimpleMenuProvider((id, inv, __) -> new WorkbenchMenu(id, inv, pos), Component.empty()), buf -> this.sendBlockPos(buf, pos)
+                player.openMenu(new SimpleMenuProvider((id, inv, __) -> new WorkbenchMenu(id, inv, pos), Component.empty()), buf -> this.sendBlockPos(buf, pos)
                 );
             }
         }
-        return InteractionResult.SUCCESS;
     }
 
     private void sendBlockPos(FriendlyByteBuf buf, BlockPos pos) {

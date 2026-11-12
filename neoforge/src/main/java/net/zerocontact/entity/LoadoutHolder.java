@@ -7,10 +7,10 @@ import com.tacz.guns.api.item.builder.GunItemBuilder;
 import com.tacz.guns.resource.index.CommonAmmoIndex;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.caliber.AmmoInjector;
 import net.zerocontact.caliber.CaliberHelper;
 import net.zerocontact.compat.MagazinesCompatHandler;
@@ -106,19 +106,19 @@ class LoadoutHolder {
             Integer stackSize = TimelessAPI.getCommonAmmoIndex(ammoIdFromGun).map(CommonAmmoIndex::getStackSize).orElse(1);
             //If input is not vanilla ammo, find its resource and build. Or build the vanilla ammo
             if (ammoId != null && !ammoId.equals(ammoIdFromGun.toString())) {
-                @Nullable Item ammoItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(ammoId));
+                @Nullable Item ammoItem = BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(ammoId)).orElse(null);
                 @Nullable GenerateAmmo generateAmmo = ammoItem instanceof GenerateAmmo ? (GenerateAmmo) ammoItem : null;
                 if (generateAmmo != null) {
                     ammoStack = generateAmmo.getDefaultInstance();
                     if (!generateAmmo.isAmmoOfGun(gunStack, ammoStack)) return;
                     ammoStack.setCount(ammoStack.getMaxStackSize());
-                    AmmoInjector.setEntityGunContext(gunStack, generateAmmo);
+                    AmmoInjector.get().setVariantForEntity(gunStack, generateAmmo);
                     this.ammoStack = ammoStack;
                     MagazinesCompatHandler.get().getCompat().ifPresent(magazinesCompat -> {
                         if (magazinesCompat.isMagazineCompatibleWithGun(gunStack)) {
                             CaliberHelper.Caliber caliber = generateAmmo.getDefualtCaliber();
                             this.ammoStack = magazinesCompat.getCompatibleMag(gunStack);
-                            AmmoInjector.write(new AmmoInjector.AmmoContext(caliber), this.ammoStack);
+                            AmmoInjector.get().writeCxtToStack(new AmmoInjector.AmmoContext(caliber), this.ammoStack);
                         }
                     });
                     return;
@@ -164,11 +164,11 @@ class LoadoutHolder {
 
     private ItemStack finalizeItem(@Nullable String id, @Nullable String defaultId) {
         if (defaultId == null) return ItemStack.EMPTY;
-        @Nullable Item defaultItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(defaultId));
+        @Nullable Item defaultItem = BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(defaultId)).orElse(null);
         if (defaultItem == null) return ItemStack.EMPTY;
         ItemStack defaultStack = new ItemStack(defaultItem);
         if (id == null) return defaultStack;
-        @Nullable Item item = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(id));
+        @Nullable Item item = BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(id)).orElse(null);
         if (item == null) return defaultStack;
         return new ItemStack(item);
     }

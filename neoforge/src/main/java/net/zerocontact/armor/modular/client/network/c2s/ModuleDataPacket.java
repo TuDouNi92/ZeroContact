@@ -1,20 +1,23 @@
 package net.zerocontact.armor.modular.client.network.c2s;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.zerocontact.api.armor.modular.ModuleDataController;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.model.ActionResult;
 import net.zerocontact.armor.modular.model.EquipmentTarget;
 import net.zerocontact.armor.modular.model.ModuleContext;
 import net.zerocontact.armor.modular.model.ModuleView;
 import net.zerocontact.armor.modular.registry.ModuleRegistry;
 import net.zerocontact.armor.modular.service.ModuleSyncService;
-import net.zerocontact.capability.CapabilityRegistries;
 
-import java.util.function.Supplier;
+import java.util.Optional;
 
 public record ModuleDataPacket(
         EquipmentTarget target,
@@ -23,8 +26,18 @@ public record ModuleDataPacket(
         ResourceLocation moduleItem,
         ResourceLocation operationId,
         CompoundTag payload
-) {
-    public void encode(FriendlyByteBuf buf) {
+) implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<ModuleDataPacket> TYPE = new CustomPacketPayload.Type<>(
+            ResourceLocation.fromNamespaceAndPath(net.zerocontact.ZeroContact.MOD_ID, "module_data"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, ModuleDataPacket> STREAM_CODEC =
+            StreamCodec.ofMember(ModuleDataPacket::encode, ModuleDataPacket::decode);
+
+    @Override
+    public CustomPacketPayload.Type<ModuleDataPacket> type() {
+        return TYPE;
+    }
+
+    public void encode(RegistryFriendlyByteBuf buf) {
         target.write(buf);
         buf.writeResourceLocation(mountId);
         buf.writeResourceLocation(equipmentItem);
@@ -33,7 +46,7 @@ public record ModuleDataPacket(
         buf.writeNbt(payload);
     }
 
-    public static ModuleDataPacket decode(FriendlyByteBuf buf) {
+    public static ModuleDataPacket decode(RegistryFriendlyByteBuf buf) {
         return new ModuleDataPacket(
                 EquipmentTarget.read(buf),
                 buf.readResourceLocation(),
@@ -44,18 +57,18 @@ public record ModuleDataPacket(
         );
     }
 
-    public static void handle(ModuleDataPacket packet, Supplier<NetworkEvent.Context> supplier) {
-        var player = supplier.get().getSender();
-        supplier.get().setPacketHandled(true);
+    public static void handle(ModuleDataPacket packet, IPayloadContext payloadContext) {
+        var player = payloadContext.player() instanceof ServerPlayer sender ? sender : null;
+
         if (player == null || !player.isAlive() || player.isSpectator()) return;
         if (packet.payload() == null) return;
         var equipment = packet.target().resolve(player);
-        if (equipment.isEmpty() || !packet.equipmentItem().equals(ForgeRegistries.ITEMS.getKey(equipment.getItem())))
+        if (equipment.isEmpty() || !packet.equipmentItem().equals(BuiltInRegistries.ITEM.getKey(equipment.getItem())))
             return;
-        equipment.getCapability(CapabilityRegistries.MODULAR_EQUIPMENT).ifPresent(container -> {
-            // The query returns a copy: commit it only after successful execution.
-            var module = container.getModule(packet.mountId());
-            if (module.isEmpty() || !packet.moduleItem().equals(ForgeRegistries.ITEMS.getKey(module.getItem()))) return;
+        Optional.ofNullable(equipment.getCapability(ModularCapabilityRegistry.MODULAR_EQUIPMENT)).ifPresent(container -> {
+            // Work on a copy so rejected actions cannot mutate the equipped module.
+            var module = container.getModule(packet.mountId()).copy();
+            if (module.isEmpty() || !packet.moduleItem().equals(BuiltInRegistries.ITEM.getKey(module.getItem()))) return;
             ModuleRegistry.getController(module).ifPresent(controller -> {
                 if (!(controller instanceof ModuleDataController dataController)) return;
                 var context = new ModuleContext(player, packet.target(), packet.mountId(), module);
@@ -75,6 +88,5 @@ public record ModuleDataPacket(
                 ModuleSyncService.sync(player, packet.target());
             });
         });
-
     }
 }

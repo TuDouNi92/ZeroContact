@@ -6,7 +6,7 @@ import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.client.gameplay.ClientAmmoCount;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.zerocontact.caliber.compat.ReloadManager;
 import net.zerocontact.compat.MagazinesCompat;
 import net.zerocontact.compat.MagazinesCompatHandler;
@@ -43,7 +43,7 @@ public class ClientAmmoCountMixin {
                         cir.setReturnValue(ClientAmmoCount.MAX_DISPLAY_COUNT);
                         return;
                     }
-                    count += Math.min(Math.max(0, box.getAmmoCount(stack)), ClientAmmoCount.MAX_DISPLAY_COUNT - count);
+                    count += Math.clamp(box.getAmmoCount(stack), 0, ClientAmmoCount.MAX_DISPLAY_COUNT - count);
                 }
             }
             if (count >= ClientAmmoCount.MAX_DISPLAY_COUNT) {

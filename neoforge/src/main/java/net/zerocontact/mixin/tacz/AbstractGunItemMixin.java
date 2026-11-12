@@ -11,25 +11,27 @@ import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.InaccuracyType;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
-import net.zerocontact.api.caliber.ICartridgeHolder;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.zerocontact.caliber.api.ICartridgeHolder;
 import net.zerocontact.caliber.AmmoInjector;
+import net.zerocontact.caliber.capability.CapabilityRegistry;
 import net.zerocontact.caliber.compat.MagazineReloadCheck;
 import net.zerocontact.caliber.compat.ReloadManager;
-import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.compat.MagazinesCompatHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.item.ammo.GenerateAmmo;
+
+import java.util.Optional;
 
 @Mixin(AbstractGunItem.class)
 public abstract class AbstractGunItemMixin implements IGun {
@@ -52,7 +54,7 @@ public abstract class AbstractGunItemMixin implements IGun {
         if (gunIndex == null) return;
 
         ReloadManager.ReloadInventory zeroContact$reloadInventory = ReloadManager.resolveReloadInv(shooter);
-        boolean magazineCompat = MagazinesCompatHandler.get().getCompat().map(compat->compat.isMagazineCompatibleWithGun(gunItem)).orElse(false);
+        boolean magazineCompat = MagazinesCompatHandler.get().getCompat().map(compat -> compat.isMagazineCompatibleWithGun(gunItem)).orElse(false);
 
         if (!magazineCompat) {
 
@@ -101,16 +103,16 @@ public abstract class AbstractGunItemMixin implements IGun {
             int i) {
 
         ItemStack checkAmmoStack = iItemHandler.getStackInSlot(i);
-        String selectedAmmoId = gunItem
-                .getCapability(CapabilityRegistries.CARTRIDGE)
+        String selectedAmmoId = Optional.ofNullable(gunItem
+                        .getCapability(CapabilityRegistry.CARTRIDGE))
                 .map(cap -> cap.getClientSelectedAmmoVariant(gunItem))
                 .orElse("");
 
         if (checkAmmoStack.getItem() instanceof IAmmo ammo
                 && ammo.isAmmoOfGun(gunItem, checkAmmoStack)) {
 
-            AmmoInjector.AmmoContext gunCtx = AmmoInjector.read(gunItem);
-            AmmoInjector.AmmoContext ammoCtx = AmmoInjector.read(checkAmmoStack);
+            AmmoInjector.AmmoContext gunCtx = AmmoInjector.get().readCxtFromStack(gunItem);
+            AmmoInjector.AmmoContext ammoCtx = AmmoInjector.get().readCxtFromStack(checkAmmoStack);
 
             if (gunCtx.isEmpty() || ammoCtx.isEmpty()) {
                 return false;
@@ -118,7 +120,7 @@ public abstract class AbstractGunItemMixin implements IGun {
 
             ResourceLocation actualAmmoId = ammo.getAmmoId(checkAmmoStack);
             ResourceLocation itemId =
-                    ForgeRegistries.ITEMS.getKey(checkAmmoStack.getItem());
+                    BuiltInRegistries.ITEM.getKey(checkAmmoStack.getItem());
 
             // Exact data-driven TaCZ ammo ID.
             if (!selectedAmmoId.isEmpty()
@@ -130,7 +132,6 @@ public abstract class AbstractGunItemMixin implements IGun {
             // Preserve registered ZeroContact GenerateAmmo variants.
             if (!selectedAmmoId.isEmpty()
                     && checkAmmoStack.getItem() instanceof GenerateAmmo
-                    && itemId != null
                     && selectedAmmoId.equals(itemId.toString())) {
                 return true;
             }
@@ -144,8 +145,8 @@ public abstract class AbstractGunItemMixin implements IGun {
         if (checkAmmoStack.getItem() instanceof IAmmoBox ammoBox
                 && ammoBox.isAmmoBoxOfGun(gunItem, checkAmmoStack)) {
 
-            AmmoInjector.AmmoContext gunCtx = AmmoInjector.read(gunItem);
-            AmmoInjector.AmmoContext ammoCtx = AmmoInjector.read(checkAmmoStack);
+            AmmoInjector.AmmoContext gunCtx = AmmoInjector.get().readCxtFromStack(gunItem);
+            AmmoInjector.AmmoContext ammoCtx = AmmoInjector.get().readCxtFromStack(checkAmmoStack);
 
             if (gunCtx.isEmpty() || ammoCtx.isEmpty()) {
                 return false;
@@ -175,9 +176,9 @@ public abstract class AbstractGunItemMixin implements IGun {
         }
     }
 
-    @ModifyArg(method = "findAndExtractInventoryAmmo", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/items/IItemHandler;extractItem(IIZ)Lnet/minecraft/world/item/ItemStack;"), remap = false)
+    @ModifyArg(method = "findAndExtractInventoryAmmo", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/items/IItemHandler;extractItem(IIZ)Lnet/minecraft/world/item/ItemStack;"), remap = false)
     public boolean zeroContact$findAndExtractInventoryAmmo(boolean simulate, @Local(argsOnly = true) ItemStack gunItem) {
-        return gunItem.getCapability(CapabilityRegistries.CARTRIDGE).map(ICartridgeHolder::getCreativeHandling).orElse(simulate);
+        return Optional.ofNullable(gunItem.getCapability(CapabilityRegistry.CARTRIDGE)).map(ICartridgeHolder::getCreativeHandling).orElse(simulate);
     }
 
     @ModifyVariable(
@@ -190,7 +191,7 @@ public abstract class AbstractGunItemMixin implements IGun {
     private float zeroContact$modifyInaccuracy(float original, @Local(argsOnly = true) LivingEntity shooter) {
         ItemStack gunStack = shooter.getMainHandItem();
         if (IGun.getIGunOrNull(gunStack) == null) return original;
-        return gunStack.getCapability(CapabilityRegistries.CARTRIDGE).map(
+        return Optional.ofNullable(gunStack.getCapability(CapabilityRegistry.CARTRIDGE)).map(
                 cap -> {
                     InaccuracyType type = InaccuracyType.getInaccuracyType(shooter);
                     return cap.getInaccuracy(gunStack).get(type);

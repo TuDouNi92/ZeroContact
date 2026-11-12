@@ -4,9 +4,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.armor.modular.ModuleController;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.model.*;
 import net.zerocontact.armor.modular.module.nvg.container.NvgContainer;
-import net.zerocontact.capability.CapabilityRegistries;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +19,7 @@ public class NvgController implements ModuleController {
 
     @Override
     public Optional<ModuleView> inspect(ModuleContext context) {
-        return context.module().getCapability(CapabilityRegistries.NVG).map(cap -> {
+        return Optional.ofNullable(context.module().getCapability(ModularCapabilityRegistry.NVG)).map(cap -> {
             NvgPowerService.refresh(context.wearer(), cap);
             Supplier<ResourceLocation> state = () -> {
                 if (cap.outOfPower()) return NvgContainer.STATE_NO_POWER;
@@ -51,7 +51,7 @@ public class NvgController implements ModuleController {
 
     @Override
     public ActionResult execute(ModuleContext context, ModuleAction action) {
-        return context.module().getCapability(CapabilityRegistries.NVG).map(nvg -> {
+        return Optional.ofNullable(context.module().getCapability(ModularCapabilityRegistry.NVG)).map(nvg -> {
             NvgPowerService.refresh(context.wearer(), nvg);
             if (action.id().equals(ENABLE_ACTION)) {
                 if (nvg.outOfPower()) return ActionResult.rejected(Component.literal("Low battery"));

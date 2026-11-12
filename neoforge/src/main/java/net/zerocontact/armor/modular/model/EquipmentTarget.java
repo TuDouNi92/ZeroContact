@@ -16,7 +16,7 @@ public record EquipmentTarget(String slot, int index) {
     public ItemStack resolve(Player player) {
         if (index < 0) return ItemStack.EMPTY;
         for (EquipmentSlot armorSlot : EquipmentSlot.values()) {
-            if (armorSlot.getType() == EquipmentSlot.Type.ARMOR && index == 0
+            if (armorSlot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR && index == 0
                     && slot.equals("armor/" + armorSlot.getName())) return player.getItemBySlot(armorSlot);
         }
         if (!slot.startsWith("curios/")) return ItemStack.EMPTY;
@@ -27,7 +27,7 @@ public record EquipmentTarget(String slot, int index) {
     public static Map<EquipmentTarget, ItemStack> wornBy(Player player) {
         Map<EquipmentTarget, ItemStack> result = new LinkedHashMap<>();
         for (EquipmentSlot slot : EquipmentSlot.values()) {
-            if (slot.getType() == EquipmentSlot.Type.ARMOR) {
+            if (slot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR) {
                 result.put(new EquipmentTarget("armor/" + slot.getName(), 0), player.getItemBySlot(slot));
             }
         }

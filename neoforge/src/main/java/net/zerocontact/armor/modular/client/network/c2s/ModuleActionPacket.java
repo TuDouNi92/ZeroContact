@@ -1,39 +1,53 @@
 package net.zerocontact.armor.modular.client.network.c2s;
 
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.model.*;
 import net.zerocontact.armor.modular.registry.ModuleRegistry;
 import net.zerocontact.armor.modular.service.ModuleSyncService;
-import net.zerocontact.capability.CapabilityRegistries;
-import java.util.function.Supplier;
+
+import java.util.Optional;
 
 public record ModuleActionPacket(EquipmentTarget target, ResourceLocation mountId,
                                  ResourceLocation equipmentItem, ResourceLocation moduleItem,
-                                 ResourceLocation actionId) {
-    public void encode(FriendlyByteBuf buf) {
+                                 ResourceLocation actionId) implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<ModuleActionPacket> TYPE = new CustomPacketPayload.Type<>(
+            ResourceLocation.fromNamespaceAndPath(net.zerocontact.ZeroContact.MOD_ID, "module_action"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, ModuleActionPacket> STREAM_CODEC =
+            StreamCodec.ofMember(ModuleActionPacket::encode, ModuleActionPacket::decode);
+
+    @Override
+    public CustomPacketPayload.Type<ModuleActionPacket> type() {
+        return TYPE;
+    }
+
+    public void encode(RegistryFriendlyByteBuf buf) {
         target.write(buf);
         buf.writeResourceLocation(mountId);
         buf.writeResourceLocation(equipmentItem);
         buf.writeResourceLocation(moduleItem);
         buf.writeResourceLocation(actionId);
     }
-    public static ModuleActionPacket decode(FriendlyByteBuf buf) {
+    public static ModuleActionPacket decode(RegistryFriendlyByteBuf buf) {
         return new ModuleActionPacket(EquipmentTarget.read(buf), buf.readResourceLocation(),
                 buf.readResourceLocation(), buf.readResourceLocation(), buf.readResourceLocation());
     }
-    public static void handle(ModuleActionPacket packet, Supplier<NetworkEvent.Context> supplier) {
-        var player = supplier.get().getSender();
-        supplier.get().setPacketHandled(true);
+    public static void handle(ModuleActionPacket packet, IPayloadContext payloadContext) {
+        var player = payloadContext.player() instanceof ServerPlayer sender ? sender : null;
+
         if (player == null || !player.isAlive() || player.isSpectator()) return;
         var equipment = packet.target().resolve(player);
-        if (equipment.isEmpty() || !packet.equipmentItem().equals(ForgeRegistries.ITEMS.getKey(equipment.getItem()))) return;
-        equipment.getCapability(CapabilityRegistries.MODULAR_EQUIPMENT).ifPresent(container -> {
-            // The query returns a copy: commit it only after successful execution.
-            var module = container.getModule(packet.mountId());
-            if (module.isEmpty() || !packet.moduleItem().equals(ForgeRegistries.ITEMS.getKey(module.getItem()))) return;
+        if (equipment.isEmpty() || !packet.equipmentItem().equals(BuiltInRegistries.ITEM.getKey(equipment.getItem()))) return;
+        Optional.ofNullable(equipment.getCapability(ModularCapabilityRegistry.MODULAR_EQUIPMENT)).ifPresent(container -> {
+            // Work on a copy so rejected actions cannot mutate the equipped module.
+            var module = container.getModule(packet.mountId()).copy();
+            if (module.isEmpty() || !packet.moduleItem().equals(BuiltInRegistries.ITEM.getKey(module.getItem()))) return;
             ModuleRegistry.getController(module).ifPresent(controller -> {
                 var context = new ModuleContext(player, packet.target(), packet.mountId(), module);
                 boolean allowed = controller.inspect(context).stream().flatMap(view -> view.actions().stream())

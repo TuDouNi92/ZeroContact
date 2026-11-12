@@ -1,7 +1,7 @@
 package net.zerocontact.compat;
 
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.LoadingModList;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.loading.LoadingModList;
 import net.zerocontact.api.compat.ICompatHandler;
 
 import java.util.Optional;

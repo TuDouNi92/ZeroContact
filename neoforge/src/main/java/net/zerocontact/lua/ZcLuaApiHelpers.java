@@ -1,17 +1,18 @@
 package net.zerocontact.lua;
 
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.ZeroContactLogger;
-import net.zerocontact.api.caliber.lua.ZCLuaApi;
+import net.zerocontact.caliber.api.lua.ZCLuaApi;
 import net.zerocontact.caliber.extension.HookActionExecutor;
 import net.zerocontact.caliber.extension.model.TargetSelector;
 import net.zerocontact.datagen.model.AmmoDataPOJO;
@@ -140,7 +141,7 @@ public class ZcLuaApiHelpers {
                             return selector.resolve(context.hookContext(), 0)
                                     .findFirst()
                                     .map(lv -> {
-                                        EntityType<?> entityType = ForgeRegistries.ENTITY_TYPES.getValue(type);
+                                        EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(type);
                                         return LuaValue.valueOf(lv.getType().equals(entityType));
                                     })
                                     .orElse(LuaValue.FALSE);
@@ -209,12 +210,12 @@ public class ZcLuaApiHelpers {
                         public LuaValue call(LuaValue arg, LuaValue arg2) {
                             String target = arg.checkjstring();
                             String effect = arg2.checkjstring();
-                            MobEffect mobEffect = ForgeRegistries.MOB_EFFECTS.getValue(ResourceLocation.parse(effect));
+                            MobEffect mobEffect = BuiltInRegistries.MOB_EFFECT.get(ResourceLocation.parse(effect));
                             if (mobEffect == null) return LuaValue.FALSE;
                             TargetSelector selector = parseTarget(target);
                             return selector.resolve(context.hookContext(), 0)
                                     .findFirst()
-                                    .map(lv -> (LuaValue) LuaValue.valueOf(lv.hasEffect(mobEffect))).orElse(LuaValue.FALSE);
+                                    .map(lv -> (LuaValue) LuaValue.valueOf(lv.hasEffect(Holder.direct(mobEffect)))).orElse(LuaValue.FALSE);
                         }
                     });
 
@@ -223,14 +224,14 @@ public class ZcLuaApiHelpers {
                         public LuaValue call(LuaValue arg, LuaValue arg2) {
                             String target = arg.checkjstring();
                             String effect = arg2.checkjstring();
-                            MobEffect mobEffect = ForgeRegistries.MOB_EFFECTS.getValue(ResourceLocation.parse(effect));
+                            MobEffect mobEffect = BuiltInRegistries.MOB_EFFECT.get(ResourceLocation.parse(effect));
                             if (mobEffect == null) return LuaValue.FALSE;
                             TargetSelector selector = parseTarget(target);
                             return selector.resolve(context.hookContext(), 0)
                                     .findFirst()
                                     .map(lv -> {
                                         ZeroContactLogger.LOG.debug("Remove effect {} from {}", effect, lv.toString());
-                                        return (LuaValue) LuaValue.valueOf(lv.removeEffect(mobEffect));
+                                        return (LuaValue) LuaValue.valueOf(lv.removeEffect(Holder.direct(mobEffect)));
                                     }).orElse(LuaValue.FALSE);
                         }
                     });
@@ -277,7 +278,7 @@ public class ZcLuaApiHelpers {
                             float radius = (float) varargs.optdouble(3, 1);
                             targetSelector.resolve(context.hookContext(), radius).forEach(
                                     lv -> {
-                                        lv.setSecondsOnFire(seconds);
+                                        lv.setRemainingFireTicks(seconds*20);
                                         ZeroContactLogger.LOG.debug("Ignited entity {}", lv.toString());
                                     }
                             );
@@ -305,7 +306,7 @@ public class ZcLuaApiHelpers {
                                 double zOffset = varargs.checkdouble(8);
                                 double speed = varargs.checkdouble(9);
                                 ServerLevel level = context.level();
-                                ParticleType<?> particleType = ForgeRegistries.PARTICLE_TYPES.getValue(ResourceLocation.parse(particlePath));
+                                ParticleType<?> particleType = BuiltInRegistries.PARTICLE_TYPE.get(ResourceLocation.parse(particlePath));
                                 if (particleType == null) return LuaValue.FALSE;
                                 if (particleType instanceof SimpleParticleType simpleParticleType) {
                                     level.sendParticles(simpleParticleType, x, y, z, count, xOffset, yOffset, zOffset, speed);

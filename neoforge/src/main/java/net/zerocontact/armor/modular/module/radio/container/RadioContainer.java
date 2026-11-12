@@ -3,18 +3,29 @@ package net.zerocontact.armor.modular.module.radio.container;
 import net.minecraft.nbt.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.zerocontact.armor.modular.ModuleQuery;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
+import net.zerocontact.armor.modular.container.StackModuleState;
 import net.zerocontact.armor.modular.module.radio.api.MBITR;
 import net.zerocontact.armor.modular.module.radio.model.RadioProfile;
 import net.zerocontact.armor.modular.module.radio.model.RadioState;
 import net.zerocontact.armor.modular.module.radio.model.RadioTransmission;
-import net.zerocontact.capability.CapabilityRegistries;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class RadioContainer implements MBITR {
+public class RadioContainer extends StackModuleState implements MBITR {
+    public RadioContainer() {
+        super("radio");
+    }
+
+    public RadioContainer(ItemStack stack) {
+        this();
+        bind(stack);
+    }
+
     private static final int holdLastScanTimedOut = 40;
     private static final double RANGE = 16 * 8;
     public static final String NBT_ACTIVATED = "activated";
@@ -35,17 +46,20 @@ public class RadioContainer implements MBITR {
 
 
     public void setRadioActivated(boolean radioActivated) {
+        refreshState();
         this.radioActivated = radioActivated;
         if (!radioActivated) {
             endTalk();
             radioPos = null;
             capturedChannel = 0;
         }
+        changed();
     }
 
 
     @Override
     public RadioState getRadioState() {
+        refreshState();
         return new RadioState(
                 radioActivated,
                 currentChannel
@@ -54,25 +68,30 @@ public class RadioContainer implements MBITR {
 
     @Override
     public RadioProfile getProfile() {
+        refreshState();
         return currentProfile;
     }
 
     @Override
     public void setProfile(RadioProfile profile) {
+        refreshState();
         this.currentProfile = profile;
         if (!transmitting) {
             currentChannel = profile.homeChannel();
         }
         capturedChannel = 0;
+        changed();
     }
 
     @Override
     public boolean transmitting() {
+        refreshState();
         return transmitting && radioActivated;
     }
 
     @Override
     public boolean canReceiveFrom(RadioTransmission transmission) {
+        refreshState();
         if (!radioActivated || radioPos == null) return false;
         if (!transmission.radioState().radioActivated()) return false;
         if (transmission.senderPos().distanceToSqr(radioPos) <= RANGE * RANGE) {
@@ -84,6 +103,7 @@ public class RadioContainer implements MBITR {
 
     @Override
     public void scanChannel(ServerPlayer player) {
+        refreshState();
         if (!radioActivated) {
             radioPos = null;
             return;
@@ -102,7 +122,7 @@ public class RadioContainer implements MBITR {
                 return false;
             }).forEach(other -> {
                 ModuleQuery.streamMounted(other).forEach(ref -> {
-                    ref.stack().getCapability(CapabilityRegistries.RADIO).ifPresent(otherRadio -> {
+                    Optional.ofNullable(ref.stack().getCapability(ModularCapabilityRegistry.RADIO)).ifPresent(otherRadio -> {
                         if (otherRadio.transmitting()) {
                             currentProfile.subChannels()
                                     .stream()
@@ -122,6 +142,7 @@ public class RadioContainer implements MBITR {
 
     @Override
     public void talk() {
+        refreshState();
         transmitting = true;
         if (capturedChannel != 0.0f) {
             currentChannel = capturedChannel;
@@ -132,6 +153,7 @@ public class RadioContainer implements MBITR {
 
     @Override
     public void endTalk() {
+        refreshState();
         transmitting = false;
         currentChannel = currentProfile.homeChannel();
     }
@@ -164,5 +186,6 @@ public class RadioContainer implements MBITR {
         currentChannel = currentProfile.homeChannel();
         capturedChannel = 0;
         transmitting = false;
+        changed();
     }
 }

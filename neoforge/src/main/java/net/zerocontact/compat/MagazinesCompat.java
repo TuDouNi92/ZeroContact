@@ -1,7 +1,6 @@
 package net.zerocontact.compat;
 
 import com.raiiiden.taczmagazines.capability.GunMagazineCapability;
-import com.raiiiden.taczmagazines.capability.GunMagazineProvider;
 import com.raiiiden.taczmagazines.config.MechanicsConfig;
 import com.raiiiden.taczmagazines.item.AmmoBoxMagazineStorage;
 import com.raiiiden.taczmagazines.item.MagazineItem;
@@ -18,25 +17,30 @@ import com.tacz.guns.api.item.builder.AmmoItemBuilder;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
 import com.tacz.guns.util.AttachmentDataUtils;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.zerocontact.api.caliber.ICartridgeHolder;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.zerocontact.caliber.ServerAmmoSelector;
+import net.zerocontact.caliber.api.ICartridgeHolder;
 import net.zerocontact.caliber.AmmoInjector;
 import net.zerocontact.caliber.CaliberSerializer;
+import net.zerocontact.caliber.capability.CapabilityRegistry;
 import net.zerocontact.compat.magazines.MagazineRoundStack;
 import net.zerocontact.compat.magazines.MagazineRoundStack.Round;
-import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.item.ammo.GenerateAmmo;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.raiiiden.taczmagazines.item.MagazineAmmoSource.*;
+import static net.zerocontact.capability.TagUtil.getOrCreateTag;
+import static net.zerocontact.capability.TagUtil.updateTag;
 
 public class MagazinesCompat {
     private static final String CHAMBER = "ZeroContact_ChamberRound";
@@ -120,7 +124,7 @@ public class MagazinesCompat {
     private @Nullable MagazineRoundStack readRounds(ItemStack magazine, int count) {
         if (isEmpty(magazine) || !(magazine.getItem() instanceof MagazineItem)) return null;
         int capacity = Math.max(0, MagazineItem.getMaxCapacity(magazine));
-        return MagazineRoundStack.load(magazine.getTag(), Math.min(Math.max(0, count), capacity), legacyRound(magazine));
+        return MagazineRoundStack.load(getOrCreateTag(magazine), Math.clamp(count, 0, capacity), legacyRound(magazine));
     }
 
     private @Nullable Round topRound(ItemStack magazine, int count) {
@@ -135,17 +139,18 @@ public class MagazinesCompat {
     }
 
     private void saveRounds(ItemStack magazine, MagazineRoundStack rounds) {
-        CompoundTag tag = magazine.getOrCreateTag();
-        tag.put(MagazineRoundStack.TAG, rounds.save());
-        tag.putInt("AmmoCount", rounds.size());
         Round top = rounds.peek();
         ((MagazineItem) magazine.getItem()).setAmmoId(magazine,
                 top == null ? DefaultAssets.EMPTY_AMMO_ID : ResourceLocation.parse(top.ammoId()));
-        if (top == null) {
-            magazine.removeTagKey(CaliberSerializer.AI_AMMO);
-        } else {
-            tag.put(CaliberSerializer.AI_AMMO, top.save());
-        }
+        updateTag(magazine, tag -> {
+            tag.put(MagazineRoundStack.TAG, rounds.save());
+            tag.putInt("AmmoCount", rounds.size());
+            if (top == null) {
+                tag.remove(CaliberSerializer.AI_AMMO);
+            } else {
+                tag.put(CaliberSerializer.AI_AMMO, top.save());
+            }
+        });
     }
 
     /**
@@ -156,11 +161,11 @@ public class MagazinesCompat {
         if (rounds == null) {
             // setAmmoCount has already run; preserve the previous count when recovery is impossible.
             if (!isEmpty(magazine) && magazine.getItem() instanceof MagazineItem) {
-                magazine.getOrCreateTag().putInt("AmmoCount", Math.max(0, previousCount));
+                updateTag(magazine, compoundTag -> compoundTag.putInt("AmmoCount", Math.max(0, previousCount)));
             }
             return;
         }
-        newCount = Math.min(Math.max(0, newCount), Math.max(0, MagazineItem.getMaxCapacity(magazine)));
+        newCount = Math.clamp(newCount, 0, Math.max(0, MagazineItem.getMaxCapacity(magazine)));
         Transfer active = transfer.get();
         Round loaded = active != null && active.loaded != null ? active.loaded : legacyRound(magazine);
         ResourceLocation required = magazineAmmoId(magazine);
@@ -230,7 +235,7 @@ public class MagazinesCompat {
 
     private ItemStack createRound(@Nullable Round round) {
         if (round == null) return ItemStack.EMPTY;
-        Item item = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(round.variant()));
+        Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(round.variant()));
         return item instanceof GenerateAmmo ? item.getDefaultInstance()
                 : AmmoItemBuilder.create().setId(ResourceLocation.parse(round.ammoId())).setCount(1).build();
     }
@@ -247,7 +252,7 @@ public class MagazinesCompat {
         for (int i = 0; i < original.getCount() && active.returned.size() > 0; i++) {
             @Nullable Round popped = active.returned.pop();
             ItemStack round = createRound(popped);
-            if (!group.isEmpty() && ItemStack.isSameItemSameTags(group, round)
+            if (!group.isEmpty() && ItemStack.isSameItemSameComponents(group, round)
                     && group.getCount() < group.getMaxStackSize()) {
                 group.grow(1);
             } else {
@@ -268,7 +273,7 @@ public class MagazinesCompat {
     }
 
     private @Nullable Round gunRound(ItemStack gun, String key) {
-        return isEmpty(gun) || gun.getTag() == null ? null : Round.load(gun.getTag().getCompound(key));
+        return isEmpty(gun) || getOrCreateTag(gun).isEmpty() ? null : Round.load(getOrCreateTag(gun).getCompound(key));
     }
 
     private void applyRound(ItemStack gun, @Nullable Round round) {
@@ -277,11 +282,12 @@ public class MagazinesCompat {
         root.put(CaliberSerializer.AI_AMMO, round.save());
         AmmoInjector.AmmoContext context = CaliberSerializer.load(root, gun);
         if (context.isEmpty()) return;
-        AmmoInjector.write(context, gun);
-        gun.getOrCreateTagElement(CaliberSerializer.AI_AMMO)
-                .putString(CaliberSerializer.EXISTED_VARIANT, round.variant());
-        gun.getOrCreateTagElement(CaliberSerializer.AI_AMMO)
-                .putString(CaliberSerializer.EXISTED_AMMO_ID,round.ammoId());
+        AmmoInjector.get().writeCxtToStack(context, gun);
+        updateTag(gun, compoundTag -> {
+            CompoundTag ammoTag = compoundTag.getCompound(CaliberSerializer.AI_AMMO);
+            ammoTag.putString(CaliberSerializer.EXISTED_VARIANT, round.variant());
+            ammoTag.putString(CaliberSerializer.EXISTED_AMMO_ID, round.ammoId());
+        });
     }
 
     public void captureChamber(ItemStack gunStack) {
@@ -289,7 +295,9 @@ public class MagazinesCompat {
         if (gun == null) return;
         if (gun.hasBulletInBarrel(gunStack) && gunRound(gunStack, CHAMBER) == null) {
             Round round = roundFrom(gunStack, gunAmmoId(gunStack));
-            if (round != null) gunStack.getOrCreateTag().put(CHAMBER, round.save());
+            if (round != null) {
+                updateTag(gunStack, compoundTag -> compoundTag.put(CHAMBER, round.save()));
+            }
         }
     }
 
@@ -306,7 +314,7 @@ public class MagazinesCompat {
         Round result = null;
         for (int i = 0; i < amount && rounds.size() > 0; i++) result = rounds.pop();
         saveRounds(magazine, rounds);
-        gunStack.getCapability(GunMagazineProvider.GUN_MAGAZINE).ifPresent(cap -> cap.setStoredMagazine(magazine));
+        GunMagazineCapability.of(gunStack).ifPresent(cap -> cap.setStoredMagazine(magazine));
         return result;
     }
 
@@ -324,7 +332,7 @@ public class MagazinesCompat {
         }
         applyRound(gunStack, current);
         if (current == null) return originalBulletAmount;
-        AmmoInjector.AmmoContext context = AmmoInjector.read(gunStack);
+        AmmoInjector.AmmoContext context = AmmoInjector.get().readCxtFromStack(gunStack);
         return context.isEmpty() ? originalBulletAmount : Math.max(1, context.caliber().bulletAmount());
     }
 
@@ -340,39 +348,45 @@ public class MagazinesCompat {
             Round round = popFromGun(gunStack, previousCount, removed);
             if (fired == null) fired = round;
             if (hadChamber && gun.hasBulletInBarrel(gunStack) && round != null) {
-                gunStack.getOrCreateTag().put(CHAMBER, round.save());
+                updateTag(gunStack, compoundTag -> compoundTag.put(CHAMBER, round.save()));
             }
         }
         applyRound(gunStack, fired);
-        if (!gun.hasBulletInBarrel(gunStack)) gunStack.removeTagKey(CHAMBER);
+        if (!gun.hasBulletInBarrel(gunStack)) {
+            updateTag(gunStack, compoundTag -> compoundTag.remove(CHAMBER));
+        }
     }
 
     public void removedFromMagazine(ItemStack gunStack, int previousCount, int removed) {
         if (!managesGun(gunStack) || removed <= 0) return;
         Round round = popFromGun(gunStack, previousCount, removed);
-        if (round != null) gunStack.getOrCreateTag().put(FEED, round.save());
+        if (round != null) {
+            updateTag(gunStack, compoundTag -> compoundTag.put(FEED, round.save()));
+        }
     }
 
     public void setChamber(ItemStack gunStack, boolean chambered) {
         IGun gun = managedGun(gunStack);
         if (gun == null) return;
         if (chambered) {
-            Round round = gunRound(gunStack, FEED);
+            var ref = new Object() {
+                Round round = gunRound(gunStack, FEED);
+            };
             ItemStack magazine = getMag(gunStack);
             // Some scripts account for the chamber by inserting N-1, without a removeAmmoFromMagazine call.
-            if (round == null && magazine.getItem() instanceof MagazineItem item) {
+            if (ref.round == null && magazine.getItem() instanceof MagazineItem item) {
                 int count = item.getAmmoCount(magazine);
                 int unaccounted = count - gun.getCurrentAmmoCount(gunStack);
-                if (unaccounted > 0) round = popFromGun(gunStack, count, unaccounted);
+                if (unaccounted > 0) ref.round = popFromGun(gunStack, count, unaccounted);
             }
-            if (round == null) round = gunRound(gunStack, CHAMBER);
-            if (round == null) round = roundFrom(gunStack, gunAmmoId(gunStack));
-            if (round != null) gunStack.getOrCreateTag().put(CHAMBER, round.save());
-            applyRound(gunStack, round);
+            if (ref.round == null) ref.round = gunRound(gunStack, CHAMBER);
+            if (ref.round == null) ref.round = roundFrom(gunStack, gunAmmoId(gunStack));
+            if (ref.round != null) updateTag(gunStack, compoundTag -> compoundTag.put(CHAMBER, ref.round.save()));
+            applyRound(gunStack, ref.round);
         } else {
-            gunStack.removeTagKey(CHAMBER);
+            updateTag(gunStack, compoundTag -> compoundTag.remove(CHAMBER));
         }
-        gunStack.removeTagKey(FEED);
+        updateTag(gunStack, compoundTag -> compoundTag.remove(FEED));
     }
 
     public void endShot(ItemStack gunStack) {
@@ -408,13 +422,13 @@ public class MagazinesCompat {
         String familyId = MagazineFamilySystem.getFamilyForGun(gunId);
         if (familyId == null || familyId.isBlank()) return ItemStack.EMPTY;
         GunData gunData = gunData(gunStack);
-        if (gunData == null || gunData.getAmmoId() == null || !MagazineRegistrar.MAGAZINE.isPresent()) {
+        if (gunData == null || gunData.getAmmoId() == null) {
             return ItemStack.EMPTY;
         }
         List<String> extFamilies = MagazineFamilySystem.getExtendedFamiliesForBaseFamily(familyId);
         int extLevel = AttachmentDataUtils.getMagExtendLevel(gunStack, gunData);
         String familyIdWithExt = extFamilies.stream().filter(s -> MagazineFamilySystem.getExtLevelForFamily(s) == extLevel).findAny().orElse("");
-        return gunStack.getCapability(GunMagazineProvider.GUN_MAGAZINE).map(cap -> {
+        return GunMagazineCapability.of(gunStack).map(cap -> {
             Item magItem = MagazineRegistrar.MAGAZINE.get();
             String id = familyId;
             if (!familyIdWithExt.isEmpty()) {
@@ -437,7 +451,7 @@ public class MagazinesCompat {
 
     public ItemStack getMag(ItemStack gunStack) {
         if (isEmpty(gunStack)) return ItemStack.EMPTY;
-        return gunStack.getCapability(GunMagazineProvider.GUN_MAGAZINE).map(GunMagazineCapability::getStoredMagazine).orElse(ItemStack.EMPTY);
+        return GunMagazineCapability.of(gunStack).map(GunMagazineCapability::getStoredMagazine).orElse(ItemStack.EMPTY);
     }
 
     public void setVariantFromMag(ItemStack gunStack, ItemStack magStack, ICartridgeHolder cap) {
@@ -451,7 +465,7 @@ public class MagazinesCompat {
         }
         if (!isEmpty(magStack) && magStack.getItem() instanceof MagazineItem magazineItem) {
             if (magazineItem.isAmmoBoxOfGun(gunStack, magStack)) {
-                AmmoInjector.AmmoContext context = AmmoInjector.read(magStack);
+                AmmoInjector.AmmoContext context = AmmoInjector.get().readCxtFromStack(magStack);
                 if (context.isEmpty()) {
                     ResourceLocation defaultAmmo = gunAmmoId(gunStack);
                     if (defaultAmmo != null)
@@ -474,12 +488,14 @@ public class MagazinesCompat {
         ItemStack source = selectedSlot >= 0
                 ? inventory.getStackInSlot(selectedSlot) : gun;
         Round selectedRound = roundFrom(source, magazineAmmoId(magazine));
-        if (magazine.getTag() == null || !magazine.getTag().contains(MagazineRoundStack.TAG)) {
-            if (selectedRound != null) magazine.getOrCreateTag().put(CaliberSerializer.AI_AMMO, selectedRound.save());
+        if (getOrCreateTag(magazine).isEmpty() || getOrCreateTag(magazine).contains(MagazineRoundStack.TAG)) {
+            if (selectedRound != null) {
+                updateTag(magazine, compoundTag -> compoundTag.put(CaliberSerializer.AI_AMMO, selectedRound.save()));
+            }
         }
         // Selected mixed magazines retain their order; the native refill extends them with their top round.
         initializeMagazine(magazine);
-        gun.getCapability(CapabilityRegistries.CARTRIDGE).ifPresent(cap -> {
+        Optional.ofNullable(gun.getCapability(CapabilityRegistry.CARTRIDGE)).ifPresent(cap -> {
             if (selectedSlot >= 0 && selectedRound != null) {
                 cap.setClientSelectedAmmoVariant(gun, selectedRound.variant());
             }
@@ -536,4 +552,31 @@ public class MagazinesCompat {
         }
         return 0;
     }
+
+    public void remapSelectedMagazineSlot(
+            ItemStack gunStack,
+            IItemHandler handler
+    ) {
+        CompoundTag tag = getOrCreateTag(gunStack);
+        if (tag.isEmpty() || !tag.contains("TaCZMag_SelectedSlot", Tag.TAG_INT)) {
+            return;
+        }
+
+        if (!(handler instanceof ServerAmmoSelector.MappedItemHandler mapped)) {
+            return;
+        }
+
+        int rawSlot = tag.getInt("TaCZMag_SelectedSlot");
+        int filteredSlot = mapped.toFilteredSlot(rawSlot);
+
+        updateTag(gunStack, compoundTag -> {
+            if (filteredSlot >= 0) {
+                compoundTag.putInt("TaCZMag_SelectedSlot", filteredSlot);
+            } else {
+                compoundTag.remove("TaCZMag_SelectedSlot");
+            }
+        });
+    }
+
+
 }

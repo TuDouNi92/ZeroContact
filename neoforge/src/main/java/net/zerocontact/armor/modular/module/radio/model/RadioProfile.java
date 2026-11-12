@@ -6,4 +6,7 @@ public record RadioProfile(
         int homeChannel,
         List<Integer> subChannels
 ) {
+    public RadioProfile {
+        subChannels = List.copyOf(subChannels);
+    }
 }

@@ -1,0 +1,66 @@
+import org.gradle.api.artifacts.transform.CacheableTransform
+import org.gradle.api.artifacts.transform.InputArtifact
+import org.gradle.api.artifacts.transform.TransformAction
+import org.gradle.api.artifacts.transform.TransformOutputs
+import org.gradle.api.artifacts.transform.TransformParameters
+import org.gradle.api.artifacts.type.ArtifactTypeDefinition
+import org.gradle.api.file.FileSystemLocation
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
+
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
+
+// The production bundle and its nested mod both declare modId "sodium". On Loom's
+// dev classpath FML selects the outer LIBRARY in place of the nested renderer.
+// Drop only the outer mod declaration, keeping the manifest, services and JarJar
+// metadata so FML discovers the actual mod and all bundled libraries normally.
+@CacheableTransform
+abstract class SodiumDevBundle implements TransformAction<TransformParameters.None> {
+    @InputArtifact
+    @PathSensitive(PathSensitivity.NAME_ONLY)
+    abstract Provider<FileSystemLocation> getInputArtifact()
+
+    @Override
+    void transform(TransformOutputs outputs) {
+        def input = inputArtifact.get().asFile
+        def output = outputs.file(input.name.replaceFirst(/\.jar$/, '-dev.jar'))
+        new ZipFile(input).withCloseable { source ->
+            new ZipOutputStream(new FileOutputStream(output)).withCloseable { target ->
+                source.entries().each { entry ->
+                    if (entry.name != 'META-INF/neoforge.mods.toml') {
+                        def copy = new ZipEntry(entry.name)
+                        copy.time = entry.time
+                        target.putNextEntry(copy)
+                        if (!entry.directory) {
+                            source.getInputStream(entry).withCloseable { it.transferTo(target) }
+                        }
+                        target.closeEntry()
+                    }
+                }
+            }
+        }
+    }
+}
+
+configurations {
+    sodiumDevBundle {
+        canBeConsumed = false
+        canBeResolved = true
+        transitive = false
+    }
+}
+
+dependencies {
+    registerTransform(SodiumDevBundle) {
+        from.attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, 'jar')
+        to.attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, 'sodium-dev-jar')
+    }
+    runtimeOnly files(configurations.sodiumDevBundle.incoming.artifactView {
+        attributes {
+            attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, 'sodium-dev-jar')
+        }
+    }.files)
+}

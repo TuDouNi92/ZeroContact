@@ -1,10 +1,10 @@
 {
   "required": true,
   "package": "net.zerocontact.mixin.minecraft",
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "JAVA_21",
   "minVersion": "0.8",
   "mixins": [
-    "FriendlyByteBufMixin",
+    "ModularItemStackMixin",
     "ServerLevelMixin"
   ],
   "client": [

@@ -2,13 +2,13 @@ package net.zerocontact.events;
 
 import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
 import com.tacz.guns.api.event.common.GunDamageSourcePart;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.api.armor.ICombatArmorItem;
 import net.zerocontact.api.armor.HelmetInfoProvider;
 import net.zerocontact.caliber.damage.DamagePipeLine;
@@ -52,7 +52,7 @@ public class PlateEntityHurtEvent {
         ItemStack helmet = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
         if (!(helmet.getItem() instanceof HelmetInfoProvider
                 && helmet.getItem() instanceof ICombatArmorItem armorProvider)) {
-            ResourceLocation mobId = ForgeRegistries.ENTITY_TYPES.getKey(livingEntity.getType());
+            ResourceLocation mobId = BuiltInRegistries.ENTITY_TYPE.getKey(livingEntity.getType());
             MobRulesPOJO.Pattern mobPattern = MobRuleRegistry.get(mobId);
             if (mobPattern != null) {
                 eventPre.setBaseAmount(amount * Math.max(0, mobPattern.headshotMultiplier()));

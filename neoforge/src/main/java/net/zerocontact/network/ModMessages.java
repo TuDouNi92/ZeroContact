@@ -1,12 +1,12 @@
 package net.zerocontact.network;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.HandlerThread;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.zerocontact.armor.modular.client.network.c2s.*;
 import net.zerocontact.network.c2s.*;
 import net.zerocontact.network.s2c.AppendSuppressionPacket;
@@ -17,136 +17,42 @@ import net.zerocontact.armor.modular.client.network.s2c.SyncEquipmentCandidatesP
 import net.zerocontact.network.s2c.ToggleVisorResultPacket;
 import net.zerocontact.armor.modular.client.network.s2c.UpdateNavBoardPacket;
 
-import static net.zerocontact.ZeroContact.MOD_ID;
+public final class ModMessages {
+    private ModMessages() {}
 
-public class ModMessages {
-    private static SimpleChannel INSTANCE;
-    private static int packetId = 0;
-
-    private static int id() {
-        return packetId++;
+    public static void register(RegisterPayloadHandlersEvent event) {
+        // Preserve the old consumerMainThread dispatch for every business handler.
+        PayloadRegistrar registrar = event.registrar("1").executesOn(HandlerThread.MAIN);
+        registrar.playToClient(SyncStaminaPacket.TYPE, SyncStaminaPacket.STREAM_CODEC, SyncStaminaPacket::handle);
+        registrar.playToServer(FlipVisorPacket.TYPE, FlipVisorPacket.STREAM_CODEC, FlipVisorPacket::handle);
+        registrar.playToClient(ToggleVisorResultPacket.TYPE, ToggleVisorResultPacket.STREAM_CODEC, ToggleVisorResultPacket::handle);
+        registrar.playToServer(ToggleBackpackPacket.TYPE, ToggleBackpackPacket.STREAM_CODEC, ToggleBackpackPacket::handle);
+        registrar.playToServer(BuyGearsPacket.TYPE, BuyGearsPacket.STREAM_CODEC, BuyGearsPacket::handle);
+        registrar.playToServer(OpenAmmoSelectorPacket.TYPE, OpenAmmoSelectorPacket.STREAM_CODEC, OpenAmmoSelectorPacket::handle);
+        registrar.playToServer(SelectAmmoPacket.TYPE, SelectAmmoPacket.STREAM_CODEC, SelectAmmoPacket::handle);
+        registrar.playToClient(ClientAmmoReloadPacket.TYPE, ClientAmmoReloadPacket.STREAM_CODEC, ClientAmmoReloadPacket::handle);
+        registrar.playToClient(AppendSuppressionPacket.TYPE, AppendSuppressionPacket.STREAM_CODEC, AppendSuppressionPacket::handle);
+        registrar.playToClient(SyncModulesPacket.TYPE, SyncModulesPacket.STREAM_CODEC, SyncModulesPacket::handle);
+        registrar.playToServer(SelectEquipmentMountPacket.TYPE, SelectEquipmentMountPacket.STREAM_CODEC, SelectEquipmentMountPacket::handle);
+        registrar.playToClient(SyncEquipmentCandidatesPacket.TYPE, SyncEquipmentCandidatesPacket.STREAM_CODEC, SyncEquipmentCandidatesPacket::handle);
+        registrar.playToServer(OpenModularMenuPacket.TYPE, OpenModularMenuPacket.STREAM_CODEC, OpenModularMenuPacket::handle);
+        registrar.playToServer(MountPacket.TYPE, MountPacket.STREAM_CODEC, MountPacket::handle);
+        registrar.playToServer(UnMountPacket.TYPE, UnMountPacket.STREAM_CODEC, UnMountPacket::handle);
+        registrar.playToServer(ModuleActionPacket.TYPE, ModuleActionPacket.STREAM_CODEC, ModuleActionPacket::handle);
+        registrar.playToClient(UpdateNavBoardPacket.TYPE, UpdateNavBoardPacket.STREAM_CODEC, UpdateNavBoardPacket::handle);
+        registrar.playToServer(ModuleDataPacket.TYPE, ModuleDataPacket.STREAM_CODEC, ModuleDataPacket::handle);
+        registrar.playToServer(EquipPlatePacket.TYPE, EquipPlatePacket.STREAM_CODEC, EquipPlatePacket::handle);
     }
 
-    public static void register() {
-        SimpleChannel net = NetworkRegistry.ChannelBuilder
-                .named(ResourceLocation.fromNamespaceAndPath(MOD_ID, "messages"))
-                .networkProtocolVersion(() -> "1.0f")
-                .clientAcceptedVersions(s -> true)
-                .serverAcceptedVersions(s -> true)
-                .simpleChannel();
-        INSTANCE = net;
-        net.messageBuilder(SyncStaminaPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(SyncStaminaPacket::new)
-                .encoder(SyncStaminaPacket::toBytes)
-                .consumerMainThread(SyncStaminaPacket::handle)
-                .add();
-        net.messageBuilder(ToggleStaminaPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(ToggleStaminaPacket::decode)
-                .encoder(ToggleStaminaPacket::encode)
-                .consumerMainThread(ToggleStaminaPacket::handle)
-                .add();
-        net.messageBuilder(FlipVisorPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(FlipVisorPacket::decode)
-                .encoder(FlipVisorPacket::encode)
-                .consumerMainThread(FlipVisorPacket::handle)
-                .add();
-        net.messageBuilder(ToggleVisorResultPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(ToggleVisorResultPacket::decode)
-                .encoder(ToggleVisorResultPacket::encode)
-                .consumerMainThread(ToggleVisorResultPacket::handle)
-                .add();
-        net.messageBuilder(ToggleBackpackPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(ToggleBackpackPacket::decode)
-                .encoder(ToggleBackpackPacket::encode)
-                .consumerMainThread(ToggleBackpackPacket::handle)
-                .add();
-        net.messageBuilder(BuyGearsPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(BuyGearsPacket::decode)
-                .encoder(BuyGearsPacket::encode)
-                .consumerMainThread(BuyGearsPacket::handle)
-                .add();
-
-        net.messageBuilder(OpenAmmoSelectorPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(OpenAmmoSelectorPacket::decode)
-                .encoder(OpenAmmoSelectorPacket::encode)
-                .consumerMainThread(OpenAmmoSelectorPacket::handle)
-                .add();
-        net.messageBuilder(SelectAmmoPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(SelectAmmoPacket::decode)
-                .encoder(SelectAmmoPacket::encode)
-                .consumerMainThread(SelectAmmoPacket::handle)
-                .add();
-        net.messageBuilder(ClientAmmoReloadPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(ClientAmmoReloadPacket::decode)
-                .encoder(ClientAmmoReloadPacket::encode)
-                .consumerMainThread(ClientAmmoReloadPacket::handle)
-                .add();
-        net.messageBuilder(AppendSuppressionPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(AppendSuppressionPacket::decode)
-                .encoder(AppendSuppressionPacket::encode)
-                .consumerMainThread(AppendSuppressionPacket::handle)
-                .add();
-        net.messageBuilder(SyncModulesPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(SyncModulesPacket::decode)
-                .encoder(SyncModulesPacket::encode)
-                .consumerMainThread(SyncModulesPacket::handle)
-                .add();
-        net.messageBuilder(SelectEquipmentMountPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(SelectEquipmentMountPacket::decode)
-                .encoder(SelectEquipmentMountPacket::encode)
-                .consumerMainThread(SelectEquipmentMountPacket::handle)
-                .add();
-        net.messageBuilder(SyncEquipmentCandidatesPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(SyncEquipmentCandidatesPacket::decode)
-                .encoder(SyncEquipmentCandidatesPacket::encode)
-                .consumerMainThread(SyncEquipmentCandidatesPacket::handle)
-                .add();
-        net.messageBuilder(OpenModularMenuPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(OpenModularMenuPacket::decode)
-                .encoder(OpenModularMenuPacket::encode)
-                .consumerMainThread(OpenModularMenuPacket::handle)
-                .add();
-        net.messageBuilder(MountPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(MountPacket::decode)
-                .encoder(MountPacket::encode)
-                .consumerMainThread(MountPacket::handle)
-                .add();
-        net.messageBuilder(UnMountPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(UnMountPacket::decode)
-                .encoder(UnMountPacket::encode)
-                .consumerMainThread(UnMountPacket::handle)
-                .add();
-        net.messageBuilder(ModuleActionPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(ModuleActionPacket::decode)
-                .encoder(ModuleActionPacket::encode)
-                .consumerMainThread(ModuleActionPacket::handle)
-                .add();
-        net.messageBuilder(UpdateNavBoardPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(UpdateNavBoardPacket::decode)
-                .encoder(UpdateNavBoardPacket::encode)
-                .consumerMainThread(UpdateNavBoardPacket::handle)
-                .add();
-        net.messageBuilder(ModuleDataPacket.class,id(),NetworkDirection.PLAY_TO_SERVER)
-                .decoder(ModuleDataPacket::decode)
-                .encoder(ModuleDataPacket::encode)
-                .consumerMainThread(ModuleDataPacket::handle)
-                .add();
-        net.messageBuilder(EquipPlatePacket.class,id(),NetworkDirection.PLAY_TO_SERVER)
-                .decoder(EquipPlatePacket::decode)
-                .encoder(EquipPlatePacket::encode)
-                .consumerMainThread(EquipPlatePacket::handle)
-                .add();
+    public static void sendToTrackingAndSelf(CustomPacketPayload msg, Entity entity) {
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(entity, msg);
     }
 
-    public static <MSG> void sendToTrackingAndSelf(MSG msg, Entity entity) {
-        INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), msg);
+    public static void sendToServer(CustomPacketPayload msg) {
+        PacketDistributor.sendToServer(msg);
     }
 
-    public static <MSG> void sendToServer(MSG msg) {
-        INSTANCE.sendToServer(msg);
-    }
-
-    public static <MSG> void sendToPlayer(MSG msg, ServerPlayer player) {
-        INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), msg);
+    public static void sendToPlayer(CustomPacketPayload msg, ServerPlayer player) {
+        PacketDistributor.sendToPlayer(player, msg);
     }
 }

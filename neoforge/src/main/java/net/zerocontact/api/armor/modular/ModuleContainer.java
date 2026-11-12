@@ -6,13 +6,21 @@ import net.minecraft.world.item.ItemStack;
 import java.util.Map;
 
 public interface ModuleContainer {
-    //get installed module by mountId.
+    // Returns the live mounted stack. Its component changes write through to the equipment.
     ItemStack getModule(ResourceLocation mountId);
 
     void setModule(ResourceLocation mountId, ItemStack module);
 
     ItemStack removeModule(ResourceLocation mountId);
 
-    //get modules from all mounts
+    // Read-only map of live stacks; use setModule/removeModule to change the mounts.
     Map<ResourceLocation, ItemStack> getMountedModules();
+
+    /** Replace a synchronized snapshot, including an empty one. */
+    default void replaceModules(Map<ResourceLocation, ItemStack> modules) {
+        Map<ResourceLocation, ItemStack> snapshot = new java.util.HashMap<>();
+        modules.forEach((id, stack) -> snapshot.put(id, stack.copy()));
+        new java.util.ArrayList<>(getMountedModules().keySet()).forEach(this::removeModule);
+        snapshot.forEach(this::setModule);
+    }
 }

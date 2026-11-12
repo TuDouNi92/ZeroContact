@@ -8,11 +8,12 @@ import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.world.item.Items;
 import net.zerocontact.client.gui.WorkbenchScreen;
 import net.zerocontact.datagen.model.RecipePOJO;
 import org.jetbrains.annotations.NotNull;
@@ -29,18 +30,12 @@ public class ScrollList extends AbstractSelectionList<ScrollList.GearEntry> {
     private final WorkbenchScreen screen;
     private GearEntry hoveredEntry;
 
-    public ScrollList(Minecraft minecraft, int width, int height, int y0, int y1, int itemHeight, WorkbenchScreen screen) {
-        super(minecraft, width, height, y0, y1, itemHeight);
-        this.setRenderBackground(false);
-        this.setRenderTopAndBottom(false);
+    public ScrollList(Minecraft minecraft, int width, int height, int y1, int itemHeight, WorkbenchScreen screen) {
+        super(minecraft, width, height, y1, itemHeight);
         this.centerListVertically = false;
         this.screen = screen;
     }
 
-    @Override
-    public void updateNarration(@NotNull NarrationElementOutput narrationElementOutput) {
-
-    }
 
     public static class GearEntry extends ContainerObjectSelectionList.Entry<GearEntry> {
         public final Item gearItem;
@@ -57,13 +52,13 @@ public class ScrollList extends AbstractSelectionList<ScrollList.GearEntry> {
 
         public GearEntry(RecipePOJO gearRecipeData, ScrollList parent, int recipeIndex) {
             this.parent = parent;
-            this.gearItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(gearRecipeData.gearId));
+            this.gearItem = BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(gearRecipeData.gearId)).orElse(Items.AIR);
             this.recipeIndex = recipeIndex;
-            if (this.gearItem != null) {
+            if (this.gearItem != Items.AIR) {
                 this.gearName = Component.translatable(this.gearItem.getDescriptionId()).getString();
                 for (RecipePOJO.IngredientItems ingredientItems : gearRecipeData.ingredientItems) {
-                    Item item = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(ingredientItems.itemId));
-                    if (item == null) continue;
+                    Item item = BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(ingredientItems.itemId)).orElse(Items.AIR);
+                    if (item == Items.AIR) continue;
                     recipes.put(new ItemStack(item), ingredientItems.neededCount);
                 }
             } else {
@@ -143,7 +138,7 @@ public class ScrollList extends AbstractSelectionList<ScrollList.GearEntry> {
 
     @Override
     protected int getRowTop(int index) {
-        int top = y0 + 4 - (int) getScrollAmount() + headerHeight;
+        int top = getY() + 4 - (int) getScrollAmount() + headerHeight;
         for (int i = 0; i < index; i++) {
             top += children().get(i).getRowHeight();
         }
@@ -156,13 +151,13 @@ public class ScrollList extends AbstractSelectionList<ScrollList.GearEntry> {
     }
 
     @Override
-    protected void renderList(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderListItems(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         int rowLeft = getRowLeft();
         int rowWidth = getRowWidth();
         for (int i = 0; i < children().size(); i++) {
             int rowTop = getRowTop(i);
             int rowBottom = getRowBottom(i);
-            if (rowBottom >= y0 && rowTop <= y1) {
+            if (rowBottom >= getY() && rowTop <= getBottom()) {
                 renderItem(guiGraphics, mouseX, mouseY, partialTick, i, rowLeft, rowTop,
                         rowWidth, children().get(i).getRowHeight() - 4);
             }
@@ -201,10 +196,10 @@ public class ScrollList extends AbstractSelectionList<ScrollList.GearEntry> {
         }
         int top = getRowTop(index);
         int bottom = getRowBottom(index);
-        if (top < y0 + 4) {
-            setScrollAmount(getScrollAmount() + top - y0 - 4);
-        } else if (bottom > y1) {
-            setScrollAmount(getScrollAmount() + bottom - y1);
+        if (top < getY() + 4) {
+            setScrollAmount(getScrollAmount() + top - getY() - 4);
+        } else if (bottom > getBottom()) {
+            setScrollAmount(getScrollAmount() + bottom - getBottom());
         }
     }
 
@@ -214,23 +209,26 @@ public class ScrollList extends AbstractSelectionList<ScrollList.GearEntry> {
     }
 
     @Override
-    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         hoveredEntry = entryAtPosition(mouseX, mouseY);
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
         if (hoveredEntry != null) {
-            guiGraphics.renderTooltip(screen.getMinecraft().font, hoveredEntry.gearItem.getDefaultInstance(), mouseX, mouseY);
+            if (hoveredEntry.gearItem != null) {
+                guiGraphics.renderTooltip(screen.getMinecraft().font, hoveredEntry.gearItem.getDefaultInstance(), mouseX, mouseY);
+            }
         }
     }
+
 
     //Fking bugjump, a scrollbar blocked me for the entire day
     @Override
     protected int getScrollbarPosition() {
-        return this.x1 + 2;
+        return this.getRight() + 2;
     }
 
     @Override
     public int getRowLeft() {
-        return this.x0;
+        return this.getX();
     }
 
     @Override
@@ -245,7 +243,7 @@ public class ScrollList extends AbstractSelectionList<ScrollList.GearEntry> {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         boolean onScrollbar = button == 0 && getMaxScroll() > 0
-                && mouseY >= y0 && mouseY <= y1
+                && mouseY >= getY() && mouseY <= getBottom()
                 && mouseX >= getScrollbarPosition() && mouseX < getScrollbarPosition() + 6;
         if (!isMouseOver(mouseX, mouseY) && !onScrollbar) {
             return false;
@@ -261,5 +259,10 @@ public class ScrollList extends AbstractSelectionList<ScrollList.GearEntry> {
             return clicked;
         }
         return onScrollbar;
+    }
+
+    @Override
+    protected void updateWidgetNarration(@NotNull NarrationElementOutput narrationElementOutput) {
+
     }
 }

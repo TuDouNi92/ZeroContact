@@ -8,18 +8,17 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.armor.modular.EquipmentModule;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.module.nvg.api.INvg;
 import net.zerocontact.armor.modular.module.nvg.container.NvgContainer;
-import net.zerocontact.capability.CapabilityRegistries;
-import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
+import net.zerocontact.item.neoforge.AbstractGenerateGeoCurioItemImpl;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
+import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.constant.DataTickets;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.Animation;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.animation.RawAnimation;
-import software.bernie.geckolib.core.object.PlayState;
+
+
+import java.util.Optional;
 
 public abstract class NVG extends AbstractGenerateGeoCurioItemImpl implements EquipmentModule, INvg {
     protected static final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "textures/models/nvg/nvg_pvs31.png");
@@ -40,7 +39,7 @@ public abstract class NVG extends AbstractGenerateGeoCurioItemImpl implements Eq
     public void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entity, int slotId, boolean isSelected) {
         super.inventoryTick(stack, level, entity, slotId, isSelected);
         if (level.isClientSide) return;
-        stack.getCapability(CapabilityRegistries.NVG).ifPresent(nvg -> {
+        Optional.ofNullable(stack.getCapability(ModularCapabilityRegistry.NVG)).ifPresent(nvg -> {
             // Loose inventory modules have no external supply; discard an old mounted snapshot.
             nvg.refreshPowerStatus(0, 0);
             this.setDamage(stack, (int) (nvg.getMaxBattery() - nvg.getBattery()));
@@ -77,7 +76,7 @@ public abstract class NVG extends AbstractGenerateGeoCurioItemImpl implements Eq
                                     }
                                     ItemStack stack = state.getData(DataTickets.ITEMSTACK);
                                     if (stack == null) return PlayState.STOP;
-                                    boolean enabled = stack.getCapability(CapabilityRegistries.NVG).map(NvgContainer::getEnabled).orElse(false);
+                                    boolean enabled = Optional.ofNullable(stack.getCapability(ModularCapabilityRegistry.NVG)).map(NvgContainer::getEnabled).orElse(false);
                                     state.getController().setAnimation(enabled ? ACTIVATE : DEACTIVATE);
                                     return PlayState.CONTINUE;
                                 })

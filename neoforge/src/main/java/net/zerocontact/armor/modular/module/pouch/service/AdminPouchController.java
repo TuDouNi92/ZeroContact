@@ -6,9 +6,9 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.armor.modular.ModuleController;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.model.*;
 import net.zerocontact.armor.modular.module.pouch.container.AdminPouchContainer;
-import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.registries.ModSoundEventsReg;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public class AdminPouchController implements ModuleController {
 
     @Override
     public Optional<ModuleView> inspect(ModuleContext context) {
-        return context.module().getCapability(CapabilityRegistries.ADMIN_POUCH).map(cap -> {
+        return Optional.ofNullable(context.module().getCapability(ModularCapabilityRegistry.ADMIN_POUCH)).map(cap -> {
             Supplier<ResourceLocation> state = () -> {
                 if (cap.hasMap()) {
                     return AdminPouchContainer.HAS_MAP_SATE;
@@ -52,7 +52,7 @@ public class AdminPouchController implements ModuleController {
 
     @Override
     public ActionResult execute(ModuleContext context, ModuleAction action) {
-        return context.module().getCapability(CapabilityRegistries.ADMIN_POUCH).map(cap -> {
+        return Optional.ofNullable(context.module().getCapability(ModularCapabilityRegistry.ADMIN_POUCH)).map(cap -> {
             if (action.id().equals(TAKE_MAP_ACTION)) {
                 if (!cap.hasMap()) return ActionResult.unchanged();
                 ItemStack extracted = cap.extractMap();
@@ -70,8 +70,8 @@ public class AdminPouchController implements ModuleController {
                 ItemStack mainHandItem = context.wearer().getMainHandItem();
                 ItemStack offHandItem = context.wearer().getOffhandItem();
 
-                ItemStack heldMap = cap.isItemValid(0, mainHandItem) ? mainHandItem : offHandItem;
-                if (!cap.isItemValid(0, heldMap)) {
+                ItemStack heldMap = !mainHandItem.isEmpty() && cap.isItemValid(0, mainHandItem) ? mainHandItem : offHandItem;
+                if (heldMap.isEmpty() || !cap.isItemValid(0, heldMap)) {
                     return ActionResult.rejected(Component.literal("Not holding the map"));
                 }
 

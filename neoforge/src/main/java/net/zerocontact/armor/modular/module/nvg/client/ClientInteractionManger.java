@@ -2,20 +2,20 @@ package net.zerocontact.armor.modular.module.nvg.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LightLayer;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.module.nvg.api.INvg;
-import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.registries.ModSoundEventsReg;
 import software.bernie.geckolib.animatable.GeoItem;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Local presentation only. The server capability remains authoritative.
@@ -57,9 +57,8 @@ public final class ClientInteractionManger {
                 reset();
                 return;
             }
-            var selected = minecraft.player.getItemBySlot(EquipmentSlot.HEAD)
-                    .getCapability(CapabilityRegistries.MODULAR_EQUIPMENT)
-                    .map(cap -> cap)
+            var selected = Optional.ofNullable(minecraft.player.getItemBySlot(EquipmentSlot.HEAD)
+                    .getCapability(ModularCapabilityRegistry.MODULAR_EQUIPMENT))
                     .flatMap(container -> container.getMountedModules()
                             .entrySet()
                             .stream()
@@ -74,9 +73,8 @@ public final class ClientInteractionManger {
                 return;
             }
             ItemStack selectedStack = selected.getValue();
-            // getId cannot distinguish a missing numeric tag from ID zero in GeckoLib 4.7.
-            if (selectedStack.getTag() == null
-                    || !selectedStack.getTag().contains(GeoItem.ID_NBT_KEY, Tag.TAG_ANY_NUMERIC)) {
+            // GeckoLib uses MAX_VALUE for a missing animation identity.
+            if (GeoItem.getId(selectedStack) == Long.MAX_VALUE) {
                 reset(); // Wait for the server to assign and sync this mounted stack's ID.
                 return;
             }
@@ -85,7 +83,7 @@ public final class ClientInteractionManger {
             if (changedModule) reset();
             identity = next;
             module = selectedStack; // Sync rebuilds stacks but preserves their identity.
-            var capability = module.getCapability(CapabilityRegistries.NVG).map(cap -> cap).orElse(null);
+            var capability = module.getCapability(ModularCapabilityRegistry.NVG);
             if (capability == null) {
                 reset();
                 return;

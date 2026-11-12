@@ -1,5 +1,6 @@
 package net.zerocontact.item.armor.forge;
 
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.ItemStack;
@@ -35,8 +36,8 @@ public class GenerateCarrierGeoImpl extends BaseArmorGeoImpl implements GeoItem,
     }
 
     @Override
-    public @NotNull SoundEvent getEquipSound() {
-        return ModSoundEventsReg.ARMOR_EQUIP_PLATE;
+    public @NotNull Holder<SoundEvent> getEquipSound() {
+        return Holder.direct(ModSoundEventsReg.ARMOR_EQUIP_PLATE);
     }
 
 

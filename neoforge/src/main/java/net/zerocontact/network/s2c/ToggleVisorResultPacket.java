@@ -1,14 +1,25 @@
 package net.zerocontact.network.s2c;
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.zerocontact.animation_data.AnimateData;
-import net.zerocontact.client.animation.VisorTracker;
+import net.zerocontact.client.network.ClientPacketHandlers;
 
-import java.util.function.Supplier;
+public record ToggleVisorResultPacket(AnimateData.VisorAnimateData visorAnimateData) implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<ToggleVisorResultPacket> TYPE = new CustomPacketPayload.Type<>(
+            ResourceLocation.fromNamespaceAndPath(net.zerocontact.ZeroContact.MOD_ID, "toggle_visor_result"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, ToggleVisorResultPacket> STREAM_CODEC =
+            StreamCodec.ofMember(ToggleVisorResultPacket::encode, ToggleVisorResultPacket::decode);
 
-public record ToggleVisorResultPacket(AnimateData.VisorAnimateData visorAnimateData) {
-    public void encode(FriendlyByteBuf buf) {
+    @Override
+    public CustomPacketPayload.Type<ToggleVisorResultPacket> type() {
+        return TYPE;
+    }
+
+    public void encode(RegistryFriendlyByteBuf buf) {
         String animName = "";
         boolean isPlaying = false;
         double animLength = 0;
@@ -22,7 +33,7 @@ public record ToggleVisorResultPacket(AnimateData.VisorAnimateData visorAnimateD
         buf.writeBoolean(isPlaying);
     }
 
-    public static ToggleVisorResultPacket decode(FriendlyByteBuf buf) {
+    public static ToggleVisorResultPacket decode(RegistryFriendlyByteBuf buf) {
         return new ToggleVisorResultPacket(
                 new AnimateData.VisorAnimateData(
                         buf.readUtf(),
@@ -32,8 +43,7 @@ public record ToggleVisorResultPacket(AnimateData.VisorAnimateData visorAnimateD
         );
     }
 
-    public static void handle(ToggleVisorResultPacket msg, Supplier<NetworkEvent.Context> supplier) {
-        NetworkEvent.Context context = supplier.get();
-        context.enqueueWork(() -> VisorTracker.update(msg.visorAnimateData));
+    public static void handle(ToggleVisorResultPacket msg, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandlers.toggleVisor(msg));
     }
 }

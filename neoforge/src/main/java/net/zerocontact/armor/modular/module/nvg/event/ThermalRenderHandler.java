@@ -14,20 +14,21 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderLevelStageEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.event.RenderFrameEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.armor.modular.client.renderer.ThermalBufferSource;
 import net.zerocontact.armor.modular.client.renderer.ThermalCaptureSource;
+import org.joml.Matrix4fStack;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.joml.Matrix4f;
 import java.util.function.Consumer;
 
-@Mod.EventBusSubscriber(modid = ZeroContact.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@EventBusSubscriber(modid = ZeroContact.MOD_ID, value = Dist.CLIENT)
 public final class ThermalRenderHandler {
     public static final float DEFAULT_HEAT = 0.85F;
     // Dedicated to this pass; getBuffer() may flush when the material changes.
@@ -54,9 +55,9 @@ public final class ThermalRenderHandler {
                                       ModelPart arm, ModelPart sleeve) {
         renderHandHeat(buffers -> {
             arm.render(poseStack, buffers.getBuffer(
-                    RenderType.entitySolid(player.getSkinTextureLocation())), light, OverlayTexture.NO_OVERLAY);
+                    RenderType.entitySolid(player.getSkin().texture())), light, OverlayTexture.NO_OVERLAY);
             sleeve.render(poseStack, buffers.getBuffer(
-                    RenderType.entityTranslucent(player.getSkinTextureLocation())), light, OverlayTexture.NO_OVERLAY);
+                    RenderType.entityTranslucent(player.getSkin().texture())), light, OverlayTexture.NO_OVERLAY);
         });
     }
 
@@ -106,8 +107,7 @@ public final class ThermalRenderHandler {
     }
 
     @SubscribeEvent
-    public static void onRenderTick(TickEvent.RenderTickEvent event) {
-        if (event.phase != TickEvent.Phase.START) return;
+    public static void onRenderTick(RenderFrameEvent.Pre event) {
         worldMatrices = null;
         captureWorldHeat = false;
         WORLD_HEAT_CAPTURE.clear();
@@ -168,12 +168,12 @@ public final class ThermalRenderHandler {
         boolean cull = GL11.glIsEnabled(GL11.GL_CULL_FACE);
         Matrix4f projection = new Matrix4f(RenderSystem.getProjectionMatrix());
         VertexSorting sorting = RenderSystem.getVertexSorting();
-        PoseStack modelView = RenderSystem.getModelViewStack();
-        modelView.pushPose();
+        Matrix4fStack modelView = RenderSystem.getModelViewStack();
+        modelView.pushMatrix();
 
         try {
-            modelView.setIdentity();
-            modelView.mulPoseMatrix(matrices.modelView());
+            modelView.identity();
+            modelView.mul(matrices.modelView());
             RenderSystem.applyModelViewMatrix();
             RenderSystem.setProjectionMatrix(matrices.projection(), VertexSorting.DISTANCE_TO_ORIGIN);
             // The post chain owns this target and handles resizing/reload/cleanup.
@@ -192,7 +192,7 @@ public final class ThermalRenderHandler {
                 HEAT_BUFFERS.endBatch();
             }
         } finally {
-            modelView.popPose();
+            modelView.popMatrix();
             RenderSystem.applyModelViewMatrix();
             RenderSystem.setProjectionMatrix(projection, sorting);
             mainTarget.bindWrite(true);

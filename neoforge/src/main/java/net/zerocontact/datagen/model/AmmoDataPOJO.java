@@ -2,9 +2,9 @@ package net.zerocontact.datagen.model;
 
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.caliber.CaliberHelper;
 import net.zerocontact.caliber.extension.HookEventTrigger;
@@ -143,7 +143,7 @@ public class AmmoDataPOJO {
             float radius
     ) {
         public @Nullable MobEffect resolveEffect() {
-            return ForgeRegistries.MOB_EFFECTS.getValue(ResourceLocation.parse(effect));
+            return BuiltInRegistries.MOB_EFFECT.getOptional(ResourceLocation.parse(effect)).orElse(null);
         }
     }
 

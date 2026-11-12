@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Mth;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
@@ -25,7 +26,7 @@ public final class NavBoardScreenTarget implements AutoCloseable {
     private final TextureTarget target;
     private DynamicTexture map;
     private final RenderType renderType;
-    private final BufferBuilder vertices = new BufferBuilder(1024);
+    private final ByteBufferBuilder vertices = new ByteBufferBuilder(1024);
     private boolean closed;
 
     public NavBoardScreenTarget(ResourceLocation location) {
@@ -43,7 +44,7 @@ public final class NavBoardScreenTarget implements AutoCloseable {
                 }
 
                 @Override
-                public void load(ResourceManager resources) {
+                public void load(@NotNull ResourceManager resources) {
                 }
 
                 @Override
@@ -105,7 +106,7 @@ public final class NavBoardScreenTarget implements AutoCloseable {
             RenderSystem.colorMask(true, true, true, true);
             RenderSystem.setShaderColor(1, 1, 1, 1);
             RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, WIDTH, HEIGHT, 0, -1, 1), VertexSorting.ORTHOGRAPHIC_Z);
-            RenderSystem.getModelViewStack().setIdentity();
+            RenderSystem.getModelViewStack().identity();
             RenderSystem.applyModelViewMatrix();
 
             // Use the actual allocated size, including screens created before a radius change.
@@ -118,45 +119,63 @@ public final class NavBoardScreenTarget implements AutoCloseable {
             float u1 = (float) ((mapPlayerX + halfWidth) / mapSize);
             float v1 = (float) ((mapPlayerZ + halfHeight) / mapSize);
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
-            vertices.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-            colorVertex(0, 0, 20, 27, 36);
-            colorVertex(0, HEIGHT, 20, 27, 36);
-            colorVertex(WIDTH, HEIGHT, 20, 27, 36);
-            colorVertex(WIDTH, 0, 20, 27, 36);
-            BufferUploader.drawWithShader(vertices.end());
-            // Clip to available sampled terrain instead of stretching edge texels into unknown space.
-            float left = Math.max(0, -u0 / (u1 - u0) * WIDTH);
-            float right = Math.min(WIDTH, (1 - u0) / (u1 - u0) * WIDTH);
-            float top = Math.max(0, -v0 / (v1 - v0) * HEIGHT);
-            float bottom = Math.min(HEIGHT, (1 - v0) / (v1 - v0) * HEIGHT);
-            if (left < right && top < bottom) {
-                RenderSystem.setShader(GameRenderer::getPositionTexShader);
-                RenderSystem.setShaderTexture(0, map.getId());
-                vertices.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-                texVertex(left, top, Math.max(0, u0), Math.max(0, v0));
-                texVertex(left, bottom, Math.max(0, u0), Math.min(1, v1));
-                texVertex(right, bottom, Math.min(1, u1), Math.min(1, v1));
-                texVertex(right, top, Math.min(1, u1), Math.max(0, v0));
-                BufferUploader.drawWithShader(vertices.end());
+
+            try {
+                BufferBuilder background = new BufferBuilder(
+                        vertices,
+                        VertexFormat.Mode.QUADS,
+                        DefaultVertexFormat.POSITION_COLOR
+                );
+                colorVertex(background, 0, 0, 20, 27, 36);
+                colorVertex(background, 0, HEIGHT, 20, 27, 36);
+                colorVertex(background, WIDTH, HEIGHT, 20, 27, 36);
+                colorVertex(background, WIDTH, 0, 20, 27, 36);
+                BufferUploader.drawWithShader(background.buildOrThrow());
+                // Clip to available sampled terrain instead of stretching edge texels into unknown space.
+                float left = Math.max(0, -u0 / (u1 - u0) * WIDTH);
+                float right = Math.min(WIDTH, (1 - u0) / (u1 - u0) * WIDTH);
+                float top = Math.max(0, -v0 / (v1 - v0) * HEIGHT);
+                float bottom = Math.min(HEIGHT, (1 - v0) / (v1 - v0) * HEIGHT);
+                if (left < right && top < bottom) {
+                    RenderSystem.setShader(GameRenderer::getPositionTexShader);
+                    RenderSystem.setShaderTexture(0, map.getId());
+                    BufferBuilder terrain = new BufferBuilder(
+                            vertices,
+                            VertexFormat.Mode.QUADS,
+                            DefaultVertexFormat.POSITION_TEX
+                    );
+                    texVertex(terrain, left, top, Math.max(0, u0), Math.max(0, v0));
+                    texVertex(terrain, left, bottom, Math.max(0, u0), Math.min(1, v1));
+                    texVertex(terrain, right, bottom, Math.min(1, u1), Math.min(1, v1));
+                    texVertex(terrain, right, top, Math.min(1, u1), Math.max(0, v0));
+                    BufferUploader.drawWithShader(terrain.buildOrThrow());
+                }
+                // North-up terrain, smoothly rotating player arrow (Minecraft yaw 0 faces south).
+                RenderSystem.setShader(GameRenderer::getPositionColorShader);
+                BufferBuilder arrows = new BufferBuilder(
+                        vertices,
+                        VertexFormat.Mode.TRIANGLES,
+                        DefaultVertexFormat.POSITION_COLOR
+                );
+                drawAllyArrow(arrows, level, playerX, playerZ, partial);
+                drawCenterArrow(arrows, yaw);
+                BufferUploader.drawWithShader(arrows.buildOrThrow());
+
+            } finally {
+                vertices.clear();
             }
-            // North-up terrain, smoothly rotating player arrow (Minecraft yaw 0 faces south).
-            RenderSystem.setShader(GameRenderer::getPositionColorShader);
-            vertices.begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION_COLOR);
-            drawAllyArrow(level, playerX, playerZ, partial);
-            drawCenterArrow(yaw);
-            BufferUploader.drawWithShader(vertices.end());
         }
     }
 
-    public void drawCenterArrow(float yaw) {
+    public void drawCenterArrow(BufferBuilder bufferBuilder, float yaw) {
         double radians = Math.toRadians(yaw);
         float dx = (float) -Math.sin(radians), dz = (float) Math.cos(radians);
-        centerArrowVertex(dx * 7, dz * 7);
-        centerArrowVertex(-dx * 4 - dz * 4, -dz * 4 + dx * 4);
-        centerArrowVertex(-dx * 4 + dz * 4, -dz * 4 - dx * 4);
+        centerArrowVertex(bufferBuilder, dx * 7, dz * 7);
+        centerArrowVertex(bufferBuilder, -dx * 4 - dz * 4, -dz * 4 + dx * 4);
+        centerArrowVertex(bufferBuilder, -dx * 4 + dz * 4, -dz * 4 - dx * 4);
     }
 
-    private void drawAllyArrow(ClientLevel level, double playerX, double playerZ, float partial) {
+    private void drawAllyArrow(BufferBuilder bufferBuilder, ClientLevel level, double playerX, double playerZ, float partial) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player != null) {
             level.players().stream().filter(p -> !p.getUUID().equals(mc.player.getUUID()) && p.isAlliedTo(mc.player))
@@ -170,26 +189,26 @@ public final class NavBoardScreenTarget implements AutoCloseable {
                         float pixelsPerBlock = (float) WIDTH / NavBoardScreens.viewWidthBlocks();
                         float centerX = WIDTH / 2f + (float) (px - playerX) * pixelsPerBlock;
                         float centerZ = HEIGHT / 2f + (float) (pz - playerZ) * pixelsPerBlock;
-                        colorVertex(centerX + dx * 7,
+                        colorVertex(bufferBuilder, centerX + dx * 7,
                                 centerZ + dz * 7, 255, 150, 70);
-                        colorVertex(centerX - dx * 4 - dz * 4,
+                        colorVertex(bufferBuilder, centerX - dx * 4 - dz * 4,
                                 centerZ - dz * 4 + dx * 4, 255, 150, 70);
-                        colorVertex(centerX - dx * 4 + dz * 4,
+                        colorVertex(bufferBuilder, centerX - dx * 4 + dz * 4,
                                 centerZ - dz * 4 - dx * 4, 255, 150, 70);
                     });
         }
     }
 
-    private void texVertex(float x, float y, float u, float v) {
-        vertices.vertex(x, y, 0).uv(u, v).endVertex();
+    private void texVertex(BufferBuilder bufferBuilder, float x, float y, float u, float v) {
+        bufferBuilder.addVertex(x, y, 0).setUv(u, v);
     }
 
-    private void colorVertex(float x, float y, int r, int g, int b) {
-        vertices.vertex(x, y, 0).color(r, g, b, 255).endVertex();
+    private void colorVertex(BufferBuilder bufferBuilder, float x, float y, int r, int g, int b) {
+        bufferBuilder.addVertex(x, y, 0).setColor(r, g, b, 255);
     }
 
-    private void centerArrowVertex(float x, float y) {
-        colorVertex(WIDTH / 2f + x, HEIGHT / 2f + y, 255, 235, 70);
+    private void centerArrowVertex(BufferBuilder bufferBuilder, float x, float y) {
+        colorVertex(bufferBuilder, WIDTH / 2f + x, HEIGHT / 2f + y, 255, 235, 70);
     }
 
     @Override
@@ -201,6 +220,8 @@ public final class NavBoardScreenTarget implements AutoCloseable {
             Minecraft.getInstance().getTextureManager().release(location);
             map.close();
             target.destroyBuffers();
+        } finally {
+            vertices.close();
         }
     }
 
@@ -232,7 +253,7 @@ public final class NavBoardScreenTarget implements AutoCloseable {
             RenderSystem.activeTexture(org.lwjgl.opengl.GL13.GL_TEXTURE0);
             textureZero = GL11.glGetInteger(GL11.GL_TEXTURE_BINDING_2D);
             RenderSystem.activeTexture(activeTexture);
-            RenderSystem.getModelViewStack().pushPose();
+            RenderSystem.getModelViewStack().pushMatrix();
         }
 
         @Override
@@ -241,7 +262,7 @@ public final class NavBoardScreenTarget implements AutoCloseable {
             GL30.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, read);
             RenderSystem.viewport(viewport[0], viewport[1], viewport[2], viewport[3]);
             RenderSystem.setProjectionMatrix(projection, sorting);
-            RenderSystem.getModelViewStack().popPose();
+            RenderSystem.getModelViewStack().popMatrix();
             RenderSystem.applyModelViewMatrix();
             RenderSystem.setShader(() -> shader);
             RenderSystem.setShaderTexture(0, texture);

@@ -35,7 +35,7 @@ public class ZContentLoader implements IContentLoader {
     }
 
 
-    public void loadItems(Set<Zpack> packs) {
+    public void loadItems(Set<ZPack> packs) {
         packs.forEach(pack -> {
             Path itemPath = pack.outerPack().resolve(ITEM_PATH);
             try {
@@ -49,7 +49,7 @@ public class ZContentLoader implements IContentLoader {
         });
     }
 
-    public void loadBallistics(Set<Zpack> packs) {
+    public void loadBallistics(Set<ZPack> packs) {
         packs.forEach(pack -> {
             Path ballisticPath = pack.outerPack().resolve(AMMO_DEF_PATH);
             try {
@@ -71,7 +71,7 @@ public class ZContentLoader implements IContentLoader {
         });
     }
 
-    public void loadScripts(Set<Zpack> packs) {
+    public void loadScripts(Set<ZPack> packs) {
         ZCLuaEngine.ZcLuaInstance luaEngine = ZCLuaEngine.getInstance();
         Map<ResourceLocation, Path> loadedScripts = new HashMap<>();
 
@@ -151,9 +151,9 @@ public class ZContentLoader implements IContentLoader {
                 });
     }
 
-    public void loadRecipes(Set<Zpack> packs) {
+    public void loadRecipes(Set<ZPack> packs) {
         Map<String, List<RecipePOJO.IngredientItems>> merged = new HashMap<>();
-        for (Zpack pack : packs) {
+        for (ZPack pack : packs) {
             Path recipesPath = pack.outerPack().resolve(RECIPES_PATH);
             try {
                 List<Path> recipePaths = assetManager.getJsonListPathsFromPath(recipesPath);
@@ -185,8 +185,8 @@ public class ZContentLoader implements IContentLoader {
                 .toList();
     }
 
-    public void loadMobRules(Set<Zpack> packs) {
-        for (Zpack pack : packs) {
+    public void loadMobRules(Set<ZPack> packs) {
+        for (ZPack pack : packs) {
             Path mobRulesPath = pack.outerPack().resolve(MOB_RULES_PATH);
             try {
                 assetManager.deserializeFromManifest(
@@ -201,7 +201,7 @@ public class ZContentLoader implements IContentLoader {
     }
 
     @Override
-    public void load(Set<Zpack> packs) {
+    public void load(Set<ZPack> packs) {
         loadItems(packs);
         loadBallistics(packs);
         loadRecipes(packs);

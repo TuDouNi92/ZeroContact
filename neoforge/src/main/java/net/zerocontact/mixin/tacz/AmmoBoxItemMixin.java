@@ -4,13 +4,13 @@ import com.tacz.guns.api.DefaultAssets;
 import com.tacz.guns.api.item.IAmmoBox;
 import com.tacz.guns.item.AmmoBoxItem;
 import com.tacz.guns.resource.index.CommonAmmoIndex;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.caliber.AmmoInjector;
 import net.zerocontact.item.ammo.GenerateAmmo;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,15 +25,15 @@ public class AmmoBoxItemMixin {
 
     @Unique
     private boolean zeroContact$updateCartridge(ItemStack ammoBoxStack, Slot slot) {
-        AmmoInjector.AmmoContext contextFromAmmo = AmmoInjector.read(slot.getItem());
+        AmmoInjector.AmmoContext contextFromAmmo = AmmoInjector.get().readCxtFromStack(slot.getItem());
         if (!(ammoBoxStack.getItem() instanceof IAmmoBox box)) return false;
         if (box.getAmmoCount(ammoBoxStack) <= 0) {
-            AmmoInjector.write(contextFromAmmo, ammoBoxStack);
+            AmmoInjector.get().writeCxtToStack(contextFromAmmo, ammoBoxStack);
         } else if (box.isCreative(ammoBoxStack) && box.getAmmoId(ammoBoxStack).equals(DefaultAssets.EMPTY_AMMO_ID)) {
-            AmmoInjector.write(contextFromAmmo, ammoBoxStack);
+            AmmoInjector.get().writeCxtToStack(contextFromAmmo, ammoBoxStack);
             box.setAmmoId(ammoBoxStack, ResourceLocation.parse(contextFromAmmo.caliber().id()));
         }
-        AmmoInjector.AmmoContext contextFromMag = AmmoInjector.read(ammoBoxStack);
+        AmmoInjector.AmmoContext contextFromMag = AmmoInjector.get().readCxtFromStack(ammoBoxStack);
         return !contextFromAmmo.caliber().equals(contextFromMag.caliber());
     }
 
@@ -64,9 +64,9 @@ public class AmmoBoxItemMixin {
     @ModifyVariable(method = "lambda$overrideStackedOnOther$0", at = @At("STORE"), name = "takeAmmo")
     private ItemStack replaceBullet(ItemStack takeAmmo, int boxAmmoCount, ResourceLocation boxAmmoId,
                                     Slot slot, ItemStack ammoBox, Player player, CommonAmmoIndex index) {
-        AmmoInjector.AmmoContext context = AmmoInjector.read(ammoBox);
+        AmmoInjector.AmmoContext context = AmmoInjector.get().readCxtFromStack(ammoBox);
         if (context != null && !context.isEmpty()) {
-            Item ammoItem = AmmoInjector.getAmmoVariantItem(context);
+            Item ammoItem = AmmoInjector.get().getItemForVariant(context);
             if (ammoItem != null) {
                 ItemStack finalStack = ammoItem instanceof GenerateAmmo ? ammoItem.getDefaultInstance() : takeAmmo;
                 finalStack.setCount(takeAmmo.getCount());
@@ -80,11 +80,10 @@ public class AmmoBoxItemMixin {
             at = @At("STORE"),
             name = "ammoStack", remap = true)
     public ItemStack replaceAmmoStack(ItemStack ammoStack, ItemStack stack) {
-        AmmoInjector.AmmoContext context = AmmoInjector.read(stack);
+        AmmoInjector.AmmoContext context = AmmoInjector.get().readCxtFromStack(stack);
         if (!context.isEmpty()) {
             String variantId = context.caliber().variant();
-            Item ammoItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(variantId));
-            if (ammoItem == null) return ammoStack;
+            Item ammoItem = BuiltInRegistries.ITEM.get(ResourceLocation.parse(variantId));
             return ammoItem instanceof GenerateAmmo ? ammoItem.getDefaultInstance() : ammoStack;
         }
         return ammoStack;

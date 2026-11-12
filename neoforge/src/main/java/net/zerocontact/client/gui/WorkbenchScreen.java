@@ -5,16 +5,17 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.PlainTextButton;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.world.item.Items;
 import net.zerocontact.api.armor.IEquipmentTypeTag;
 import net.zerocontact.client.gui.components.ScrollList;
-import net.zerocontact.menu.WorkbenchMenu;
+import net.zerocontact.item.block.menu.WorkbenchMenu;
 import net.zerocontact.datagen.model.RecipePOJO;
 import net.zerocontact.item.block.WorkBenchEntity;
 import net.zerocontact.network.ModMessages;
@@ -71,9 +72,9 @@ public class WorkbenchScreen extends AbstractContainerScreen<WorkbenchMenu> {
         submitButton.setAlpha(0);
         submitButton.active = false;
         submitButton.setFGColor(LABEL_TEXT_COLOR);
-        this.scrollList = new ScrollList(Minecraft.getInstance(), imageWidth - LIST_INSET * 2, imageHeight,
-                getGuiTop() + 22, getGuiTop() + 150, 36, this);
-        scrollList.setLeftPos(getGuiLeft() + LIST_INSET);
+        this.scrollList = new ScrollList(Minecraft.getInstance(), imageWidth - LIST_INSET * 2, imageHeight, getGuiTop() + 22, 36, this);
+        scrollList.setX(getGuiLeft() + LIST_INSET);
+        scrollList.setHeight(getGuiTop()+76);
         buildTabButtons();
         addRenderableWidget(submitButton);
         addRenderableWidget(scrollList);
@@ -87,8 +88,8 @@ public class WorkbenchScreen extends AbstractContainerScreen<WorkbenchMenu> {
         LinkedHashSet<RecipePOJO> recipes = new LinkedHashSet<>();
         replaceData(tab, (type, data) -> {
             LinkedHashSet<RecipePOJO> filteredRecipes = data.stream().filter(e -> {
-                Item gearItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(e.gearId));
-                if (gearItem == null) return false;
+                Item gearItem = BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(e.gearId)).orElse(Items.AIR);
+                if (gearItem == Items.AIR) return false;
                 return gearItem instanceof IEquipmentTypeTag tag && tag.getArmorType().equals(type);
             }).collect(Collectors.toCollection(LinkedHashSet::new));
             recipes.addAll(filteredRecipes);

@@ -11,6 +11,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.item.ItemArgument;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -49,6 +50,11 @@ public class CommandManager {
     public static final String FAILED_TO_FIND_TARGET_MSG = "Failed to find  target";
 
     public static class CommandSavedData extends SavedData {
+        private static final Factory<CommandSavedData> FACTORY = new Factory<>(
+                CommandSavedData::new,
+                CommandSavedData::load
+        );
+
         private static final String STAMINA_STATE = "staminaState";
         private static final String DOGTAG_STATE = "dogTagState";
         private static final String EXP_BALLISTIC = "experimentalBallistic";
@@ -60,7 +66,7 @@ public class CommandManager {
         CommandSavedData() {
         }
 
-        public static CommandSavedData load(CompoundTag compoundTag) {
+        public static CommandSavedData load(CompoundTag compoundTag, HolderLookup.Provider registries) {
             CommandSavedData data = new CommandSavedData();
             data.staminaState = compoundTag.getBoolean(STAMINA_STATE);
             data.dogTagState = compoundTag.getBoolean(DOGTAG_STATE);
@@ -69,7 +75,7 @@ public class CommandManager {
         }
 
         @Override
-        public @NotNull CompoundTag save(@NotNull CompoundTag compoundTag) {
+        public @NotNull CompoundTag save(@NotNull CompoundTag compoundTag, HolderLookup.@NotNull Provider registries) {
             compoundTag.putBoolean(STAMINA_STATE, staminaState);
             compoundTag.putBoolean(DOGTAG_STATE, dogTagState);
             compoundTag.putBoolean(EXP_BALLISTIC, experimentalBallistic);
@@ -93,9 +99,8 @@ public class CommandManager {
 
         public static CommandSavedData get(ServerLevel level) {
             return level.getDataStorage().computeIfAbsent(
-                    CommandSavedData::load,
-                    CommandSavedData::new,
-                    DATA_NAME
+                    FACTORY
+                    , DATA_NAME
             );
         }
     }

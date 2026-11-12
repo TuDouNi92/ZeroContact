@@ -6,11 +6,13 @@ import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.init.ModDamageTypes;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.*;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.item.ItemStack;
-import net.zerocontact.api.caliber.ICartridgeType;
+import net.minecraft.world.item.component.CustomData;
+import net.zerocontact.caliber.api.ICartridgeType;
 import net.zerocontact.datagen.model.AmmoDataPOJO;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -221,8 +223,9 @@ public enum CaliberHelper {
                 );
             } else {
                 String finalAmmoId = ammoId;
-                if (ammoId.isEmpty() && checkStack.getTag() != null) {
-                    finalAmmoId = checkStack.getTag().getString("AmmoId");
+                CustomData data = checkStack.get(DataComponents.CUSTOM_DATA);
+                if (ammoId.isEmpty() && data != null) {
+                    finalAmmoId = data.copyTag().getString("AmmoId");
                 }
                 return new Caliber(
                         finalAmmoId,
@@ -328,7 +331,7 @@ public enum CaliberHelper {
 
             } else if (caliberData instanceof Caliber caliber) {
                 if (ammoContext != null && ammoContext.isEmpty() && source.getEntity() instanceof ServerPlayer player) {
-                    ammoContext = AmmoInjector.setPlayerGunContext(player);
+                    ammoContext = AmmoInjector.get().setPlayerGunContext(player);
                 }
                 if (ammoContext != null && caliber.equals(ammoContext.caliber())) {
                     result.set(Optional.of(caliber));

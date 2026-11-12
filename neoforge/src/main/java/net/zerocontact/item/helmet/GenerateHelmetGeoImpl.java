@@ -1,20 +1,13 @@
 package net.zerocontact.item.helmet;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.*;
 import net.zerocontact.api.armor.HelmetInfoProvider;
@@ -23,17 +16,14 @@ import net.zerocontact.api.armor.IEquipmentTypeTag;
 import net.zerocontact.api.armor.modular.ModularEquipment;
 import net.zerocontact.api.datagen.IAssetManager;
 import net.zerocontact.armor.modular.model.MountDefinition;
-import net.zerocontact.client.renderer.HelmetRender;
 import net.zerocontact.datagen.model.GenerationRecord;
 import net.zerocontact.datagen.model.ItemPOJO;
 import net.zerocontact.events.ArmorUnEquippedHelper;
 import net.zerocontact.item.armor.forge.BaseArmorGeoImpl;
-import net.zerocontact.models.GenerateModel;
 import org.jetbrains.annotations.NotNull;
 import top.theillusivec4.curios.api.SlotContext;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInfoProvider, IGeoCurioItem, ICombatArmorItem, IAssetManager.GeneratableItem, ModularEquipment {
     private final int defaultDurability;
@@ -111,39 +101,7 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
         return ICombatArmorItem.generateLossDefault(damageAmount, durabilityLossProvider, hits);
     }
 
-    @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
-        if (slot != EquipmentSlot.HEAD) return super.getAttributeModifiers(slot, stack);
-        Multimap<Attribute, AttributeModifier> modifierMultimap = HashMultimap.create();
-        stack.getOrCreateTag().putInt("protection_class", getAbsorb());
-        modifierMultimap.put(Attributes.ARMOR, new AttributeModifier(UUID.nameUUIDFromBytes(("Armor").getBytes()), "CuriosArmorDefense", this.getDefense(), AttributeModifier.Operation.ADDITION));
-        return modifierMultimap;
-    }
 
-    @Override
-    public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(new IClientItemExtensions() {
-            private HelmetRender.HelmetArmorRender<GenerateHelmetGeoImpl> render;
-            private HelmetRender.HelmetItemRender<GenerateHelmetGeoImpl> itemRender;
-
-            @Override
-            public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
-                if (this.render == null) {
-                    this.render = new HelmetRender.HelmetArmorRender<>(new GenerateModel<>(texture, model, animation));
-                }
-                this.render.prepForRender(livingEntity, itemStack, equipmentSlot, original);
-                return this.render;
-            }
-
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                if (this.itemRender == null) {
-                    this.itemRender = new HelmetRender.HelmetItemRender<>(new GenerateModel<>(texture, model, animation));
-                }
-                return this.itemRender;
-            }
-        });
-    }
 
     @Override
     public void curioTick(SlotContext slotContext, ItemStack stack) {
@@ -152,13 +110,15 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
     }
 
     @Override
-    public void onInventoryTick(ItemStack stack, Level level, Player player, int slotIndex, int selectedIndex) {
-        super.onInventoryTick(stack, level, player, slotIndex, selectedIndex);
-        ItemStack helmetStack = player.getItemBySlot(EquipmentSlot.HEAD);
+    public void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entity, int slotId, boolean isSelected) {
+        if(!(entity instanceof LivingEntity livingEntity))return;
+        ItemStack helmetStack = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
         if (stack == helmetStack) {
-            immuneEffectTick(player, helmetStack);
+            immuneEffectTick(livingEntity, helmetStack);
         }
+        super.inventoryTick(stack, level, entity, slotId, isSelected);
     }
+
 
     private void immuneEffectTick(LivingEntity entity, ItemStack stack) {
         if (entity.level().isClientSide) return;
@@ -167,11 +127,10 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
         }
         if (stack.getMaxDamage() - stack.getDamageValue() <= 1) return;
         for (MobEffect immuneEffect : immuneEffects) {
-            if (!entity.hasEffect(immuneEffect)) continue;
-            boolean successRemoved = entity.removeEffect(immuneEffect);
+            if (!entity.hasEffect(Holder.direct(immuneEffect))) continue;
+            boolean successRemoved = entity.removeEffect(Holder.direct(immuneEffect));
             if (effectTick == 0 && successRemoved) {
-                stack.hurtAndBreak(1, entity, lv -> {
-                });
+                stack.hurtAndBreak(1, entity, EquipmentSlot.HEAD);
             }
         }
         effectTick++;
@@ -180,21 +139,6 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
     @Override
     public @NotNull IEquipmentTypeTag.EquipmentType getArmorType() {
         return equipmentType;
-    }
-
-    @Override
-    public ResourceLocation texture() {
-        return this.texture;
-    }
-
-    @Override
-    public ResourceLocation model() {
-        return this.model;
-    }
-
-    @Override
-    public ResourceLocation animation() {
-        return this.animation;
     }
 
     @Override
@@ -207,5 +151,20 @@ public class GenerateHelmetGeoImpl extends BaseArmorGeoImpl implements HelmetInf
                         pojo.getAcceptCategories()
                 )
         ).toList();
+    }
+
+    @Override
+    public ResourceLocation getTexture() {
+        return texture;
+    }
+
+    @Override
+    public ResourceLocation getModel() {
+        return model;
+    }
+
+    @Override
+    public ResourceLocation getAnimation() {
+        return animation;
     }
 }

@@ -2,28 +2,32 @@ package net.zerocontact.armor.modular.module.nvg.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
+import net.zerocontact.ZeroContact;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.module.nvg.api.INvg;
 import net.zerocontact.armor.modular.module.nvg.client.ClientInteractionManger;
-import net.zerocontact.capability.CapabilityRegistries;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+import java.util.Optional;
+
+@EventBusSubscriber(modid = ZeroContact.MOD_ID, value = Dist.CLIENT)
 public final class BatteryStatusOverlay {
-    public static final IGuiOverlay NVG_BATTERY = (forgeGui, graphics, partialTick, w, h) -> {
+    public static final LayeredDraw.Layer NVG_BATTERY = (forgeGui, deltaTracker) -> {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || !minecraft.player.isAlive() || minecraft.player.isSpectator()
                 || minecraft.options.hideGui || !minecraft.options.getCameraType().isFirstPerson()
                 || minecraft.getCameraEntity() != minecraft.player) return;
-        float alpha = ClientInteractionManger.get().vignetteAlpha(partialTick);
+        float alpha = ClientInteractionManger.get().vignetteAlpha(deltaTracker.getGameTimeDeltaPartialTick(false));
         ItemStack checkStack = ClientInteractionManger.get().module();
         if (checkStack.getItem() instanceof INvg) {
-            checkStack.getCapability(CapabilityRegistries.NVG).ifPresent(cap -> {
+            Optional.ofNullable(checkStack.getCapability(ModularCapabilityRegistry.NVG)).ifPresent(cap -> {
                 String battery = "Power";
                 int fontWidth = minecraft.font.width(battery);
                 int barWidth = 12;
@@ -31,15 +35,15 @@ public final class BatteryStatusOverlay {
                 int screenMargin = 4;
                 // Include the label's shadow when checking the screen boundary.
                 int overlayWidth = Math.max(barWidth, fontWidth + 1);
-                int hotbarRight = w / 2 + 91;
+                int hotbarRight = forgeGui.guiWidth() / 2 + 91;
                 // Reserve space for an offhand slot or the hotbar attack indicator.
                 int overlayLeft = hotbarRight;
-                int heightY = h - 2;
-                if (overlayLeft + overlayWidth > w - screenMargin) {
-                    overlayLeft = Math.max(screenMargin,
-                            Math.min(hotbarRight - overlayWidth, w - screenMargin - overlayWidth));
+                int heightY = forgeGui.guiHeight() - 2;
+                if (overlayLeft + overlayWidth > forgeGui.guiWidth() - screenMargin) {
+                    overlayLeft = Math.clamp(hotbarRight - overlayWidth, screenMargin,
+                            Math.max(screenMargin, forgeGui.guiWidth() - screenMargin - overlayWidth));
                     // Stay above the hotbar and the current health/armor/air rows.
-                    heightY = h - Math.max(22, Math.max(forgeGui.leftHeight, forgeGui.rightHeight)) - screenMargin;
+                    heightY = forgeGui.guiHeight() - Math.max(22, Math.max(minecraft.gui.leftHeight, minecraft.gui.rightHeight)) - screenMargin;
                 }
                 int startX = overlayLeft + (overlayWidth - barWidth) / 2;
                 int widthX = startX + barWidth;
@@ -47,7 +51,7 @@ public final class BatteryStatusOverlay {
                 int labelY = heightY - maxHeight - minecraft.font.lineHeight - 2;
                 float maxBattery = cap.getMaxBattery();
                 float remainBatteryPercent = maxBattery > 0
-                        ? Math.max(0f, Math.min(1f, cap.getBattery() / maxBattery))
+                        ? Math.clamp(cap.getBattery() / maxBattery, 0f, 1f)
                         : 0f;
                 int startY = heightY - Math.round(maxHeight * remainBatteryPercent);
                 RenderSystem.disableDepthTest();
@@ -56,9 +60,9 @@ public final class BatteryStatusOverlay {
                 RenderSystem.defaultBlendFunc();
                 RenderSystem.setShader(GameRenderer::getPositionShader);
                 RenderSystem.setShaderColor(1, 1, 1, alpha);
-                graphics.fill(startX, startY, widthX, heightY, 0xffffffff);
-                graphics.fill(startX, startY, widthX, heightY - maxHeight, 0xaaaaaaaa);
-                graphics.drawString(minecraft.font, battery, labelX, labelY, 0xffffff);
+                forgeGui.fill(startX, startY, widthX, heightY, 0xffffffff);
+                forgeGui.fill(startX, startY, widthX, heightY - maxHeight, 0xaaaaaaaa);
+                forgeGui.drawString(minecraft.font, battery, labelX, labelY, 0xffffff);
                 RenderSystem.setShaderColor(1, 1, 1, 1);
                 RenderSystem.disableBlend();
                 RenderSystem.depthMask(true);
@@ -69,7 +73,7 @@ public final class BatteryStatusOverlay {
     };
 
     @SubscribeEvent
-    public static void onRegisterOverlay(RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll("zc_nvg_battery", NVG_BATTERY);
+    public static void onRegisterOverlay(RegisterGuiLayersEvent event) {
+        event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "zc_nvg_battery"), NVG_BATTERY);
     }
 }

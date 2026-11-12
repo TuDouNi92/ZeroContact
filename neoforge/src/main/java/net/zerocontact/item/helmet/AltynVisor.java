@@ -1,22 +1,24 @@
 package net.zerocontact.item.helmet;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraft.world.item.component.CustomData;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.zerocontact.ZeroContact;
 import net.zerocontact.api.armor.Toggleable;
 import net.zerocontact.animation_data.AnimateData;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.constant.DataTickets;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.*;
-import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import static net.zerocontact.ZeroContact.MOD_ID;
@@ -40,6 +42,7 @@ public class AltynVisor {
         public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
             controllerRegistrar.add(new AnimationController<>(this, "controller", 0, state -> {
                         ItemStack animStack = state.getData(DataTickets.ITEMSTACK);
+                        if(animStack==null)return PlayState.CONTINUE;
                         AnimationProcessor.QueuedAnimation queuedAnimation = state.getController().getCurrentAnimation();
                         if (animStack.getItem() instanceof Toggleable toggleable) {
                             if (queuedAnimation != null) {
@@ -66,8 +69,10 @@ public class AltynVisor {
 
         @Override
         public AnimateData.VisorAnimateData readAnimData(ItemStack stack) {
-            CompoundTag tag = stack.getOrCreateTag().getCompound("AnimCompound");
             AnimateData.VisorAnimateData animateData = AnimateData.VisorAnimateData.create("empty", 0, false);
+            @Nullable CustomData data = stack.get(DataComponents.CUSTOM_DATA);
+            if(data==null)return animateData;
+            CompoundTag tag = data.copyTag().getCompound("AnimCompound");;
             String animName = tag.getString("anim_name");
             double length = tag.getDouble("anim_length");
             boolean isPlaying = tag.getBoolean("anim_playing");
@@ -78,11 +83,15 @@ public class AltynVisor {
         @Override
         public void saveAnimData(@Nullable AnimateData.VisorAnimateData animateData, ItemStack stack) {
             if (animateData == null) return;
-            CompoundTag tag = stack.getOrCreateTag().getCompound("AnimCompound");
-            tag.putString("anim_name", animateData.animationName);
-            tag.putDouble("anim_length", animateData.animLength);
-            tag.putBoolean("anim_playing", animateData.isPlaying);
-            stack.getOrCreateTag().put("AnimCompound", tag);
+            @Nullable CustomData data = stack.get(DataComponents.CUSTOM_DATA);
+            if(data==null)return;
+            CompoundTag tag = data.copyTag();
+            CompoundTag animCompound = tag.getCompound("AnimCompound");
+            animCompound.putString("anim_name", animateData.animationName);
+            animCompound.putDouble("anim_length", animateData.animLength);
+            animCompound.putBoolean("anim_playing", animateData.isPlaying);
+            tag.put("AnimCompound",animCompound);
+            CustomData.set(DataComponents.CUSTOM_DATA,stack,tag);
         }
 
         @Override
@@ -90,13 +99,21 @@ public class AltynVisor {
             return cache;
         }
 
-        @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
+        @EventBusSubscriber(modid = ZeroContact.MOD_ID)
         static class VisorAnim {
             @SubscribeEvent
-            public static void visorTick(net.minecraftforge.event.TickEvent.PlayerTickEvent tickEvent) {
-                Player player = tickEvent.player;
+            public static void visorPreTick(net.neoforged.neoforge.event.tick.PlayerTickEvent.Pre event) {
+                visorTick(event.getEntity());
+            }
+
+            @SubscribeEvent
+            public static void visorPostTick(net.neoforged.neoforge.event.tick.PlayerTickEvent.Post event) {
+                visorTick(event.getEntity());
+            }
+
+            private static void visorTick(Player player) {
                 if (player.level() instanceof ServerLevel serverLevel) {
-                    ItemStack helmetStack = tickEvent.player.getItemBySlot(EquipmentSlot.HEAD);
+                    ItemStack helmetStack = player.getItemBySlot(EquipmentSlot.HEAD);
                     if (helmetStack.getItem() instanceof Toggleable toggleable
                             && helmetStack.getItem() instanceof SingletonGeoAnimatable animatable) {
                         if (toggleable.getTriggered(helmetStack)) {

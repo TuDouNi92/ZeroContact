@@ -9,10 +9,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.zerocontact.ZeroContact;
 import net.zerocontact.caliber.extension.HookDispatcher;
 import net.zerocontact.caliber.extension.HookEventTrigger;
 import net.zerocontact.caliber.extension.model.HookContext;
@@ -24,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = ZeroContact.MOD_ID)
 public class BulletBinder {
     private static final Map<UUID, AmmoInjector.AmmoContext> mapping = new HashMap<>();
 
@@ -82,9 +83,9 @@ public class BulletBinder {
                 player.getInventory().items.stream()
                         .filter(itemStack -> itemStack.getItem() instanceof AbstractGunItem)
                         .forEach(stack -> {
-                            AmmoInjector.AmmoContext context = AmmoInjector.read(stack);
+                            AmmoInjector.AmmoContext context = AmmoInjector.get().readCxtFromStack(stack);
                             if (context.isEmpty()) {
-                                AmmoInjector.setEntityGunContext(stack);
+                                AmmoInjector.get().setDefaultAmmoVariantInGun(stack);
                             }
                         });
             }
@@ -92,9 +93,9 @@ public class BulletBinder {
             else {
                 ItemStack checkHandStack = livingEntity.getMainHandItem();
                 if (checkHandStack.getItem() instanceof AbstractGunItem) {
-                    AmmoInjector.AmmoContext context = AmmoInjector.read(checkHandStack);
+                    AmmoInjector.AmmoContext context = AmmoInjector.get().readCxtFromStack(checkHandStack);
                     if (context.isEmpty()) {
-                        AmmoInjector.setEntityGunContext(checkHandStack);
+                        AmmoInjector.get().prepareGunCtxForEntity(livingEntity);
                     }
                 }
             }
@@ -103,10 +104,10 @@ public class BulletBinder {
     }
 
     private static void bindBulletContext(EntityKineticBullet bullet, Entity owner) {
-        if (owner instanceof LivingEntity livingEntity) {
+        if (owner instanceof LivingEntity livingEntity && !bullet.level().isClientSide) {
             ItemStack checkHandStack = livingEntity.getMainHandItem();
             if (!(checkHandStack.getItem() instanceof AbstractGunItem)) return;
-            AmmoInjector.AmmoContext context = AmmoInjector.read(checkHandStack);
+            AmmoInjector.AmmoContext context = AmmoInjector.get().readCxtFromStack(checkHandStack);
             if (!context.isEmpty()) {
                 HookDispatcher.fire(
                         HookEventTrigger.SPAWN,
@@ -124,7 +125,7 @@ public class BulletBinder {
         }
 
         //ClientLevel to operate tracer color
-        if (owner == null) {
+        if (bullet.level().isClientSide) {
             AmmoInjector.AmmoContext context = getContext(bullet);
             if (context == null || context.isEmpty()) return;
             bullet.getPersistentData().putIntArray(EntityKineticBullet.TRACER_COLOR_OVERRIDER_KEY, context.caliber().tracerColor());

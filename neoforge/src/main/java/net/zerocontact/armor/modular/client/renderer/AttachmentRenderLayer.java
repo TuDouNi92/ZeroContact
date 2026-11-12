@@ -9,14 +9,14 @@ import net.minecraft.world.item.ItemStack;
 import net.zerocontact.api.armor.modular.ModularEquipment;
 import net.zerocontact.armor.modular.ModuleQuery;
 import net.zerocontact.armor.modular.model.MountDefinition;
+import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.cache.object.GeoBone;
-import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.renderer.GeoArmorRenderer;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.renderer.GeoRenderer;
 import software.bernie.geckolib.renderer.layer.BlockAndItemGeoLayer;
-import software.bernie.geckolib.util.RenderUtils;
+import software.bernie.geckolib.util.RenderUtil;
 
 public class AttachmentRenderLayer<T extends Item & GeoItem & GeoAnimatable> extends BlockAndItemGeoLayer<T> {
     private final GeoRenderer<T> geoRenderer;
@@ -52,7 +52,7 @@ public class AttachmentRenderLayer<T extends Item & GeoItem & GeoAnimatable> ext
                 if (module.isEmpty()) continue;
                 poseStack.pushPose();
                 try {
-                    RenderUtils.translateToPivotPoint(poseStack, bone);
+                    RenderUtil.translateToPivotPoint(poseStack, bone);
                     super.renderStackForBone(poseStack, bone, module, animatable, bufferSource, partialTick, packedLight, packedOverlay);
                 } finally {
                     poseStack.popPose();

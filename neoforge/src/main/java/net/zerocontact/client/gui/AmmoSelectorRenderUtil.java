@@ -7,8 +7,10 @@ import net.minecraft.client.renderer.GameRenderer;
 import org.joml.Matrix4f;
 
 public class AmmoSelectorRenderUtil {
-    public record Ring(float centerX, float centerY, float innerRadius, float outerRadius, int segmentCount, float gapDegrees){
+    public record Ring(float centerX, float centerY, float innerRadius, float outerRadius, int segmentCount,
+                       float gapDegrees) {
     }
+
     public static void drawSegmentedRing(
             GuiGraphics guiGraphics,
             Ring ring,
@@ -38,9 +40,8 @@ public class AmmoSelectorRenderUtil {
         RenderSystem.defaultBlendFunc();
         RenderSystem.disableCull();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        BufferBuilder buffer = Tesselator.getInstance().getBuilder();
-        buffer.begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION_COLOR);
-
+        Tesselator tesselator = Tesselator.getInstance();
+        BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION_COLOR);
         double baseAngle = -Math.PI / 2.0;
 
         for (int segment = 0; segment < ring.segmentCount; segment++) {
@@ -48,7 +49,7 @@ public class AmmoSelectorRenderUtil {
             double endAngle = baseAngle + (segment + 1) * sectionAngle - gapAngle / 2.0;
 
             drawRingSection(
-                    buffer,
+                    bufferBuilder,
                     matrix,
                     ring,
                     startAngle,
@@ -61,7 +62,7 @@ public class AmmoSelectorRenderUtil {
             );
         }
 
-        BufferUploader.drawWithShader(buffer.end());
+        BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
 
         RenderSystem.enableCull();
         RenderSystem.disableBlend();
@@ -99,8 +100,8 @@ public class AmmoSelectorRenderUtil {
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
 
-        BufferBuilder buffer = Tesselator.getInstance().getBuilder();
-        buffer.begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION_COLOR);
+        Tesselator tesselator = Tesselator.getInstance();
+        BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION_COLOR);
 
         double baseAngle = -Math.PI / 2.0;
         double startAngle = baseAngle + segmentIndex * sectionAngle + gapAngle / 2.0;
@@ -119,7 +120,7 @@ public class AmmoSelectorRenderUtil {
                 alpha
         );
 
-        BufferUploader.drawWithShader(buffer.end());
+        BufferUploader.drawWithShader(buffer.buildOrThrow());
 
         RenderSystem.enableCull();
         RenderSystem.disableBlend();
@@ -153,15 +154,15 @@ public class AmmoSelectorRenderUtil {
             float innerX2 = ring.centerX + (float) Math.cos(angle2) * ring.innerRadius;
             float innerY2 = ring.centerY + (float) Math.sin(angle2) * ring.innerRadius;
 
-            buffer.vertex(matrix, outerX1, outerY1, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrix, outerX2, outerY2, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrix, innerX1, innerY1, 0).color(red, green, blue, alpha).endVertex();
-
-            buffer.vertex(matrix, outerX2, outerY2, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrix, innerX2, innerY2, 0).color(red, green, blue, alpha).endVertex();
-            buffer.vertex(matrix, innerX1, innerY1, 0).color(red, green, blue, alpha).endVertex();
+            buffer.addVertex(matrix, outerX1, outerY1, 0).setColor(red, green, blue, alpha);
+            buffer.addVertex(matrix, outerX2, outerY2, 0).setColor(red, green, blue, alpha);
+            buffer.addVertex(matrix, innerX1, innerY1, 0).setColor(red, green, blue, alpha);
+            buffer.addVertex(matrix, outerX2, outerY2, 0).setColor(red, green, blue, alpha);
+            buffer.addVertex(matrix, innerX2, innerY2, 0).setColor(red, green, blue, alpha);
+            buffer.addVertex(matrix, innerX1, innerY1, 0).setColor(red, green, blue, alpha);
         }
     }
+
     public static int getHoveredSegment(
             double mouseX,
             double mouseY,

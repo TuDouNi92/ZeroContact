@@ -1,20 +1,21 @@
 package net.zerocontact.item.block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.datagen.model.RecipePOJO;
 import net.zerocontact.network.c2s.BuyGearsPacket;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.*;
-import software.bernie.geckolib.core.object.PlayState;
+
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.ArrayList;
@@ -37,8 +38,7 @@ public class WorkBenchEntity extends BlockEntity implements GeoBlockEntity {
     public static void buy(BuyGearsPacket msg, ServerPlayer player) {
         BlockEntity be = player.level().getBlockEntity(msg.pos());
         if (!(be instanceof WorkBenchEntity workBenchEntity)) return;
-        ResourceLocation gearKey = ForgeRegistries.ITEMS.getKey(msg.gearItem());
-        if (gearKey == null) return;
+        ResourceLocation gearKey = BuiltInRegistries.ITEM.getKey(msg.gearItem());
         Optional<RecipePOJO> gearRecipeData = recipeData.stream().filter(data -> data.gearId.equals(gearKey.toString())).findFirst();
         if (gearRecipeData.isEmpty()) return;
         if (workBenchEntity.canTrade(gearRecipeData.get(), player)) {
@@ -68,8 +68,8 @@ public class WorkBenchEntity extends BlockEntity implements GeoBlockEntity {
         if (player.isCreative()) return true;
         Inventory inv = player.getInventory();
         for (RecipePOJO.IngredientItems req : data.ingredientItems) {
-            Item item = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(req.itemId));
-            if (item == null) return false;
+            Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(req.itemId));
+            if(item == Items.AIR)continue;
             int total = 0;
             for (ItemStack stack : inv.items) {
                 if (stack.getItem() == item) {
@@ -87,8 +87,8 @@ public class WorkBenchEntity extends BlockEntity implements GeoBlockEntity {
         if (player.isCreative()) return;
         Inventory inv = player.getInventory();
         for (RecipePOJO.IngredientItems req : data.ingredientItems) {
-            Item item = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(req.itemId));
-            if (item == null) continue;
+            Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(req.itemId));
+            if (item == Items.AIR)continue;
             int remaining = req.neededCount;
             for (ItemStack stack : inv.items) {
                 if (stack.getItem() == item && remaining > 0) {
@@ -103,8 +103,8 @@ public class WorkBenchEntity extends BlockEntity implements GeoBlockEntity {
     }
 
     public void giveItem(ServerPlayer player, String id) {
-        Item targetItem = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(id));
-        if (targetItem == null) return;
+        Item targetItem = BuiltInRegistries.ITEM.get(ResourceLocation.parse(id));
+        if(targetItem == Items.AIR)return;
         ItemStack stack = new ItemStack(targetItem);
         stack.setCount(stack.getMaxStackSize());
         player.getInventory().placeItemBackInInventory(stack, true);

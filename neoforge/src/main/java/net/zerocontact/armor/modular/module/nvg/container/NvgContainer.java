@@ -3,10 +3,20 @@ package net.zerocontact.armor.modular.module.nvg.container;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraft.world.item.ItemStack;
 import net.zerocontact.ZeroContact;
+import net.zerocontact.armor.modular.container.StackModuleState;
 
-public class NvgContainer implements INBTSerializable<CompoundTag> {
+public class NvgContainer extends StackModuleState {
+    public NvgContainer() {
+        super("nvg");
+    }
+
+    public NvgContainer(ItemStack stack) {
+        this();
+        bind(stack);
+    }
+
     public static final ResourceLocation STATE_ON = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "nvg/on");
     public static final ResourceLocation STATE_OFF = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "nvg/off");
     public static final ResourceLocation STATE_NO_POWER = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "nvg/no_power");
@@ -28,39 +38,50 @@ public class NvgContainer implements INBTSerializable<CompoundTag> {
     }
 
     public PowerStatus getPowerStatus() {
+        refreshState();
         return powerStatus;
     }
 
     /** Server only: recompute even while disabled and before validating an action. */
     public void refreshPowerStatus(float externalRemaining, float externalCapacity) {
+        refreshState();
         powerStatus = externalRemaining > 0
                 ? new PowerStatus(PowerSource.EXTERNAL, externalRemaining, externalCapacity)
                 : new PowerStatus(battery > 0 ? PowerSource.INTERNAL : PowerSource.NONE, battery, maxBattery);
+        changed();
     }
 
     public boolean getEnabled() {
+        refreshState();
         return enabled;
     }
 
     public void setEnabled(boolean enabled) {
+        refreshState();
         this.enabled = enabled;
+        changed();
     }
 
     public float getMaxBattery() {
+        refreshState();
         return powerStatus.capacity();
     }
 
     public float getBattery() {
+        refreshState();
         return powerStatus.remaining();
     }
 
     public boolean outOfPower() {
+        refreshState();
         return !powerStatus.powered();
     }
 
     /** Server only. Refresh snapshots after all consumers have drawn power. */
     public void consumeInternalBattery() {
+        refreshState();
         battery = Math.max(0, battery - 1);
+        changed();
     }
 
     @Override
@@ -97,6 +118,7 @@ public class NvgContainer implements INBTSerializable<CompoundTag> {
         }
         // On the server this snapshot must be recomputed before use; on the client
         // it is the authoritative display state received through ModuleSyncService.
+        changed();
     }
 
     private static float clampBattery(float value, float capacity) {

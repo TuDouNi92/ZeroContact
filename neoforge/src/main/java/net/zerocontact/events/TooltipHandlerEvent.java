@@ -7,14 +7,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.zerocontact.ZeroContact;
 import net.zerocontact.caliber.AmmoInjector;
 import net.zerocontact.caliber.CaliberHelper;
-import net.zerocontact.capability.CapabilityRegistries;
+import net.zerocontact.caliber.capability.CapabilityRegistry;
 import net.zerocontact.client.tooltip.AdvancedAmmoInfoComponents;
 import net.zerocontact.config.ModConfigs;
 import net.zerocontact.datagen.loader.ZPackManager;
@@ -23,8 +23,9 @@ import net.zerocontact.item.ammo.GenerateAmmo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@EventBusSubscriber(modid = ZeroContact.MOD_ID, value = Dist.CLIENT)
 public class TooltipHandlerEvent {
     public static final String SHOW_BULLET_DATA_LABEL = "tooltip.zerocontact.bullet_data";
 
@@ -45,7 +46,7 @@ public class TooltipHandlerEvent {
                             .withStyle(ChatFormatting.ITALIC);
                     MutableComponent packHint = Component.translatable("tooltip.zerocontact.pack_hint").withStyle(ChatFormatting.GRAY);
                     List<MutableComponent> packInfo = new ArrayList<>(List.of(packHeader, packHint));
-                    if (DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> Screen::hasShiftDown)) {
+                    if (Screen.hasShiftDown()) {
                         packInfo.addAll(ZPackManager.getInstance().outerPacks
                                 .stream()
                                 .filter(pack -> pack.tab().equals(entry.getValue()))
@@ -64,9 +65,9 @@ public class TooltipHandlerEvent {
         if (!ModConfigs.CLIENT.ammoTypeTooltip().get()) return;
         ItemStack checkStack = event.getItemStack();
         if (IGun.getIGunOrNull(checkStack) != null) {
-            checkStack.getCapability(CapabilityRegistries.CARTRIDGE).ifPresent(cap -> {
+            Optional.ofNullable(checkStack.getCapability(CapabilityRegistry.CARTRIDGE)).ifPresent(cap -> {
                 String ammoVariantId = cap.getAmmoVariantInGun(checkStack);
-                CaliberHelper.Caliber caliber = AmmoInjector.read(checkStack).caliber();
+                CaliberHelper.Caliber caliber = AmmoInjector.get().readCxtFromStack(checkStack).caliber();
                 MutableComponent ammoLabel = Component.translatable("tooltip.zerocontact.gun.ammoVariant").withStyle(ChatFormatting.GOLD).append(":");
                 ItemStack ammoStack = cap.getDefaultStack(ammoVariantId);
                 Component ammoName = Component.literal("\uD83E\uDC35 ").append(Component.translatable(ammoStack.getDescriptionId())).withStyle(ChatFormatting.YELLOW);
@@ -79,7 +80,7 @@ public class TooltipHandlerEvent {
                 } else {
                     ammoLabel.append(ammoName);
                     event.getToolTip().addAll(List.of(ammoName, ammoAdvancedInfo));
-                    if (DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> Screen::hasShiftDown)) {
+                    if (Screen.hasShiftDown()) {
                         List<Component> fullAmmoData = AdvancedAmmoInfoComponents.create(caliber, false);
                         event.getToolTip().addAll(fullAmmoData);
                     }

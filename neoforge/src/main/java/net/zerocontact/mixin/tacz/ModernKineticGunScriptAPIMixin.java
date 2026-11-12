@@ -5,21 +5,19 @@ import com.tacz.guns.api.item.IAmmoBox;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.item.ModernKineticGunScriptAPI;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.zerocontact.api.caliber.ICartridgeHolder;
+import net.minecraft.world.item.Items;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
+import net.zerocontact.caliber.api.ICartridgeHolder;
 import net.zerocontact.caliber.AmmoInjector;
+import net.zerocontact.caliber.capability.CapabilityRegistry;
 import net.zerocontact.caliber.compat.ReloadManager;
-import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.compat.MagazinesCompatHandler;
 import net.zerocontact.caliber.ServerAmmoSelector;
 import org.jetbrains.annotations.Nullable;
@@ -32,6 +30,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.LinkedHashMap;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import com.tacz.guns.api.item.builder.AmmoItemBuilder;
@@ -86,7 +85,7 @@ public abstract class ModernKineticGunScriptAPIMixin {
             return;
         }
 
-        LazyOptional<ICartridgeHolder> gunCartridgeHolder = itemStack.getCapability(CapabilityRegistries.CARTRIDGE);
+        Optional<ICartridgeHolder> gunCartridgeHolder = Optional.ofNullable(itemStack.getCapability(CapabilityRegistry.CARTRIDGE));
         String selectedVariant = gunCartridgeHolder.map(cap -> cap.getClientSelectedAmmoVariant(itemStack)).orElse("");
         IItemHandler filteredHandler = ServerAmmoSelector.filteredAmmoHandler(
                 zeroContact$reloadInventory.get().rawHandler(), selectedVariant, itemStack);
@@ -120,7 +119,7 @@ public abstract class ModernKineticGunScriptAPIMixin {
 
     @Unique
     private int zeroContact$checkDropAmmo(int neededAmount, @Nullable ItemStack rigs) {
-        ICartridgeHolder cap = itemStack.getCapability(CapabilityRegistries.CARTRIDGE).resolve().orElse(null);
+        ICartridgeHolder cap = itemStack.getCapability(CapabilityRegistry.CARTRIDGE);
         if (cap == null) return neededAmount;
         if (MagazinesCompatHandler.get().getCompat().map(compat -> compat.isMagazineCompatibleWithGun(itemStack)).orElse(false))
             return neededAmount;
@@ -128,7 +127,8 @@ public abstract class ModernKineticGunScriptAPIMixin {
         if (clientSelected.isEmpty()) return neededAmount;
         ResourceLocation selectedId = ResourceLocation.tryParse(clientSelected);
         if (selectedId == null) return neededAmount;
-        Item selectedItem = ForgeRegistries.ITEMS.getValue(selectedId);
+        Item selectedItem = BuiltInRegistries.ITEM.get(selectedId);
+        if(selectedItem == Items.AIR)return neededAmount;
         ItemStack selectedAmmoStack;
         if (selectedItem instanceof GenerateAmmo) {
             selectedAmmoStack = selectedItem.getDefaultInstance();
@@ -160,9 +160,8 @@ public abstract class ModernKineticGunScriptAPIMixin {
             CallbackInfoReturnable<Integer> cir,
             IItemHandler itemHandler,
             @Nullable ItemStack rigs) {
-        ICartridgeHolder cap = itemStack.getCapability(CapabilityRegistries.CARTRIDGE).resolve().orElse(null);
+        ICartridgeHolder cap = itemStack.getCapability(CapabilityRegistry.CARTRIDGE);
         if (cap == null) return;
-
         int actualNeededAmount = zeroContact$checkDropAmmo(neededAmount, rigs);
         String selectedVariant = cap.getClientSelectedAmmoVariant(itemStack);
         IItemHandler filteredHandler = ServerAmmoSelector.filteredAmmoHandler(itemHandler, selectedVariant, itemStack);
@@ -212,7 +211,7 @@ public abstract class ModernKineticGunScriptAPIMixin {
         }
 
         cap.setAmmoVariantInGun(itemStack, selectedVariant);
-        zeroContact$remapSelectedMagazineSlot(itemStack, filteredHandler);
+        MagazinesCompatHandler.get().getCompat().ifPresent(compat->{compat.remapSelectedMagazineSlot(itemStack, filteredHandler);});
         int extractedAmount = this.abstractGunItem.findAndExtractInventoryAmmo(filteredHandler, itemStack, extractionAmount);
         int amountForCaller = extractedAmount;
         if (extractionAmount > requestedAmount) {
@@ -233,29 +232,6 @@ public abstract class ModernKineticGunScriptAPIMixin {
         cir.setReturnValue(amountForCaller);
     }
 
-    @Unique
-    private static void zeroContact$remapSelectedMagazineSlot(
-            ItemStack gunStack,
-            IItemHandler handler
-    ) {
-        CompoundTag tag = gunStack.getTag();
-        if (tag == null || !tag.contains("TaCZMag_SelectedSlot", Tag.TAG_INT)) {
-            return;
-        }
-
-        if (!(handler instanceof ServerAmmoSelector.MappedItemHandler mapped)) {
-            return;
-        }
-
-        int rawSlot = tag.getInt("TaCZMag_SelectedSlot");
-        int filteredSlot = mapped.toFilteredSlot(rawSlot);
-
-        if (filteredSlot >= 0) {
-            tag.putInt("TaCZMag_SelectedSlot", filteredSlot);
-        } else {
-            tag.remove("TaCZMag_SelectedSlot");
-        }
-    }
 
     @Redirect(
             method = "shootOnce",
@@ -268,7 +244,7 @@ public abstract class ModernKineticGunScriptAPIMixin {
             )
     )
     public Object overrideBulletAmount(ModernKineticGunScriptAPI instance, String id, Class<?> type, Object value) {
-        AmmoInjector.AmmoContext context = AmmoInjector.read(itemStack);
+        AmmoInjector.AmmoContext context = AmmoInjector.get().readCxtFromStack(itemStack);
         if (!context.isEmpty()) {
             return context.caliber().bulletAmount();
         }

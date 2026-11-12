@@ -1,95 +1,94 @@
 package net.zerocontact.armor.modular.registry;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.capabilities.ItemCapability;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.armor.modular.ModuleController;
 import net.zerocontact.api.armor.modular.ModuleUseHandler;
-import net.zerocontact.armor.modular.module.battery.capability.BatteryProvider;
-import net.zerocontact.armor.modular.module.beacon.capability.BeaconProvider;
-import net.zerocontact.armor.modular.module.beacon.service.BeaconController;
-import net.zerocontact.armor.modular.module.headset.capability.HeadsetProvider;
-import net.zerocontact.armor.modular.module.headset.service.HeadsetController;
-import net.zerocontact.armor.modular.module.nvg.capability.NvgProvider;
-import net.zerocontact.armor.modular.module.nvg.service.NvgController;
-import net.zerocontact.armor.modular.module.pouch.capability.AdminPouchProvider;
-import net.zerocontact.armor.modular.module.pouch.capability.PouchProvider;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.model.MountCategory;
 import net.zerocontact.armor.modular.model.MountDefinition;
+import net.zerocontact.armor.modular.module.battery.container.BatteryContainer;
+import net.zerocontact.armor.modular.module.beacon.container.BeaconContainer;
+import net.zerocontact.armor.modular.module.beacon.service.BeaconController;
+import net.zerocontact.armor.modular.module.headset.container.HeadsetContainer;
+import net.zerocontact.armor.modular.module.headset.service.HeadsetController;
+import net.zerocontact.armor.modular.module.nvg.container.NvgContainer;
+import net.zerocontact.armor.modular.module.nvg.service.NvgController;
+import net.zerocontact.armor.modular.module.pouch.container.AdminPouchContainer;
+import net.zerocontact.armor.modular.module.pouch.container.PouchContainer;
+import net.zerocontact.armor.modular.module.pouch.container.navboard.NavBoardContainer;
 import net.zerocontact.armor.modular.module.pouch.service.AdminPouchController;
 import net.zerocontact.armor.modular.module.pouch.service.NavBoardController;
-import net.zerocontact.armor.modular.module.pouch.capability.NavBoardProvider;
-import net.zerocontact.armor.modular.module.radio.capability.RadioProvider;
+import net.zerocontact.armor.modular.module.radio.container.RadioContainer;
 import net.zerocontact.armor.modular.module.radio.service.MBITRController;
-import net.zerocontact.capability.CapabilityRegistries;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 public final class ModuleRegistry {
     public static Optional<ModuleController> getController(ItemStack stack) {
         if (!(stack.getItem() instanceof net.zerocontact.api.armor.modular.EquipmentModule module)) {
             return Optional.empty();
         }
-        CapabilityEntry trait = getTrait(module.getModuleTrait());
+        CapabilityEntry<?> trait = getTrait(module.getModuleTrait());
         return trait == null ? Optional.empty() : Optional.ofNullable(trait.controller());
     }
 
-    public record CapabilityEntry(
-            Capability<?> capability,
+    public record CapabilityEntry<T>(
+            ItemCapability<T, Void> capability,
             ModuleController controller,
-            Supplier<? extends ICapabilityProvider> providerFactory,
+            Function<ItemStack, T> containerFactory,
             Optional<ModuleUseHandler> useHandler
     ) {
-        public CapabilityEntry(Capability<?> capability, @Nullable ModuleController controller,
-                               Supplier<? extends ICapabilityProvider> providerFactory) {
-            this(capability, controller, providerFactory, Optional.empty());
+        public CapabilityEntry(ItemCapability<T, Void> capability, @Nullable ModuleController controller,
+                               Function<ItemStack, T> containerFactory) {
+            this(capability, controller, containerFactory, Optional.empty());
         }
 
-        public CapabilityEntry withUse(ModuleUseHandler handler) {
-            return new CapabilityEntry(capability, controller, providerFactory, Optional.of(handler));
+        public CapabilityEntry<T> withUse(ModuleUseHandler handler) {
+            return new CapabilityEntry<>(capability, controller, containerFactory, Optional.of(handler));
         }
     }
 
     //<ModuleResource,ModuleCategory>
     private static final Map<ResourceLocation, MountCategory> moduleItems = new HashMap<>();
 
-    //<TraitId,Provider>
-    private static final Map<ResourceLocation, CapabilityEntry> traits = new HashMap<>();
+    // Trait factories are stack-bound; registration and controller lookup share this table.
+    private static final Map<ResourceLocation, CapabilityEntry<?>> traits = new HashMap<>();
 
     public static void registerTrait() {
         traits.putAll(
                 Map.of(
                         ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "pouch"),
-                        new CapabilityEntry(CapabilityRegistries.POUCH, null, PouchProvider::new),
+                        new CapabilityEntry<>(ModularCapabilityRegistry.POUCH, null, stack -> new PouchContainer()),
                         ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "admin_pouch"),
-                        new CapabilityEntry(CapabilityRegistries.ADMIN_POUCH, new AdminPouchController(), AdminPouchProvider::new),
+                        new CapabilityEntry<>(ModularCapabilityRegistry.ADMIN_POUCH, new AdminPouchController(), AdminPouchContainer::new),
                         ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "navboard"),
-                        new CapabilityEntry(CapabilityRegistries.NAV_BOARD, new NavBoardController(), NavBoardProvider::new),
+                        new CapabilityEntry<>(ModularCapabilityRegistry.NAV_BOARD, new NavBoardController(), NavBoardContainer::new),
                         ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "nvg"),
-                        new CapabilityEntry(CapabilityRegistries.NVG, new NvgController(), NvgProvider::new),
+                        new CapabilityEntry<>(ModularCapabilityRegistry.NVG, new NvgController(), NvgContainer::new),
                         ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "battery"),
-                        new CapabilityEntry(CapabilityRegistries.BATTERY, null, BatteryProvider::new),
+                        new CapabilityEntry<>(ModularCapabilityRegistry.BATTERY, null, BatteryContainer::new),
                         ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "beacon"),
-                        new CapabilityEntry(CapabilityRegistries.BEACON, new BeaconController(), BeaconProvider::new),
+                        new CapabilityEntry<>(ModularCapabilityRegistry.BEACON, new BeaconController(), BeaconContainer::new),
                         ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "headset"),
-                        new CapabilityEntry(CapabilityRegistries.HEADSET, new HeadsetController(), HeadsetProvider::new),
+                        new CapabilityEntry<>(ModularCapabilityRegistry.HEADSET, new HeadsetController(), HeadsetContainer::new),
                         ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "radio"),
-                        new CapabilityEntry(CapabilityRegistries.RADIO, new MBITRController(), RadioProvider::new)
+                        new CapabilityEntry<>(ModularCapabilityRegistry.RADIO, new MBITRController(), RadioContainer::new)
 
                 )
         );
     }
 
-    public static CapabilityEntry getTrait(ResourceLocation traitId) {
+    public static CapabilityEntry<?> getTrait(ResourceLocation traitId) {
         return traits.get(traitId);
     }
 
@@ -98,7 +97,7 @@ public final class ModuleRegistry {
     }
 
     public static MountCategory getCategory(ItemStack module) {
-        ResourceLocation id = ForgeRegistries.ITEMS.getKey(module.getItem());
+        ResourceLocation id = BuiltInRegistries.ITEM.getKey(module.getItem());
         return moduleItems.getOrDefault(id, MountCategory.UNDEFINED);
     }
 
@@ -110,9 +109,9 @@ public final class ModuleRegistry {
                 .filter(entry -> entry.getValue() != MountCategory.UNDEFINED)
                 .filter(entry -> mount.acceptsModule(entry.getValue()))
                 .sorted(Map.Entry.comparingByKey())
-                .filter(entry -> ForgeRegistries.ITEMS.containsKey(entry.getKey()))
+                .filter(entry -> BuiltInRegistries.ITEM.containsKey(entry.getKey()))
                 .map(entry -> {
-                    Item item = ForgeRegistries.ITEMS.getValue(entry.getKey());
+                    Item item = BuiltInRegistries.ITEM.get(entry.getKey());
                     if (item == null) return ItemStack.EMPTY;
                     return item.getDefaultInstance();
                 })

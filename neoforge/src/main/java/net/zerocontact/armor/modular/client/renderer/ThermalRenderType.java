@@ -21,7 +21,7 @@ final class ThermalRenderType extends RenderType {
             });
 
     private ThermalRenderType() {
-        super("thermal", DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS,
+        super("thermal", DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS,
                 256, false, false, () -> {
                 }, () -> {
                 });
@@ -40,7 +40,7 @@ final class ThermalRenderType extends RenderType {
         return TYPES.computeIfAbsent(original, ignored -> {
             if (state != null) {
                 return create(
-                        "zerocontact_thermal", DefaultVertexFormat.POSITION_COLOR_TEX,
+                        "zerocontact_thermal", DefaultVertexFormat.POSITION_TEX_COLOR,
                         VertexFormat.Mode.QUADS, 256, false, false,
                         CompositeState.builder()
                                 .setShaderState(RENDERTYPE_OUTLINE_SHADER)

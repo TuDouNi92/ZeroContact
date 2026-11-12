@@ -4,17 +4,16 @@ import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
 import dev.architectury.event.events.common.TickEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.zerocontact.ZeroContact;
 import net.zerocontact.command.CommandManager;
 import net.zerocontact.effects.ZCEffect;
 import net.zerocontact.item.backpack.BaseBackpack;
-import net.zerocontact.network.ModMessages;
-import net.zerocontact.stamina.PlayerStamina;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = ZeroContact.MOD_ID)
 public class ServerForgeEventBus {
 
     @SubscribeEvent
@@ -23,8 +22,6 @@ public class ServerForgeEventBus {
     }
 
     public static void regEvents() {
-        ModMessages.register();
-        TickEvent.PLAYER_PRE.register(PlayerStamina::staminaTick);
         TickEvent.SERVER_LEVEL_POST.register(ZCEffect.Tick::serverTick);
         dev.architectury.event.events.common.EntityEvent.LIVING_HURT.register(PlateDamageEvent::register);
     }

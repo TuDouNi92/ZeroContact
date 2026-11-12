@@ -11,7 +11,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import net.zerocontact.client.gui.ConfigScreen;
 import net.zerocontact.config.ModConfigs;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +27,7 @@ public class ConfigOptionsList extends ContainerObjectSelectionList<ConfigOption
     private OptionEntry defaultLabel;
 
     public ConfigOptionsList(ConfigScreen owner, Minecraft minecraft, int width, int height, int y0, int y1, int itemHeight) {
-        super(minecraft, width, height, y0, y1, itemHeight);
+        super(minecraft, width, y1 - y0, y0, itemHeight);
         this.owner = owner;
         this.entries = new ArrayList<>();
     }
@@ -61,7 +61,7 @@ public class ConfigOptionsList extends ContainerObjectSelectionList<ConfigOption
         return this.owner.getFocused() == this;
     }
 
-    public void registerBoolEntry(String descriptionKey, Font font, ForgeConfigSpec.BooleanValue booleanValue, ForgeConfigSpec spec) {
+    public void registerBoolEntry(String descriptionKey, Font font, ModConfigSpec.BooleanValue booleanValue, ModConfigSpec spec) {
         OptionEntry entry = new OptionEntry();
         entry.addWidget(
                 ConfigOptionsList.OptionEntry.WidgetBox.booleanWidget(
@@ -81,7 +81,7 @@ public class ConfigOptionsList extends ContainerObjectSelectionList<ConfigOption
 
         public record WidgetBox(AbstractWidget widget, int offsetX, int offsetY) {
 
-            public static List<WidgetBox> booleanWidget(ConfigOptionsList list, String descriptionKey, Font font, ForgeConfigSpec.BooleanValue booleanValue, ForgeConfigSpec configSpec) {
+            public static List<WidgetBox> booleanWidget(ConfigOptionsList list, String descriptionKey, Font font, ModConfigSpec.BooleanValue booleanValue, ModConfigSpec configSpec) {
                 boolean configSpecLoaded = configSpec.isLoaded();
                 boolean operatorPlayer = Optional.ofNullable(Minecraft.getInstance().player)
                         .map(player -> player.hasPermissions(2)).orElse(false);

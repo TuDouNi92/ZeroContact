@@ -8,18 +8,19 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.zerocontact.ZeroContact;
 import net.zerocontact.api.armor.ICombatArmorItem;
 import net.zerocontact.caliber.damage.HitUtil;
 import net.zerocontact.caliber.damage.ZDamageTypes;
 import net.zerocontact.registries.ModSoundEventsReg;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = ZeroContact.MOD_ID)
 public class PlateEntityHurtSoundEvent {
     @SubscribeEvent
-    public static void onHurtSound(LivingHurtEvent hurtEvent) {
+    public static void onHurtSound(LivingIncomingDamageEvent hurtEvent) {
         DamageSource source = hurtEvent.getSource();
         LivingEntity hurtEntity = hurtEvent.getEntity();
         ItemStack checkHelmetStack = hurtEntity.getItemBySlot(EquipmentSlot.HEAD);

@@ -1,7 +1,5 @@
 package net.zerocontact.item.plate;
 
-import com.google.common.collect.Multimap;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -10,36 +8,23 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.armor.IEquipmentTypeTag;
 import net.zerocontact.api.armor.PlateInfoProvider;
 import net.zerocontact.client.interaction.PlateInteractionManager;
-import net.zerocontact.client.renderer.ItemRender;
 import net.zerocontact.curios.CuriosConstants;
-import net.zerocontact.item.PlateBaseMaterial;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.constant.DataTickets;
-import software.bernie.geckolib.core.animatable.GeoAnimatable;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.Animation;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.animation.RawAnimation;
-import software.bernie.geckolib.core.object.PlayState;
-import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
@@ -47,7 +32,6 @@ import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 public class BasePlate extends ArmorItem implements PlateInfoProvider, GeoItem, IEquipmentTypeTag {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
@@ -62,10 +46,12 @@ public class BasePlate extends ArmorItem implements PlateInfoProvider, GeoItem, 
     public final RawAnimation installAnim;
 
     public BasePlate(int durability, int defense, int absorb, float bluntReduction, float penetrateReduction, float ricochetReduction, float movementFix, float durabilityLoss, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
-        super(PlateBaseMaterial.ARMOR_STEEL, Type.CHESTPLATE, new Properties().defaultDurability(durability));
+        super(ArmorMaterials.IRON, Type.CHESTPLATE, new Properties().durability(durability));
         this.texture = texture;
         this.model = model;
-        this.animation = animation;
+        this.animation = animation.getPath().isBlank()
+                ? ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "animations/plate.animation.json")
+                : animation;
         this.penetrateReduction = penetrateReduction;
         this.bluntReduction = bluntReduction;
         this.durabilityLoss = durabilityLoss;
@@ -98,19 +84,10 @@ public class BasePlate extends ArmorItem implements PlateInfoProvider, GeoItem, 
     }
 
     @Override
-    public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(new IClientItemExtensions() {
-            private GeoItemRenderer<?> render;
-
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                if (render == null) {
-                    render = new ItemRender<>(texture, model, ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID,"animations/plate.animation.json"));
-                }
-                return render;
-            }
-        });
+    public @NotNull ItemAttributeModifiers getDefaultAttributeModifiers(@NotNull ItemStack stack) {
+        return super.getDefaultAttributeModifiers(stack);
     }
+
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
@@ -172,10 +149,6 @@ public class BasePlate extends ArmorItem implements PlateInfoProvider, GeoItem, 
         return this.movementFix;
     }
 
-    @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
-        return super.getAttributeModifiers(slot, stack);
-    }
 
     @Override
     public boolean canEquip(ItemStack stack, EquipmentSlot armorType, Entity entity) {
@@ -184,8 +157,8 @@ public class BasePlate extends ArmorItem implements PlateInfoProvider, GeoItem, 
 
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
-        PlateInfoProvider.super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
+        PlateInfoProvider.super.appendHoverText(stack, context, tooltipComponents, isAdvanced);
     }
 
     @Override
@@ -194,10 +167,25 @@ public class BasePlate extends ArmorItem implements PlateInfoProvider, GeoItem, 
     }
 
     public static void resolveSlot(Player player, TriConsumer<ICuriosItemHandler, Optional<ICurioStacksHandler>, Optional<ICurioStacksHandler>> consumer) {
-        CuriosApi.getCuriosInventory(player).resolve().ifPresent(i -> {
+        CuriosApi.getCuriosInventory(player).ifPresent(i -> {
             Optional<ICurioStacksHandler> frontHandler = i.getStacksHandler(CuriosConstants.FRONT_PLATE);
             Optional<ICurioStacksHandler> backHandler = i.getStacksHandler(CuriosConstants.BACK_PLATE);
             consumer.accept(i, frontHandler, backHandler);
         });
+    }
+
+    @Override
+    public ResourceLocation getTexture() {
+        return this.texture;
+    }
+
+    @Override
+    public ResourceLocation getModel() {
+        return this.model;
+    }
+
+    @Override
+    public ResourceLocation getAnimation() {
+        return this.animation;
     }
 }

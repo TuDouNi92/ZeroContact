@@ -5,7 +5,7 @@ import net.minecraft.world.item.ArmorItem;
 import net.zerocontact.api.datagen.IAssetManager;
 import net.zerocontact.api.armor.IEquipmentTypeTag;
 import net.zerocontact.datagen.model.GenerationRecord;
-import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
+import net.zerocontact.item.neoforge.AbstractGenerateGeoCurioItemImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;

@@ -1,10 +1,10 @@
 package net.zerocontact.entity;
 
 import com.tacz.guns.api.entity.IGunOperator;
-import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.DifficultyInstance;
@@ -29,12 +29,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.wrapper.InvWrapper;
+import net.neoforged.neoforge.event.EventHooks;
 import net.zerocontact.api.armor.IEquipmentTypeTag;
 import net.zerocontact.curios.CuriosConstants;
 import net.zerocontact.entity.ai.NameList;
@@ -46,11 +41,9 @@ import net.zerocontact.entity.ai.goal.RestrictedGoalWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.core.animatable.GeoAnimatable;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.*;
-import software.bernie.geckolib.core.animation.AnimationState;
-import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.*;
+import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import top.theillusivec4.curios.api.CuriosApi;
 
@@ -75,7 +68,6 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     private static final RawAnimation IDLE = RawAnimation.begin().then("raider.animation.idle", Animation.LoopType.LOOP);
     public final RandomSource random = this.getRandom();
     private final SimpleContainer inventory = new SimpleContainer(7);
-    private final LazyOptional<IItemHandler> itemHandlerLazyOptional = LazyOptional.of(() -> new InvWrapper(inventory));
     private final IGunOperator operator;
     public final GlobalStateController stateController;
     private LoadoutHolder.LoadoutData loadout = randomLoadout()
@@ -122,7 +114,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
         controllerRegistrar.add(new AnimationController<>(this, "controller", 10, this::defaultPredicate));
-        controllerRegistrar.add(new AnimationController<GeoAnimatable>(this, "fire", 10, (state) -> PlayState.CONTINUE)
+        controllerRegistrar.add(new AnimationController<ArmedRaider>(this, "fire", 10, (state) -> PlayState.CONTINUE)
                 .triggerableAnim("shoot", SHOOT_ANIM));
     }
 
@@ -132,7 +124,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         return geoCache;
     }
 
-    private <E extends GeoAnimatable> PlayState defaultPredicate(AnimationState<E> state) {
+    private PlayState defaultPredicate(AnimationState<ArmedRaider> state) {
         if (state.isMoving()) {
             state.getController().setAnimation(WALK);
         } else {
@@ -142,9 +134,9 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     }
 
     @Override
-    public @Nullable SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor level, @NotNull DifficultyInstance difficulty, @NotNull MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
+    public @Nullable SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor level, @NotNull DifficultyInstance difficulty, @NotNull MobSpawnType reason, @Nullable SpawnGroupData spawnData) {
         prepareLoadout();
-        return super.finalizeSpawn(level, difficulty, reason, spawnData, dataTag);
+        return super.finalizeSpawn(level, difficulty, reason, spawnData);
     }
 
     private void prepareLoadout() {
@@ -199,7 +191,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     }
 
     @Override
-    protected void dropCustomDeathLoot(@NotNull DamageSource damageSource, int looting, boolean hitByPlayer) {
+    protected void dropCustomDeathLoot(@NotNull ServerLevel level, @NotNull DamageSource damageSource, boolean hitByPlayer) {
         ItemStack mainHandItem = getMainHandItem();
         if (mainHandItem.isEmpty()) return;
         if (random.nextFloat() < .3F) {
@@ -222,7 +214,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     public void addAdditionalSaveData(@NotNull CompoundTag compound) {
         CompoundTag taczTag = createWeaponTag();
         compound.put(TACZ_TAG, taczTag);
-        writeInventoryToTag(compound);
+        writeInventoryToTag(compound, registryAccess());
         super.addAdditionalSaveData(compound);
     }
 
@@ -237,7 +229,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag compound) {
         super.readAdditionalSaveData(compound);
-        readInventoryFromTag(compound);
+        readInventoryFromTag(compound, registryAccess());
         importWeaponTag(compound);
     }
 
@@ -275,20 +267,6 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         }
     }
 
-    @Override
-    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, final @Nullable Direction side) {
-        if (cap == ForgeCapabilities.ITEM_HANDLER) {
-            return itemHandlerLazyOptional.cast();
-        }
-        return super.getCapability(cap, null);
-    }
-
-    @Override
-    public void invalidateCaps() {
-        super.invalidateCaps();
-        itemHandlerLazyOptional.invalidate();
-    }
-
     private void listenPlayVoice() {
         GlobalStateController.VoiceManager manager = stateController.voiceManager;
         manager.playSound(GlobalStateController.Voice.CONTACT, this, () -> stateController.getPhase() == GlobalStateController.Phase.ATTACK);
@@ -309,7 +287,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         if (stateController.getPhase() == GlobalStateController.Phase.ATTACK && !this.walkAnimation.isMoving()) {
             this.triggerAnim("fire", "shoot");
         } else {
-            this.stopTriggeredAnimation("fire", "shoot");
+            this.stopTriggeredAnim("fire", "shoot");
         }
     }
 
@@ -358,7 +336,7 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         Vec3i vec3i = this.getPickupReach();
         AABB searchArea = this.getBoundingBox().inflate(vec3i.getX(), vec3i.getY(), vec3i.getZ());
         List<? extends Entity> ammoItems = this.level().getEntitiesOfClass(ItemEntity.class, searchArea,
-                entity -> ItemStack.isSameItemSameTags(entity.getItem(), loadout.ammoStack()));
+                entity -> ItemStack.isSameItemSameComponents(entity.getItem(), loadout.ammoStack()));
         return !ammoItems.isEmpty() || super.canPickUpLoot();
     }
 
@@ -367,9 +345,9 @@ public class ArmedRaider extends PatrollingMonster implements GeoEntity, Invento
         super.aiStep();
         this.level().getProfiler().push("looting");
         Vec3i vec3i = this.getPickupReach();
-        if (!this.level().isClientSide && this.canPickUpLoot() && this.isAlive() && !this.dead && ForgeEventFactory.getMobGriefingEvent(this.level(), this)) {
+        if (!this.level().isClientSide && this.canPickUpLoot() && this.isAlive() && !this.dead && EventHooks.canEntityGrief(this.level(), this)) {
             for (ItemEntity itementity : this.level().getEntitiesOfClass(ItemEntity.class, this.getBoundingBox().inflate(vec3i.getX(), vec3i.getY(), vec3i.getZ()),
-                    entity -> ItemStack.isSameItemSameTags(entity.getItem(), loadout.ammoStack()))) {
+                    entity -> ItemStack.isSameItemSameComponents(entity.getItem(), loadout.ammoStack()))) {
                 if (!itementity.isRemoved() && !itementity.getItem().isEmpty() && !itementity.hasPickUpDelay()) {
                     this.pickUpItem(itementity);
                 }

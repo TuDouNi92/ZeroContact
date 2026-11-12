@@ -6,11 +6,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.armor.modular.EquipmentModule;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.model.MountCategory;
 import net.zerocontact.armor.modular.registry.ModuleRegistry;
-import net.zerocontact.capability.CapabilityRegistries;
-import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
+import net.zerocontact.item.neoforge.AbstractGenerateGeoCurioItemImpl;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Optional;
 
 public class Battery extends AbstractGenerateGeoCurioItemImpl implements EquipmentModule {
 
@@ -28,7 +30,7 @@ public class Battery extends AbstractGenerateGeoCurioItemImpl implements Equipme
     public void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entity, int slotId, boolean isSelected) {
         super.inventoryTick(stack, level, entity, slotId, isSelected);
         if(level.isClientSide)return;
-        stack.getCapability(CapabilityRegistries.BATTERY).ifPresent(battery -> this.setDamage(stack, battery.getMaxBattery() - battery.getBattery()));
+        Optional.ofNullable(stack.getCapability(ModularCapabilityRegistry.BATTERY)).ifPresent(battery -> this.setDamage(stack, battery.getMaxBattery() - battery.getBattery()));
 
     }
 

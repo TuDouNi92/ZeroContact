@@ -9,16 +9,14 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.zerocontact.api.armor.IEquipmentTypeTag;
 import net.zerocontact.caliber.AmmoInjector;
 import net.zerocontact.caliber.CaliberHelper;
 import net.zerocontact.client.tooltip.AdvancedAmmoInfoComponents;
 import net.zerocontact.client.tooltip.BallisticToolTipComponent;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +34,7 @@ public class GenerateAmmo extends Item implements AmmoItemDataAccessor, IEquipme
 
     @Override
     public @NotNull ResourceLocation getAmmoId(ItemStack ammo) {
-        AmmoInjector.write(new AmmoInjector.AmmoContext(caliber), ammo);
+        AmmoInjector.get().writeCxtToStack(new AmmoInjector.AmmoContext(caliber), ammo);
         return ResourceLocation.parse(caliber.id());
     }
 
@@ -47,7 +45,7 @@ public class GenerateAmmo extends Item implements AmmoItemDataAccessor, IEquipme
     @Override
     public @NotNull ItemStack getDefaultInstance() {
         ItemStack stack = new ItemStack(this);
-        AmmoInjector.write(new AmmoInjector.AmmoContext(caliber), stack);
+        AmmoInjector.get().writeCxtToStack(new AmmoInjector.AmmoContext(caliber), stack);
         return stack;
     }
 
@@ -62,7 +60,7 @@ public class GenerateAmmo extends Item implements AmmoItemDataAccessor, IEquipme
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
         Function<Float, Integer> decimalToPercent = (armorDamage) -> (int) Math.ceil(armorDamage * 100);
         Component penetrationHint = Component.translatable("tooltip.zerocontact.bullet_penetration")
                 .append(":")
@@ -78,10 +76,10 @@ public class GenerateAmmo extends Item implements AmmoItemDataAccessor, IEquipme
                 .append(Component.literal(String.valueOf(caliber.fleshDamage())).withStyle(ChatFormatting.YELLOW));
         Component ammoAdvancedInfo = Component.translatable(SHOW_BULLET_DATA_LABEL).withStyle(ChatFormatting.GRAY);
         tooltipComponents.addAll(List.of(penetrationHint, armorDamageHint, fleshDamageHint, ammoAdvancedInfo));
-        if (DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> Screen::hasShiftDown)) {
-            List<Component> advancedInfos = AdvancedAmmoInfoComponents.create(caliber,true);
+        if (FMLEnvironment.dist == Dist.CLIENT && Screen.hasShiftDown()) {
+            List<Component> advancedInfos = AdvancedAmmoInfoComponents.create(caliber, true);
             tooltipComponents.addAll(advancedInfos);
         }
-        super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
+        super.appendHoverText(stack, context, tooltipComponents, isAdvanced);
     }
 }

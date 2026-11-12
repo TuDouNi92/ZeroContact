@@ -1,13 +1,11 @@
 package net.zerocontact.armor.modular.module.radio.api;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.common.util.INBTSerializable;
 import net.zerocontact.armor.modular.module.radio.model.RadioProfile;
 import net.zerocontact.armor.modular.module.radio.model.RadioState;
 import net.zerocontact.armor.modular.module.radio.model.RadioTransmission;
 
-public interface MBITR extends INBTSerializable<CompoundTag> {
+public interface MBITR {
 
     RadioState getRadioState();
 

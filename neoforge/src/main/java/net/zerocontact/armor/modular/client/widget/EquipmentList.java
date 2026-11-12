@@ -14,15 +14,23 @@ public class EquipmentList extends ContainerObjectSelectionList<EquipmentList.Eq
     private static final int CARD_HEIGHT = 60;
     private static final int GAP = 4;
 
-    public EquipmentList(Minecraft minecraft, int width, int height, int y0, int y1) {
-        this(minecraft, width, height, y0, y1, CARD_HEIGHT + GAP);
+    public EquipmentList(Minecraft minecraft, int width, int height, int y0) {
+        this(minecraft, width, height, y0, CARD_HEIGHT + GAP);
     }
 
-    public EquipmentList(Minecraft minecraft, int width, int height, int y0, int y1, int itemHeight) {
-        super(minecraft, width, height, y0, y1, Math.max(itemHeight, CARD_HEIGHT + GAP));
-        setRenderBackground(false);
-        setRenderTopAndBottom(false);
+    public EquipmentList(Minecraft minecraft, int width, int height, int y0, int itemHeight) {
+        super(minecraft, width, height, y0, Math.max(itemHeight, CARD_HEIGHT + GAP));
         centerListVertically = false;
+    }
+
+    @Override
+    protected void renderListBackground(@NotNull GuiGraphics guiGraphics) {
+        // EquipmentScreen draws the panel background.
+    }
+
+    @Override
+    protected void renderListSeparators(@NotNull GuiGraphics guiGraphics) {
+        // Keep the list inside the custom panel without vanilla separators.
     }
 
     public void setCards(List<EquipmentCard> cards) {
@@ -43,12 +51,12 @@ public class EquipmentList extends ContainerObjectSelectionList<EquipmentList.Eq
 
     @Override
     public int getRowLeft() {
-        return x0 + GAP;
+        return getX() + GAP;
     }
 
     @Override
     protected int getScrollbarPosition() {
-        return x1 - 6;
+        return getRight() - 6;
     }
 
     public static class EquipmentEntry extends Entry<EquipmentEntry> {
@@ -65,7 +73,7 @@ public class EquipmentList extends ContainerObjectSelectionList<EquipmentList.Eq
 
         @Override
         public void render(@NotNull GuiGraphics guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovering, float partialTick) {
-            int cardWidth = Math.max(1, Math.min(CARD_WIDTH, (width - (cards.size() - 1) * GAP) / Math.max(1, cards.size())));
+            int cardWidth = Math.clamp((width - (long) (cards.size() - 1) * GAP) / Math.max(1, cards.size()), 1, CARD_WIDTH);
             for (int column = 0; column < cards.size(); column++) {
                 EquipmentCard card = cards.get(column);
                 card.setX(left + column * (cardWidth + GAP));

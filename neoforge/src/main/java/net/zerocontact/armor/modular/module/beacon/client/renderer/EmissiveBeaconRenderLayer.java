@@ -11,15 +11,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.zerocontact.ZeroContact;
-import net.zerocontact.armor.modular.module.beacon.container.BeaconContainer;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.module.beacon.item.Beacon;
-import net.zerocontact.capability.CapabilityRegistries;
+import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
-import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.renderer.GeoRenderer;
 import software.bernie.geckolib.renderer.layer.GeoRenderLayer;
+import software.bernie.geckolib.util.Color;
+
+import java.util.Optional;
 
 public class EmissiveBeaconRenderLayer<T extends Item & GeoItem & GeoAnimatable> extends GeoRenderLayer<T> {
     private static final ResourceLocation GLOW_TEXTURE =
@@ -54,7 +56,7 @@ public class EmissiveBeaconRenderLayer<T extends Item & GeoItem & GeoAnimatable>
 
         boolean[] lightOn = {false};
         float[] r = {1}, g = {1}, b = {1};
-        stack.getCapability(CapabilityRegistries.BEACON).ifPresent(beacon -> {
+        Optional.ofNullable(stack.getCapability(ModularCapabilityRegistry.BEACON)).ifPresent(beacon -> {
             lightOn[0] = beacon.getLightOn();
             switch (beacon.getMode()) {
                 case RED -> {
@@ -98,7 +100,7 @@ public class EmissiveBeaconRenderLayer<T extends Item & GeoItem & GeoAnimatable>
                 partialTick,
                 LightTexture.FULL_BRIGHT,
                 OverlayTexture.NO_OVERLAY,
-                r[0], g[0], b[0], 0.87f
+                Color.ofRGBA(r[0], g[0], b[0], 0.87f).argbInt()
         );
     }
 

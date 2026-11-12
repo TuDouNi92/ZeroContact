@@ -1,5 +1,6 @@
 package net.zerocontact.caliber.extension;
 
+import net.minecraft.core.Holder;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -27,7 +28,7 @@ public final class HookActionExecutor {
         }
         for (LivingEntity target : targets) {
             target.addEffect(new MobEffectInstance(
-                    mobEffect.get(),
+                    Holder.direct(mobEffect.get()),
                     actionData.duration(),
                     actionData.amplifier())
             );

@@ -1,7 +1,7 @@
 package net.zerocontact.caliber.compat;
 
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 
 import java.util.function.BooleanSupplier;
 

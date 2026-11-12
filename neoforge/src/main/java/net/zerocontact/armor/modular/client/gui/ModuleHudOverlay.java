@@ -1,20 +1,20 @@
 package net.zerocontact.armor.modular.client.gui;
 
+import net.minecraft.client.gui.LayeredDraw;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
+import net.zerocontact.ZeroContact;
 import net.minecraft.network.chat.Component;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = ZeroContact.MOD_ID, value = Dist.CLIENT)
 public class ModuleHudOverlay {
-    public static final IGuiOverlay MODULE_HUD =
-            (gui, graphics, partialTick, width, height) -> {
-                renderModules(graphics, width, height);
-            };
+    public static final LayeredDraw.Layer MODULE_HUD =
+            (gui, deltaTracker) -> renderModules(gui, gui.guiWidth(), gui.guiHeight());
 
     private static void renderModules(GuiGraphics graphics, int screenWidth, int screenHeight) {
 
@@ -24,11 +24,11 @@ public class ModuleHudOverlay {
         var entries = state.entries();
         int top = 8;
         int rowHeight = 20;
-        int width = Math.min(200, Math.max(1, screenWidth - 16));
+        int width = Math.clamp(screenWidth - 16, 1, 200);
         int left = (screenWidth - width) / 2;
-        int visible = Math.min(8, Math.max(1, (screenHeight - top - 12) / rowHeight));
-        int rows = Math.max(1, Math.min(visible, entries.size()));
-        int first = Math.max(0, Math.min(state.selectedIndex() - visible / 2, entries.size() - visible));
+        int visible = Math.clamp((screenHeight - top - 12) / rowHeight, 1, 8);
+        int rows = Math.clamp(entries.size(), 1, visible);
+        int first = Math.clamp(state.selectedIndex() - visible / 2, 0, Math.max(0, entries.size() - visible));
         int bottom = top + rows * rowHeight + 4;
         graphics.fill(left + 2, top + 3, left + width + 2, bottom + 3, 0x55000000);
         graphics.fill(left, top, left + width, bottom, 0xEE171B20);
@@ -75,8 +75,8 @@ public class ModuleHudOverlay {
 
 
     @SubscribeEvent
-    public static void registerOverlayEvent(RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll("module_menu", MODULE_HUD);
+    public static void registerOverlayEvent(RegisterGuiLayersEvent event) {
+        event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "module_menu"), MODULE_HUD);
     }
 
 

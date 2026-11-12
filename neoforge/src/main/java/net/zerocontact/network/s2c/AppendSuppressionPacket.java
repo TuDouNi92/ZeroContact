@@ -1,41 +1,34 @@
 package net.zerocontact.network.s2c;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.sounds.SoundSource;
-import net.minecraftforge.network.NetworkEvent;
-import net.zerocontact.client.interaction.SuppressionManager;
-import net.zerocontact.registries.ModSoundEventsReg;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.zerocontact.client.network.ClientPacketHandlers;
 import org.joml.Vector3f;
 
-import java.util.function.Supplier;
+public record AppendSuppressionPacket(Vector3f bulletPos, float amount) implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<AppendSuppressionPacket> TYPE = new CustomPacketPayload.Type<>(
+            ResourceLocation.fromNamespaceAndPath(net.zerocontact.ZeroContact.MOD_ID, "append_suppression"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, AppendSuppressionPacket> STREAM_CODEC =
+            StreamCodec.ofMember(AppendSuppressionPacket::encode, AppendSuppressionPacket::decode);
 
-public record AppendSuppressionPacket(Vector3f bulletPos, float amount) {
-    public void encode(FriendlyByteBuf buf) {
+    @Override
+    public CustomPacketPayload.Type<AppendSuppressionPacket> type() {
+        return TYPE;
+    }
+
+    public void encode(RegistryFriendlyByteBuf buf) {
         buf.writeVector3f(bulletPos);
         buf.writeFloat(amount);
     }
 
-    public static AppendSuppressionPacket decode(FriendlyByteBuf buf) {
+    public static AppendSuppressionPacket decode(RegistryFriendlyByteBuf buf) {
         return new AppendSuppressionPacket(buf.readVector3f(), buf.readFloat());
     }
 
-    public static void handle(AppendSuppressionPacket msg, Supplier<NetworkEvent.Context> supplier) {
-        NetworkEvent.Context context = supplier.get();
-        context.enqueueWork(() -> SuppressionManager.increaseSuppression(msg.amount, () -> {
-            Minecraft minecraft = Minecraft.getInstance();
-            if (minecraft.level != null) {
-                minecraft.level.playLocalSound(
-                        msg.bulletPos().x(),
-                        msg.bulletPos().y(),
-                        msg.bulletPos().z(),
-                        ModSoundEventsReg.randomBulletSound(),
-                        SoundSource.HOSTILE,
-                        2.0F,
-                        1.0F,
-                        false
-                );
-            }
-        }));
+    public static void handle(AppendSuppressionPacket msg, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPacketHandlers.appendSuppression(msg));
     }
 }

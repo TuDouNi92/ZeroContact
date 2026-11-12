@@ -1,20 +1,20 @@
 package net.zerocontact.armor.modular.client.gui;
 
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.client.event.InputEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.zerocontact.ZeroContact;
 import net.zerocontact.client.interaction.KeyBindingHandler;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = ZeroContact.MOD_ID, value = Dist.CLIENT)
 public final class ModuleHudInputHandler {
     private static boolean menuHeld;
     private static boolean actionHeld;
     @SubscribeEvent
-    public static void tick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
+    public static void tick(ClientTickEvent.Post event) {
         var menu = KeyBindingHandler.TOGGLE_MODULE_HUD;
         var action = KeyBindingHandler.ACTIVATE_MODULE;
         if (menu == null || action == null) return;
@@ -41,8 +41,8 @@ public final class ModuleHudInputHandler {
         Minecraft mc = Minecraft.getInstance();
         if (!ModuleHudState.INSTANCE.isOpened() || mc.player == null || mc.screen != null) return;
         event.setCanceled(true);
-        if (event.getScrollDelta() != 0) {
-            ModuleHudState.INSTANCE.move(event.getScrollDelta() > 0 ? -1 : 1);
+        if (event.getScrollDeltaY() != 0) {
+            ModuleHudState.INSTANCE.move(event.getScrollDeltaY() > 0 ? -1 : 1);
         }
     }
 }

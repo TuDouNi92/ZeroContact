@@ -45,6 +45,11 @@ public class AmmoSelectorScreen extends AbstractContainerScreen<AmmoSelectorMenu
     }
 
     @Override
+    public void renderBackground(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        // The radial selector overlays the world without the container's full-screen dimming.
+    }
+
+    @Override
     protected void renderBg(@NotNull GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
 
     }

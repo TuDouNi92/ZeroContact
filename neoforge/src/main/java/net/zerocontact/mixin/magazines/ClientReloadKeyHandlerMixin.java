@@ -9,7 +9,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.event.TickEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.zerocontact.caliber.compat.ReloadManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,10 +34,10 @@ public class ClientReloadKeyHandlerMixin {
     }
 
     @Inject(method = "onClientTick", at = @At("RETURN"), remap = false)
-    private static void zeroContact$releaseSelector(TickEvent.ClientTickEvent event, CallbackInfo ci) {
+    private static void zeroContact$releaseSelector(ClientTickEvent.Post event, CallbackInfo ci) {
         // Upstream returns from the selector branch before checking whether R was released.
         // Run after its cancellation/screen cleanup, including that early return.
-        if (event.phase == TickEvent.Phase.END && keyDown && inSelectorMode
+        if (keyDown && inSelectorMode
                 && !ReloadKey.RELOAD_KEY.isDown()) {
             onReloadKeyReleased();
         }

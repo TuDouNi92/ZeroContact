@@ -1,20 +1,27 @@
 package net.zerocontact.events;
 
-import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
-import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.items.wrapper.InvWrapper;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.zerocontact.ZeroContact;
+import net.zerocontact.api.armor.RenderableItem;
 import net.zerocontact.client.gui.AmmoSelectorScreen;
 import net.zerocontact.armor.modular.client.screen.EquipmentScreen;
-import net.zerocontact.client.gui.BackpackScreen;
+import net.zerocontact.item.backpack.client.screen.BackpackScreen;
 import net.zerocontact.client.gui.WorkbenchScreen;
 import net.zerocontact.client.interaction.KeyBindingHandler;
 import net.zerocontact.client.particle.PersistentSignalSmokeParticle;
@@ -27,10 +34,12 @@ import net.zerocontact.entity.ArmedRaider;
 import net.zerocontact.forge_registries.ParticleRegistry;
 import net.zerocontact.client.renderer.ArmedRaiderRender;
 import net.zerocontact.item.block.Workbench;
-import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
+import net.zerocontact.item.neoforge.AbstractGenerateGeoCurioItemImpl;
 import net.zerocontact.item.helmet.GenerateHelmetGeoImpl;
 import net.zerocontact.models.GenerateModel;
 import net.zerocontact.registries.ItemsReg;
+import org.jetbrains.annotations.NotNull;
+import software.bernie.geckolib.animatable.client.GeoRenderProvider;
 import software.bernie.geckolib.renderer.GeoBlockRenderer;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 
@@ -38,24 +47,33 @@ import static net.zerocontact.forge_registries.BlockRegistry.WORKBENCH_ENTITY;
 
 
 public class ModRegEventBus {
-    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+    @EventBusSubscriber(modid = ZeroContact.MOD_ID)
     static class ServerDistribution {
+        @SubscribeEvent
+        public static void registerCapabilities(RegisterCapabilitiesEvent event) {
+            event.registerEntity(Capabilities.ItemHandler.ENTITY, EntitiyRegistry.ARMED_RAIDER.get(),
+                    (raider, context) -> new InvWrapper(raider.getInventory()));
+        }
+
         @SubscribeEvent
         public static void registerAttr(EntityAttributeCreationEvent event) {
             event.put(EntitiyRegistry.ARMED_RAIDER.get(), ArmedRaider.createAttributes().build());
         }
     }
 
-    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = ZeroContact.MOD_ID, value = Dist.CLIENT)
     static class ClientDistribution {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
-            EntityRenderers.register(EntitiyRegistry.ARMED_RAIDER.get(), ArmedRaiderRender::new);
-            MenuScreens.register(MenuRegistry.BACKPACK_CONTAINER.get(), BackpackScreen::new);
-            MenuScreens.register(MenuRegistry.WORKBENCH_MENU.get(), WorkbenchScreen::new);
-            MenuScreens.register(MenuRegistry.AMMO_SELECTOR.get(), AmmoSelectorScreen::new);
-            MenuScreens.register(MenuRegistry.EQUIPMENT_MENU.get(), EquipmentScreen::new);
-            RegCurioGeoItemRender();
+            event.enqueueWork(ModRegEventBus::RegCurioGeoItemRender);
+        }
+
+        @SubscribeEvent
+        public static void registerMenuScreens(RegisterMenuScreensEvent event) {
+            event.register(MenuRegistry.BACKPACK_CONTAINER.get(), BackpackScreen::new);
+            event.register(MenuRegistry.WORKBENCH_MENU.get(), WorkbenchScreen::new);
+            event.register(MenuRegistry.AMMO_SELECTOR.get(), AmmoSelectorScreen::new);
+            event.register(MenuRegistry.EQUIPMENT_MENU.get(), EquipmentScreen::new);
         }
 
         @SubscribeEvent
@@ -78,6 +96,7 @@ public class ModRegEventBus {
 
         @SubscribeEvent
         public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
+            event.registerEntityRenderer(EntitiyRegistry.ARMED_RAIDER.get(), ArmedRaiderRender::new);
             event.registerBlockEntityRenderer(
                     WORKBENCH_ENTITY.get(), arg -> new GeoBlockRenderer<>(
                             new GenerateModel<>(
@@ -87,6 +106,25 @@ public class ModRegEventBus {
                             )
                     )
             );
+        }
+
+        @SubscribeEvent
+        public static void registerClientExtensions(RegisterClientExtensionsEvent event){
+            ItemsReg.ITEMS.forEach(item->{
+                Item item1 = item.get();
+                if(item1 instanceof RenderableItem){
+                    event.registerItem(
+                            new IClientItemExtensions() {
+                                @Override
+                                public @NotNull BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                                    BlockEntityWithoutLevelRenderer renderer = GeoRenderProvider.of(item1).getGeoItemRenderer();
+                                    return renderer != null ? renderer : IClientItemExtensions.super.getCustomRenderer();
+                                }
+                            },
+                            item1
+                    );
+                }
+            });
         }
     }
 

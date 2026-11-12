@@ -1,6 +1,6 @@
 package net.zerocontact.armor.modular.client.renderer;
 
-import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -27,7 +27,7 @@ public final class ThermalBufferSource implements MultiBufferSource {
     }
 
     public ThermalBufferSource(boolean hand) {
-        this(MultiBufferSource.immediate(new BufferBuilder(256)), hand);
+        this(MultiBufferSource.immediate(new ByteBufferBuilder(256)), hand);
     }
 
     public ThermalBufferSource(BufferSource delegate) {
@@ -39,10 +39,12 @@ public final class ThermalBufferSource implements MultiBufferSource {
         this.hand = hand;
     }
 
-    /** Red stores heat, blue marks hand heat, and alpha stores coverage. */
+    /**
+     * Red stores heat, blue marks hand heat, and alpha stores coverage.
+     */
     public void setHeat(float heat) {
         if (!Float.isFinite(heat)) throw new IllegalArgumentException("Heat must be finite");
-        this.heat = Math.round(Math.max(0, Math.min(1, heat)) * 255);
+        this.heat = Math.round(Math.clamp(heat, 0, 1) * 255);
     }
 
     @Override
@@ -55,60 +57,49 @@ public final class ThermalBufferSource implements MultiBufferSource {
         delegate.endBatch();
     }
 
-    // Buffer positions and UVs so arbitrary source formats/attribute ordering can
-    // feed POSITION_COLOR_TEX. Ignore tint, lighting, overlay and normals.
-    private static final class HeatVertexConsumer implements VertexConsumer {
-        private final VertexConsumer delegate;
-        private final int heat;
-        private final boolean hand;
-        private double x, y, z;
-        private float u, v;
-
-        private HeatVertexConsumer(VertexConsumer delegate, int heat) {
-            this(delegate, heat, false);
-        }
-
-        private HeatVertexConsumer(VertexConsumer delegate, int heat, boolean hand) {
-            this.delegate = delegate;
-            this.heat = heat;
-            this.hand = hand;
-        }
+    // Forward positions and UVs to POSITION_TEX_COLOR and supply the heat color
+        // for every vertex. Ignore source tint, lighting, overlay and normals.
+        private record HeatVertexConsumer(VertexConsumer delegate, int heat, boolean hand) implements VertexConsumer {
+            private HeatVertexConsumer(VertexConsumer delegate, int heat) {
+                this(delegate, heat, false);
+            }
 
         @Override
-        public @NotNull VertexConsumer vertex(double x, double y, double z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            return this;
-        }
+            public @NotNull VertexConsumer addVertex(float x, float y, float z) {
+                if (delegate != null) {
+                    // Blue identifies hand heat, which must remain visible after the
+                    // first-person depth pass replaces the world's depth buffer.
+                    delegate.addVertex(x, y, z).setColor(heat, heat, hand ? 255 : 0, 255);
+                }
+                return this;
+            }
 
-        @Override
-        public @NotNull VertexConsumer uv(float u, float v) {
-            this.u = u;
-            this.v = v;
-            return this;
-        }
+            @Override
+            public @NotNull VertexConsumer setUv(float u, float v) {
+                if (delegate != null) {
+                    delegate.setUv(u, v);
+                }
+                return this;
+            }
 
-        @Override
-        public @NotNull VertexConsumer color(int r, int g, int b, int a) { return this; }
-        @Override
-        public @NotNull VertexConsumer overlayCoords(int u, int v) { return this; }
-        @Override
-        public @NotNull VertexConsumer uv2(int u, int v) { return this; }
-        @Override
-        public @NotNull VertexConsumer normal(float x, float y, float z) { return this; }
-        @Override
-        public void defaultColor(int r, int g, int b, int a) { }
-        @Override
-        public void unsetDefaultColor() { }
+            @Override
+            public @NotNull VertexConsumer setColor(int r, int g, int b, int a) {
+                return this;
+            }
 
-        @Override
-        public void endVertex() {
-            if (delegate != null) {
-                // Blue identifies hand heat, which must remain visible after the
-                // first-person depth pass replaces the world's depth buffer.
-                delegate.vertex(x, y, z).color(heat, heat, hand ? 255 : 0, 255).uv(u, v).endVertex();
+            @Override
+            public @NotNull VertexConsumer setUv1(int u, int v) {
+                return this;
+            }
+
+            @Override
+            public @NotNull VertexConsumer setUv2(int u, int v) {
+                return this;
+            }
+
+            @Override
+            public @NotNull VertexConsumer setNormal(float x, float y, float z) {
+                return this;
             }
         }
-    }
 }

@@ -49,8 +49,10 @@ public class EquipmentScreen extends AbstractContainerScreen<EquipmentMenu> {
         previewBottom = Math.max(previewTop + 1, height - 30);
         listLeft = previewRight + 8;
         int listWidth = Math.max(1, width - MARGIN - listLeft);
-        equipmentList = new EquipmentList(minecraft, listWidth, height, previewTop + 22, previewBottom);
-        equipmentList.setLeftPos(listLeft);
+        int listTop = previewTop + 22;
+        int listHeight = Math.max(1, previewBottom - listTop);
+        equipmentList = new EquipmentList(minecraft, listWidth, listHeight, listTop);
+        equipmentList.setX(listLeft);
         addRenderableWidget(equipmentList);
         displayedRevision = -1;
         draggingPreview = false;
@@ -117,8 +119,8 @@ public class EquipmentScreen extends AbstractContainerScreen<EquipmentMenu> {
         if (minecraft.player == null) return;
         guiGraphics.enableScissor(previewLeft, previewTop, previewRight, previewBottom);
         try {
-            float scale = Math.max(1, Math.min((previewRight - previewLeft) / 1.5f,
-                    (previewBottom - previewTop - 16) / 2.1f)) * zoom;
+            float scale = Math.clamp((previewRight - previewLeft) / 1.5f, 1,
+                    Math.max(1, (previewBottom - previewTop - 16) / 2.1f)) * zoom;
             anchors = EquipmentPlayerPreview.render(guiGraphics, minecraft.player,
                     (previewLeft + previewRight) / 2, (previewTop + previewBottom) / 2, scale, yaw, pitch);
             if (anchors.isEmpty()) {
@@ -202,14 +204,16 @@ public class EquipmentScreen extends AbstractContainerScreen<EquipmentMenu> {
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
+
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         if (inPreview(mouseX, mouseY)) {
-            zoom = Mth.clamp(zoom + (float) delta * 0.1f, 0.6f, 1.8f);
+            zoom = Mth.clamp(zoom + (float) scrollY * 0.1f, 0.6f, 1.8f);
             return true;
         }
-        return super.mouseScrolled(mouseX, mouseY, delta);
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
+
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {

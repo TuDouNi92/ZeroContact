@@ -6,8 +6,8 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
+import net.neoforged.bus.api.Event;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -99,8 +99,7 @@ public class HitProcessEvent extends Event {
         RICOCHET
     }
 
-    @Cancelable
-    public static class Pre extends HitProcessEvent {
+    public static class Pre extends HitProcessEvent implements ICancellableEvent {
 
         @ApiStatus.Internal
         public Pre(LivingEntity attacker, Entity hurtEntity, Entity bulletEntity, DamageSource source, EventArmorContext eventArmorContext, EventAmmoContext eventAmmoContext, ZHitOutcome outcome, boolean headShot, float finalDamage) {
@@ -117,10 +116,6 @@ public class HitProcessEvent extends Event {
             this.finalDamage = damage;
         }
 
-        @Override
-        public boolean isCancelable() {
-            return true;
-        }
     }
 
     public static class Post extends HitProcessEvent {

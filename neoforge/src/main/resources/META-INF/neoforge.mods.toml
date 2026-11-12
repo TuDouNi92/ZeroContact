@@ -1,7 +1,7 @@
 modLoader = "javafml"
 loaderVersion = "[4,)"
-#issueTrackerURL = ""
-license = "Insert License Here"
+issueTrackerURL = "https://github.com/TuDouNi92/ZeroContact/issues"
+license = "GPLv3 / ARR"
 
 [[mods]]
 modId = "zerocontact"
@@ -9,9 +9,10 @@ version = "${version}"
 displayName = "Zero Contact"
 authors = "TuDouNi92"
 description = '''
-This is an example description! Tell everyone what your mod is about!
+Bring tactical Armor and Ammunition Classification System to TaCZ.
 '''
-#logoFile = ""
+logoFile = "logo.png"
+logoBlur = false
 
 [[dependencies.zerocontact]]
 modId = "neoforge"
@@ -23,7 +24,7 @@ side = "BOTH"
 [[dependencies.zerocontact]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21.1,)"
+versionRange = "[1.21.1]"
 ordering = "NONE"
 side = "BOTH"
 
@@ -52,6 +53,13 @@ side = "BOTH"
 modId = "geckolib"
 type = "required"
 versionRange = "[4.8.4,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.zerocontact]]
+modId = "taczmagazines"
+type = "optional"
+versionRange = "[0.2.9-hotfix-Beta]"
 ordering = "NONE"
 side = "BOTH"
 

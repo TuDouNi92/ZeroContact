@@ -1,11 +1,11 @@
 package net.zerocontact.api.datagen;
 
-import net.zerocontact.datagen.model.Zpack;
+import net.zerocontact.datagen.model.ZPack;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Set;
 
 @ApiStatus.Internal
 public interface IContentLoader {
-    void load(Set<Zpack> packs);
+    void load(Set<ZPack> packs);
 }

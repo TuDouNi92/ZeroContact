@@ -1,13 +1,12 @@
 package net.zerocontact.mixin.tacz;
 
-import com.tacz.guns.network.NetworkHandler;
 import com.tacz.guns.network.message.ServerMessageSound;
 import com.tacz.guns.sound.SoundManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -35,10 +34,7 @@ public class SoundManagerMixin {
                 continue;
             }
             ServerMessageSound soundMessage = new ServerMessageSound(sourceEntity.getId(), gunId, gunDisplayId, soundName, volume, pitch, distance);
-            NetworkHandler.CHANNEL.send(
-                    PacketDistributor.PLAYER.with(() -> player),
-                    soundMessage
-            );
+            PacketDistributor.sendToPlayer(player, soundMessage);
         }
         ci.cancel();
     }

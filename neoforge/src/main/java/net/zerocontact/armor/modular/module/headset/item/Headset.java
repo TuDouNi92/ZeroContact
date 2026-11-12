@@ -4,7 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.armor.modular.EquipmentModule;
 import net.zerocontact.armor.modular.module.headset.model.AudioProfile;
-import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
+import net.zerocontact.item.neoforge.AbstractGenerateGeoCurioItemImpl;
 
 public class Headset extends AbstractGenerateGeoCurioItemImpl implements EquipmentModule {
     private static final ResourceLocation trait = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "headset");

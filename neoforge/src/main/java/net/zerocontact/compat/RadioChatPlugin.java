@@ -14,19 +14,20 @@ import de.maxhenkel.voicechat.api.opus.OpusEncoder;
 import de.maxhenkel.voicechat.api.opus.OpusEncoderMode;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import net.zerocontact.armor.modular.ModuleQuery;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.module.radio.api.MBITR;
 import net.zerocontact.armor.modular.module.radio.model.RadioTransmission;
 import net.zerocontact.armor.modular.module.radio.service.MBITRService;
-import net.zerocontact.capability.CapabilityRegistries;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @ForgeVoicechatPlugin
@@ -43,7 +44,7 @@ public class RadioChatPlugin implements VoicechatPlugin {
 
     @Override
     public void initialize(VoicechatApi api) {
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
     }
 
     @Override
@@ -103,10 +104,10 @@ public class RadioChatPlugin implements VoicechatPlugin {
     }
 
     @SubscribeEvent
-    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || !(event.player instanceof ServerPlayer player)) return;
-        ModuleQuery.streamMounted(player).forEach(ref -> ref.stack()
-                .getCapability(CapabilityRegistries.RADIO).ifPresent(radio -> radio.scanChannel(player)));
+    public void onPlayerTick(PlayerTickEvent.Post event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        ModuleQuery.streamMounted(player).forEach(ref -> Optional.ofNullable(ref.stack()
+                .getCapability(ModularCapabilityRegistry.RADIO)).ifPresent(radio -> radio.scanChannel(player)));
 
         UUID playerId = player.getUUID();
         Integer lastTick = lastPacketTick.get(playerId);

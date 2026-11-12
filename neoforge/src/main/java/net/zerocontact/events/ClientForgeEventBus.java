@@ -1,10 +1,11 @@
 package net.zerocontact.events;
 
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.zerocontact.ZeroContact;
 import net.zerocontact.armor.modular.client.network.c2s.OpenModularMenuPacket;
 import net.zerocontact.armor.modular.client.screen.EquipmentScreen;
 import net.zerocontact.client.interaction.KeyBindingHandler;
@@ -13,13 +14,13 @@ import net.zerocontact.network.c2s.FlipVisorPacket;
 import net.zerocontact.network.c2s.OpenAmmoSelectorPacket;
 import net.zerocontact.network.c2s.ToggleBackpackPacket;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT)
+@EventBusSubscriber(modid = ZeroContact.MOD_ID, value = Dist.CLIENT)
 public class ClientForgeEventBus {
     private static boolean suppressBackpackOpenUntilKeyRelease;
 
     @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || Minecraft.getInstance().player == null) return;
+    public static void onClientTick(ClientTickEvent.Post event) {
+        if (Minecraft.getInstance().player == null) return;
         listenVisorKey();
         listenBackpackKey();
         listenAmmoSelectorKey();

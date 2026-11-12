@@ -1,37 +1,28 @@
 package net.zerocontact.item.armor.forge;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
+
+import net.zerocontact.ZeroContact;
 import net.zerocontact.api.armor.IEquipmentTypeTag;
 import net.zerocontact.api.armor.ICombatArmorItem;
-import net.zerocontact.client.renderer.ArmorRender;
-import net.zerocontact.item.PlateBaseMaterial;
-import net.zerocontact.models.GenerateModel;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoItem;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
+
+
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
-import java.util.UUID;
-import java.util.function.Consumer;
 
 public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEquipmentTypeTag, ICombatArmorItem {
     protected final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -46,7 +37,7 @@ public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEq
     private final float ricochetReduction;
 
     public BaseArmorGeoImpl(Type type, String id, int defense, int defaultDurability, int absorb, float bluntReduction, float penetrateReduction, float ricochetReduction, float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
-        super(PlateBaseMaterial.ARMOR_STEEL, type, new Properties().defaultDurability(defaultDurability));
+        super(ArmorMaterials.IRON, type, new Properties().durability(defaultDurability));
         this.type = type;
         this.id = id;
         this.defense = defense;
@@ -60,8 +51,8 @@ public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEq
         this.ricochetReduction = ricochetReduction;
     }
 
-    public BaseArmorGeoImpl(Type type, String id, int defense, int defaultDurability, int absorb, float bluntReduction, float penetrateReduction,float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
-        super(PlateBaseMaterial.ARMOR_STEEL, type, new Properties().defaultDurability(defaultDurability));
+    public BaseArmorGeoImpl(Type type, String id, int defense, int defaultDurability, int absorb, float bluntReduction, float penetrateReduction, float mass, ResourceLocation texture, ResourceLocation model, ResourceLocation animation) {
+        super(ArmorMaterials.IRON, type, new Properties().durability(defaultDurability));
         this.type = type;
         this.id = id;
         this.defense = defense;
@@ -80,10 +71,6 @@ public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEq
         return type;
     }
 
-    @Override
-    public @NotNull ArmorMaterial getMaterial() {
-        return PlateBaseMaterial.ARMOR_STEEL;
-    }
 
     @Override
     public int getDefense() {
@@ -99,30 +86,6 @@ public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEq
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
     }
 
-    @Override
-    public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(new IClientItemExtensions() {
-            private ArmorRender<BaseArmorGeoImpl> render;
-            private ArmorRender.ItemRender<BaseArmorGeoImpl> itemRender;
-
-            @Override
-            public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
-                if (render == null) {
-                    this.render = new ArmorRender<>(new GenerateModel<>(texture, model, animation));
-                }
-                render.prepForRender(livingEntity, itemStack, equipmentSlot, original);
-                return render;
-            }
-
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                if (itemRender == null) {
-                    this.itemRender = new ArmorRender.ItemRender<>(new GenerateModel<>(texture, model, animation));
-                }
-                return itemRender;
-            }
-        });
-    }
 
     @Override
     public int getAbsorb() {
@@ -139,20 +102,44 @@ public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEq
         return mass;
     }
 
+
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
-        if (slot != EquipmentSlot.CHEST) return super.getAttributeModifiers(slot, stack);
-        Multimap<Attribute, AttributeModifier> modifierMultimap = HashMultimap.create();
-        stack.getOrCreateTag().putInt("protection_class", getAbsorb());
-        stack.getOrCreateTag().putFloat("movement_fix", getMass());
-        modifierMultimap.put(Attributes.ARMOR, new AttributeModifier(UUID.nameUUIDFromBytes(("Armor").getBytes()), "CuriosArmorDefense", this.getDefense(), AttributeModifier.Operation.ADDITION));
-        modifierMultimap.put(Attributes.MOVEMENT_SPEED, new AttributeModifier(UUID.nameUUIDFromBytes(("MoveSpeed").getBytes()), "MoveSpeed", getMass(), AttributeModifier.Operation.MULTIPLY_TOTAL));
-        return modifierMultimap;
+    public @NotNull ItemAttributeModifiers getDefaultAttributeModifiers() {
+        return super.getDefaultAttributeModifiers();
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
-        ICombatArmorItem.super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
+    public @NotNull ItemAttributeModifiers getDefaultAttributeModifiers(@NotNull ItemStack stack) {
+        CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+        tag.putInt("protection_class", getAbsorb());
+        tag.putFloat("movement_fix", getMass());
+        CustomData.set(DataComponents.CUSTOM_DATA, stack, tag);
+        return ItemAttributeModifiers.builder()
+                .add(
+                        Attributes.ARMOR,
+                        new AttributeModifier(
+                                ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "armor_attr"),
+                                this.getDefense(),
+                                AttributeModifier.Operation.ADD_VALUE
+                        ),
+                        EquipmentSlotGroup.CHEST
+                )
+                .add(
+                        Attributes.MOVEMENT_SPEED,
+                        new AttributeModifier(
+                                ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "speed_attr"),
+                                this.getMass(),
+                                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
+                        ),
+                        EquipmentSlotGroup.CHEST
+                )
+
+                .build();
+    }
+
+    @Override
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
+        ICombatArmorItem.super.appendHoverText(stack, context, tooltipComponents, isAdvanced);
     }
 
     @Override
@@ -168,6 +155,21 @@ public abstract class BaseArmorGeoImpl extends ArmorItem implements GeoItem, IEq
     @Override
     public float generateRicochet() {
         return ricochetReduction;
+    }
+
+    @Override
+    public ResourceLocation getTexture() {
+        return texture;
+    }
+
+    @Override
+    public ResourceLocation getModel() {
+        return model;
+    }
+
+    @Override
+    public ResourceLocation getAnimation() {
+        return animation;
     }
 }
 

@@ -9,7 +9,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.MinecraftForge;
+import net.neoforged.neoforge.common.NeoForge;
 import net.zerocontact.api.armor.IEquipmentTypeTag;
 import net.zerocontact.curios.CuriosConstants;
 import net.zerocontact.events.EventUtil;
@@ -35,13 +35,13 @@ public class HitUtil {
         Vec3 hitPosition = collision != null && collision.getEntity() == target ? collision.getHitPos() : null;
         HitPart fallback = new HitPart(headshot ? HitPartEnum.HEAD : HitPartEnum.TORSO, 1f);
         ResolveHitBodyPartEvent.Pre pre = new ResolveHitBodyPartEvent.Pre(target, source, hitPosition, fallback);
-        MinecraftForge.EVENT_BUS.post(pre);
+        NeoForge.EVENT_BUS.post(pre);
         HitPart resolved = pre.getHitPart();
         if (resolved.hitPart() == HitPartEnum.UNSET) {
             resolved = new HitPart(fallback.hitPart(), resolved.damageFactor());
         }
         if (accessor != null) accessor.zc$setResolvedHitPart(target, resolved);
-        MinecraftForge.EVENT_BUS.post(new ResolveHitBodyPartEvent.Post(target, source, hitPosition, resolved));
+        NeoForge.EVENT_BUS.post(new ResolveHitBodyPartEvent.Post(target, source, hitPosition, resolved));
         return resolved;
     }
 

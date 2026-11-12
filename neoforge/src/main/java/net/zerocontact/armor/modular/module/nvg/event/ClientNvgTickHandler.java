@@ -7,11 +7,12 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RenderFrameEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.armor.modular.module.nvg.api.INvg;
 import net.zerocontact.armor.modular.module.nvg.client.ClientInteractionManger;
@@ -23,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.Objects;
 
-@Mod.EventBusSubscriber(modid = ZeroContact.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@EventBusSubscriber(modid = ZeroContact.MOD_ID, value = Dist.CLIENT)
 public final class ClientNvgTickHandler {
     private static final Map<INvg.Type, ResourceLocation> TYPE_EFFECTS = Map.of(
             INvg.Type.GREEN, ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "shaders/post/nvg_green.json"),
@@ -36,7 +37,7 @@ public final class ClientNvgTickHandler {
     private static PostChain ownedEffect;
     private static boolean reloadPending;
 
-    @Mod.EventBusSubscriber(modid = ZeroContact.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = ZeroContact.MOD_ID, value = Dist.CLIENT)
     public static final class ReloadListener {
         @SubscribeEvent
         public static void register(RegisterClientReloadListenersEvent event) {
@@ -45,8 +46,7 @@ public final class ClientNvgTickHandler {
     }
 
     @SubscribeEvent
-    public static void clientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
+    public static void clientTick(ClientTickEvent.Post event) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.getOverlay() instanceof LoadingOverlay) return;
         var effect = ClientInteractionManger.get();
@@ -91,8 +91,7 @@ public final class ClientNvgTickHandler {
     }
 
     @SubscribeEvent
-    public static void renderTick(TickEvent.RenderTickEvent event) {
-        if (event.phase != TickEvent.Phase.START) return;
+    public static void renderTick(RenderFrameEvent.Pre event) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level == null || minecraft.player == null
                 || minecraft.getOverlay() instanceof LoadingOverlay || reloadPending) return;
@@ -103,7 +102,7 @@ public final class ClientNvgTickHandler {
                 && !Objects.equals(loadedEffect, TYPE_EFFECTS.get(INvg.Type.WHITE))) return;
 
         // Update the existing program before this frame's PostChain.process().
-        float partialTick = minecraft.isPaused() ? 1.0F : event.renderTickTime;
+        float partialTick = minecraft.isPaused() ? 1.0F : event.getPartialTick().getGameTimeDeltaPartialTick(false);
         float gain = ClientInteractionManger.get().gain(partialTick);
         for (var pass : ((PostChainAccessor) ownedEffect).zerocontact$getPasses()) {
             var uniform = pass.getEffect().getUniform("Gain");

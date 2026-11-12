@@ -1,16 +1,18 @@
 package net.zerocontact.armor.modular.client.network.handler;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.client.network.s2c.UpdateNavBoardPacket;
+import net.zerocontact.armor.modular.module.pouch.client.NavBoardScreens;
 import net.zerocontact.armor.modular.module.pouch.container.navboard.ChunkSampler;
 import net.zerocontact.armor.modular.module.pouch.container.navboard.NavBoardChunkTile;
-import net.zerocontact.capability.CapabilityRegistries;
-import net.zerocontact.armor.modular.module.pouch.client.NavBoardScreens;
+
+import java.util.Optional;
 
 public final class NavBoardUpdateHandler {
 
@@ -23,11 +25,11 @@ public final class NavBoardUpdateHandler {
         if (player == null || level == null || !player.isAlive() || player.isSpectator()
                 || !level.dimension().location().equals(packet.dimension())) return;
         var equipment = packet.target().resolve(player);
-        if (equipment.isEmpty() || !packet.equipmentItem().equals(ForgeRegistries.ITEMS.getKey(equipment.getItem()))) return;
-        equipment.getCapability(CapabilityRegistries.MODULAR_EQUIPMENT).ifPresent(modules -> {
+        if (equipment.isEmpty() || !packet.equipmentItem().equals(BuiltInRegistries.ITEM.getKey(equipment.getItem()))) return;
+        Optional.ofNullable(equipment.getCapability(ModularCapabilityRegistry.MODULAR_EQUIPMENT)).ifPresent(modules -> {
             var module = modules.getModule(packet.mountId());
-            if (module.isEmpty() || !packet.moduleItem().equals(ForgeRegistries.ITEMS.getKey(module.getItem()))) return;
-            module.getCapability(CapabilityRegistries.NAV_BOARD).ifPresent(cap -> {
+            if (module.isEmpty() || !packet.moduleItem().equals(BuiltInRegistries.ITEM.getKey(module.getItem()))) return;
+            Optional.ofNullable(module.getCapability(ModularCapabilityRegistry.NAV_BOARD)).ifPresent(cap -> {
                 if (!cap.isEnabled()) {
                     cap.clearTiles();
                     return;

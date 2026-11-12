@@ -1,9 +1,10 @@
 package net.zerocontact.client.interaction;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.zerocontact.ZeroContact;
 import net.zerocontact.config.ModConfigs;
 
 public class SuppressionManager {
@@ -20,11 +21,10 @@ public class SuppressionManager {
         suppressionLevel = (float) Math.max(0.0, suppressionLevel - DECAY_RATE);
     }
 
-    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = ZeroContact.MOD_ID, value = Dist.CLIENT)
     static class Listener {
         @SubscribeEvent
-        public static void onClientTick(TickEvent.ClientTickEvent event) {
-            if (event.phase != TickEvent.Phase.END) return;
+        public static void onClientTick(ClientTickEvent.Post event) {
             if (suppressionLevel > 0) {
                 decreaseSuppression();
             }

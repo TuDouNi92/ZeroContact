@@ -4,6 +4,8 @@ import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
 import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.init.ModDamageTypes;
 import dev.architectury.event.EventResult;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
@@ -11,6 +13,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.zerocontact.api.armor.ICombatArmorItem;
 import net.zerocontact.api.armor.HelmetInfoProvider;
 import net.zerocontact.caliber.AmmoInjector;
@@ -34,7 +37,9 @@ public class PlateDamageEvent {
     }
 
     private static void damage(LivingEntity livingEntity, DamageSource damageSource, float amount, ItemStack[] stacksInSlot) {
-        if (damageSource.is(ModDamageTypes.BULLET_IGNORE_ARMOR) && damageSource.typeHolder().containsTag(DamageTypeTags.BYPASSES_ARMOR))
+        if (damageSource.is(ModDamageTypes.BULLET_IGNORE_ARMOR)
+                && damageSource.typeHolder().tags().anyMatch(tag -> tag.equals(DamageTypeTags.BYPASSES_ARMOR))
+        )
             return;
         float durabilityLossFactor = 0.1f;
         float defaultArmorDamage = Math.min(amount * 0.1f, 10);
@@ -57,7 +62,7 @@ public class PlateDamageEvent {
 
                 AmmoInjector.AmmoContext ammoContext = BulletBinder.getContext(bullet);
                 float caliberArmorDamage;
-                int hits = stackInSlot.getOrCreateTag().getInt("hits");
+                int hits = getHits(stackInSlot);
                 if (ammoContext != null) {
                     CaliberHelper.Caliber caliber = ammoContext.caliber();
                     if (caliber.armorDamage() != 0) {
@@ -73,10 +78,12 @@ public class PlateDamageEvent {
                     }
                 }
 
-                hits++;
-                stackInSlot.getOrCreateTag().putInt("hits", hits);
+                advanceHits(stackInSlot, hits);
 
-                stackInSlot.hurtAndBreak(durabilityLossAmount, livingEntity, holder -> holder.level().playSound(null, holder.blockPosition(), ModSoundEventsReg.ARMOR_BROKEN_PLATE, SoundSource.PLAYERS));
+                stackInSlot.hurtAndBreak(
+                        durabilityLossAmount, (ServerLevel) livingEntity.level(),
+                        livingEntity, (item) -> livingEntity.level().playSound(null, livingEntity.blockPosition(), ModSoundEventsReg.ARMOR_BROKEN_PLATE, SoundSource.PLAYERS)
+                );
             }
         }
     }
@@ -97,12 +104,15 @@ public class PlateDamageEvent {
             if (e instanceof LivingEntity livingEntity) {
                 ItemStack stack = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
                 float durabilityLossFactor = 1;
-                int hits = stack.getOrCreateTag().getInt("hits") + 1;
+                int hits = getHits(stack);
                 int durabilityLossAmount;
                 if (stack.getItem() instanceof ICombatArmorItem durabilityLossProvider && stack.getItem() instanceof HelmetInfoProvider) {
                     durabilityLossAmount = durabilityLossProvider.generateLoss(amount, durabilityLossFactor, hits);
-                    stack.getOrCreateTag().putInt("hits", hits);
-                    stack.hurtAndBreak(durabilityLossAmount, livingEntity, holder -> holder.level().playSound(null, holder.blockPosition(), ModSoundEventsReg.ARMOR_BROKEN_PLATE, SoundSource.PLAYERS));
+                    advanceHits(stack, hits);
+                    stack.hurtAndBreak(
+                            durabilityLossAmount, (ServerLevel) livingEntity.level(),
+                            livingEntity, (item) -> livingEntity.level().playSound(null, livingEntity.blockPosition(), ModSoundEventsReg.ARMOR_BROKEN_PLATE, SoundSource.PLAYERS)
+                    );
                 }
             }
         });
@@ -116,5 +126,19 @@ public class PlateDamageEvent {
         ResolveHitBodyPartEvent.HitPart part = HitUtil.resolveHitPart(entity, damageSource);
         if (part.hitPart() == ResolveHitBodyPartEvent.HitPartEnum.HEAD || part.isLimb()) return EventResult.pass();
         return modify(entity, damageSource, amount, HitUtil.getHitBodyPartStack(entity, damageSource, part)) ? EventResult.interruptFalse() : EventResult.pass();
+    }
+
+    private static int getHits(ItemStack stack) {
+        return stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getInt("hits");
+    }
+
+    private static void advanceHits(ItemStack stack, int hits) {
+        CustomData.update(
+                DataComponents.CUSTOM_DATA,
+                stack,
+                (tag) -> {
+                    tag.putInt("hits", hits + 1);
+                }
+        );
     }
 }

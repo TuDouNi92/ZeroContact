@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    name: Build for Forge
+    name: Build for NeoForge
     runs-on: ubuntu-latest
     steps:
       - name: CheckOut
@@ -12,7 +12,7 @@ jobs:
       - name : Set Up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 21
           distribution: temurin
       - name: Cache Gradle
         uses: actions/cache@v3
@@ -26,7 +26,7 @@ jobs:
       - name: Make Gradle Executable
         run: chmod +x ./gradlew
       - name: Build and Remap Jar
-        run: ./gradlew :forge:remapJar
+        run: ./gradlew :neoforge:remapJar
 
       - name: Get build metadata
         id: vars
@@ -38,12 +38,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ZeroContact-${{ steps.vars.outputs.SAFE_REF }}-build-${{ github.run_number }}-${{ steps.vars.outputs.SHORT_SHA }}
-          path: forge/build/libs/zerocontact-*.*.*.jar
+          path: neoforge/build/libs/zerocontact-*.*.*.jar
 
       - name: Rename file
         run: |
           mkdir -p nightly 
-          original_jar=$(ls forge/build/libs/zerocontact-*.*.[0-9].jar) 
+          original_jar=$(ls neoforge/build/libs/zerocontact-*.*.[0-9].jar) 
           new_jar="ZeroContact-${{ steps.vars.outputs.SAFE_REF }}-build-${{ github.run_number }}-${{ steps.vars.outputs.SHORT_SHA }}.jar" 
           cp "$original_jar" "nightly/$new_jar" 
 

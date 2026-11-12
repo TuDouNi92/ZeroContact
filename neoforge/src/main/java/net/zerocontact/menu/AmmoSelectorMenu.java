@@ -1,6 +1,7 @@
 package net.zerocontact.menu;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -14,8 +15,9 @@ public class AmmoSelectorMenu extends AbstractContainerMenu {
     public final ArrayList<Map.Entry<ItemStack, Integer>> ammo;
     public final Inventory playerInv;
 
-    public AmmoSelectorMenu(int containerId, Inventory playerInv, FriendlyByteBuf buf) {
-        this(containerId, buf.readMap(LinkedHashMap::new,FriendlyByteBuf::readItem, FriendlyByteBuf::readInt), playerInv);
+    public AmmoSelectorMenu(int containerId, Inventory playerInv, RegistryFriendlyByteBuf buf) {
+        this(containerId, buf.readMap(LinkedHashMap::new,
+                buffer -> ItemStack.OPTIONAL_STREAM_CODEC.decode(buf), FriendlyByteBuf::readInt), playerInv);
     }
 
     //server Constructor

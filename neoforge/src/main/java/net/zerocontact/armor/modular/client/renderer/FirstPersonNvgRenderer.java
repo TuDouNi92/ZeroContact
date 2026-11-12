@@ -5,12 +5,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderHandEvent;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.client.event.RenderHandEvent;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
+import net.neoforged.neoforge.client.event.RenderFrameEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.armor.modular.module.nvg.client.ClientInteractionManger;
 import net.zerocontact.armor.modular.module.nvg.client.NvgEffectState;
@@ -18,7 +18,7 @@ import net.zerocontact.armor.modular.module.nvg.client.NvgEffectState;
 /**
  * Camera-relative view model, independent of the player's held items and NVG power.
  */
-@Mod.EventBusSubscriber(modid = ZeroContact.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@EventBusSubscriber(modid = ZeroContact.MOD_ID, value = Dist.CLIENT)
 public final class FirstPersonNvgRenderer {
     // Camera coordinates: +X right, +Y up, -Z forward. Kept together for model fitting.
     private static final double OFFSET_X = 0.0;
@@ -31,8 +31,8 @@ public final class FirstPersonNvgRenderer {
     }
 
     @SubscribeEvent
-    public static void beginFrame(TickEvent.RenderTickEvent event) {
-        if (event.phase == TickEvent.Phase.START) renderedThisFrame = false;
+    public static void beginFrame(RenderFrameEvent.Pre event) {
+        renderedThisFrame = false;
     }
 
     @SubscribeEvent(receiveCanceled = true)

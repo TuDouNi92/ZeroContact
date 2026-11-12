@@ -3,7 +3,7 @@ package net.zerocontact.item.uniform;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ArmorItem;
 import net.zerocontact.api.armor.IEquipmentTypeTag;
-import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
+import net.zerocontact.item.neoforge.AbstractGenerateGeoCurioItemImpl;
 import org.jetbrains.annotations.NotNull;
 
 public class BaseUniformTop extends AbstractGenerateGeoCurioItemImpl implements IEquipmentTypeTag {

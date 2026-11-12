@@ -3,7 +3,7 @@ package net.zerocontact.armor.modular.client.gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.zerocontact.armor.modular.ModuleQuery;
 import net.zerocontact.armor.modular.client.network.c2s.ModuleActionPacket;
 import net.zerocontact.armor.modular.model.*;
@@ -57,8 +57,8 @@ public final class ModuleHudState {
                     ModuleContext context = new ModuleContext(player, ref.equipmentTarget(), ref.mountId(), ref.stack());
                     controller.inspect(context).ifPresent(view -> next.add(new Entry(
                             new Address(ref.equipmentTarget(), ref.mountId()), ref.stack().getHoverName().copy(), view,
-                            ForgeRegistries.ITEMS.getKey(ref.equipmentTarget().resolve(player).getItem()),
-                            ForgeRegistries.ITEMS.getKey(ref.stack().getItem()))));
+                            BuiltInRegistries.ITEM.getKey(ref.equipmentTarget().resolve(player).getItem()),
+                            BuiltInRegistries.ITEM.getKey(ref.stack().getItem()))));
                 }));
         entries = List.copyOf(next);
         selected = Math.min(selected, Math.max(0, entries.size() - 1));

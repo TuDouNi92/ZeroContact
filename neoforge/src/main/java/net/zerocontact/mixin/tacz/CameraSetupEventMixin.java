@@ -7,10 +7,12 @@ import com.tacz.guns.resource.pojo.data.gun.GunRecoil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.zerocontact.capability.CapabilityRegistries;
+import net.zerocontact.caliber.capability.CapabilityRegistry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import java.util.Optional;
 
 @Mixin(value = CameraSetupEvent.class)
 public class CameraSetupEventMixin {
@@ -26,7 +28,7 @@ public class CameraSetupEventMixin {
         if (player == null) return original;
         ItemStack gunStack = player.getMainHandItem();
         if (!(gunStack.getItem() instanceof IGun)) return original;
-        return gunStack.getCapability(CapabilityRegistries.CARTRIDGE).map(cap -> {
+        return Optional.ofNullable(gunStack.getCapability(CapabilityRegistry.CARTRIDGE)).map(cap -> {
             GunRecoil recoil = cap.getRecoil(gunStack);
             if (recoil == null) return original;
             return recoil;

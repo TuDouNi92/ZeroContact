@@ -5,9 +5,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.zerocontact.ZeroContact;
 import net.zerocontact.api.armor.modular.ModuleController;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.model.*;
 import net.zerocontact.armor.modular.module.beacon.container.BeaconContainer;
-import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.registries.ModSoundEventsReg;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class BeaconController implements ModuleController {
 
     @Override
     public Optional<ModuleView> inspect(ModuleContext context) {
-        return context.module().getCapability(CapabilityRegistries.BEACON)
+        return Optional.ofNullable(context.module().getCapability(ModularCapabilityRegistry.BEACON))
                 .map(
                         cap -> {
                             ResourceLocation nextAction = switch (cap.getMode()) {
@@ -72,7 +72,7 @@ public class BeaconController implements ModuleController {
 
     @Override
     public ActionResult execute(ModuleContext context, ModuleAction action) {
-        return context.module().getCapability(CapabilityRegistries.BEACON)
+        return Optional.ofNullable(context.module().getCapability(ModularCapabilityRegistry.BEACON))
                 .map(cap -> {
                     context.wearer().playNotifySound(ModSoundEventsReg.BEACON_SWITCH, SoundSource.PLAYERS,1.0f,1.0f);
                     if (action.id().equals(DISABLE_ACTION)) {

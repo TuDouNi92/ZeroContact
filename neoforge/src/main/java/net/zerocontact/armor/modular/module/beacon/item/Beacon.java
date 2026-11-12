@@ -5,7 +5,7 @@ import net.zerocontact.ZeroContact;
 import net.zerocontact.api.armor.modular.EquipmentModule;
 import net.zerocontact.armor.modular.model.MountCategory;
 import net.zerocontact.armor.modular.registry.ModuleRegistry;
-import net.zerocontact.item.forge.AbstractGenerateGeoCurioItemImpl;
+import net.zerocontact.item.neoforge.AbstractGenerateGeoCurioItemImpl;
 
 public class Beacon extends AbstractGenerateGeoCurioItemImpl implements EquipmentModule {
     private static final ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(ZeroContact.MOD_ID, "textures/models/beacon/beacon.png");

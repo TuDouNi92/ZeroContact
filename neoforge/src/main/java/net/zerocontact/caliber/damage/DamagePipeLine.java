@@ -2,13 +2,13 @@ package net.zerocontact.caliber.damage;
 
 import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
 import com.tacz.guns.api.event.common.GunDamageSourcePart;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.common.NeoForge;
 import net.zerocontact.api.armor.ICombatArmorItem;
 import net.zerocontact.api.armor.HelmetInfoProvider;
 import net.zerocontact.caliber.damage.model.DamageContext;
@@ -185,7 +185,7 @@ public class DamagePipeLine {
                 Entity target = context.event().getHurtEntity();
                 if (target == null) return current;
                 EntityType<?> type = target.getType();
-                ResourceLocation mobId = ForgeRegistries.ENTITY_TYPES.getKey(type);
+                ResourceLocation mobId = BuiltInRegistries.ENTITY_TYPE.getKey(type);
                 MobRulesPOJO.Pattern mobPattern = MobRuleRegistry.get(mobId);
                 if (mobPattern == null || context.event().isHeadShot()) return current;
                 return current.finalAmount(
@@ -219,7 +219,7 @@ public class DamagePipeLine {
                 result.isHeadshot(),
                 result.finalAmount()
         );
-        boolean eventCanceled = MinecraftForge.EVENT_BUS.post(pre);
+        boolean eventCanceled = NeoForge.EVENT_BUS.post(pre).isCanceled();
         if (eventCanceled) {
             event.setBaseAmount(result.finalAmount());
             ((ZDamageTypes.ZDamageSource) result.finalSource()).setSkip(true);

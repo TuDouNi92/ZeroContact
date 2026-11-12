@@ -1,8 +1,7 @@
 package net.zerocontact.caliber.registry;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EntityType;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.datagen.model.MobRulesPOJO;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,10 +18,7 @@ public class MobRuleRegistry {
     public static void register(MobRulesPOJO pojo) {
         for (MobRulesPOJO.Pattern mob : pojo.mobs) {
             ResourceLocation mobId = ResourceLocation.parse(mob.mobId());
-            EntityType<?> type = ForgeRegistries.ENTITY_TYPES.getValue(mobId);
-            if (type != null) {
-                MOB_RULES.put(mobId, mob);
-            }
+            BuiltInRegistries.ENTITY_TYPE.getOptional(mobId).ifPresent(type -> MOB_RULES.put(mobId, mob));
         }
     }
 }

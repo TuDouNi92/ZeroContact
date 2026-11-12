@@ -7,11 +7,14 @@ import com.tacz.guns.api.item.builder.AmmoItemBuilder;
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.world.item.component.CustomData;
 import net.zerocontact.caliber.CaliberSerializer;
 import net.zerocontact.compat.magazines.MagazineRoundStack;
 import net.zerocontact.compat.magazines.MagazineRoundStack.Group;
@@ -22,21 +25,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-/** Read-only feed-order preview, shared across tooltip renderers recreated each frame. */
+/**
+ * Read-only feed-order preview, shared across tooltip renderers recreated each frame.
+ */
 public final class MagazineAmmoTooltip {
     private static final int GAP = 8;
     private static final int INDENT = 6;
     private static final long SCROLL_MILLIS = 220;
     private static final Map<ItemStack, ScrollState> STATES = new WeakHashMap<>();
 
-    private MagazineAmmoTooltip() {}
+    private MagazineAmmoTooltip() {
+    }
 
     private static List<Group> groups(ItemStack magazine) {
         if (magazine.isEmpty() || !(magazine.getItem() instanceof MagazineItem item)) return List.of();
-        int count = Math.min(Math.max(0, item.getAmmoCount(magazine)),
-                Math.max(0, MagazineItem.getMaxCapacity(magazine)));
-        Round fallback = magazine.getTag() == null ? null
-                : Round.load(magazine.getTag().getCompound(CaliberSerializer.AI_AMMO));
+        int count = Math.clamp(item.getAmmoCount(magazine), 0, Math.max(0, MagazineItem.getMaxCapacity(magazine)));
+        CustomData data = magazine.get(DataComponents.CUSTOM_DATA);
+        if (data == null) return List.of();
+        CompoundTag tag = data.copyTag();
+        Round fallback = Round.load(tag.getCompound(CaliberSerializer.AI_AMMO));
         if (fallback == null) {
             String family = MagazineItem.getMagazineFamilyId(magazine);
             ResourceLocation id = family == null || family.isBlank() ? null
@@ -46,12 +53,12 @@ public final class MagazineAmmoTooltip {
                 fallback = new Round(id.toString(), CaliberSerializer.DEFAULT_AMMO);
             }
         }
-        MagazineRoundStack rounds = MagazineRoundStack.load(magazine.getTag(), count, fallback);
+        MagazineRoundStack rounds = MagazineRoundStack.load(tag, count, fallback);
         return rounds == null ? List.of() : rounds.feedGroups(2);
     }
 
     private static ItemStack displayStack(Round round) {
-        Item item = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(round.variant()));
+        Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(round.variant()));
         return item instanceof GenerateAmmo ? item.getDefaultInstance()
                 : AmmoItemBuilder.create().setId(ResourceLocation.parse(round.ammoId())).setCount(1).build();
     }

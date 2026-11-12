@@ -1,13 +1,16 @@
 package net.zerocontact.api.armor;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.zerocontact.ZeroContact;
 import net.zerocontact.animation_data.AnimateData;
+import net.zerocontact.capability.TagUtil;
 import net.zerocontact.network.ModMessages;
 import net.zerocontact.network.s2c.ToggleVisorResultPacket;
 import org.jetbrains.annotations.ApiStatus;
@@ -21,11 +24,13 @@ public interface Toggleable {
     void saveAnimData(AnimateData.VisorAnimateData animateData, ItemStack stack);
 
     default void saveStatus(ItemStack stack, boolean switchOn) {
-        stack.getOrCreateTag().putBoolean("VisorOn", switchOn);
+        TagUtil.updateTag(stack,compoundTag -> {
+            compoundTag.putBoolean("VisorOn", switchOn);
+        });
     }
 
     default Boolean readStatus(ItemStack stack, String key) {
-        return stack.getOrCreateTag().getBoolean(key);
+        return TagUtil.getOrCreateTag(stack).getBoolean(key);
     }
 
     default void flipState(Toggleable toggleable, ItemStack stack) {
@@ -36,11 +41,11 @@ public interface Toggleable {
     }
 
     default void triggered(ItemStack stack, boolean toggleState) {
-        stack.getOrCreateTag().putBoolean("Toggle", toggleState);
+        TagUtil.updateTag(stack,compoundTag -> compoundTag.putBoolean("Toggle", toggleState));
     }
 
     default boolean getTriggered(ItemStack stack) {
-        return stack.getOrCreateTag().getBoolean("Toggle");
+        return TagUtil.getOrCreateTag(stack).getBoolean("Toggle");
     }
 
     interface Backpack {
@@ -49,7 +54,7 @@ public interface Toggleable {
         boolean getToggling(ItemStack stack);
     }
 
-    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
+    @EventBusSubscriber(modid = ZeroContact.MOD_ID)
     class VisorListener {
         @SubscribeEvent
         public static void visorEquip(LivingEquipmentChangeEvent equipmentChangeEvent) {

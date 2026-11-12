@@ -4,21 +4,21 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.zerocontact.armor.modular.ModuleQuery;
+import net.zerocontact.armor.modular.capability.ModularCapabilityRegistry;
 import net.zerocontact.armor.modular.client.network.c2s.ModuleDataPacket;
 import net.zerocontact.armor.modular.model.EquipmentTarget;
 import net.zerocontact.armor.modular.module.radio.api.MBITR;
 import net.zerocontact.armor.modular.module.radio.container.RadioContainer;
 import net.zerocontact.armor.modular.module.radio.model.RadioProfile;
 import net.zerocontact.armor.modular.module.radio.service.MBITRController;
-import net.zerocontact.capability.CapabilityRegistries;
 import net.zerocontact.network.ModMessages;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -58,15 +58,15 @@ public final class RadioScreen extends Screen {
     public static void openFirstActive(Minecraft minecraft) {
         var player = minecraft.player;
         if (player == null) return;
-        ModuleQuery.streamMounted(player).filter(ref -> ref.stack()
-                .getCapability(CapabilityRegistries.RADIO)
-                .map(radio -> radio.getRadioState().radioActivated()).orElse(false))
-                .findFirst().ifPresent(ref -> ref.stack().getCapability(CapabilityRegistries.RADIO).ifPresent(radio -> {
+        ModuleQuery.streamMounted(player).filter(ref -> Optional.ofNullable(ref.stack()
+                                .getCapability(ModularCapabilityRegistry.RADIO))
+                        .map(radio -> radio.getRadioState().radioActivated()).orElse(false))
+                .findFirst().ifPresent(ref -> Optional.ofNullable(ref.stack().getCapability(ModularCapabilityRegistry.RADIO)).ifPresent(radio -> {
                     var equipment = ref.equipmentTarget().resolve(player);
                     if (equipment.isEmpty()) return;
                     minecraft.setScreen(new RadioScreen(ref,
-                            ForgeRegistries.ITEMS.getKey(equipment.getItem()),
-                            ForgeRegistries.ITEMS.getKey(ref.stack().getItem()), radio.getProfile()));
+                            BuiltInRegistries.ITEM.getKey(equipment.getItem()),
+                            BuiltInRegistries.ITEM.getKey(ref.stack().getItem()), radio.getProfile()));
                 }));
     }
 
@@ -165,14 +165,14 @@ public final class RadioScreen extends Screen {
         if (minecraft != null) {
             equipment = target.resolve(minecraft.player);
         }
-        if (equipment != null && (equipment.isEmpty() || !equipmentItem.equals(ForgeRegistries.ITEMS.getKey(equipment.getItem())))) {
+        if (equipment != null && (equipment.isEmpty() || !equipmentItem.equals(BuiltInRegistries.ITEM.getKey(equipment.getItem())))) {
             return Optional.empty();
         }
         if (equipment != null) {
-            return equipment.getCapability(CapabilityRegistries.MODULAR_EQUIPMENT).resolve()
+            return Optional.ofNullable(equipment.getCapability(ModularCapabilityRegistry.MODULAR_EQUIPMENT))
                     .map(container -> container.getModule(mountId))
-                    .filter(stack -> !stack.isEmpty() && moduleItem.equals(ForgeRegistries.ITEMS.getKey(stack.getItem())))
-                    .flatMap(stack -> stack.getCapability(CapabilityRegistries.RADIO).resolve())
+                    .filter(stack -> !stack.isEmpty() && moduleItem.equals(BuiltInRegistries.ITEM.getKey(stack.getItem())))
+                    .flatMap(stack -> Optional.ofNullable(stack.getCapability(ModularCapabilityRegistry.RADIO)))
                     .filter(radio -> radio.getRadioState().radioActivated());
         }
         return Optional.empty();
@@ -208,8 +208,8 @@ public final class RadioScreen extends Screen {
     }
 
     @Override
-    public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        renderBackground(graphics);
+    public void renderBackground(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.renderBackground(graphics, mouseX, mouseY, partialTick);
         int left = (width - PANEL_WIDTH) / 2;
         int top = (height - PANEL_HEIGHT) / 2;
         graphics.fill(left, top, left + PANEL_WIDTH, top + PANEL_HEIGHT, 0xFF20282D);
@@ -222,7 +222,6 @@ public final class RadioScreen extends Screen {
                         + (input.isEmpty() ? "" : "_") + " MHz",
                 left + 16, top + 52, 0xFF172A1E, false);
         if (!status.isEmpty()) graphics.drawCenteredString(font, status, width / 2, top + 220, 0xFFE0DFB0);
-        super.render(graphics, mouseX, mouseY, partialTick);
     }
 
     @Override
