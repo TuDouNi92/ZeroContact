@@ -1,16 +1,17 @@
 package net.zerocontact.client.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.tacz.guns.init.ModDamageTypes;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -20,8 +21,7 @@ import net.zerocontact.caliber.damage.ZDamageTypes;
 import net.zerocontact.forge.EnvHelper;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Locale;
 
 @EventBusSubscriber(modid = ZeroContact.MOD_ID, value = Dist.CLIENT)
 public class HitIndicatorOverlay {
@@ -33,11 +33,10 @@ public class HitIndicatorOverlay {
         private final int displaySlot;
         private int timer;
 
-        HurtRecord(LivingEntity target, float amount, int timer, int displaySlot) {
-            this.targetPos = target.position();
-            this.targetId = target.getId();
+        HurtRecord(Vec3 targetPos, int targetId, float amount, int displaySlot) {
+            this.targetPos = targetPos;
+            this.targetId = targetId;
             this.amount = amount;
-            this.timer = timer;
             this.displaySlot = displaySlot;
         }
     }
@@ -51,10 +50,28 @@ public class HitIndicatorOverlay {
 
     @SubscribeEvent
     public static void livingHurt(LivingIncomingDamageEvent event) {
+        if (!EnvHelper.DEBUG) return;
         DamageSource source = event.getSource();
         if (source.is(ZDamageTypes.ZC_DAMAGE) || source.is(ModDamageTypes.BULLETS_TAG)) {
             LivingEntity target = event.getEntity();
-            targetEntities.add(new HurtRecord(target, event.getAmount(), 0, findAvailableDisplaySlot(target.getId())));
+            Vec3 targetPos = target.position();
+            int targetId = target.getId();
+            float amount = event.getAmount();
+            // Damage events also run on the integrated server thread; keep the render list client-owned.
+            Minecraft.getInstance().execute(() -> targetEntities.add(
+                    new HurtRecord(targetPos, targetId, amount, findAvailableDisplaySlot(targetId))));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onClientTick(ClientTickEvent.Post event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null) {
+            targetEntities.clear();
+            return;
+        }
+        if (!mc.isPaused()) {
+            targetEntities.removeIf(record -> ++record.timer >= RESIDENCE_TICKS);
         }
     }
 
@@ -73,23 +90,19 @@ public class HitIndicatorOverlay {
 
     @SubscribeEvent
     public static void renderInLevel(RenderLevelStageEvent event) {
-        if(!EnvHelper.DEBUG)return;
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_ENTITIES) return;
+        if (!EnvHelper.DEBUG) return;
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_LEVEL) return;
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null) return;
-        PoseStack poseStack = event.getPoseStack();
-        Camera camera = mc.gameRenderer.getMainCamera();
+        if (mc.player == null || targetEntities.isEmpty()) return;
+        // AFTER_LEVEL runs after LevelRenderer restores the global model-view stack.
+        PoseStack poseStack = new PoseStack();
+        poseStack.mulPose(event.getModelViewMatrix());
+        Camera camera = event.getCamera();
         Vec3 cameraPos = camera.getPosition();
-        Iterator<HurtRecord> iterator = targetEntities.iterator();
-        while (iterator.hasNext()) {
-            HurtRecord record = iterator.next();
-            record.timer++;
-            if (record.timer >= RESIDENCE_TICKS) {
-                iterator.remove();
-            }
-        }
-        for (HurtRecord record1 : List.copyOf(targetEntities)) {
-            float progress = (float) record1.timer/RESIDENCE_TICKS;
+        MultiBufferSource.BufferSource buffer = mc.renderBuffers().bufferSource();
+        float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(false);
+        for (HurtRecord record1 : targetEntities) {
+            float progress = (record1.timer + partialTick) / RESIDENCE_TICKS;
             double yOffset = progress / 2;
             poseStack.pushPose();
             poseStack.translate(
@@ -98,34 +111,33 @@ public class HitIndicatorOverlay {
                     record1.targetPos.z - cameraPos.z
             );
             poseStack.mulPose(mc.getEntityRenderDispatcher().cameraOrientation());
+            // Match 1.21.1 name tags: a negative X scale reverses glyph winding and gets culled.
             poseStack.scale(
-                    -0.025F,
+                    0.025F,
                     -0.025F,
                     0.025F
             );
-            MultiBufferSource.BufferSource buffer = mc.renderBuffers().bufferSource();
-            String text = String.format("%.2f",record1.amount);
+            String text = String.format(Locale.ROOT, "%.2f", record1.amount);
             int column = record1.displaySlot % DISPLAY_COLUMNS;
             int row = record1.displaySlot / DISPLAY_COLUMNS;
             float textX = (float) -mc.font.width(text) / 2
                     + DISPLAY_COLUMN_OFFSETS[column] * DISPLAY_COLUMN_SPACING;
             float textY = -row * DISPLAY_ROW_SPACING;
-            RenderSystem.disableDepthTest();
             mc.font.drawInBatch(
                     text,
                     textX,
                     textY,
-                    0xFFE135,
+                    0xFFFFE135,
                     false,
                     poseStack.last().pose(),
                     buffer,
-                    Font.DisplayMode.NORMAL,
+                    // NORMAL re-enables depth testing when its RenderType is flushed.
+                    Font.DisplayMode.SEE_THROUGH,
                     0,
-                    15728880
+                    LightTexture.FULL_BRIGHT
             );
-            buffer.endBatch();
-            RenderSystem.enableDepthTest();
             poseStack.popPose();
         }
+        buffer.endBatch();
     }
 }

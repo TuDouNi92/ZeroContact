@@ -42,13 +42,12 @@ dependencies {
 
     // NeoForge + Mojang mappings: skip remapping; the helper fixes Sodium's dev bundle metadata.
     sodiumDevBundle("curse.maven:sodium-394468:8756580")
-    runtimeOnly("curse.maven:irisshaders-455508:8242804")
+    localRuntime("curse.maven:irisshaders-455508:8242804")
 
     modImplementation("com.github.mcmodderanchor:simplebedrockmodel:2.6.2-neoforge-mc1.21.1")
 
     modCompileOnly("curse.maven:tacz-magazines-1504588:${magazine_version}")
     modLocalRuntime("curse.maven:tacz-magazines-1504588:${magazine_version}")
-
     modLocalRuntime("curse.maven:simple-voice-chat-416089:9350472")
 
 }
